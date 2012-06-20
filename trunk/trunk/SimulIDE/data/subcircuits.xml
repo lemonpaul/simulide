@@ -1,0 +1,9 @@
+<!DOCTYPE SimutronQt4>
+<itemlib>
+    <itemset category="Logic" type="Subcircuit">
+
+    <item name="74HC164" package="logic/74HC164" subcircuit="74HC164" icon="ic2.png" ></item>
+
+    </itemset>
+</itemlib>
+

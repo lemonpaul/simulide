@@ -1,0 +1,9 @@
+<!DOCTYPE SimutronQt4>
+<itemlib>
+    <itemset category="Boards" type="Arduino">
+
+    <item name="Arduino Uno"  package="arduino/arduino_uno" device="atmega328" icon="arduinoUno.png" ></item>
+
+    </itemset>
+</itemlib>
+

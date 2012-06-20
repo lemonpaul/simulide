@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="newcirc.png">src/icons/mainwindow/newcirc.png</file>
+        <file alias="opencirc.png">src/icons/mainwindow/opencirc.png</file>
+        <file alias="savecirc.png">src/icons/mainwindow/savecirc.png</file>
+        <file alias="savecircas.png">src/icons/mainwindow/savecircas.png</file>
+        <file alias="led.png">src/icons/components/led.png</file>
+        <file alias="diode.png">src/icons/components/diode.png</file>
+        <file alias="probe.png">src/icons/components/probe.png</file>
+        <file alias="resistor.png">src/icons/components/resistor.png</file>
+        <file alias="voltage.png">src/icons/components/voltage.png</file>
+        <file alias="ic2.png">src/icons/components/ic2.png</file>
+        <file alias="ground.png">src/icons/components/ground.png</file>
+        <file alias="poweroff.png">src/icons/mainwindow/poweroff.png</file>
+        <file alias="poweron.png">src/icons/mainwindow/poweron.png</file>
+        <file alias="voltsource.png">src/icons/components/voltsource.png</file>
+        <file alias="capacitor.png">src/icons/components/capacitor.png</file>
+        <file alias="arduinoUno.png">src/icons/components/arduinoUno.png</file>
+        <file alias="seven_segment.png">src/icons/components/seven_segment.png</file>
+    </qresource>
+</RCC>
