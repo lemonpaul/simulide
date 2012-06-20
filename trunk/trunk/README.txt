@@ -8,8 +8,6 @@ ______________________________________________________________________
 COMPILING:
 
 compiling simavr:
-There is a pre-compiled simavr shared library libsimavr.so (Ubuntu 10.04) 
-in: SimulIDE/lib/libsimavr.so
 
 If you need you can compile simavr library,
 there is a folder containing simavr sources: include/simavr
@@ -17,8 +15,6 @@ there is a folder containing simavr sources: include/simavr
 cd include/simavr
 make
 
-if you compiled simavr  You must copy:
-include/simavr/simavr/libsimavr.so to: SimulIDE/lib/libsimavr.so
 
 
 Compiling SimulIDE:
