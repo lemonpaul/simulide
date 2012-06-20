@@ -1,0 +1,14 @@
+<!DOCTYPE SimulIDE>
+<itemlib>
+    <itemset category="AVR" type="AVR">
+
+    <item name="atmega16"  package="avr/atmega32"  device="atmega16" ></item>
+    <item name="atmega32"  package="avr/atmega32"  device="atmega32" ></item>
+
+    <item name="atmega48"  package="avr/atmega328" device="atmega48" ></item>
+    <item name="atmega88"  package="avr/atmega328" device="atmega88" ></item>
+    <item name="atmega168" package="avr/atmega328" device="atmega168" ></item>
+    <item name="atmega328" package="avr/atmega328" device="atmega328" ></item>
+
+    </itemset>
+</itemlib>

@@ -1,0 +1,21 @@
+<!DOCTYPE SimulIDE>
+<package name="dip4" pins="14" width="4" height="8">
+
+    <pin side="left" pos="1"  type="" id="DSA" label="DA"/>
+    <pin side="left" pos="2"  type="" id="DSB" label="DB"/>
+    <pin side="left" pos="3"  type="" id="Q0"  label="Q0"/>
+    <pin side="left" pos="4"  type="" id="Q1"  label="Q1"/>
+    <pin side="left" pos="5"  type="" id="Q2"  label="Q2"/>
+    <pin side="left" pos="6"  type="" id="Q3"  label="Q3"/>
+    <pin side="left" pos="7"  type="" id="Gnd" label="V-"/>
+
+    <pin side="right" pos="1" type="" id="Vcc" label="V+"/>
+    <pin side="right" pos="2" type="" id="Q7"  label="Q7"/>
+    <pin side="right" pos="3" type="" id="Q6"  label="Q6"/>
+    <pin side="right" pos="4" type="" id="Q5"  label="Q5"/>
+    <pin side="right" pos="5" type="" id="Q4"  label="Q4"/>
+    <pin side="right" pos="6" type="" id="Rst" label="Rs"/>
+    <pin side="right" pos="7" type="" id="Clk" label="Ck"/>
+    
+</package>
+
