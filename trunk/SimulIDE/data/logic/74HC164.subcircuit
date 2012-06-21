@@ -1,0 +1,20 @@
+<!DOCTYPE SimulIDE>
+
+<subcircuit enodes="0">
+
+    <item itemtype="eShiftReg" 
+    connections="
+    ePin8-Pin0 
+    ePin0-Pin2 
+    ePin1-Pin3 
+    ePin2-Pin4 
+    ePin3-Pin5 
+    ePin4-Pin11 
+    ePin5-Pin10 
+    ePin6-Pin9 
+    ePin7-Pin8 
+    ePin9-Pin12 
+    ePin10-Pin13" ></item>
+    
+</subcircuit>
+
