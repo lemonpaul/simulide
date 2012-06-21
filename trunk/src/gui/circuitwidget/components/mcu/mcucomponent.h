@@ -52,6 +52,7 @@ class McuComponent : public Package
         virtual void reset();
         void slotLoad();
         void slotReload();
+        void load( QString fileName );
 
 	protected:
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);

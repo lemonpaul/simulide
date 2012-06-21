@@ -22,7 +22,7 @@
 
 
 McuComponentPin::McuComponentPin( McuComponent *mcuComponent, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
-    : QObject(mcuComponent), eSource(0l)// , m_id( id )
+    : QObject( mcuComponent ), eSource( id.toStdString(), 0l )// , m_id( id )
 {
     //m_gOutHigh = 0.0;
     //m_gOutLow = 0.0;
@@ -42,22 +42,13 @@ McuComponentPin::McuComponentPin( McuComponent *mcuComponent, QString id, QStrin
     nodid.append( id );
     QPoint nodpos = QPoint ( xpos, ypos );
     Pin *pin = new Pin( angle, nodpos, nodid, pos, m_mcuComponent );
-    pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false );
+    //pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false );
+    pin->setLabelText( label );
     m_ePin[0] = pin;
 
-    eSource::setImp(high_imp);
+    eSource::setImp(high_imp);  // this is an eSource
     eSource::setVoltHigh(5);
     eSource::setOut(false);
-
-    int xlabelpos = xpos+10;
-
-    if( angle == 0 ) xlabelpos = xpos - 5*label.length()-10;
-
-    const QFont sansFont("Helvetica [Cronyx]", 6);
-    m_pinLabel = Circuit::self()->addSimpleText( label.toLatin1().data(), sansFont);
-    m_pinLabel->setParentItem( m_mcuComponent );
-    m_pinLabel->setPos( xlabelpos, ypos-6 );
-    m_pinLabel->setBrush( QColor( 250, 250, 200 ) );
 }
 McuComponentPin::~McuComponentPin()
 {
@@ -91,9 +82,10 @@ void McuComponentPin::move( int dx, int dy )
     pin()->moveBy( dx, dy );
 }
 
-void McuComponentPin::moveLabel( int dx, int dy )
+/*void McuComponentPin::moveLabel( int dx, int dy )
 {
-    m_pinLabel->moveBy( dx, dy );
-}
+    pin()->setLabelPos();
+    //m_pinLabel->moveBy( dx, dy );
+}*/
 
 #include "moc_mcucomponentpin.cpp"
