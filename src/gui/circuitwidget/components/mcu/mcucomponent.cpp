@@ -25,10 +25,11 @@
 #include "mainwindow.h"
 
 McuComponent::McuComponent( QObject* parent, QString type, QString id )
-    : Component( parent, type, id )
+    : Package( parent, type, id )
 {
     m_processor = 0l;
     m_symbolFile = "";
+    m_device = "";
 
     m_labelx = -38;
     m_labely = -137;
@@ -40,12 +41,14 @@ McuComponent::McuComponent( QObject* parent, QString type, QString id )
     if( m_lastFirmDir.isEmpty() )
         m_lastFirmDir = QCoreApplication::applicationDirPath()+"/examples/mega48_adc/mega48_adc.hex";
 }
-McuComponent::~McuComponent() { /*if( m_processor ) m_processor->terminate();*/ }
+McuComponent::~McuComponent() {}
 
 void McuComponent::initPackage()
 {
     QString compName = m_id.split("-").first(); // for example: "atmega328-1" to: "atmega328"
     label->setText( compName );
+
+    //qDebug() << "McuComponent::initPackage datafile: " << m_dataFile;
 
     QFile file( QCoreApplication::applicationDirPath()+"/"+m_dataFile );
     if( !file.open(QFile::ReadOnly | QFile::Text) )
@@ -65,92 +68,35 @@ void McuComponent::initPackage()
     }
     file.close();
 
-    QDomElement root    = domDoc.documentElement();
-    QDomElement element = root.toElement();
-    QDomNode    node    = root.firstChild();
+    QDomElement root  = domDoc.documentElement();
+    QDomNode    rNode = root.firstChild();
+    QString package;
 
-    QString type;
-
-    while( !node.isNull() )         // Find the "type", for example 628A is type: 627A, Same pins
+    while( !rNode.isNull() )
     {
-        element = node.toElement();
-        if( /*(element.tagName()=="mcu") &&*/ (element.attribute("name")==compName) )
-            type = element.attribute( "type" );
+        QDomElement element = rNode.toElement();
+        QDomNode    node    = element.firstChild();
 
-        node = node.nextSibling();
-    }
-    node = root.firstChild();
-
-    while( !node.isNull() )         // Find the node that contais pin description for "type"
-    {
-        element = node.toElement();
-        if( /*(element.tagName()=="mcu") &&*/ (element.attribute("name")==type) )
+        while( !node.isNull() )         // Find the "package", for example 628A is package: 627A, Same pins
         {
-            m_numpins = element.attribute( "pins" ).toInt();
-            m_device  = element.attribute( "device" );
-
-            int width  = element.attribute( "width" ).toInt();  //64;
-            int height = element.attribute( "height" ).toInt();  //16 + 8*m_numpins;
-
-            m_processor->setDevice( m_device );
-
-            m_area = QRect( -(width/2)*8, -(height/2)*8, 8*width, 8*height );
-            label->setPos( m_area.x(), m_area.y()-20);
-
-            node = node.firstChild();
-
-            int chipPos = 0;
-
-            while( !node.isNull() )
+            QDomElement element = node.toElement();
+            if( element.attribute("name")==compName )
             {
-                element = node.toElement();
-                if( element.tagName() == "pin" )
-                {
-                    QString label = element.attribute( "label" );
-                    QString type  = element.attribute( "type" );
-                    QString id    = element.attribute( "id" );
+                package = element.attribute( "package" );
+                m_dataFile = m_dataFile.replace( m_dataFile.split("/").last(), package.append(".package") );
+                //qDebug() << m_dataFile;
 
-                    int pos   = element.attribute( "pos" ).toInt();
-                    int angle = element.attribute( "angle" ).toInt();
-
-                    int xpos = 0;
-                    int ypos = 0;
-
-                    if( angle == 180 )      // Left
-                    {
-                        xpos = -(width/2)*8-8;
-                        ypos = -(height/2)*8+8*pos;
-                    }
-                    else if( angle == 270 ) // Top
-                    {
-                        xpos = -(width/2)*8+8*pos;
-                        ypos = -(height/2)*8-8;
-                    }
-                    else if( angle == 0 )   // Right
-                    {
-                        xpos =  (width/2)*8+8;
-                        ypos = -(height/2)*8+8*pos;
-                    }
-                    else if( angle == 90 )  // Bottom
-                    {
-                        xpos = -(width/2)*8+8*pos;
-                        ypos =  (height/2)*8+8;
-                    }
-
-                    chipPos++;
-                    addPin( id, type, label, chipPos, xpos, ypos, angle );
-                }
-                node = node.nextSibling();
+                m_device = element.attribute( "device" );
+                m_processor->setDevice( m_device );
+                break;
             }
+            node = node.nextSibling();
         }
-        node = node.nextSibling();
+        rNode = rNode.nextSibling();
     }
+    if( m_device != "" ) Package::initPackage();
+    else qDebug() << compName << "ERROR!! McuComponent::initPackage Package not Found: " << package;
 }
-
-/*void McuComponent::inStateChanged( int pin )
-{
-    //if( m_processor->getLoadStatus() ) m_pinList[pin-1]->changed();
-}*/
 
 void McuComponent::reset()
 {
@@ -163,16 +109,15 @@ void McuComponent::terminate()
 {
     qDebug() <<"McuComponent::terminate "<<m_id<<"\n";
     m_processor->terminate();
-    for( int i = 0; i < m_numpins; i++ ) m_pinList[i]->terminate();
+    for( int i=0; i<m_numpins; i++ ) m_pinList[i]->terminate();
     reset();
     /*while( !m_pinList.isEmpty() ) delete m_pinList.takeFirst();
     initPackage();*/
 }
 
-
 void McuComponent::remove()
 {
-    foreach( McuComponentPin *mcupin, m_pinList )
+    foreach( McuComponentPin* mcupin, m_pinList )
     {
         Pin* pin = mcupin->pin(); //static_cast<Pin*>(mcupin->pin());
         if( pin->connector() ) pin->connector()->remove();
@@ -186,14 +131,14 @@ void McuComponent::remove()
 void McuComponent::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 {
     event->accept();
-    QMenu *menu = new QMenu();
-    QAction *loadAction = menu->addAction( QIcon(":/fileopen.png"),tr("Load firmware") );
+    QMenu* menu = new QMenu();
+    QAction* loadAction = menu->addAction( QIcon(":/fileopen.png"),tr("Load firmware") );
     connect( loadAction, SIGNAL(triggered()), this, SLOT(slotLoad()) );
 
-    QAction *reloadAction = menu->addAction( QIcon(":/fileopen.png"),tr("Reload firmware") );
+    QAction* reloadAction = menu->addAction( QIcon(":/fileopen.png"),tr("Reload firmware") );
     connect( reloadAction, SIGNAL(triggered()), this, SLOT(slotReload()) );
     
-    /*QAction *ramAction = menu->addAction( QIcon(":/fileopen.png"),"View Ram" );
+    /*QAction* ramAction = menu->addAction( QIcon(":/fileopen.png"),"View Ram" );
     connect( ramAction, SIGNAL(triggered()), this, SLOT(viewRam()) );*/
 
     menu->addSeparator();
@@ -251,14 +196,12 @@ void McuComponent::load( QString fileName )
     }
 }
 
-void McuComponent::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
+void McuComponent::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
-    Component::paint( p, option, widget );
+    Package::paint( p, option, widget );
 
-    p->drawRoundedRect( boundingRect(), 1, 1);
-
-    p->setPen( QColor( 170, 170, 150 ) );
-    p->drawArc( -4, boundingRect().y()-4, 8, 8, 0, -2880 /* -16*180 */ );
+    //p->setPen( QColor( 170, 170, 150 ) );
+    //p->drawArc( -4, boundingRect().y()-4, 8, 8, 0, -2880 /* -16*180 */ );
 }
 
 #include "moc_mcucomponent.cpp"
