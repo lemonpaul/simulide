@@ -1,0 +1,144 @@
+<circuit type="simu">
+ 
+Arduino Uno-1boardled: 
+<item labelrot="0" Umbral="2.4" objectName="Arduino Uno-1boardled" x="-45" y="14" itemtype="LEDSMD" rotation="0" labelx="0" labely="-24" MaxCurrent="0.003" Show_id="false" id="Arduino Uno-1boardled"/>
+ 
+Arduino Uno-1: 
+<item labelrot="0" objectName="Arduino Uno-1" x="-164" program="" y="-76" itemtype="Arduino" rotation="0" labelx="-38" labely="-137" Show_id="false" id="Arduino Uno-1"/>
+ 
+Seven Segment-2-led_h: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_h" x="44" y="19" itemtype="LEDSMD" rotation="0" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_h"/>
+ 
+Seven Segment-2-led_g: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_g" x="25" y="0" itemtype="LEDSMD" rotation="0" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_g"/>
+ 
+Seven Segment-2-led_f: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_f" x="24" y="-16" itemtype="LEDSMD" rotation="96" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_f"/>
+ 
+Seven Segment-2-led_e: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_e" x="23" y="3" itemtype="LEDSMD" rotation="96" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_e"/>
+ 
+Seven Segment-2-led_d: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_d" x="24" y="19" itemtype="LEDSMD" rotation="0" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_d"/>
+ 
+Seven Segment-2-led_c: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_c" x="42" y="3" itemtype="LEDSMD" rotation="96" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_c"/>
+ 
+Seven Segment-2-led_b: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_b" x="43" y="-16" itemtype="LEDSMD" rotation="96" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_b"/>
+ 
+Seven Segment-2-led_a: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_a" x="27" y="-20" itemtype="LEDSMD" rotation="0" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_a"/>
+ 
+Seven Segment-2-led_h: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_h" x="12" y="19" itemtype="LEDSMD" rotation="0" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_h"/>
+ 
+Seven Segment-2-led_g: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_g" x="-6" y="0" itemtype="LEDSMD" rotation="0" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_g"/>
+ 
+Seven Segment-2-led_f: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_f" x="-7" y="-16" itemtype="LEDSMD" rotation="96" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_f"/>
+ 
+Seven Segment-2-led_e: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_e" x="-9" y="3" itemtype="LEDSMD" rotation="96" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_e"/>
+ 
+Seven Segment-2-led_d: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_d" x="-8" y="19" itemtype="LEDSMD" rotation="0" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_d"/>
+ 
+Seven Segment-2-led_c: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_c" x="10" y="3" itemtype="LEDSMD" rotation="96" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_c"/>
+ 
+Seven Segment-2-led_b: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_b" x="11" y="-16" itemtype="LEDSMD" rotation="96" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_b"/>
+ 
+Seven Segment-2-led_a: 
+<item labelrot="0" Umbral="2.4" objectName="Seven Segment-2-led_a" x="-5" y="-20" itemtype="LEDSMD" rotation="0" labelx="0" labely="-24" MaxCurrent="0.015" Show_id="false" id="Seven Segment-2-led_a"/>
+ 
+Seven Segment-2: 
+<item labelrot="0" objectName="Seven Segment-2" x="-164" y="-268" itemtype="Seven Segment" rotation="0" labelx="0" labely="-24" CommonCathode="true" Show_id="false" NumDisplays="2" id="Seven Segment-2"/>
+ 
+Resistor-3: 
+<item labelrot="0" objectName="Resistor-3" x="-228" y="-292" itemtype="Resistor" rotation="0" labelx="0" Resistance="100" labely="-24" Show_id="false" id="Resistor-3"/>
+ 
+Resistor-4: 
+<item labelrot="0" objectName="Resistor-4" x="-228" y="-284" itemtype="Resistor" rotation="0" labelx="0" Resistance="100" labely="-24" Show_id="false" id="Resistor-4"/>
+ 
+Resistor-5: 
+<item labelrot="0" objectName="Resistor-5" x="-228" y="-276" itemtype="Resistor" rotation="0" labelx="0" Resistance="100" labely="-24" Show_id="false" id="Resistor-5"/>
+ 
+Resistor-6: 
+<item labelrot="0" objectName="Resistor-6" x="-228" y="-268" itemtype="Resistor" rotation="0" labelx="0" Resistance="100" labely="-24" Show_id="false" id="Resistor-6"/>
+ 
+Resistor-7: 
+<item labelrot="0" objectName="Resistor-7" x="-228" y="-260" itemtype="Resistor" rotation="0" labelx="0" Resistance="100" labely="-24" Show_id="false" id="Resistor-7"/>
+ 
+Resistor-8: 
+<item labelrot="0" objectName="Resistor-8" x="-228" y="-252" itemtype="Resistor" rotation="0" labelx="0" Resistance="100" labely="-24" Show_id="false" id="Resistor-8"/>
+ 
+Resistor-9: 
+<item labelrot="0" objectName="Resistor-9" x="-228" y="-244" itemtype="Resistor" rotation="0" labelx="0" Resistance="100" labely="-24" Show_id="false" id="Resistor-9"/>
+ 
+Resistor-10: 
+<item labelrot="0" objectName="Resistor-10" x="-228" y="-236" itemtype="Resistor" rotation="0" labelx="0" Resistance="100" labely="-24" Show_id="false" id="Resistor-10"/>
+ 
+Volt. Source-29: 
+<item labelrot="0" objectName="Volt. Source-29" x="-4" y="-220" itemtype="Voltage Source" rotation="0" labelx="0" labely="-24" Voltage="5" Show_id="false" id="Volt. Source-29"/>
+ 
+Connector-11: 
+<item labelrot="0" objectName="Connector-11" x="-212" startpinid="Resistor-3rnod" y="-292" itemtype="Connector" pointList="-212,-292,-212,-292,-212,-292,-212,-292,-212,-292,-188,-292" rotation="0" labelx="0" labely="-24" endpinid="Seven Segment-2-pin_a" Show_id="false" id="Connector-11" enodeid="enode-11"/>
+ 
+Connector-12: 
+<item labelrot="0" objectName="Connector-12" x="-212" startpinid="Resistor-4rnod" y="-284" itemtype="Connector" pointList="-212,-284,-212,-284,-212,-284,-212,-284,-212,-284,-188,-284" rotation="0" labelx="0" labely="-24" endpinid="Seven Segment-2-pin_b" Show_id="false" id="Connector-12" enodeid="enode-12"/>
+ 
+Connector-13: 
+<item labelrot="0" objectName="Connector-13" x="-212" startpinid="Resistor-5rnod" y="-276" itemtype="Connector" pointList="-212,-276,-212,-276,-212,-276,-212,-276,-212,-276,-188,-276" rotation="0" labelx="0" labely="-24" endpinid="Seven Segment-2-pin_c" Show_id="false" id="Connector-13" enodeid="enode-13"/>
+ 
+Connector-14: 
+<item labelrot="0" objectName="Connector-14" x="-212" startpinid="Resistor-6rnod" y="-268" itemtype="Connector" pointList="-212,-268,-212,-268,-212,-268,-212,-268,-212,-268,-188,-268" rotation="0" labelx="0" labely="-24" endpinid="Seven Segment-2-pin_d" Show_id="false" id="Connector-14" enodeid="enode-14"/>
+ 
+Connector-15: 
+<item labelrot="0" objectName="Connector-15" x="-212" startpinid="Resistor-7rnod" y="-260" itemtype="Connector" pointList="-212,-260,-212,-260,-212,-260,-212,-260,-212,-260,-188,-260" rotation="0" labelx="0" labely="-24" endpinid="Seven Segment-2-pin_e" Show_id="false" id="Connector-15" enodeid="enode-15"/>
+ 
+Connector-16: 
+<item labelrot="0" objectName="Connector-16" x="-212" startpinid="Resistor-8rnod" y="-252" itemtype="Connector" pointList="-212,-252,-212,-252,-212,-252,-212,-252,-212,-252,-188,-252" rotation="0" labelx="0" labely="-24" endpinid="Seven Segment-2-pin_f" Show_id="false" id="Connector-16" enodeid="enode-16"/>
+ 
+Connector-17: 
+<item labelrot="0" objectName="Connector-17" x="-212" startpinid="Resistor-9rnod" y="-244" itemtype="Connector" pointList="-212,-244,-212,-244,-212,-244,-212,-244,-212,-244,-188,-244" rotation="0" labelx="0" labely="-24" endpinid="Seven Segment-2-pin_g" Show_id="false" id="Connector-17" enodeid="enode-17"/>
+ 
+Connector-18: 
+<item labelrot="0" objectName="Connector-18" x="-212" startpinid="Resistor-10rnod" y="-236" itemtype="Connector" pointList="-212,-236,-212,-236,-212,-236,-212,-236,-212,-236,-172,-236" rotation="0" labelx="0" labely="-24" endpinid="Seven Segment-2-pin_dot" Show_id="false" id="Connector-18" enodeid="enode-18"/>
+ 
+Connector-19: 
+<item labelrot="0" objectName="Connector-19" x="-244" startpinid="Resistor-3lnod" y="-292" itemtype="Connector" pointList="-244,-292,-244,-292,-244,-292,-244,-292,-244,-292,-284,-292,-284,-172,-236,-172" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PD0" Show_id="false" id="Connector-19" enodeid="enode-19"/>
+ 
+Connector-20: 
+<item labelrot="0" objectName="Connector-20" x="-244" startpinid="Resistor-4lnod" y="-284" itemtype="Connector" pointList="-244,-284,-244,-284,-244,-284,-244,-284,-244,-284,-292,-284,-292,-164,-236,-164" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PD1" Show_id="false" id="Connector-20" enodeid="enode-20"/>
+ 
+Connector-21: 
+<item labelrot="0" objectName="Connector-21" x="-244" startpinid="Resistor-5lnod" y="-276" itemtype="Connector" pointList="-244,-276,-244,-276,-244,-276,-244,-276,-244,-276,-300,-276,-300,-156,-236,-156" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PD2" Show_id="false" id="Connector-21" enodeid="enode-21"/>
+ 
+Connector-22: 
+<item labelrot="0" objectName="Connector-22" x="-244" startpinid="Resistor-6lnod" y="-268" itemtype="Connector" pointList="-244,-268,-244,-268,-244,-268,-244,-268,-244,-268,-308,-268,-308,-148,-236,-148" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PD3" Show_id="false" id="Connector-22" enodeid="enode-22"/>
+ 
+Connector-23: 
+<item labelrot="0" objectName="Connector-23" x="-244" startpinid="Resistor-7lnod" y="-260" itemtype="Connector" pointList="-244,-260,-244,-260,-244,-260,-244,-260,-244,-260,-316,-260,-316,-140,-236,-140" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PD4" Show_id="false" id="Connector-23" enodeid="enode-23"/>
+ 
+Connector-24: 
+<item labelrot="0" objectName="Connector-24" x="-244" startpinid="Resistor-8lnod" y="-252" itemtype="Connector" pointList="-244,-252,-244,-252,-244,-252,-244,-252,-244,-252,-324,-252,-324,-132,-236,-132" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PD5" Show_id="false" id="Connector-24" enodeid="enode-24"/>
+ 
+Connector-25: 
+<item labelrot="0" objectName="Connector-25" x="-244" startpinid="Resistor-9lnod" y="-244" itemtype="Connector" pointList="-244,-244,-244,-244,-244,-244,-244,-244,-244,-244,-332,-244,-332,-124,-236,-124" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PD6" Show_id="false" id="Connector-25" enodeid="enode-25"/>
+ 
+Connector-26: 
+<item labelrot="0" objectName="Connector-26" x="-244" startpinid="Resistor-10lnod" y="-236" itemtype="Connector" pointList="-244,-236,-244,-236,-244,-236,-244,-236,-244,-236,-340,-236,-340,-116,-236,-116" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PD7" Show_id="false" id="Connector-26" enodeid="enode-26"/>
+ 
+Connector-27: 
+<item labelrot="0" objectName="Connector-27" x="-156" startpinid="Seven Segment-2-pin_commona" y="-236" itemtype="Connector" pointList="-156,-236,-156,-236,-156,-236,-156,-236,-156,-236,-156,-228,-348,-228,-348,-100,-236,-100" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PB0" Show_id="false" id="Connector-27" enodeid="enode-27"/>
+ 
+Connector-28: 
+<item labelrot="0" objectName="Connector-28" x="-124" startpinid="Seven Segment-2-pin_commonb" y="-236" itemtype="Connector" pointList="-124,-236,-124,-236,-124,-236,-124,-236,-124,-236,-124,-220,-356,-220,-356,-92,-236,-92" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PB1" Show_id="false" id="Connector-28" enodeid="enode-28"/>
+ 
+Connector-29: 
+<item labelrot="0" objectName="Connector-29" x="12" startpinid="Volt. Source-29outnod" y="-220" itemtype="Connector" pointList="12,-220,68,-220,68,-132,-92,-132" rotation="0" labelx="0" labely="-24" endpinid="Arduino Uno-1-PC0" Show_id="false" id="Connector-29" enodeid="enode-29"/>
+ 
+</circuit>
