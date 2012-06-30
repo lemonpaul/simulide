@@ -25,6 +25,7 @@ eSource::eSource( string id, ePin* epin ) : eElement( id )
     m_ePin.resize(1);
     m_ePin[0] = epin;
     m_out   = false;
+    m_inverted = false;
     //m_power = false;
 
     m_voltHigh = cero_doub;
@@ -70,13 +71,23 @@ void eSource::setVoltLow( double v )
 // Set output to hight(m_voltHight) or low(0)
 void eSource::setOut( bool out )
 {
-    m_out = out;
-    double    v = m_voltLow;
-    if( out ) v = m_voltHigh;
+    if( m_inverted ) m_out = !out;
+    else             m_out =  out;
+
+    double v = m_voltLow;
+    if( m_out ) v = m_voltHigh;
 
     m_scrEnode->setVolt(v);
 
     m_ePin[0]->stampCurrent( v/m_imp );
+}
+
+void eSource::setInverted( bool inverted )
+{
+    if( inverted == m_inverted ) return;
+
+    m_inverted = inverted;
+    setOut( m_out );
 }
 
 void eSource::setImp( double imp )
@@ -91,3 +102,8 @@ void eSource::setImp( double imp )
     if( pow ) setOut( m_out );
     m_power = pow;
 }*/
+
+ePin* eSource::getEpin()
+{
+    return m_ePin[0];
+}

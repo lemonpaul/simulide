@@ -25,6 +25,9 @@
 #include "e-shiftreg.h"
 #include "e-resistor.h"
 #include "e-capacitor.h"
+#include "e-gate_or.h"
+#include "e-gate_xor.h"
+#include "e-logic_device.h"
 #include "ledsmd.h"
 
 Component* SubCircuit::construct( QObject* parent, QString type, QString id )
@@ -165,6 +168,20 @@ void SubCircuit::initSubcircuit()
             else if( type == "eResistor" )  ecomponent = new eResistor( id.toStdString() );
             else if( type == "eCapacitor" ) ecomponent = new eCapacitor( id.toStdString() );
             else if( type == "eDiode" )     ecomponent = new eDiode( id.toStdString() );
+            else if( type == "eBuffer"
+                  || type == "eInverter"
+                  || type == "eAndGate"
+                  || type == "eNandGate" )
+            {
+                //qDebug() << "SubCircuit::initSubcircuit , type: " << type;
+                int numInputs = 2;
+                if( element.hasAttribute("numInputs") ) numInputs  = element.attribute( "numInputs" ).toInt();
+                eGate* egate = new eGate( id.toStdString(), numInputs );
+                ecomponent = egate;
+
+                if( type == "eInverter" || type == "eNandGate" ) egate->setInverted( true );
+
+            }
             else if( type == "LedSmd" )
             {
                 int width = 8;
@@ -196,6 +213,26 @@ void SubCircuit::initSubcircuit()
                 eResistor* eresistor = static_cast<eResistor*>(ecomponent);
                 eresistor->setRes( element.attribute( "resistance" ).toDouble() );
             }
+            if( element.hasAttribute("outHighV") )
+            {
+                eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                elogicdevice->setOutHighV( element.attribute( "outHighV" ).toDouble() );
+            }
+            if( element.hasAttribute("outLowV") )
+            {
+                eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                elogicdevice->setOutLowV( element.attribute( "outLowV" ).toDouble() );
+            }
+            if( element.hasAttribute("inputImp") )
+            {
+                eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                elogicdevice->setInputImp( element.attribute( "inputImp" ).toDouble() );
+            }
+            if( element.hasAttribute("outImp") )
+            {
+                eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                elogicdevice->setOutImp( element.attribute( "outImp" ).toDouble() );
+            }
 
             // Get the connections list
             QStringList connectionList = element.attribute( "connections" ).split(" ");
@@ -214,8 +251,10 @@ void SubCircuit::initSubcircuit()
 
 void SubCircuit::connectEpin( ePin* epin, QString connetTo )
 {
+
     if( connetTo.startsWith("eNode") )
     {
+        //qDebug() << "SubCircuit::connectEpin" << connetTo;
         int eNodeNum = connetTo.remove("eNode").toInt();
         epin->setEnode( m_internal_eNode.at(eNodeNum) );
     }

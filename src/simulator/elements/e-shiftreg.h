@@ -20,14 +20,12 @@
 #ifndef ESHIFTREG_H
 #define ESHIFTREG_H
 
-
 #include <bitset>
 
 #include <QObject>
 
 #include "e-source.h"
 #include "e-node.h"
-
 
 
 class eShiftReg : public eElement

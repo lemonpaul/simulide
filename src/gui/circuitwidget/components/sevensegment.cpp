@@ -183,7 +183,7 @@ void SevenSegment::createDisplay( int dispNumber )
         else      lsmd = new LedSmd( this, "LEDSMD", nodid, QRectF(0, 0, 1.5, 1.5) );
         lsmd->setParentItem(this);
         lsmd->setEnabled(false);
-        lsmd->createEpins(2);
+        lsmd->setNumEpins(2);
         lsmd->setMaxCurrent( 0.015 );
 
         m_anodePin[dispNumber*8+i]= lsmd->getEpin(0);

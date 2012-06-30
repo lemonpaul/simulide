@@ -31,7 +31,7 @@ class eElement
         ~eElement();
 
         virtual void initEpins();
-        virtual void createEpins( int n );
+        virtual void setNumEpins( int n );
 
         virtual void initialize(){;}
         virtual void stamp(){;}
@@ -39,7 +39,7 @@ class eElement
         virtual void updateStep(){;}
         virtual void setVChanged(){;}
 
-        ePin* getEpin( int pin );
+        virtual ePin* getEpin( int pin );
 
         string getId(){ return m_elmId; }
 
