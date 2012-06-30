@@ -57,7 +57,7 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
     m_button->setText( QString("%1").arg(float(int(m_voltHight*100))/100));
 
     QString nodid = id;
-    nodid.append(QString("-outnod"));
+    nodid.append(QString("outnod"));
     QPoint nodpos = QPoint(16,0);
     outpin = new Pin( 0, nodpos, nodid, 0, this );
 

@@ -81,7 +81,7 @@ void AVRBoard::initBoard()
     newid = m_id;
     newid.append(QString("boardled"));
     LedSmd* boardLed = new LedSmd( this, "LEDSMD", newid, QRectF(0, 0, 4, 3) );
-    boardLed->createEpins(2);
+    boardLed->setNumEpins(2);
     boardLed->setParentItem(this);
     boardLed->setPos( -45, 14/*22*/ );
     boardLed->setEnabled(false);

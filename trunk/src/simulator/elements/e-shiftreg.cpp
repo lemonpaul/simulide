@@ -29,8 +29,6 @@ eShiftReg::eShiftReg( string id ) : eElement( id )
 
     //m_ePin.resize(11);
 
-
-
     m_shiftReg.reset();
 }
 eShiftReg::~eShiftReg()
@@ -44,7 +42,7 @@ eShiftReg::~eShiftReg()
 
 void eShiftReg::initEpins()
 {
-    createEpins(11);
+    eElement::setNumEpins(11);
     // Create outputs
     for( int i=0; i<8; i++ )
     {
@@ -56,8 +54,11 @@ void eShiftReg::initEpins()
 void eShiftReg::initialize()
 {
     // Register for callBack when eNode volt change on clock or reset pins
-    m_ePin[9]->getEnode()->addToChangedList(this);
-    m_ePin[10]->getEnode()->addToChangedList(this);
+    eNode* enode = m_ePin[9]->getEnode();
+    if( enode ) enode->addToChangedList(this);
+
+    enode = m_ePin[10]->getEnode();
+    if( enode ) enode->addToChangedList(this);
 
 }
 

@@ -29,7 +29,7 @@
 class eSource : public eElement
 {
     public:
-        eSource( string id, ePin *epin );
+        eSource( string id, ePin* epin );
         ~eSource();
 
         void initialize();
@@ -41,11 +41,16 @@ class eSource : public eElement
         double voltLow() { return m_voltLow; }
         void  setVoltLow( double v );
 
-        bool  out()       { return m_out; }
+        bool  out() { return m_out; }
         void  setOut( bool hight );
+
+        bool  isInverted() { return m_inverted; }
+        void  setInverted( bool inverted );
 
         double imp()       { return m_imp; }
         void  setImp( double imp );
+
+        ePin* getEpin();
 
        // void setEpin( ePin* epin );
 
@@ -55,7 +60,8 @@ class eSource : public eElement
         double m_imp;
         double m_admit;
 
-        bool  m_out;
+        bool m_out;
+        bool m_inverted;
 
         eNode* m_scrEnode;
 };

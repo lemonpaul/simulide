@@ -35,23 +35,25 @@ eElement::eElement( string id )
 eElement::~eElement()
 {
     Simulator::self()->remFromElementList( this );
+    m_ePin.clear();
 }
 
 void eElement::initEpins()
 {
-    createEpins(2);
+    setNumEpins(2); // by default create 2 ePins
 }
 
-void eElement::createEpins( int n )
+void eElement::setNumEpins( int n )
 {
+    m_ePin.clear();
+
     m_ePin.resize(n);
 
     for( int i=0; i<n; i++ )
     {
-        //string id = m_elmId;
         std::stringstream ss;
-        ss << m_elmId <<"ePin" << i;
-        m_ePin[i] = new ePin( ss.str(), i);
+        ss << m_elmId << "ePin" << i;
+        m_ePin[i] = new ePin( ss.str(), i );
     }
 }
 
