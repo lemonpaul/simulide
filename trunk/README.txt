@@ -1,4 +1,4 @@
-A Electronic Circuit Simulator.
+An Electronic Circuit Simulator.
 
 It's developed in C++ using Qt4 framework.
 
@@ -66,13 +66,7 @@ Circuit Simulator:
                 
             Re-load firmware:
                 Re-loads a loaded firmware ( for example new version ).
-                
-            Load from editor:
-                Loads the firmware asociated to actual document in editor
-                and start a debugging session in editor.
-                Then step, step-over, etc.
-                click on power button to have the circuit working.
-                You can watch registers.
+
                 
 
 
