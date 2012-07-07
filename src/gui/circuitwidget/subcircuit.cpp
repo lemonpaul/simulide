@@ -162,7 +162,7 @@ void SubCircuit::initSubcircuit()
             id.append("-").append(type).append("-").append( QString::number(m_numItems) );
             m_numItems++;
 
-            eElement* ecomponent;
+            eElement* ecomponent = 0l;
 
             if     ( type == "eShiftReg" )  ecomponent = new eShiftReg( id.toStdString() );
             else if( type == "eResistor" )  ecomponent = new eResistor( id.toStdString() );
@@ -182,6 +182,30 @@ void SubCircuit::initSubcircuit()
                 if( type == "eInverter" || type == "eNandGate" ) egate->setInverted( true );
 
             }
+            else if( type == "eOrGate"
+                  || type == "eNorGate")
+            {
+                //qDebug() << "SubCircuit::initSubcircuit , type: " << type;
+                int numInputs = 2;
+                if( element.hasAttribute("numInputs") ) numInputs  = element.attribute( "numInputs" ).toInt();
+                eOrGate* egate = new eOrGate( id.toStdString(), numInputs );
+                ecomponent = egate;
+
+                if( type == "eNorGate" ) egate->setInverted( true );
+
+            }
+            else if( type == "eXorGate"
+                  || type == "eXnorGate")
+            {
+                //qDebug() << "SubCircuit::initSubcircuit , type: " << type;
+                int numInputs = 2;
+                if( element.hasAttribute("numInputs") ) numInputs  = element.attribute( "numInputs" ).toInt();
+                eXorGate* egate = new eXorGate( id.toStdString(), numInputs );
+                ecomponent = egate;
+
+                if( type == "eXnorGate" ) egate->setInverted( true );
+
+            }
             else if( type == "LedSmd" )
             {
                 int width = 8;
@@ -191,58 +215,70 @@ void SubCircuit::initSubcircuit()
 
                 ecomponent = new LedSmd( this, "LEDSMD", id, QRectF( 0, 0, width, height )  );
             }
-            ecomponent->initEpins();
+            if( ecomponent )
+            {
+                ecomponent->initEpins();
 
-            if( element.hasAttribute("maxcurrent") )
-            {
-                eLed* eled = static_cast<eLed*>(ecomponent);
-                eled->setMaxCurrent( element.attribute( "maxcurrent" ).toDouble() );
-            }
-            if( element.hasAttribute("threshold") )
-            {
-                eDiode* ediode = static_cast<eDiode*>(ecomponent);
-                ediode->setThreshold( element.attribute( "threshold" ).toDouble() );
-            }
-            if( element.hasAttribute("uf") )
-            {
-                eCapacitor* ecapacitor = static_cast<eCapacitor*>(ecomponent);
-                ecapacitor->setuF( element.attribute( "uf" ).toDouble() );
-            }
-            if( element.hasAttribute("resistance") )
-            {
-                eResistor* eresistor = static_cast<eResistor*>(ecomponent);
-                eresistor->setRes( element.attribute( "resistance" ).toDouble() );
-            }
-            if( element.hasAttribute("outHighV") )
-            {
-                eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
-                elogicdevice->setOutHighV( element.attribute( "outHighV" ).toDouble() );
-            }
-            if( element.hasAttribute("outLowV") )
-            {
-                eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
-                elogicdevice->setOutLowV( element.attribute( "outLowV" ).toDouble() );
-            }
-            if( element.hasAttribute("inputImp") )
-            {
-                eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
-                elogicdevice->setInputImp( element.attribute( "inputImp" ).toDouble() );
-            }
-            if( element.hasAttribute("outImp") )
-            {
-                eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
-                elogicdevice->setOutImp( element.attribute( "outImp" ).toDouble() );
-            }
+                // Get properties
+                if( element.hasAttribute("maxcurrent") )
+                {
+                    eLed* eled = static_cast<eLed*>(ecomponent);
+                    eled->setMaxCurrent( element.attribute( "maxcurrent" ).toDouble() );
+                }
+                if( element.hasAttribute("threshold") )
+                {
+                    eDiode* ediode = static_cast<eDiode*>(ecomponent);
+                    ediode->setThreshold( element.attribute( "threshold" ).toDouble() );
+                }
+                if( element.hasAttribute("uf") )
+                {
+                    eCapacitor* ecapacitor = static_cast<eCapacitor*>(ecomponent);
+                    ecapacitor->setuF( element.attribute( "uf" ).toDouble() );
+                }
+                if( element.hasAttribute("resistance") )
+                {
+                    eResistor* eresistor = static_cast<eResistor*>(ecomponent);
+                    eresistor->setRes( element.attribute( "resistance" ).toDouble() );
+                }
+                if( element.hasAttribute("outHighV") )
+                {
+                    eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                    elogicdevice->setOutHighV( element.attribute( "outHighV" ).toDouble() );
+                }
+                if( element.hasAttribute("outLowV") )
+                {
+                    eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                    elogicdevice->setOutLowV( element.attribute( "outLowV" ).toDouble() );
+                }
+                if( element.hasAttribute("inputImp") )
+                {
+                    eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                    elogicdevice->setInputImp( element.attribute( "inputImp" ).toDouble() );
+                }
+                if( element.hasAttribute("outImp") )
+                {
+                    eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                    elogicdevice->setOutImp( element.attribute( "outImp" ).toDouble() );
+                }
+                if( element.hasAttribute("tristate") )
+                {
+                    if( element.attribute( "tristate" ) == "true" )
+                    {
+                        eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                        elogicdevice->createOutEnablePin();
+                    }
+                }
 
-            // Get the connections list
-            QStringList connectionList = element.attribute( "connections" ).split(" ");
+                // Get the connections list
+                QStringList connectionList = element.attribute( "connections" ).split(" ");
 
-            foreach( QString connection, connectionList )   // Get the connection points for each connection
-            {
-                QStringList pins = connection.split("-");
-                int pin = pins.first().remove("ePin").toInt();
-                connectEpin( ecomponent->getEpin(pin), pins.last() );   // Connect points (ePin to Pin or eNode)
-                //qDebug() << pin << pins.last();
+                foreach( QString connection, connectionList )   // Get the connection points for each connection
+                {
+                    QStringList pins = connection.split("-");
+                    int pin = pins.first().remove("ePin").toInt();
+                    connectEpin( ecomponent->getEpin(pin), pins.last() );   // Connect points (ePin to Pin or eNode)
+                    //qDebug() << pin << pins.last();
+                }
             }
         }
         rNode = rNode.nextSibling();

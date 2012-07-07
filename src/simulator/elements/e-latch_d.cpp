@@ -21,47 +21,47 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "e-gate.h"
+#include "e-latch_d.h"
 
-eGate::eGate( string id, int inputs )
+eLatchD::eLatchD( string id, int channels )
     : eLogicDevice( id )
 {
-    createPins( inputs, 1 );         // From eLogicDevice
+    setNumChannels( channels );
+    createClockPin();
 }
-eGate::~eGate(){}
+eLatchD::~eLatchD(){}
 
-void eGate::initialize()
+/*void eLatchD::initialize()
 {
-    for( int i=0; i<m_numInputs; i++ )
+    eNode* enode = m_clockPin->getEpin()->getEnode(); // Clock pin
+    if( enode ) enode->addToChangedList(this);
+}*/
+
+void eLatchD::setInverted( bool inverted )
+{
+    for( int i=0; i>m_numOutputs; i++ )
+        m_output[i]->setInverted( inverted );
+}
+
+void eLatchD::setVChanged()
+{
+    if( getClockState() == Rising ) // rising edge in clock pin
     {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedList(this);
+        bool outEn = outputEnabled();
+
+        for( int i=0; i<m_numOutputs; i++ )
+        {
+            bool state = m_inputState[i];
+            double volt = m_input[i]->getVolt();
+
+            if     ( volt > m_inputHighV ) state = true;
+            else if( volt < m_inputLowV )  state = false;
+
+            m_inputState[i] = state;
+            if( outEn ) m_output[i]->setOut( state );
+        }
     }
 }
 
-void eGate::setInverted( bool inverted )
-{
-    m_output[0]->setInverted( inverted );
-}
-
-void eGate::setVChanged()
-{
-    int  inputs = 0;
-
-    for( int i=0; i<m_numInputs; i++ )
-    {
-        bool  state = m_inputState[i];
-        double volt = m_input[i]->getVolt();
-
-        if     ( volt > m_inputHighV ) state = true;
-        else if( volt < m_inputLowV )  state = false;
-
-        if( state ) inputs++;
-        m_inputState[i] = state;
-    }
-
-    m_output[0]->setOut( calcOutput( inputs ) );   // In each gate type
-}
-
-bool eGate::calcOutput( int inputs ) { return (inputs==m_numInputs); } // default for: Buffer, Inverter, And, Nand
+void eLatchD::setNumChannels( int channels ) { createPins( channels, channels); }
 

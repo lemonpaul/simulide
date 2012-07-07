@@ -37,11 +37,84 @@ eLogicDevice::eLogicDevice( string id )
 
     m_inputImp = high_imp;
     m_outImp   = 50;
+
+    m_clock = false;
+    m_outEnable = true;
+    m_clockPin = 0l;
+    m_outEnablePin = 0l;
 }
 eLogicDevice::~eLogicDevice()
 {
     m_output.clear();
     m_input.clear();
+    if( m_clockPin )     delete m_clockPin;
+    if( m_outEnablePin ) delete m_outEnablePin;
+}
+
+void eLogicDevice::initialize()
+{
+    if( m_clockPin )
+    {
+        eNode* enode = m_clockPin->getEpin()->getEnode(); // Clock pin
+        if( enode ) enode->addToChangedList(this);
+    }
+}
+
+int eLogicDevice::getClockState()
+{
+    if( !m_clockPin ) return Low;
+
+    int cState = 1;
+    if( m_clock ) cState = 2;
+
+    double volt = m_clockPin->getVolt(); // Clock pin volt.
+
+    if     ( volt > m_inputHighV ) m_clock = true;
+    else if( volt < m_inputLowV )  m_clock = false;
+
+    if( m_clock ) cState++;
+    else          cState--;
+
+    return cState;
+}
+
+bool eLogicDevice::outputEnabled()
+{
+    if( !m_outEnablePin ) return true;
+
+    bool outEnable = m_outEnable;
+    double volt = m_outEnablePin->getVolt();
+
+    if     ( volt > m_inputHighV ) outEnable = false;   // Active Low
+    else if( volt < m_inputLowV )  outEnable = true;
+
+    m_outEnable = outEnable;
+
+    return outEnable;
+}
+
+void eLogicDevice::createClockPin()
+{
+    std::stringstream sspin;
+    sspin << m_elmId << "clockPin";
+    ePin* epin = new ePin( sspin.str(), 0 );
+
+    std::stringstream ssesource;
+    ssesource << m_elmId << "eSourceClock";
+    m_clockPin = new eSource( ssesource.str(), epin );
+    m_clockPin->setImp( m_inputImp );
+}
+
+void eLogicDevice::createOutEnablePin()
+{
+    std::stringstream sspin;
+    sspin << m_elmId << "outEnablePin";
+    ePin* epin = new ePin( sspin.str(), 0 );
+
+    std::stringstream ssesource;
+    ssesource << m_elmId << "eSourceOutEnable";
+    m_outEnablePin = new eSource( ssesource.str(), epin );
+    m_outEnablePin->setImp( m_inputImp );
 }
 
 void eLogicDevice::createPins( int inputs, int outputs )

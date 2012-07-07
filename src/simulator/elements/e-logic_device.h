@@ -27,6 +27,10 @@
 #include "e-source.h"
 #include "e-pin.h"
 
+#define Low     0
+#define Falling 1
+#define Rising  2
+#define High    3
 
 class eLogicDevice : public eElement
 {
@@ -70,6 +74,13 @@ class eLogicDevice : public eElement
         void initEpins(){;}
         ePin* getEpin( int pin );
 
+        int getClockState();
+        bool outputEnabled();
+
+        virtual void initialize();
+
+        void createClockPin();
+        void createOutEnablePin();
 
     protected:
         virtual void createPins( int inputs, int outputs );
@@ -88,6 +99,12 @@ class eLogicDevice : public eElement
 
         int m_numInputs;
         int m_numOutputs;
+
+        bool m_clock;
+        bool m_outEnable;
+
+        eSource* m_clockPin;
+        eSource* m_outEnablePin;
 
         std::vector<eSource*> m_output;
         std::vector<eSource*> m_input;
