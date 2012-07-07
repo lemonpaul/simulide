@@ -107,3 +107,8 @@ ePin* eSource::getEpin()
 {
     return m_ePin[0];
 }
+
+double eSource::getVolt()
+{
+    return m_ePin[0]->getVolt();
+}

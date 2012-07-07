@@ -50,6 +50,8 @@ class eSource : public eElement
         double imp()       { return m_imp; }
         void  setImp( double imp );
 
+        double getVolt();
+
         ePin* getEpin();
 
        // void setEpin( ePin* epin );

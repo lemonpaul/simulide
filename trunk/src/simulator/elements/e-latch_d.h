@@ -21,47 +21,26 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "e-gate.h"
+#ifndef ELATCHD_H
+#define ELATCHD_H
 
-eGate::eGate( string id, int inputs )
-    : eLogicDevice( id )
+#include "e-logic_device.h"
+
+class eLatchD : public eLogicDevice
 {
-    createPins( inputs, 1 );         // From eLogicDevice
-}
-eGate::~eGate(){}
+    public:
 
-void eGate::initialize()
-{
-    for( int i=0; i<m_numInputs; i++ )
-    {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedList(this);
-    }
-}
+        eLatchD( string id, int channels );
+        ~eLatchD();
 
-void eGate::setInverted( bool inverted )
-{
-    m_output[0]->setInverted( inverted );
-}
+        //virtual void initialize();
+        virtual void setVChanged();
 
-void eGate::setVChanged()
-{
-    int  inputs = 0;
+        void setInverted( bool inverted );
+                             
+    protected:           
+        void setNumChannels( int channels );
+};
 
-    for( int i=0; i<m_numInputs; i++ )
-    {
-        bool  state = m_inputState[i];
-        double volt = m_input[i]->getVolt();
 
-        if     ( volt > m_inputHighV ) state = true;
-        else if( volt < m_inputLowV )  state = false;
-
-        if( state ) inputs++;
-        m_inputState[i] = state;
-    }
-
-    m_output[0]->setOut( calcOutput( inputs ) );   // In each gate type
-}
-
-bool eGate::calcOutput( int inputs ) { return (inputs==m_numInputs); } // default for: Buffer, Inverter, And, Nand
-
+#endif
