@@ -52,12 +52,12 @@ AVRComponent::~AVRComponent() { }
 
 void AVRComponent::attachPins()
 {
-    AvrProcessor *ap = dynamic_cast<AvrProcessor*>( m_processor );
-    avr_t *cpu = ap->getCpu();
+    AvrProcessor* ap = dynamic_cast<AvrProcessor*>( m_processor );
+    avr_t* cpu = ap->getCpu();
 
     for( int i = 0; i < m_numpins; i++ )
     {
-        AVRComponentPin *pin = dynamic_cast<AVRComponentPin*>( m_pinList[i] );
+        AVRComponentPin* pin = dynamic_cast<AVRComponentPin*>( m_pinList[i] );
         pin->attach( cpu );
     }
 }
