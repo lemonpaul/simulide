@@ -82,15 +82,12 @@ bool eLogicDevice::outputEnabled()
 {
     if( !m_outEnablePin ) return true;
 
-    bool outEnable = m_outEnable;
     double volt = m_outEnablePin->getVolt();
 
-    if     ( volt > m_inputHighV ) outEnable = false;   // Active Low
-    else if( volt < m_inputLowV )  outEnable = true;
+    if     ( volt > m_inputHighV ) m_outEnable = false;   // Active Low
+    else if( volt < m_inputLowV )  m_outEnable = true;
 
-    m_outEnable = outEnable;
-
-    return outEnable;
+    return m_outEnable;
 }
 
 void eLogicDevice::createClockPin()
@@ -138,6 +135,7 @@ void eLogicDevice::createInputs( int inputs )
         ssesource << m_elmId << "eSourceInput" << i;
         m_input[i] = new eSource( ssesource.str(), epin );
         m_input[i]->setImp( m_inputImp );
+        //m_inputState[i] = false;
     }
     m_numInputs = totalInps;
 }
@@ -222,9 +220,35 @@ void eLogicDevice::setOutImp( double imp )
         m_output[i]->setImp( imp );
 }
 
-ePin* eLogicDevice::getEpin( int pin )  // First InPuts, then OutPuts
+/*ePin* eLogicDevice::getEpin( int pin )  // First InPuts, then OutPuts
 {
     //qDebug() << "eLogicDevice::getEpin " << pin;
     if( pin<m_numInputs ) return m_input[pin]->getEpin();
     else                  return m_output[pin-m_numInputs]->getEpin();
+}*/
+
+ePin* eLogicDevice::getEpin( QString pinName )
+{
+    //qDebug() << "eLogicDevice::getEpin" << pinName;
+    if( pinName.contains("input") )
+    {
+        int pin = pinName.remove("input").toInt();
+
+        return m_input[pin]->getEpin();
+    }
+    if( pinName.contains("output") )
+    {
+        int pin = pinName.remove("output").toInt();
+
+        return m_output[pin]->getEpin();
+    }
+    if( pinName.contains("clock") )
+    {
+        return m_clockPin->getEpin();
+    }
+    if( pinName.contains("outEnable") )
+    {
+        return m_outEnablePin->getEpin();
+    }
+    return eElement::getEpin( pinName );
 }

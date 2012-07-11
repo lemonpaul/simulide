@@ -94,7 +94,7 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (20 m
 
 void Simulator::runContinuous()
 {
-    sleep( 0.1 );   // Wait for previous steps to finish
+    //sleep( 0.1 );   // Wait for previous steps to finish
 
     if( avr.getLoadStatus() ) m_avrCpu = avr.getCpu();
     else                      m_avrCpu = 0l;

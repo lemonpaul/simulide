@@ -40,6 +40,7 @@ class eElement
         virtual void setVChanged(){;}
 
         virtual ePin* getEpin( int pin );
+        virtual ePin* getEpin( QString pinName );
 
         string getId(){ return m_elmId; }
 

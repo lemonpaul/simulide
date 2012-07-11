@@ -36,7 +36,7 @@ class eLatchD : public eLogicDevice
         //virtual void initialize();
         virtual void setVChanged();
 
-        void setInverted( bool inverted );
+        //void setInverted( bool inverted );
                              
     protected:           
         void setNumChannels( int channels );

@@ -62,3 +62,13 @@ ePin* eElement::getEpin( int pin )
     return m_ePin[pin];
 }
 
+ePin* eElement::getEpin( QString pinName )
+{
+    //qDebug() << "eElement::getEpin" << pinName;
+    if( pinName.contains("ePin") )
+    {
+        int pin = pinName.remove("ePin").toInt();
+        return m_ePin[pin];
+    }
+    return 0l;
+}

@@ -27,7 +27,6 @@ eLatchD::eLatchD( string id, int channels )
     : eLogicDevice( id )
 {
     setNumChannels( channels );
-    createClockPin();
 }
 eLatchD::~eLatchD(){}
 
@@ -37,15 +36,15 @@ eLatchD::~eLatchD(){}
     if( enode ) enode->addToChangedList(this);
 }*/
 
-void eLatchD::setInverted( bool inverted )
+/*void eLatchD::setInverted( bool inverted )
 {
     for( int i=0; i>m_numOutputs; i++ )
         m_output[i]->setInverted( inverted );
-}
+}*/
 
 void eLatchD::setVChanged()
 {
-    if( getClockState() == Rising ) // rising edge in clock pin
+    if( !m_clockPin || (getClockState()==Rising) )
     {
         bool outEn = outputEnabled();
 

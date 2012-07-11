@@ -34,6 +34,7 @@ class Package : public Component, public eElement
         Package( QObject* parent, QString type, QString id );
         ~Package();
 
+        virtual void initEpins(){;}
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 	
