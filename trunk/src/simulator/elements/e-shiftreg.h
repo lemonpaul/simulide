@@ -24,11 +24,11 @@
 
 #include <QObject>
 
-#include "e-source.h"
-#include "e-node.h"
+#include "e-logic_device.h"
+//#include "e-node.h"
 
 
-class eShiftReg : public eElement
+class eShiftReg : public eLogicDevice
 {
     public:
         eShiftReg( string id );
@@ -39,7 +39,7 @@ class eShiftReg : public eElement
         virtual void setVChanged();
 
     protected:
-        eSource* m_output[8];
+        //eSource* m_output[8];
         std::bitset<8> m_shiftReg;
         bool m_clockPrev;
 

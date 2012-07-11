@@ -72,7 +72,8 @@ class eLogicDevice : public eElement
         void  setOutImp( double imp );
 
         void initEpins(){;}
-        ePin* getEpin( int pin );
+        //ePin* getEpin( int pin );
+        ePin* getEpin( QString pinName );
 
         int getClockState();
         bool outputEnabled();

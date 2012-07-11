@@ -23,6 +23,7 @@
 #include "mainwindow.h"
 #include "itemlibrary.h"
 #include "e-shiftreg.h"
+#include "e-latch_d.h"
 #include "e-resistor.h"
 #include "e-capacitor.h"
 #include "e-gate_or.h"
@@ -53,7 +54,7 @@ SubCircuit::SubCircuit( QObject* parent, QString type, QString id )
 
     m_numItems = 0;
 
-    m_dataFile = "data/subcircuits.xml";
+    m_dataFile = "subcircuits.xml";
 
     initPackage();
     initSubcircuit();
@@ -65,7 +66,7 @@ void SubCircuit::initPackage()
     QString compName = m_id.split("-").first(); // for example: "atmega328-1" to: "atmega328"
     label->setText( compName );
 
-    QFile file( QCoreApplication::applicationDirPath()+"/"+m_dataFile );
+    QFile file( QCoreApplication::applicationDirPath()+"/data/"+m_dataFile );
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
           QMessageBox::warning(0, "McuComponent::initPackage",
@@ -95,14 +96,10 @@ void SubCircuit::initPackage()
             QDomElement element = node.toElement();
             if( element.attribute("name")==compName )
             {
-                QString package = element.attribute( "package" );
-                m_dataFile = m_dataFile.replace( m_dataFile.split("/").last(), package.append(".package") );
-                //qDebug() << m_dataFile;
-                /*if( m_device != "" )*/ Package::initPackage();
-                //else qDebug() << compName << "ERROR!! McuComponent::initPackage Package not Found: " << package
+                m_dataFile = "data/"+element.attribute( "package" );
+                Package::initPackage();
 
-                QString subcirc = element.attribute( "subcircuit" );
-                m_dataFile = m_dataFile.replace( m_dataFile.split("/").last(), subcirc.append(".subcircuit") );
+                m_dataFile = "data/"+element.attribute( "subcircuit" );
                 break;
             }
             node = node.nextSibling();
@@ -162,6 +159,8 @@ void SubCircuit::initSubcircuit()
             id.append("-").append(type).append("-").append( QString::number(m_numItems) );
             m_numItems++;
 
+            //qDebug() << "\nSubCircuit::initSubcircuit" << id;
+
             eElement* ecomponent = 0l;
 
             if     ( type == "eShiftReg" )  ecomponent = new eShiftReg( id.toStdString() );
@@ -214,6 +213,13 @@ void SubCircuit::initSubcircuit()
                 if( element.hasAttribute("height") ) height = element.attribute( "height" ).toDouble();
 
                 ecomponent = new LedSmd( this, "LEDSMD", id, QRectF( 0, 0, width, height )  );
+            }
+            else if( type == "eLatchD" )
+            {
+                int channels = 1;
+                if( element.hasAttribute("channels") ) channels = element.attribute( "channels" ).toInt();
+
+                ecomponent = new eLatchD( id.toStdString(), channels );
             }
             if( ecomponent )
             {
@@ -268,18 +274,60 @@ void SubCircuit::initSubcircuit()
                         elogicdevice->createOutEnablePin();
                     }
                 }
+                if( element.hasAttribute("clocked") )
+                {
+                    if( element.attribute( "clocked" ) == "true" )
+                    {
+                        eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                        elogicdevice->createClockPin();
+                    }
+                }
 
                 // Get the connections list
                 QStringList connectionList = element.attribute( "connections" ).split(" ");
+                //qDebug() << "connectionList" << connectionList;
 
                 foreach( QString connection, connectionList )   // Get the connection points for each connection
                 {
+                    if( !(connection.contains("-")) ) continue;
                     QStringList pins = connection.split("-");
-                    int pin = pins.first().remove("ePin").toInt();
-                    connectEpin( ecomponent->getEpin(pin), pins.last() );   // Connect points (ePin to Pin or eNode)
-                    //qDebug() << pin << pins.last();
+
+                    QString pin = pins.first();
+
+                    if( pin.startsWith("packagePin")) // This pin should be connected to an eNode
+                    {
+                        if( pins.last().startsWith("eNode") )
+                        {
+                            qDebug() << "SubCircuit::initSubcircuit connecting:" << pins.first() << pins.last();
+                            int pinNum = pin.remove("packagePin").toInt();
+
+                            // Add a resistor to connect packagePin to eNode
+                            eResistor* resistor = new eResistor( (id.append("res-").append(QString::number(pinNum))).toStdString() );
+                            resistor->initEpins();
+                            resistor->setRes( cero_doub );
+
+                            connectEpin( resistor->getEpin(0), pins.last() );   // Connect resistor to eNode
+                            connectEpin( resistor->getEpin(1), pins.first() );  // Connect resistor to packagePin
+                        }
+                        //else qDebug() << "SubCircuit::initSubcircuit Error connecting:" << pins.first() << pins.last();
+                    }
+                    else
+                    {
+                        ePin* epin = 0l;
+
+                        if( pin.startsWith("componentPin")) // Now connect resistor to packagePin
+                        {
+                            int pinNum = pin.remove("componentPin").toInt();
+                            epin = ecomponent->getEpin( pinNum );
+                        }
+                        else epin = ecomponent->getEpin( pin );
+
+                        if( epin ) connectEpin( epin, pins.last() );   // Connect points (ePin to Pin or eNode)
+                        else qDebug() << "SubCircuit::initSubcircuit Error connecting:" << pin << pins.last();
+                    }
                 }
             }
+            else qDebug() << "SubCircuit::initSubcircuit Error creating: " << id;
         }
         rNode = rNode.nextSibling();
     }
@@ -290,15 +338,15 @@ void SubCircuit::connectEpin( ePin* epin, QString connetTo )
 
     if( connetTo.startsWith("eNode") )
     {
-        //qDebug() << "SubCircuit::connectEpin" << connetTo;
         int eNodeNum = connetTo.remove("eNode").toInt();
         epin->setEnode( m_internal_eNode.at(eNodeNum) );
+        //qDebug() << "SubCircuit::connectEpin to eNode " << connetTo << eNodeNum;
     }
-    else if( connetTo.startsWith("Pin") )
+    else if( connetTo.startsWith("packagePin") )
     {
-        int pinNum = connetTo.remove("Pin").toInt();
+        int pinNum = connetTo.remove("packagePin").toInt();
         m_pinConections[pinNum].append( epin );
-        //qDebug() << "connecting to Pin" << connetTo << pinNum;
+        //qDebug() << "SubCircuit::connectEpin to Pin " << connetTo << pinNum;
     }
 }
 

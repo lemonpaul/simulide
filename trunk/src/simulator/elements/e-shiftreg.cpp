@@ -20,8 +20,11 @@
 #include "e-shiftreg.h"
 //#include "simulator.h"
 
-eShiftReg::eShiftReg( string id ) : eElement( id )
+eShiftReg::eShiftReg( string id ) : eLogicDevice( id )
 {
+    // input0: DS    serial data input
+    // input1: MR    master reset (active LOW)
+
     // ePins 0-7: Q0-Q7
     // ePin    8: DS    serial data input
     // ePin    9: MR    master reset (active LOW)
@@ -33,50 +36,57 @@ eShiftReg::eShiftReg( string id ) : eElement( id )
 }
 eShiftReg::~eShiftReg()
 {
-    for( int i=0; i<8; i++ )
+    /*for( int i=0; i<8; i++ )
     {
         delete m_output[i];
         delete m_ePin[i];
-    }
+    }*/
 }
 
 void eShiftReg::initEpins()
 {
-    eElement::setNumEpins(11);
+    createPins( 2, 8 );
+    createClockPin();
+    /*eElement::setNumEpins(11);
     // Create outputs
     for( int i=0; i<8; i++ )
     {
         m_output[i] = new eSource( m_elmId, m_ePin[i] );
         m_output[i]->setVoltHigh(5);
-    }
+    }*/
 }
 
 void eShiftReg::initialize()
 {
     // Register for callBack when eNode volt change on clock or reset pins
-    eNode* enode = m_ePin[9]->getEnode();
+    /*eNode* enode = m_ePin[9]->getEnode();
     if( enode ) enode->addToChangedList(this);
 
     enode = m_ePin[10]->getEnode();
-    if( enode ) enode->addToChangedList(this);
+    if( enode ) enode->addToChangedList(this);*/
 
+    m_input[1]->getEpin()->getEnode()->addToChangedList(this); // Reset pin
+
+    eLogicDevice::initialize();
 }
 
 void eShiftReg::setVChanged()
 {
     if( !Simulator::self()->isRunning() )return;
 
-    if( m_ePin[9]->getVolt()<digital_threshold )    // Read reset pin
+    double volt = m_input[1]->getEpin()->getVolt(); // Reset pin volt.
+
+    if     ( volt > m_inputHighV ) m_inputState[1] = true;
+    else if( volt < m_inputLowV )  m_inputState[1] = false;
+
+    if( !(m_inputState[1]) )    // Reset pin is active low
     {
         m_shiftReg.reset();                         // Reset shift register if reset pin = Low
-        for( int i=0; i<8; i++ ) m_output[i]->setOut( m_shiftReg[i] );// Set outputs
+        for( int i=0; i<8; i++ ) m_output[i]->setOut( false );// Set outputs
     }
     else
-    {                                               // Read clock pin
-        bool clock = m_ePin[10]->getVolt()>digital_threshold;
-        //qDebug() << "eShiftReg::setVChanged" << m_clockPrev << clock << Simulator::self()->isRunning();
-
-        if(  clock && !m_clockPrev)                 // If L to H edge
+    {
+        if( getClockState()==Rising )
         {
             for( int i=7; i>0; i-- )
             {
@@ -84,10 +94,15 @@ void eShiftReg::setVChanged()
                 m_output[i]->setOut( m_shiftReg[i] );// Set outputs
             }
             // Read data input pin & put in reg bit0
-            m_shiftReg[0] = m_ePin[8]->getVolt()>digital_threshold;
+            volt = m_input[0]->getEpin()->getVolt(); // Reset pin volt.
+
+            if     ( volt > m_inputHighV ) m_inputState[0] = true;
+            else if( volt < m_inputLowV )  m_inputState[0] = false;
+
+            m_shiftReg[0] = m_inputState[0];
+
             m_output[0]->setOut( m_shiftReg[0] );
         }
-        m_clockPrev = clock;
     }
 }
 
