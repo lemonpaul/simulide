@@ -22,7 +22,7 @@
 
 
 McuComponentPin::McuComponentPin( McuComponent *mcuComponent, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
-    : QObject( mcuComponent ), eSource( id.toStdString(), 0l )// , m_id( id )
+    : QObject( mcuComponent ), eSource( id.toStdString(), 0l )
 {
     //m_gOutHigh = 0.0;
     //m_gOutLow = 0.0;
@@ -37,11 +37,7 @@ McuComponentPin::McuComponentPin( McuComponent *mcuComponent, QString id, QStrin
     
     m_attached = false;
 
-    QString nodid = m_mcuComponent->objectName();
-    nodid.append("-");
-    nodid.append( id );
-    QPoint nodpos = QPoint ( xpos, ypos );
-    Pin *pin = new Pin( angle, nodpos, nodid, pos, m_mcuComponent );
+    Pin *pin = new Pin( angle, QPoint (xpos, ypos), mcuComponent->itemID()+"-"+id, pos, m_mcuComponent );
     //pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false );
     pin->setLabelText( label );
     m_ePin[0] = pin;

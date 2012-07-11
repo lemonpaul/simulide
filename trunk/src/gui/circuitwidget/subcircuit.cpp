@@ -298,7 +298,7 @@ void SubCircuit::initSubcircuit()
                     {
                         if( pins.last().startsWith("eNode") )
                         {
-                            qDebug() << "SubCircuit::initSubcircuit connecting:" << pins.first() << pins.last();
+                            //qDebug() << "SubCircuit::initSubcircuit connecting:" << pins.first() << pins.last();
                             int pinNum = pin.remove("packagePin").toInt();
 
                             // Add a resistor to connect packagePin to eNode

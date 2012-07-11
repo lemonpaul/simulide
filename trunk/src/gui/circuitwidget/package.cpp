@@ -127,7 +127,7 @@ void Package::initPackage()
 
 void Package::addPin( QString id, QString /*type*/, QString label, int pos, int xpos, int ypos, int angle )
 {
-    Pin* pin = new Pin( angle, QPoint(xpos, ypos), id, pos-1, this ); // pos in package starts at 1
+    Pin* pin = new Pin( angle, QPoint(xpos, ypos), m_id+"-"+id, pos-1, this ); // pos in package starts at 1
     pin->setLabelText( label );
     //pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false );
     //m_pinList.append( new eSource( id.append("-eSource").toStdString(), pin) );
@@ -176,3 +176,4 @@ void Package::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 }
 
 #include "moc_package.cpp"
+
