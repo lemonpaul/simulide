@@ -59,7 +59,14 @@ SubCircuit::SubCircuit( QObject* parent, QString type, QString id )
     initPackage();
     initSubcircuit();
 }
-SubCircuit::~SubCircuit() {}
+SubCircuit::~SubCircuit()
+{
+    foreach( eElement* el, m_elementList )
+    {
+        //qDebug() << "deleting" << QString::fromStdString( el->getId() );
+        delete el;
+    }
+}
 
 void SubCircuit::initPackage()
 {
@@ -223,6 +230,7 @@ void SubCircuit::initSubcircuit()
             }
             if( ecomponent )
             {
+                m_elementList.append( ecomponent );
                 ecomponent->initEpins();
 
                 // Get properties
@@ -367,14 +375,7 @@ void SubCircuit::initialize()
 
 void SubCircuit::remove()
 {
-    /*foreach( SubCircuitPin *mcupin, m_pinList )
-    {
-        Pin* pin = mcupin->pin(); //static_cast<Pin*>(mcupin->pin());
-        if( pin->isConnected() ) pin->connector()->remove();
-    }
-    m_pinList.clear();*/
-
-    Component::remove();
+    Package::remove();
 }
 
 void SubCircuit::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )

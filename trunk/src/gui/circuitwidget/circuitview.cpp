@@ -72,6 +72,9 @@ void CircuitView::scaleView(qreal scaleFactor)
 void CircuitView::dragEnterEvent(QDragEnterEvent *event)
 {
     event->accept();
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->pauseSim();
+
     QString type = event->mimeData()->html();
     QString id = event->mimeData()->text();
     id.append( "-" );
@@ -79,6 +82,8 @@ void CircuitView::dragEnterEvent(QDragEnterEvent *event)
     m_enterItem = m_circuit->createItem( type, id );
     m_enterItem->setPos( mapToScene( event->pos() ) );
     m_circuit->addItem( m_enterItem );
+
+    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void CircuitView::dragMoveEvent(QDragMoveEvent *event)

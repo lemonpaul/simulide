@@ -136,13 +136,11 @@ void Package::addPin( QString id, QString /*type*/, QString label, int pos, int 
 
 void Package::remove()
 {
-    /*foreach( PackagePin *mcupin, m_pinList )
+    for( int i=0; i<m_ePin.size(); i++ )
     {
-        Pin* pin = mcupin->pin(); //static_cast<Pin*>(mcupin->pin());
-        if( pin->isConnected() ) pin->connector()->remove();
+        Pin* pin = static_cast<Pin*>(m_ePin[i]);
+        if( pin->connector() ) pin->connector()->remove();
     }
-    m_pinList.clear();*/
-
     Component::remove();
 }
 

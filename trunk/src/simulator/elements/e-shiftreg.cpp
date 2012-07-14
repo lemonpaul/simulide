@@ -25,22 +25,10 @@ eShiftReg::eShiftReg( string id ) : eLogicDevice( id )
     // input0: DS    serial data input
     // input1: MR    master reset (active LOW)
 
-    // ePins 0-7: Q0-Q7
-    // ePin    8: DS    serial data input
-    // ePin    9: MR    master reset (active LOW)
-    // ePin   10: SH    shift register clock input (L to H  Edge-triggered)
-
-    //m_ePin.resize(11);
-
     m_shiftReg.reset();
 }
 eShiftReg::~eShiftReg()
 {
-    /*for( int i=0; i<8; i++ )
-    {
-        delete m_output[i];
-        delete m_ePin[i];
-    }*/
 }
 
 void eShiftReg::initEpins()
@@ -65,7 +53,8 @@ void eShiftReg::initialize()
     enode = m_ePin[10]->getEnode();
     if( enode ) enode->addToChangedList(this);*/
 
-    m_input[1]->getEpin()->getEnode()->addToChangedList(this); // Reset pin
+    eNode* enode = m_input[1]->getEpin()->getEnode(); // m_input[1] = Reset pin
+    if( enode ) enode->addToChangedList(this);
 
     eLogicDevice::initialize();
 }

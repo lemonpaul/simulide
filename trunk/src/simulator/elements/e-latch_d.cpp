@@ -30,11 +30,19 @@ eLatchD::eLatchD( string id, int channels )
 }
 eLatchD::~eLatchD(){}
 
-/*void eLatchD::initialize()
+void eLatchD::initialize()
 {
-    eNode* enode = m_clockPin->getEpin()->getEnode(); // Clock pin
-    if( enode ) enode->addToChangedList(this);
-}*/
+    if( !m_clockPin )
+    {
+        qDebug() << "eLatchD::initialize !m_clockPin";
+        for( int i=0; i<m_input.size(); i++ )
+        {
+            eNode* enode = m_input[i]->getEpin()->getEnode();
+            if( enode ) enode->addToChangedList(this);
+        }
+    }
+    eLogicDevice::initialize();
+}
 
 /*void eLatchD::setInverted( bool inverted )
 {
@@ -44,10 +52,17 @@ eLatchD::~eLatchD(){}
 
 void eLatchD::setVChanged()
 {
-    if( !m_clockPin || (getClockState()==Rising) )
+    if( m_outEnablePin )
     {
         bool outEn = outputEnabled();
-
+        for( int i=0; i<m_numOutputs; i++ )
+        {
+            if( outEn ) m_output[i]->setImp( m_outImp );
+            else        m_output[i]->setImp( high_imp );
+        }
+    }
+    if( !m_clockPin || (getClockState()==Rising) )
+    {
         for( int i=0; i<m_numOutputs; i++ )
         {
             bool state = m_inputState[i];
@@ -57,7 +72,8 @@ void eLatchD::setVChanged()
             else if( volt < m_inputLowV )  state = false;
 
             m_inputState[i] = state;
-            if( outEn ) m_output[i]->setOut( state );
+
+            m_output[i]->setOut( state );
         }
     }
 }

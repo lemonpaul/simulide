@@ -55,7 +55,12 @@ void eLogicDevice::initialize()
 {
     if( m_clockPin )
     {
-        eNode* enode = m_clockPin->getEpin()->getEnode(); // Clock pin
+        eNode* enode = m_clockPin->getEpin()->getEnode();
+        if( enode ) enode->addToChangedList(this);
+    }
+    if( m_outEnablePin )
+    {
+        eNode* enode = m_outEnablePin->getEpin()->getEnode();
         if( enode ) enode->addToChangedList(this);
     }
 }

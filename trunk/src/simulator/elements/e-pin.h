@@ -55,7 +55,6 @@ class ePin
 
         string m_id;
         int m_index;
-        //int m_numConections;
 
         bool m_connected;
 };

@@ -48,6 +48,8 @@ class Pin : public QObject, public QGraphicsItem, public ePin
 
         void setLength( int length );
 
+        void setBoundingRect( QRect area );
+
         //void setConnected( bool );
 
         Connector* connector();
@@ -86,7 +88,7 @@ class Pin : public QObject, public QGraphicsItem, public ePin
 
         QString m_id;
 
-        QRect       m_area;
+        QRect      m_area;
         Connector* my_connector;
         Component* m_component;
         Pin*       m_conPin;          // Pin at the other side of connector

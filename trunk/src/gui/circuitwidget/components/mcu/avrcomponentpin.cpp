@@ -89,9 +89,11 @@ void AVRComponentPin::setVChanged()
 {
     if(!m_AvrProcessor) return;
 
+    if( m_imp!=high_imp ) return; // Nothing to do if pin is output
+
     float volt = m_ePin[0]->getVolt();
 
-    //qDebug() << m_type << volt;
+    //qDebug() << m_id << m_type << volt;
     if( m_type == "mclr" )
     {
         ;

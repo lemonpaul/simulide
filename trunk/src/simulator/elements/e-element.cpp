@@ -22,8 +22,8 @@
 #include <sstream>
 
 eElement::eElement( string id )
-    : cero_doub( 1e-12 )
-    , high_imp( 1e12 )
+    : cero_doub( 1e-7 )
+    , high_imp( 1e7 )
     , digital_high( 5.0 )
     , digital_low( 0.0 )
     , digital_threshold( 2.5 )
@@ -34,6 +34,7 @@ eElement::eElement( string id )
 }
 eElement::~eElement()
 {
+    //qDebug() << "deleting" << QString::fromStdString( m_elmId );
     Simulator::self()->remFromElementList( this );
     m_ePin.clear();
 }
