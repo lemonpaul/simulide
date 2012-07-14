@@ -64,6 +64,7 @@ Probe::Probe( QObject* parent, QString type, QString id )
     QPoint nodpos = QPoint(-22,0);
     inputpin = new Pin( 180, nodpos, nodid, 0, this);
     inputpin->setLength( 20 );
+    inputpin->setBoundingRect( QRect(-2, -2, 4, 4) );
 
     setRotation( rotation() - 45 );
 

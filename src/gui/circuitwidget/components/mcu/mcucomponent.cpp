@@ -183,6 +183,9 @@ void McuComponent::slotReload()
 
 void McuComponent::load( QString fileName )
 {
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->pauseSim();
+
     if( m_processor->loadFirmware( fileName ) /*&& attachDevice()*/ )
     {
         attachPins();
@@ -194,6 +197,7 @@ void McuComponent::load( QString fileName )
         settings.setValue( "lastFirmDir", m_symbolFile );
         //MainWindow::self()->powerCircOff();
     }
+    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void McuComponent::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )

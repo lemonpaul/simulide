@@ -30,15 +30,15 @@ ePin::ePin( string id, int index )
     //m_numConections = 0;
     //reset();
 }
-ePin::~ePin(){ if( m_enode ) m_enode->remEpin( this ); }
+ePin::~ePin()
+{
+    //qDebug() << "deleting" << QString::fromStdString( m_id );
+    if( m_enode ) m_enode->remEpin( this );
+}
 
 void ePin::reset()
 {
-    //m_numConections--;
-
-    /*if( m_numConections==0 )*/ setEnode( 0l );
-    //m_enodeCon = 0l;
-    //m_connected = false;
+    setEnode( 0l );
 }
 
 eNode* ePin::getEnode()    { return m_enode; }
@@ -67,7 +67,7 @@ void ePin::setEnodeComp( eNode* enode )
 
 void ePin::stampCurrent( double data )
 {
-    //qDebug() <<"connected"<< m_connected<<data;
+    //qDebug() << "connected" << m_connected << data;
     if( m_connected ) m_enode->stampCurrent( this, data );
 }
 
@@ -84,11 +84,6 @@ double ePin::getVolt()
     if( m_enodeCon ) return m_enodeCon->getVolt();
     return 0;
 }
-
-/*void ePin::setVolt( double v )
-{
-
-}*/
 
 void ePin::setConnected( bool connected )  { m_connected = connected; }
 bool ePin::isConnected() { return m_connected; }

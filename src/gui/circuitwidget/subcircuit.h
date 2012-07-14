@@ -58,7 +58,7 @@ class SubCircuit : public Package
         int m_numItems;
 
         QList<eNode*> m_internal_eNode;
-        //QList<eSource*> m_pinList;
+        QList<eElement*> m_elementList;
         QVector<QList<ePin*> > m_pinConections;
 };
 #endif

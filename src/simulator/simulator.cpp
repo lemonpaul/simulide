@@ -60,10 +60,12 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (20 m
         {                                   // Used for all non-reactive elements
             m_step ++;
 
-            if( m_avrCpu )                  // Update at mcu clock speed rate ( 16 MHz max )
+            /*if( m_avrCpu )                  // Update at mcu clock speed rate ( 16 MHz max )
             {
                 for( int k=0; k<m_mcuStepsPT; k++ ) avr_run( m_avrCpu ); //avr.step();
-            }
+            }*/
+
+            for( int k=0; k<m_mcuStepsPT; k++ ) {if( m_avrCpu ) avr_run( m_avrCpu ); //avr.step();
 
             if( !m_changed ) continue;      // Only calc matrix when something changed
             m_changed = false;
@@ -74,6 +76,7 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (20 m
                 pauseSim();
                 return;
             }                               // m_matix sets the eNode voltages
+            }
         }
 
         std::vector<eElement*>::iterator it;

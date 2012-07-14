@@ -158,6 +158,12 @@ Pin* Pin::conPin()             { return m_conPin; }
 
 //bool Pin::changed(){ return m_changed; }
 
+void Pin::setBoundingRect( QRect area )
+{
+    m_area = area;
+}
+
+
 void Pin::paint( QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Q_UNUSED(option); Q_UNUSED(widget);
