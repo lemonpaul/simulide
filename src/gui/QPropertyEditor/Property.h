@@ -24,9 +24,9 @@
 #ifndef PROPERTY_H_
 #define PROPERTY_H_
 
-#include <QtGui/QWidget>
-#include <QtGui/QStyleOption>
-#include <QtCore/QVariant>
+//#include <QtGui/QWidget>
+#include <QStyleOption>
+#include <QVariant>
 
 /**
  * The Property class is the base class for all properties in the QPropertyEditor

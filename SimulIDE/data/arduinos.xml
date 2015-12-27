@@ -1,4 +1,5 @@
-<!DOCTYPE SimutronQt4>
+<!DOCTYPE SimulIDE>
+
 <itemlib>
     <itemset category="Boards" type="Arduino">
 

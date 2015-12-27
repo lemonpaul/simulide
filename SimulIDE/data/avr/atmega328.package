@@ -5,7 +5,7 @@
     <pin side="left" pos="2"  type="bidir" id="PD0"  label="D0"/>
     <pin side="left" pos="3"  type="bidir" id="PD1"  label="D1"/>
     <pin side="left" pos="4"  type="bidir" id="PD2"  label="D2"/>
-    <pin side="left" pos="5"  type="bidir" id="PD3"  label="D3"/>
+    <pin side="left" pos="5"  type="pwm2B" id="PD3"  label="D3"/>
     <pin side="left" pos="6"  type="bidir" id="PD4"  label="D4"/>
 
     <pin side="left" pos="7"  type="vcc"   id="VCC"  label=" +"/>
@@ -13,14 +13,14 @@
 
     <pin side="left" pos="9"  type="bidir" id="PB6"  label="B6"/>
     <pin side="left" pos="10" type="bidir" id="PB7"  label="B7"/>
-    <pin side="left" pos="11" type="bidir" id="PD5"  label="D5"/>
-    <pin side="left" pos="12" type="bidir" id="PD6"  label="D6"/>
+    <pin side="left" pos="11" type="pwm0B" id="PD5"  label="D5"/>
+    <pin side="left" pos="12" type="pwm0A" id="PD6"  label="D6"/>
     <pin side="left" pos="13" type="bidir" id="PD7"  label="D7"/>
     <pin side="left" pos="14" type="bidir" id="PB0"  label="B0"/>
 
-    <pin side="right"   pos="14" type="bidir" id="PB1"  label="B1"/>
-    <pin side="right"   pos="13" type="bidir" id="PB2"  label="B2"/>
-    <pin side="right"   pos="12" type="bidir" id="PB3"  label="B3"/>
+    <pin side="right"   pos="14" type="pwm1A" id="PB1"  label="B1"/>
+    <pin side="right"   pos="13" type="pwm1B" id="PB2"  label="B2"/>
+    <pin side="right"   pos="12" type="pwm2A" id="PB3"  label="B3"/>
     <pin side="right"   pos="11" type="open"  id="PB4"  label="B4"/>
     <pin side="right"   pos="10" type="bidir" id="PB5"  label="B5"/>
 

@@ -30,7 +30,7 @@ class eSource : public eElement
 {
     public:
         eSource( string id, ePin* epin );
-        ~eSource();
+        virtual ~eSource();
 
         void initialize();
         void stamp();

@@ -45,19 +45,15 @@ class AvrProcessor : public BaseProcessor
 
         void reset();
 
-        avr_t* getCpu() { return m_avrProcessor; }
-
         int  getRamValue( QString name );
-
-    public slots:
-        void runAvr();
+        
+        avr_t* getCpu() { return m_avrProcessor; }
+        void setCpu( avr_t* avrProc ) { m_avrProcessor = avrProc; }
 
     private:
-        QHash<QString, int> getRegsTable( QString lstFileName );
-
-        //QThread          m_avrRunThread;
-
  static AvrProcessor *m_pSelf;
+ 
+        QHash<QString, int> getRegsTable( QString lstFileName );
 
         //From simavr
         avr_t* m_avrProcessor;

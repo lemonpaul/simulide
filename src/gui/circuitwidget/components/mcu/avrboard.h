@@ -25,17 +25,19 @@
 #include "e-source.h"
 #include "e-node.h"
 
+#include "sim_uart_pty.h"
+
 class LibraryItem;
 
 class AVRBoard : public McuComponent
 {
     Q_OBJECT
 
-	public:
+    public:
 
         AVRBoard( QObject* parent, QString type, QString id );
         ~AVRBoard();
-	
+
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem * libraryItem();
 
@@ -46,9 +48,16 @@ class AVRBoard : public McuComponent
 private:
     void attachPins();
     void initBoard();
+    void initBootloader();
     void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
 
     eSource* m_ground;
+    eNode*   m_groundEnode;
+    ePin*    m_groundpin;
+    LedSmd*  m_boardLed;
+    eNode*   m_boardLedEnode;
+    
+    uart_pty_t m_uart_pty;
 
 };
 #endif

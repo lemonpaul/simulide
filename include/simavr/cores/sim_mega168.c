@@ -27,13 +27,14 @@
 
 #define _AVR_IO_H_
 #define __ASSEMBLER__
+#define __AVR_ATmega168__
 #include "avr/iom168.h"
-// instanciate the new core
+// instantiate the new core
 #include "sim_megax8.h"
 
 static avr_t * make()
 {
-	return &SIM_CORENAME.core;
+	return avr_core_allocate(&SIM_CORENAME.core, sizeof(struct mcu_t));
 }
 
 avr_kind_t mega168 = {

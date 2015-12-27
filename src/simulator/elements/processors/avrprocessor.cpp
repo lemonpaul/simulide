@@ -65,12 +65,12 @@ bool AvrProcessor::loadFirmware( QString fileN )
     char name[16] = "";
     elf_firmware_t f = {{0}};
 
-    f.frequency = 16000000;
+    //f.frequency = 16000000;
 
-    strcpy( name, m_device.toAscii() );
+    strcpy( name, m_device.toLatin1() );
 
     char filename[200]="";
-    strcpy( filename, fileN.toAscii() );
+    strcpy( filename, fileN.toLatin1() );
 
     if( fileN.endsWith("hex") )
     {
@@ -78,7 +78,7 @@ bool AvrProcessor::loadFirmware( QString fileN )
         //int cnt = read_ihex_chunks(filename, chunk, 4);
 
         ihex_chunk_p chunk = NULL;
-	    int cnt = read_ihex_chunks(filename, &chunk);
+        int cnt = read_ihex_chunks(filename, &chunk);
 
         if (cnt <= 0) 
         {
@@ -88,7 +88,7 @@ bool AvrProcessor::loadFirmware( QString fileN )
         }
         for (int ci = 0; ci < cnt; ci++) 
         {
-             if (chunk[ci].baseaddr < (1*1024*1024))
+            if (chunk[ci].baseaddr < (1*1024*1024))
             {
                 f.flash = chunk[ci].data;
                 f.flashsize = chunk[ci].size;
@@ -105,7 +105,7 @@ bool AvrProcessor::loadFirmware( QString fileN )
     //else if ( fileN.endsWith("axf") ) elf_read_firmware(filename, &f);
     else                                    // File extension not valid
     {
-        QMessageBox::warning(0,"Error:", tr("%1 should be .hex /*or .axf*/\n").arg(fileN) );
+        QMessageBox::warning(0,"Error:", tr("%1 should be .hex \n").arg(fileN) );
         return false;
     }
 
@@ -122,40 +122,20 @@ bool AvrProcessor::loadFirmware( QString fileN )
     qDebug() << "AvrProcessor::loadFirmware Avr Init: "<< name << (started==0);
     avr_load_firmware( m_avrProcessor, &f );
 
-    if ( f.flashbase ) m_avrProcessor->pc = f.flashbase; //printf( "Attempted to load a bootloader at %04x\n", f.flashbase );
+    if( f.flashbase ) m_avrProcessor->pc = f.flashbase; //printf( "Attempted to load a bootloader at %04x\n", f.flashbase );
 
+    m_avrProcessor->frequency = 16000000;
     m_symbolFile = fileN;
     initialized();
-    //mapLstToAsm();
-
-    /*if( m_avrRun )
-    {
-        //m_avrRunThread->terminate();
-        delete m_avrRun;
-    }*/
-
-    //m_avrRun = new avrRunProcessor( m_avrProcessor );
-    //m_avrRun->moveToThread( &m_avrRunThread );
-    //m_avrRunThread.start(QThread::TimeCriticalPriority);
-
+    
     if( pauseSim ) Simulator::self()->runContinuous();
     return true;
-}
-
-void AvrProcessor::runAvr()
-{
-    if( m_loadStatus )
-    {
-        for( int i=0; i<16; i++ )
-        {
-            avr_run( m_avrProcessor );
-        }
-    }
 }
 
 void AvrProcessor::step()
 { 
     avr_run( m_avrProcessor );
+    //m_avrProcessor->run(m_avrProcessor);
 }
 
 void AvrProcessor::reset()
@@ -191,13 +171,11 @@ QHash<QString, int> AvrProcessor::getRegsTable( QString lstFileName )// get regi
         line = line.toLower().replace("\t"," ").replace("="," ");
         if( line.contains("equ ") || line.contains("def "))      // This line contains a definition
         {
-            //QString temp;
             QString name    = "";
             QString addrtxt = "";
             int address   = 0;
             bool isNumber = false;
 
-            //qDebug() <<"\n"<<line;
             line.remove("equ").remove(".def").remove(".");
             QStringList wordList = line.split(QRegExp("\\s+")); // Split in words
             while( name.isEmpty() ) name = wordList.takeFirst();

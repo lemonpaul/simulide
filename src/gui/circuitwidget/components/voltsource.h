@@ -26,7 +26,7 @@
 #include "pin.h"
 
 class LibraryItem;
-//class VoltWidget;
+//class DialWidget;
 
 class VoltSource : public Component
 {
@@ -34,7 +34,7 @@ class VoltSource : public Component
     Q_PROPERTY( double Voltage  READ volt   WRITE setVolt   DESIGNABLE true USER true )
 
     public:
-        QRectF boundingRect() const { return QRect( 8, -56, 8, 40 ); }
+        QRectF boundingRect() const { return QRect( -42, -66, 52, 76 ); }
 
         VoltSource( QObject* parent, QString type, QString id );
         ~VoltSource();
@@ -63,7 +63,7 @@ class VoltSource : public Component
         VoltWidget m_voltw;
 
         QPushButton* m_button;
-        QDial *m_dial;
+        QDial* m_dial;
         QGraphicsProxyWidget* m_proxy;
 };
 

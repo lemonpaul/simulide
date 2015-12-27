@@ -25,15 +25,18 @@
 #define SIM_MMCU		"atmega8"
 #define SIM_CORENAME	mcu_mega8
 
+#define ICP_PORT	PORTB
+#define ICP_PIN		0
+
 #define _AVR_IO_H_
 #define __ASSEMBLER__
 #include "avr/iom8.h"
-// instanciate the new core
+// instantiate the new core
 #include "sim_megax.h"
 
 static avr_t * make()
 {
-	return &SIM_CORENAME.core;
+	return avr_core_allocate(&SIM_CORENAME.core, sizeof(struct mcu_t));
 }
 
 avr_kind_t mega8 = {

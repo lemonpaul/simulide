@@ -20,7 +20,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include <sys/time.h>
 #include <iostream>
@@ -28,6 +28,10 @@
 #include "e-node.h"
 #include "circmatrix.h"
 #include "avrprocessor.h"
+
+#ifndef NO_PIC
+#include "gpsimprocessor.h"
+#endif
 
 class eElement;
 
@@ -96,5 +100,10 @@ class Simulator : public QObject
         
         AvrProcessor avr;
         avr_t*       m_avrCpu;
+        
+		#ifndef NO_PIC
+        GpsimProcessor pic;
+        pic_processor* m_picCpu;
+		#endif
 };
  #endif

@@ -24,27 +24,34 @@
 //#include "logic_comb_iface.h"
 
 //BEGIN Item includes
-//#include "buffer.h"
+#include "buffer.h"
 #include "capacitor.h"
 #include "diode.h"
 //#include "FlipFlopJK.h"
 //#include "FlipFlopD.h"
-//#include "gate_and.h"
+#include "gate_and.h"
 //#include "gate_nor.h"
-//#include "gate_or.h"
-//#include "gate_xor.h"
+#include "gate_or.h"
+#include "gate_xor.h"
 #include "ground.h"
 //#include "inverter.h"
+#include "inductor.h"
 #include "led.h"
 #include "logicinput.h"
 //#include "neuron.h"
+#include "op_amp.h"
 //#include "socket.h"
 #include "probe.h"
+#include "potentiometer.h"
 //#include "rampa.h"
 #include "resistor.h"
 #include "sevensegment.h"
+#include "switch.h"
 #include "voltsource.h"
 #include "avrcomponent.h"
+#ifndef NO_PIC
+#include "piccomponent.h"
+#endif
 #include "avrboard.h"
 #include "subcircuit.h"
 //END Item includes
@@ -57,21 +64,33 @@ ItemLibrary::ItemLibrary()
     m_items.append( VoltSource::libraryItem() );
     m_items.append( Ground::libraryItem() );
     // Passive
+    m_items.append( Switch::libraryItem() );
+    m_items.append( Potentiometer::libraryItem() );
     m_items.append( Resistor::libraryItem() );
     m_items.append( Capacitor::libraryItem() );
+    m_items.append( Inductor::libraryItem() );
     m_items.append( Diode::libraryItem() );
+    // Active
+    //m_items.append( OpAmp::libraryItem() );
     // Outputs
     m_items.append( Probe::libraryItem() );
     //m_items.append( Socket::libraryItem() );
     m_items.append( Led::libraryItem() );
     m_items.append( SevenSegment::libraryItem() );
-    //Boards
-    m_items.append( AVRBoard::libraryItem() );
-    // Micro
-    m_items.append( AVRComponent::libraryItem() );
+    // Gates
+    m_items.append( Buffer::libraryItem() );
+    m_items.append( AndGate::libraryItem() );
+    m_items.append( OrGate::libraryItem() );
+    m_items.append( XorGate::libraryItem() );
     //Subcircuits
     m_items.append( SubCircuit::libraryItem() );
-
+    // Micro
+    m_items.append( AVRComponent::libraryItem() );
+    #ifndef NO_PIC
+    m_items.append( PICComponent::libraryItem() );
+    #endif
+    //Boards
+    m_items.append( AVRBoard::libraryItem() );
 }
 ItemLibrary::~ItemLibrary(){}
 

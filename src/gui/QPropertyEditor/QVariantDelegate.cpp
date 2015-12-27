@@ -25,7 +25,7 @@
 
 #include "Property.h"
 
-#include <QtGui/QAbstractItemView>
+#include <QAbstractItemView>
 #include <QtCore/QSignalMapper>
 
 

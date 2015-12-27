@@ -343,7 +343,6 @@ void SubCircuit::initSubcircuit()
 
 void SubCircuit::connectEpin( ePin* epin, QString connetTo )
 {
-
     if( connetTo.startsWith("eNode") )
     {
         int eNodeNum = connetTo.remove("eNode").toInt();

@@ -18,15 +18,11 @@
  ***************************************************************************/
 
 #include "e-element.h"
-//#include <iostream>
+#include "simulator.h"
+
 #include <sstream>
 
 eElement::eElement( string id )
-    : cero_doub( 1e-7 )
-    , high_imp( 1e7 )
-    , digital_high( 5.0 )
-    , digital_low( 0.0 )
-    , digital_threshold( 2.5 )
 {
     m_elmId = id;
 
@@ -72,4 +68,9 @@ ePin* eElement::getEpin( QString pinName )
         return m_ePin[pin];
     }
     return 0l;
+}
+
+void eElement::setEpin( int num, ePin* pin )
+{
+    m_ePin[num] = pin;
 }

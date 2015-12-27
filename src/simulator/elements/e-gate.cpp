@@ -27,6 +27,8 @@ eGate::eGate( string id, int inputs )
     : eLogicDevice( id )
 {
     createPins( inputs, 1 );         // From eLogicDevice
+    setInverted( false );
+    //m_prevInputs = 0;
 }
 eGate::~eGate(){}
 
@@ -41,8 +43,10 @@ void eGate::initialize()
 
 void eGate::setInverted( bool inverted )
 {
+    m_inverted = inverted;
     m_output[0]->setInverted( inverted );
 }
+
 
 void eGate::setVChanged()
 {
@@ -50,7 +54,7 @@ void eGate::setVChanged()
 
     for( int i=0; i<m_numInputs; i++ )
     {
-        bool  state = m_inputState[i];
+        bool  state = false; // = m_inputState[i];
         double volt = m_input[i]->getVolt();
 
         if     ( volt > m_inputHighV ) state = true;
@@ -59,8 +63,12 @@ void eGate::setVChanged()
         if( state ) inputs++;
         m_inputState[i] = state;
     }
-
-    m_output[0]->setOut( calcOutput( inputs ) );   // In each gate type
+    //qDebug() << "eGate::setVChanged" << m_prevInputs << inputs; 
+    //if( m_prevInputs != inputs )
+    //{
+        m_output[0]->setOut( calcOutput( inputs ) );   // In each gate type
+        //m_prevInputs = inputs; 
+    //}
 }
 
 bool eGate::calcOutput( int inputs ) { return (inputs==m_numInputs); } // default for: Buffer, Inverter, And, Nand

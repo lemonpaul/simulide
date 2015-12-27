@@ -44,7 +44,6 @@ Probe::Probe( QObject* parent, QString type, QString id )
     m_labelrot = 45;
     setLabelPos();
 
-
     m_voltIn   = cero_doub;
     m_voltTrig = 2.5;
     m_oscopLine = -1;
@@ -62,20 +61,20 @@ Probe::Probe( QObject* parent, QString type, QString id )
     QString nodid = id;
     nodid.append(QString("inpin"));
     QPoint nodpos = QPoint(-22,0);
-    inputpin = new Pin( 180, nodpos, nodid, 0, this);
-    inputpin->setLength( 20 );
-    inputpin->setBoundingRect( QRect(-2, -2, 4, 4) );
+    m_inputpin = new Pin( 180, nodpos, nodid, 0, this);
+    m_inputpin->setLength( 20 );
+    m_inputpin->setBoundingRect( QRect(-2, -2, 4, 4) );
+    
+    nodid.append( QString("-eSource") );
+    eSource* m_inSource = new eSource( nodid.toStdString(), m_inputpin );
+    m_inSource->setOut(false);
+    m_inSource->setImp( 1e9 );
 
     setRotation( rotation() - 45 );
 
-    //label->setRotation( label->rotation() + 45 );
-    // Input Pin signal
-    /*connect( inputpin, SIGNAL(wireState(int)),
-             this,     SLOT  (inStateChanged(int)) );*/
-
     Simulator::self()->addToUpdateList( this );
 }
-Probe::~Probe() { Simulator::self()->remFromUpdateList( this );/*killTimer( m_timerId );*/ }
+Probe::~Probe() {}
 
 void Probe::updateStep()
 {
@@ -84,17 +83,15 @@ void Probe::updateStep()
         setVolt( 0.0 );
         return;
     }
-    //if( ++m_timeStep == 10 ) m_timeStep = 0; // 100 mS
-    //else return;
 
-    if( inputpin->isConnected() )// Voltage from connected pin
+    if( m_inputpin->isConnected() )// Voltage from connected pin
     {
-         setVolt( inputpin->getVolt() );
+         setVolt( m_inputpin->getVolt() );
          return;
     }
 
     // Voltage from connector or Pin behind inputPin
-    QList<QGraphicsItem*> list = inputpin->collidingItems();
+    QList<QGraphicsItem*> list = m_inputpin->collidingItems();
 
     if( list.isEmpty() )
     {
@@ -141,16 +138,11 @@ void Probe::setVolt( double volt )
     update();       // Repaint
 }
 
-/*void Probe::setChanged( bool changed )
-{
-    m_changed = changed;
-    if( !m_changed )  inputpin->setChanged(false);
-}*/
-
 void Probe::remove()
 {
+    slotOscopRem();
     Simulator::self()->remFromUpdateList( this );
-    if( inputpin->isConnected() )  inputpin->connector()->remove();
+    if( m_inputpin->isConnected() )  m_inputpin->connector()->remove();
     Component::remove();
 }
 
@@ -166,6 +158,7 @@ void Probe::slotOscopAdd()
 
 void Probe::slotOscopRem()
 {
+    //qDebug() << m_oscopLine;
     if( m_oscopLine < 0 ) return;
 
     OscopeWidget::self()->remChannel( m_oscopLine );

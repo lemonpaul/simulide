@@ -27,7 +27,7 @@
 eCapacitor::eCapacitor( string id ) : eResistor( id )
 {
     m_cap = 1; // uF
-    m_tStep = 1/(double)Simulator::self()->reaClock();
+    m_tStep = 1e-6*(double)Simulator::self()->reaClock(); //0.0001; //1/(double)Simulator::self()->reaClock(); qDebug() << m_tStep;
     m_resist = m_tStep/(m_cap*1e-6);// capacitance property(m_cap) is in uF, covert to F
     m_curSource = 0;
     m_volt = 0;
@@ -39,9 +39,10 @@ eCapacitor::~eCapacitor(){ Simulator::self()->remFromReacList( this ); }
 
 void eCapacitor::initialize()
 {
-    //if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToChangedList(this);
-    //if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToChangedList(this);
     eResistor::initialize();
+    m_tStep = 1e-6*(double)Simulator::self()->reaClock();
+    eResistor::setRes( m_tStep/(m_cap*1e-6) );
+    //qDebug() << m_tStep;
 }
 
 void eCapacitor::setVChanged()
@@ -51,14 +52,15 @@ void eCapacitor::setVChanged()
     if( volt==0 ) return;
     m_volt = volt;
 
-    m_curSource = volt/m_resist;
+    m_curSource = -volt/m_resist;
 
-    //qDebug() << "eCapacitor::setVChanged voltdiff " <<volt<< " m_curSource "<<m_curSource;
+    //qDebug() << "eCapacitor::setVChanged voltdiff " <<volt<<" m_resist "<<m_resist<< " m_curSource "<<m_curSource;
 
-    m_ePin[0]->stampCurrent( m_curSource );
-    m_ePin[1]->stampCurrent(-m_curSource );
+    m_ePin[0]->stampCurrent(-m_curSource );
+    m_ePin[1]->stampCurrent( m_curSource );
 }
 
 double eCapacitor::uF()             { return m_cap; }
-void  eCapacitor::setuF( double c ) { m_cap = c; eResistor::setRes( m_tStep/(m_cap*1e-6) ); }
+void  eCapacitor::setuF( double c ) { m_cap = c; eResistor::setRes( m_tStep/(m_cap*1e-6) ); 
+    /*qDebug() << "eCapacitor::setVChanged  m_tStep" << m_tStep <<" m_cap "<<m_cap<<" m_resist "<<m_resist;*/}
 

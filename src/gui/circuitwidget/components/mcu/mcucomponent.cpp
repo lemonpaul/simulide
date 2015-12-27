@@ -38,6 +38,7 @@ McuComponent::McuComponent( QObject* parent, QString type, QString id )
 
     QSettings settings("PicLinux", "SimulIDE");
     m_lastFirmDir = settings.value("lastFirmDir").toString();
+    
     if( m_lastFirmDir.isEmpty() )
         m_lastFirmDir = QCoreApplication::applicationDirPath()+"/examples/mega48_adc/mega48_adc.hex";
 }
@@ -77,17 +78,17 @@ void McuComponent::initPackage()
         QDomElement element = rNode.toElement();
         QDomNode    node    = element.firstChild();
 
-        while( !node.isNull() )         // Find the "package", for example 628A is package: 627A, Same pins
+        while( !node.isNull() )                    // Find the "package" 
         {
             QDomElement element = node.toElement();
             if( element.attribute("name")==compName )
             {
                 package = element.attribute( "package" );
                 m_dataFile = m_dataFile.replace( m_dataFile.split("/").last(), package.append(".package") );
-                //qDebug() << m_dataFile;
 
                 m_device = element.attribute( "device" );
                 m_processor->setDevice( m_device );
+
                 break;
             }
             node = node.nextSibling();
@@ -96,11 +97,11 @@ void McuComponent::initPackage()
     }
     if( m_device != "" ) Package::initPackage();
     else qDebug() << compName << "ERROR!! McuComponent::initPackage Package not Found: " << package;
+
 }
 
 void McuComponent::reset()
 {
-    //qDebug()<<"McuComponent::reset"<<m_id<<"loadStatus"<<m_processor->getLoadStatus();
     for ( int i = 0; i < m_pinList.size(); i++ ) // Reset pins states
         m_pinList[i]->resetOutput();
 }
@@ -111,8 +112,6 @@ void McuComponent::terminate()
     m_processor->terminate();
     for( int i=0; i<m_numpins; i++ ) m_pinList[i]->terminate();
     reset();
-    /*while( !m_pinList.isEmpty() ) delete m_pinList.takeFirst();
-    initPackage();*/
 }
 
 void McuComponent::remove()
@@ -121,6 +120,7 @@ void McuComponent::remove()
     {
         Pin* pin = mcupin->pin(); //static_cast<Pin*>(mcupin->pin());
         if( pin->connector() ) pin->connector()->remove();
+        //delete mcupin;
     }
     terminate();
     m_pinList.clear();
@@ -137,34 +137,12 @@ void McuComponent::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 
     QAction* reloadAction = menu->addAction( QIcon(":/fileopen.png"),tr("Reload firmware") );
     connect( reloadAction, SIGNAL(triggered()), this, SLOT(slotReload()) );
-    
-    /*QAction* ramAction = menu->addAction( QIcon(":/fileopen.png"),"View Ram" );
-    connect( ramAction, SIGNAL(triggered()), this, SLOT(viewRam()) );*/
 
     menu->addSeparator();
 
     Component::contextMenu( event, menu );
     menu->deleteLater();
 }
-
-/*bool McuComponent::attachDevice()
-{
-    QString newDevice = m_processor->getDevice();
-
-    if( newDevice != m_device ) // device type error
-    {
-        QMessageBox::warning( 0, tr("Device Type Error"),
-        tr("ERROR: The file Is for %1.\nCannot load to %2.")
-        .arg(newDevice).arg(m_device) );
-
-        m_processor->terminate();
-        return false;
-    }
-    attachPins();
-    reset();
-    connect( m_processor, SIGNAL( terminated()), this, SLOT( terminate()) );
-    return true;
-}*/
 
 void McuComponent::slotLoad()
 {
@@ -184,9 +162,9 @@ void McuComponent::slotReload()
 void McuComponent::load( QString fileName )
 {
     bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    if( pauseSim )  Simulator::self()->pauseSim();
 
-    if( m_processor->loadFirmware( fileName ) /*&& attachDevice()*/ )
+    if( m_processor->loadFirmware( fileName ) )
     {
         attachPins();
         reset();
@@ -195,7 +173,6 @@ void McuComponent::load( QString fileName )
 
         QSettings settings( "PicLinux", "SimulIDE" );   //*********  !!!!!!!!!!!!!!!!!  ****************
         settings.setValue( "lastFirmDir", m_symbolFile );
-        //MainWindow::self()->powerCircOff();
     }
     if( pauseSim ) Simulator::self()->runContinuous();
 }
@@ -203,9 +180,6 @@ void McuComponent::load( QString fileName )
 void McuComponent::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Package::paint( p, option, widget );
-
-    //p->setPen( QColor( 170, 170, 150 ) );
-    //p->drawArc( -4, boundingRect().y()-4, 8, 8, 0, -2880 /* -16*180 */ );
 }
 
 #include "moc_mcucomponent.cpp"

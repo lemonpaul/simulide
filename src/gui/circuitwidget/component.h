@@ -22,6 +22,7 @@
 #define COMPONENTITEM_H
 
 #include <QPointer>
+#include <QObject>
 
 #include "simulator.h"
 #include "circuit.h"
@@ -75,11 +76,7 @@ class Component : public QObject, public QGraphicsItem
         QString category();
         QIcon   icon();
 
-        //bool isChanged();
-
         virtual void inStateChanged( int ){}
-
-        //virtual void setChanged( bool changed ){ Q_UNUSED(changed); }
 
         virtual void move( QPointF delta );
 
@@ -95,9 +92,6 @@ class Component : public QObject, public QGraphicsItem
         void slotremove();
 
         virtual void remove();
-        //virtual void runStep() { /*setChanged( false);*/ }
-        //virtual void saveState() { ; }
-        //virtual void runTimStep() = 0;
 
     protected:
         void mousePressEvent(QGraphicsSceneMouseEvent* event);
@@ -122,7 +116,6 @@ class Component : public QObject, public QGraphicsItem
         int m_labelrot;
 
         bool m_showId;
-        //bool m_changed;
         bool m_changedPrev;
 };
 

@@ -25,7 +25,7 @@ eShiftReg::eShiftReg( string id ) : eLogicDevice( id )
     // input0: DS    serial data input
     // input1: MR    master reset (active LOW)
 
-    m_shiftReg.reset();
+    m_shiftReg.reset(); 
 }
 eShiftReg::~eShiftReg()
 {
@@ -33,26 +33,12 @@ eShiftReg::~eShiftReg()
 
 void eShiftReg::initEpins()
 {
-    createPins( 2, 8 );
+    createPins( 2, 8 );                           // 2 Inputs, 8 Outputs
     createClockPin();
-    /*eElement::setNumEpins(11);
-    // Create outputs
-    for( int i=0; i<8; i++ )
-    {
-        m_output[i] = new eSource( m_elmId, m_ePin[i] );
-        m_output[i]->setVoltHigh(5);
-    }*/
 }
 
 void eShiftReg::initialize()
 {
-    // Register for callBack when eNode volt change on clock or reset pins
-    /*eNode* enode = m_ePin[9]->getEnode();
-    if( enode ) enode->addToChangedList(this);
-
-    enode = m_ePin[10]->getEnode();
-    if( enode ) enode->addToChangedList(this);*/
-
     eNode* enode = m_input[1]->getEpin()->getEnode(); // m_input[1] = Reset pin
     if( enode ) enode->addToChangedList(this);
 
@@ -63,14 +49,14 @@ void eShiftReg::setVChanged()
 {
     if( !Simulator::self()->isRunning() )return;
 
-    double volt = m_input[1]->getEpin()->getVolt(); // Reset pin volt.
+    double volt = m_input[1]->getEpin()->getVolt();   // Reset pin volt.
 
     if     ( volt > m_inputHighV ) m_inputState[1] = true;
     else if( volt < m_inputLowV )  m_inputState[1] = false;
 
-    if( !(m_inputState[1]) )    // Reset pin is active low
+    if( !(m_inputState[1]) )                  // Reset pin is active low
     {
-        m_shiftReg.reset();                         // Reset shift register if reset pin = Low
+        m_shiftReg.reset();   // Reset shift register if reset pin = Low
         for( int i=0; i<8; i++ ) m_output[i]->setOut( false );// Set outputs
     }
     else

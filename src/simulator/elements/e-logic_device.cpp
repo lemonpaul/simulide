@@ -53,6 +53,7 @@ eLogicDevice::~eLogicDevice()
 
 void eLogicDevice::initialize()
 {
+    // Register for callBack when eNode volt change on clock or OE pins
     if( m_clockPin )
     {
         eNode* enode = m_clockPin->getEpin()->getEnode();
@@ -121,7 +122,7 @@ void eLogicDevice::createOutEnablePin()
 
 void eLogicDevice::createPins( int inputs, int outputs )
 {
-    setNumImps( inputs );
+    setNumInps( inputs );
     setNumOuts( outputs );
 }
 
@@ -179,7 +180,7 @@ void eLogicDevice::deleteOutputs( int outputs )
     for( int i=0; i<outputs; i++ ) m_output.pop_back();
 }
 
-void eLogicDevice::setNumImps( int inputs )
+void eLogicDevice::setNumInps( int inputs )
 {
     if     ( inputs > m_numInputs ) createInputs( inputs - m_numInputs );
     else if( inputs < m_numInputs ) deleteInputs( m_numInputs - inputs );
@@ -213,7 +214,7 @@ void eLogicDevice::setInputImp( double imp )
 {
     m_inputImp = imp;
 
-    for( int i=0; i<m_numOutputs; i++ )
+    for( int i=0; i<m_numInputs; i++ )
         m_input[i]->setImp( imp );
 }
 
@@ -221,7 +222,7 @@ void eLogicDevice::setOutImp( double imp )
 {
     m_outImp = imp;
 
-    for( int i=0; i<m_numInputs; i++ )
+    for( int i=0; i<m_numOutputs; i++ )
         m_output[i]->setImp( imp );
 }
 

@@ -26,13 +26,13 @@ Component* AVRComponent::construct( QObject* parent, QString type, QString id )
 { return new AVRComponent( parent, type,  id ); }
 
 LibraryItem* AVRComponent::libraryItem()
-{	
-	return new LibraryItem(
+{
+    return new LibraryItem(
         tr("AVR"),
         tr("Micro"),
         "ic2.png",
         "AVR",
-		AVRComponent::construct );
+        AVRComponent::construct );
 }
 
 AVRComponent::AVRComponent( QObject* parent, QString type, QString id )

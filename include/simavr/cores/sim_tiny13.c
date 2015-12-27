@@ -20,7 +20,6 @@
 	along with simavr.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include "sim_avr.h"
 #include "sim_core_declare.h"
 #include "avr_eeprom.h"
@@ -28,6 +27,7 @@
 #include "avr_extint.h"
 #include "avr_ioport.h"
 #include "avr_timer.h"
+#include "avr_adc.h"
 
 #define _AVR_IO_H_
 #define __ASSEMBLER__
@@ -37,13 +37,14 @@ static void init(struct avr_t * avr);
 static void reset(struct avr_t * avr);
 
 
-static struct mcu_t {
+static const struct mcu_t {
 	avr_t core;
 	avr_eeprom_t 	eeprom;
 	avr_watchdog_t	watchdog;
 	avr_extint_t	extint;
 	avr_ioport_t	portb;
 	avr_timer_t		timer0;
+	avr_adc_t       adc;
 } mcu = {
 	.core = {
 		.mmcu = "attiny13",
@@ -55,7 +56,7 @@ static struct mcu_t {
 		.flashend = FLASHEND,
 		.e2end = E2END,
 		.vector_size = 2,
-// Disable signature for now, for ubuntu, gentoo and other using old avr toolchain
+// Disable signature when using an old avr toolchain
 #ifdef SIGNATURE_0
 		.signature = { SIGNATURE_0,SIGNATURE_1,SIGNATURE_2 },
 		.fuse = { LFUSE_DEFAULT, HFUSE_DEFAULT },
@@ -117,12 +118,57 @@ static struct mcu_t {
 				}
 			}
 		}
-	}
+	},
+	.adc = {
+		.r_admux = ADMUX,
+		.mux = { AVR_IO_REGBIT(ADMUX, MUX0),
+			 AVR_IO_REGBIT(ADMUX, MUX1), },
+		.ref = { AVR_IO_REGBIT(ADMUX, REFS0), },
+		.ref_values = {
+			[0] = ADC_VREF_VCC, [1] = ADC_VREF_V110,
+		},
+
+		.adlar = AVR_IO_REGBIT(ADMUX, ADLAR),
+		.r_adcsra = ADCSRA,
+		.aden = AVR_IO_REGBIT(ADCSRA, ADEN),
+		.adsc = AVR_IO_REGBIT(ADCSRA, ADSC),
+		.adate = AVR_IO_REGBIT(ADCSRA, ADATE),
+		.adps = { AVR_IO_REGBIT(ADCSRA, ADPS0),
+			  AVR_IO_REGBIT(ADCSRA, ADPS1),
+			  AVR_IO_REGBIT(ADCSRA, ADPS2),},
+
+		.r_adch = ADCH,
+		.r_adcl = ADCL,
+
+		.r_adcsrb = ADCSRB,
+		.adts = { AVR_IO_REGBIT(ADCSRB, ADTS0),
+			  AVR_IO_REGBIT(ADCSRB, ADTS1),
+			  AVR_IO_REGBIT(ADCSRB, ADTS2),},
+		.adts_op = {
+			[0] = avr_adts_free_running,
+			[1] = avr_adts_analog_comparator_0,
+			[2] = avr_adts_external_interrupt_0,
+			[3] = avr_adts_timer_0_compare_match_a,
+			[4] = avr_adts_timer_0_overflow,
+			[5] = avr_adts_timer_0_compare_match_b,
+			[6] = avr_adts_pin_change_interrupt,
+		},
+		.muxmode = {
+			[0] = AVR_ADC_SINGLE(0), [1] = AVR_ADC_SINGLE(1),
+			[2] = AVR_ADC_SINGLE(2), [3] = AVR_ADC_SINGLE(3),
+		},
+
+		.adc = {
+			.enable = AVR_IO_REGBIT(ADCSRA, ADIE),
+			.raised = AVR_IO_REGBIT(ADCSRA, ADIF),
+			.vector = ADC_vect,
+		},
+	},
 };
 
 static avr_t * make()
 {
-	return &mcu.core;
+	return avr_core_allocate(&mcu.core, sizeof(struct mcu_t));
 }
 
 avr_kind_t tiny13 = {
@@ -134,13 +180,12 @@ static void init(struct avr_t * avr)
 {
 	struct mcu_t * mcu = (struct mcu_t*)avr;
 
-	printf("%s init\n", avr->mmcu);
-
 	avr_eeprom_init(avr, &mcu->eeprom);
 	avr_watchdog_init(avr, &mcu->watchdog);
 	avr_extint_init(avr, &mcu->extint);
 	avr_ioport_init(avr, &mcu->portb);
 	avr_timer_init(avr, &mcu->timer0);
+	avr_adc_init(avr, &mcu->adc);
 }
 
 static void reset(struct avr_t * avr)

@@ -24,7 +24,7 @@
 #include "ColorCombo.h"
 
 #include <QtCore/QMetaProperty>
-#include <QtGui/QSpinBox>
+#include <QSpinBox>
 
 Property::Property(const QString& name /*= QString()*/, QObject* propertyObject /*= 0*/, QObject* parent /*= 0*/) : QObject(parent), 
 m_propertyObject(propertyObject)

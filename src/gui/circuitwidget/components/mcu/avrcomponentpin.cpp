@@ -29,8 +29,6 @@ AVRComponentPin::AVRComponentPin( McuComponent* mcu, QString id, QString type, Q
     : McuComponentPin( mcu, id, type, label, pos, xpos, ypos, angle )
 {
     m_channel = -1;
-    m_pwmFreq = 0;
-    m_pwmDuty = 0;
 }
 AVRComponentPin::~AVRComponentPin(){}
 
@@ -40,7 +38,7 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
 
     if( m_id.startsWith("P") )
     {
-        m_port = m_id.at(1).toAscii();
+        m_port = m_id.at(1).toLatin1();
         m_pinN = m_id.mid(2,1).toInt();
 
         avr_ioctl( AvrProcessor, AVR_IOCTL_IOPORT_GETSTATE(m_port), &m_avrPin );
@@ -55,6 +53,7 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
 
         // Crea IRQ para recibir estado de pin: puerto "m_port", pin numero "m_pinN"
         avr_irq_t* stateIrq = avr_io_getirq( AvrProcessor, AVR_IOCTL_IOPORT_GETIRQ( m_port ),  m_pinN );
+        
         // Registra IRQ callback a funcion "out_hook" en clase "this"
         avr_irq_register_notify( stateIrq, out_hook, this );
 
@@ -64,8 +63,8 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
 
 
         // Registra IRQ para informar a simavr de estado de pin //avr_irq_pool_t* 	pool; // Esto que es??? en nuevo simavr
-        //const char** names;
-        m_Write_stat_irq = avr_alloc_irq( 0l, 0, 1, 0l/*names*/ );
+        const char* name = " ";
+        m_Write_stat_irq = avr_alloc_irq( &AvrProcessor->irq_pool, 0, 1, &name );
         avr_irq_t* writeIrq = avr_io_getirq( AvrProcessor, AVR_IOCTL_IOPORT_GETIRQ(m_port), m_pinN );
         avr_connect_irq( m_Write_stat_irq, writeIrq );
 
@@ -74,12 +73,6 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
             m_channel = m_type.right(1).toInt();
             avr_irq_t* adcIrq = avr_io_getirq( AvrProcessor, AVR_IOCTL_ADC_GETIRQ, ADC_IRQ_OUT_TRIGGER );
             avr_irq_register_notify( adcIrq, adc_hook, this );
-        }
-
-        if( m_id.startsWith("PD6")  /*&& m_pinLabel->text().contains("PWM")*/ )
-        {
-            avr_irq_t* i_pwm = avr_io_getirq( AvrProcessor, AVR_IOCTL_TIMER_GETIRQ('0'), TIMER_IRQ_OUT_PWM0 );
-            avr_irq_register_notify( i_pwm, pwm_changed_hook, this);
         }
     }
     m_attached = true;
@@ -119,7 +112,7 @@ void AVRComponentPin::set_pinVoltage( uint32_t value )
 
 void AVRComponentPin::set_pinImpedance( uint32_t value )
 {
-    //qDebug() << "Port" << m_port << m_id << "   salida: " << (value and ( 1<<m_pinN ));
+    //qDebug() << "Port" << m_port << m_id << "   salida: " << (value & ( 1<<m_pinN ));
     if( value & (1 << m_pinN) )
     {
         setImp( 40 );
@@ -133,12 +126,6 @@ void AVRComponentPin::set_pinImpedance( uint32_t value )
             m_ePin[0]->getEnode()->addToChangedList(this);*/
     }
     //qDebug()<< m_id << "Port" << m_port << m_pinN << "   salida: " << (value and ( 1<<m_pinN ));
-}
-
-void AVRComponentPin::set_pwm( uint32_t value )
-{
-    m_pwmDuty = value;
-    qDebug()<<__FUNCTION__ << m_id << value;
 }
 
 void AVRComponentPin::adcread( int channel )

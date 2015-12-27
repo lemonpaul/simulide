@@ -70,9 +70,6 @@ Capacitor::Capacitor( QObject* parent, QString type, QString id )
 }
 Capacitor::~Capacitor(){}
 
-double Capacitor::uF()              { return eCapacitor::uF(); }
-void   Capacitor::setuF( double c ) { eCapacitor::setuF( c ); }
-
 void Capacitor::remove()
 {
     if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
@@ -88,8 +85,8 @@ void Capacitor::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWid
     pen.setWidth(3);
     p->setPen(pen);
 
-    p->drawLine(-4,-8,-4, 8 );
-    p->drawLine( 4,-8, 4, 8 );
+    p->drawLine(-3,-6,-3, 6 );
+    p->drawLine( 3,-6, 3, 6 );
 }
 
 #include "moc_capacitor.cpp"

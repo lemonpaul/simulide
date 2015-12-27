@@ -35,6 +35,11 @@
 #include "sim_elf.h"
 #include "sim_vcd_file.h"
 #include "avr_eeprom.h"
+#include "avr_ioport.h"
+
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 
 void avr_load_firmware(avr_t * avr, elf_firmware_t * firmware)
 {
@@ -46,8 +51,23 @@ void avr_load_firmware(avr_t * avr, elf_firmware_t * firmware)
 		avr->avcc = firmware->avcc;
 	if (firmware->aref)
 		avr->aref = firmware->aref;
-#if CONFIG_SIMAVR_TRACE
-	avr->trace_data->codeline = firmware->codeline;
+#if CONFIG_SIMAVR_TRACE && ELF_SYMBOLS
+	int scount = firmware->flashsize >> 1;
+	avr->trace_data->codeline = malloc(scount * sizeof(avr_symbol_t*));
+	memset(avr->trace_data->codeline, 0, scount * sizeof(avr_symbol_t*));
+
+	for (int i = 0; i < firmware->symbolcount; i++)
+		if (firmware->symbol[i]->addr < firmware->flashsize)	// code address
+			avr->trace_data->codeline[firmware->symbol[i]->addr >> 1] =
+				firmware->symbol[i];
+	// "spread" the pointers for known symbols forward
+	avr_symbol_t * last = NULL;
+	for (int i = 0; i < scount; i++) {
+		if (!avr->trace_data->codeline[i])
+			avr->trace_data->codeline[i] = last;
+		else
+			last = avr->trace_data->codeline[i];
+	}
 #endif
 
 	avr_loadcode(avr, firmware->flash, firmware->flashsize, firmware->flashbase);
@@ -56,7 +76,18 @@ void avr_load_firmware(avr_t * avr, elf_firmware_t * firmware)
 		avr_eeprom_desc_t d = { .ee = firmware->eeprom, .offset = 0, .size = firmware->eesize };
 		avr_ioctl(avr, AVR_IOCTL_EEPROM_SET, &d);
 	}
-
+	// load the default pull up/down values for ports
+	for (int i = 0; i < 8; i++)
+		if (firmware->external_state[i].port == 0)
+			break;
+		else {
+			avr_ioport_external_t e = {
+				.name = firmware->external_state[i].port,
+				.mask = firmware->external_state[i].mask,
+				.value = firmware->external_state[i].value,
+			};
+			avr_ioctl(avr, AVR_IOCTL_IOPORT_SET_EXTERNAL(e.name), &e);
+		}
 	avr_set_command_register(avr, firmware->command_register_addr);
 	avr_set_console_register(avr, firmware->console_register_addr);
 
@@ -66,18 +97,21 @@ void avr_load_firmware(avr_t * avr, elf_firmware_t * firmware)
 		return;
 	avr->vcd = malloc(sizeof(*avr->vcd));
 	memset(avr->vcd, 0, sizeof(*avr->vcd));
-	avr_vcd_init(avr, 
+	avr_vcd_init(avr,
 		firmware->tracename[0] ? firmware->tracename: "gtkwave_trace.vcd",
 		avr->vcd,
 		firmware->traceperiod >= 1000 ? firmware->traceperiod : 1000);
-	
-	printf("Creating VCD trace file '%s'\n", avr->vcd->filename);
+
+	AVR_LOG(avr, LOG_TRACE, "Creating VCD trace file '%s'\n", avr->vcd->filename);
 	for (int ti = 0; ti < firmware->tracecount; ti++) {
 		if (firmware->trace[ti].mask == 0xff || firmware->trace[ti].mask == 0) {
 			// easy one
-			avr_irq_t * all = avr_iomem_getirq(avr, firmware->trace[ti].addr, AVR_IOMEM_IRQ_ALL);
+			avr_irq_t * all = avr_iomem_getirq(avr,
+					firmware->trace[ti].addr,
+					firmware->trace[ti].name,
+					AVR_IOMEM_IRQ_ALL);
 			if (!all) {
-				printf("%s: unable to attach trace to address %04x\n",
+				AVR_LOG(avr, LOG_ERROR, "ELF: %s: unable to attach trace to address %04x\n",
 					__FUNCTION__, firmware->trace[ti].addr);
 			} else {
 				avr_vcd_add_signal(avr->vcd, all, 8, firmware->trace[ti].name);
@@ -89,20 +123,23 @@ void avr_load_firmware(avr_t * avr, elf_firmware_t * firmware)
 					count++;
 			for (int bi = 0; bi < 8; bi++)
 				if (firmware->trace[ti].mask & (1 << bi)) {
-					avr_irq_t * bit = avr_iomem_getirq(avr, firmware->trace[ti].addr, bi);
+					avr_irq_t * bit = avr_iomem_getirq(avr,
+							firmware->trace[ti].addr,
+							firmware->trace[ti].name,
+							bi);
 					if (!bit) {
-						printf("%s: unable to attach trace to address %04x\n",
+						AVR_LOG(avr, LOG_ERROR, "ELF: %s: unable to attach trace to address %04x\n",
 							__FUNCTION__, firmware->trace[ti].addr);
 						break;
 					}
-					
+
 					if (count == 1) {
 						avr_vcd_add_signal(avr->vcd, bit, 1, firmware->trace[ti].name);
 						break;
 					}
 					char comp[128];
 					sprintf(comp, "%s.%d", firmware->trace[ti].name, bi);
-					avr_vcd_add_signal(avr->vcd, bit, 1, firmware->trace[ti].name);					
+					avr_vcd_add_signal(avr->vcd, bit, 1, firmware->trace[ti].name);
 				}
 		}
 	}
@@ -111,61 +148,3 @@ void avr_load_firmware(avr_t * avr, elf_firmware_t * firmware)
 	if (!firmware->command_register_addr)
 		avr_vcd_start(avr->vcd);
 }
-
-static void elf_parse_mmcu_section(elf_firmware_t * firmware, uint8_t * src, uint32_t size)
-{
-	while (size) {
-		uint8_t tag = *src++;
-		uint8_t ts = *src++;
-		int next = size > 2 + ts ? 2 + ts : size;
-	//	printf("elf_parse_mmcu_section %d, %d / %d\n", tag, ts, size);
-		switch (tag) {
-			case AVR_MMCU_TAG_FREQUENCY:
-				firmware->frequency =
-					src[0] | (src[1] << 8) | (src[2] << 16) | (src[3] << 24);
-				break;
-			case AVR_MMCU_TAG_NAME:
-				strcpy(firmware->mmcu, (char*)src);
-				break;		
-			case AVR_MMCU_TAG_VCC:
-				firmware->vcc =
-					src[0] | (src[1] << 8) | (src[2] << 16) | (src[3] << 24);
-				break;
-			case AVR_MMCU_TAG_AVCC:
-				firmware->avcc =
-					src[0] | (src[1] << 8) | (src[2] << 16) | (src[3] << 24);
-				break;
-			case AVR_MMCU_TAG_AREF:
-				firmware->aref =
-					src[0] | (src[1] << 8) | (src[2] << 16) | (src[3] << 24);
-				break;
-			case AVR_MMCU_TAG_VCD_TRACE: {
-				uint8_t mask = src[0];
-				uint16_t addr = src[1] | (src[2] << 8);
-				char * name = (char*)src + 3;
-				printf("AVR_MMCU_TAG_VCD_TRACE %04x:%02x - %s\n", addr, mask, name);
-				firmware->trace[firmware->tracecount].mask = mask;
-				firmware->trace[firmware->tracecount].addr = addr;
-				strncpy(firmware->trace[firmware->tracecount].name, name, 
-					sizeof(firmware->trace[firmware->tracecount].name));
-				firmware->tracecount++;
-			}	break;
-			case AVR_MMCU_TAG_VCD_FILENAME: {
-				strcpy(firmware->tracename, (char*)src);
-			}	break;
-			case AVR_MMCU_TAG_VCD_PERIOD: {
-				firmware->traceperiod =
-					src[0] | (src[1] << 8) | (src[2] << 16) | (src[3] << 24);
-			}	break;
-			case AVR_MMCU_TAG_SIMAVR_COMMAND: {
-				firmware->command_register_addr = src[0] | (src[1] << 8);
-			}	break;
-			case AVR_MMCU_TAG_SIMAVR_CONSOLE: {
-				firmware->console_register_addr = src[0] | (src[1] << 8);
-			}	break;
-		}
-		size -= next;
-		src += next - 2; // already incremented
-	}
-}
-

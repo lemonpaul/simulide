@@ -23,6 +23,9 @@
 #ifndef __AVR_WATCHDOG_H___
 #define __AVR_WATCHDOG_H___
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "sim_avr.h"
 
@@ -38,6 +41,11 @@ typedef struct avr_watchdog_t {
 	avr_int_vector_t watchdog;	// watchdog interrupt
 
 	avr_cycle_count_t	cycle_count;
+
+	struct {
+		uint8_t		wdrf;		// saved watchdog reset flag
+		avr_run_t	avr_run;	// restored during reset
+	} reset_context;
 } avr_watchdog_t;
 
 /* takes no parameter */
@@ -66,9 +74,10 @@ void avr_watchdog_init(avr_t * avr, avr_watchdog_t * p);
 	}
 
 /* no WDP3, WDIE, WDIF in atmega128 */
+/* MCUSR is called MCUCSR in atmega128 */
 #define AVR_WATCHDOG_DECLARE_128(_WDSR, _vec) \
 	.watchdog = {\
-		.wdrf = AVR_IO_REGBIT(MCUSR, WDRF),\
+		.wdrf = AVR_IO_REGBIT(MCUCSR, WDRF),\
 		.wdce = AVR_IO_REGBIT(_WDSR, WDCE),\
 		.wde = AVR_IO_REGBIT(_WDSR, WDE),\
 		.wdp = { AVR_IO_REGBIT(_WDSR, WDP0),AVR_IO_REGBIT(_WDSR, WDP1),\
@@ -79,5 +88,9 @@ void avr_watchdog_init(avr_t * avr, avr_watchdog_t * p);
 			.vector = _vec,\
 		},\
 	}
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* __AVR_WATCHDOG_H___ */

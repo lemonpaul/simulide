@@ -34,21 +34,13 @@
 
 class eLogicDevice : public eElement
 {
-   /* Q_OBJECT
-    Q_PROPERTY( double Input_High_V READ inputHighV WRITE setInputHighV DESIGNABLE true USER true )
-    Q_PROPERTY( double Input_Imped  READ inputImp   WRITE setInputImp   DESIGNABLE true USER true )
-    Q_PROPERTY( double Out_High_V   READ outHighV   WRITE setOutHighV   DESIGNABLE true USER true )
-    Q_PROPERTY( double Out_Low_V    READ outLowV    WRITE setOutLowV    DESIGNABLE true USER true )
-    Q_PROPERTY( double Out_Imped    READ outImp     WRITE setOutImp     DESIGNABLE true USER true )*/
-    //Q_PROPERTY( double Num_Inputs   READ num_Inps   WRITE setNum_Inps   DESIGNABLE true USER true )
-
     public:
 
         eLogicDevice( string id );
         ~eLogicDevice();
 
-        int  numImps() const            { return m_numInputs; }
-        void setNumImps( int inputs );
+        int  numInps() const            { return m_numInputs; }
+        virtual void setNumInps( int inputs );
                                             
         int  numOuts() const            { return m_numOutputs; }
         void setNumOuts( int outputs );
@@ -66,7 +58,7 @@ class eLogicDevice : public eElement
         void  setOutLowV( double volt );
 
         double inputImp() const            { return m_inputImp; }
-        void  setInputImp( double imp );//    { m_inputImp = imp; }
+        void  setInputImp( double imp );
 
         double outImp() const            { return m_outImp; }
         void  setOutImp( double imp );
@@ -110,7 +102,6 @@ class eLogicDevice : public eElement
         std::vector<eSource*> m_output;
         std::vector<eSource*> m_input;
         std::vector<bool>     m_inputState;
-        //std::vector<bool>     m_outValue;
 };
 
 #endif

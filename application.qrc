@@ -17,5 +17,12 @@
         <file alias="capacitor.png">src/icons/components/capacitor.png</file>
         <file alias="arduinoUno.png">src/icons/components/arduinoUno.png</file>
         <file alias="seven_segment.png">src/icons/components/seven_segment.png</file>
+        <file alias="switch.png">src/icons/components/switch.png</file>
+        <file alias="inductor.png">src/icons/components/inductor.png</file>
+        <file alias="buffer.png">src/icons/components/buffer.png</file>
+        <file alias="andgate.png">src/icons/components/andgate.png</file>
+        <file alias="orgate.png">src/icons/components/orgate.png</file>
+        <file alias="xorgate.png">src/icons/components/xorgate.png</file>
+        <file alias="potentiometer.png">src/icons/components/potentiometer.png</file>
     </qresource>
 </RCC>

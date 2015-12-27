@@ -37,9 +37,12 @@ class eGate : public eLogicDevice
         virtual void setVChanged();
 
         void setInverted( bool inverted );
+        bool inverted() { return m_inverted; }
                              
     protected:           
         virtual bool calcOutput( int inputs );
+        bool m_inverted;
+        //int m_prevInputs;
 };
 
 

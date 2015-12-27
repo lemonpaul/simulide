@@ -28,16 +28,16 @@ OscopeWidget::OscopeWidget(  QWidget *parent  )
 
     this->setVisible( false );
 
-    setMinimumSize(QSize(200, 150));
+    setMinimumSize(QSize(200, 200));
 
-    m_color[0] = QColor( 170, 170, 0 );
-    m_color[1] = QColor( 255, 120, 50 );
+    m_color[0] = QColor( 190, 190, 0 );
+    m_color[1] = QColor( 240, 100, 10 );
     m_color[2] = QColor( 50, 120, 255 );
     m_color[3] = QColor( 30, 220, 150 );
 
     setupWidget();
 
-    //m_oscope->setAntialiased(true);
+    m_oscope->setAntialiased(true);
 
     m_ticksPs = 20;
     m_counter = 0;
@@ -45,9 +45,12 @@ OscopeWidget::OscopeWidget(  QWidget *parent  )
 
     for( int i=0; i<4; i++ )
     {
-        m_data[i] = 0;
+        m_data[i] = -1000;
         m_channel[i] = false;
     }
+    m_numchan = 1;
+    for( int i=0; i<1000; i++ ) step();
+    m_numchan = 0;
 }
 OscopeWidget::~OscopeWidget(){ }
 
@@ -119,6 +122,11 @@ void OscopeWidget::setTicksPs( int tps )
     m_ticksPs = tps;
 }
 
+void OscopeWidget::setOscopeTick( int tickUs )
+{
+    m_oscope->setOscopeTick( tickUs );
+}
+
 void OscopeWidget::setupWidget()
 {
     m_horizontalLayout = new QHBoxLayout( this );
@@ -161,9 +169,9 @@ void OscopeWidget::setupWidget()
 
     m_oscope = new RenderArea( this );
     m_oscope->setObjectName(tr("oscope"));
-    m_oscope->setFixedHeight( 150 );
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    m_oscope->setSizePolicy(sizePolicy);
+    //m_oscope->setFixedHeight( 200 );
+    //QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    //m_oscope->setSizePolicy(sizePolicy);
 
     QPen pen( m_color[0], 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
 
@@ -174,6 +182,8 @@ void OscopeWidget::setupWidget()
     }
 
     m_horizontalLayout->addWidget(m_oscope);
+    
+    
 
     //QGridLayout* lo = new QGridLayout(this);
     //lo->addLayout( &m_horizontalLayout, 0, 0 );

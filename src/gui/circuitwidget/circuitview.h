@@ -21,7 +21,7 @@
 #ifndef CIRCUITVIEW_H
 #define CIRCUITVIEW_H
 
-#include <QtGui>
+#include <QtWidgets>
 
 class Circuit;
 class Component;

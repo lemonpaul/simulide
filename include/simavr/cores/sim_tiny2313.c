@@ -19,7 +19,6 @@
 	along with simavr.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include "sim_core_declare.h"
 #include "avr_eeprom.h"
 #include "avr_watchdog.h"
@@ -38,7 +37,7 @@ static void reset(struct avr_t * avr);
 /*
  * This is a template for all of the tinyx5 devices, hopefully
  */
-static struct mcu_t {
+static const struct mcu_t {
 	avr_t core;
 	avr_eeprom_t 	eeprom;
 	avr_watchdog_t	watchdog;
@@ -60,9 +59,7 @@ static struct mcu_t {
 		AVR_EXTINT_TINY_DECLARE(0, 'D', 2, EIFR),
 		AVR_EXTINT_TINY_DECLARE(1, 'D', 3, EIFR),
 	},
-	.porta = {	// port A has no PCInts..
-		.name = 'A', .r_port = PORTA, .r_ddr = DDRA, .r_pin = PINA,
-	},
+	AVR_IOPORT_DECLARE(a, 'A', A), // port A has no PCInts..
 	.portb = {
 		.name = 'B',  .r_port = PORTB, .r_ddr = DDRB, .r_pin = PINB,
 		.pcint = {
@@ -72,9 +69,7 @@ static struct mcu_t {
 		},
 		.r_pcint = PCMSK,
 	},
-	.portd = {	// port D has no PCInts..
-		.name = 'D', .r_port = PORTD, .r_ddr = DDRD, .r_pin = PIND,
-	},
+	AVR_IOPORT_DECLARE(d, 'D', D), // port D has no PCInts..
 	.uart = {
 		// no PRR register on the 2313
 		//.disabled = AVR_IO_REGBIT(PRR,PRUSART0),
@@ -214,7 +209,7 @@ static struct mcu_t {
 
 static avr_t * make()
 {
-	return &mcu.core;
+	return avr_core_allocate(&mcu.core, sizeof(struct mcu_t));
 }
 
 avr_kind_t tiny2313 = {
@@ -225,8 +220,6 @@ avr_kind_t tiny2313 = {
 static void init(struct avr_t * avr)
 {
 	struct mcu_t * mcu = (struct mcu_t*)avr;
-
-	printf("%s init\n", avr->mmcu);
 
 	avr_eeprom_init(avr, &mcu->eeprom);
 	avr_watchdog_init(avr, &mcu->watchdog);

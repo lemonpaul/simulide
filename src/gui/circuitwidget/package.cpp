@@ -71,7 +71,7 @@ void Package::initPackage()
     m_numpins  = root.attribute( "pins" ).toInt();
     m_ePin.resize( m_numpins );
 
-    m_area = QRect( -(width/2)*8, -(height/2)*8, 8*width, 8*height );
+    m_area = QRect( 0, 0, 8*width, 8*height );
     label->setPos( m_area.x(), m_area.y()-20);
 
     QDomNode node = root.firstChild();
@@ -95,27 +95,27 @@ void Package::initPackage()
 
             if( side=="left" )
             {
-                xpos = -(width/2)*8-8;
-                ypos = -(height/2)*8+8*pos;
+                xpos = -8;
+                ypos = 8*pos;
                 angle = 180;
             }
             else if( side=="top")
             {
-                xpos = -(width/2)*8+8*pos;
-                ypos = -(height/2)*8-8;
-                angle = 270;
+                xpos = 8*pos;
+                ypos = -8;
+                angle = 90;
             }
             else if( side=="right" )
             {
-                xpos =  (width/2)*8+8;
-                ypos = -(height/2)*8+8*pos;
+                xpos =  width*8+8;
+                ypos = 8*pos;
                 angle = 0;
             }
             else if( side=="bottom" )
             {
-                xpos = -(width/2)*8+8*pos;
-                ypos =  (height/2)*8+8;
-                angle = 90;
+                xpos = 8*pos;
+                ypos =  height*8+8;
+                angle = 270;
             }
 
             chipPos++;
@@ -136,7 +136,7 @@ void Package::addPin( QString id, QString /*type*/, QString label, int pos, int 
 
 void Package::remove()
 {
-    for( int i=0; i<m_ePin.size(); i++ )
+    for( uint i=0; i<m_ePin.size(); i++ )
     {
         Pin* pin = static_cast<Pin*>(m_ePin[i]);
         if( pin->connector() ) pin->connector()->remove();
@@ -170,7 +170,7 @@ void Package::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     p->drawRoundedRect( boundingRect(), 1, 1);
 
     p->setPen( QColor( 170, 170, 150 ) );
-    p->drawArc( -4, boundingRect().y()-4, 8, 8, 0, -2880 /* -16*180 */ );
+    p->drawArc( boundingRect().width()/2-4, -4, 8, 8, 0, -2880 /* -16*180 */ );
 }
 
 #include "moc_package.cpp"

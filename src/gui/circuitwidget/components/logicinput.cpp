@@ -32,7 +32,7 @@ LibraryItem* LogicInput::libraryItem()
         tr( "Sources" ),
         "voltage.png",
         "Fixed Voltage",
-		LogicInput::construct );
+        LogicInput::construct );
 }
 
 LogicInput::LogicInput( QObject* parent, QString type, QString id )
@@ -45,13 +45,11 @@ LogicInput::LogicInput( QObject* parent, QString type, QString id )
     QString nodid = id;
     nodid.append(QString("-outnod"));
     QPoint nodpos = QPoint(16,0);
-    outpin = new Pin( 0, nodpos, nodid, 0, this);
+    m_outpin = new Pin( 0, nodpos, nodid, 0, this);
 
     nodid.append(QString("-eSource"));
-    m_out = new eSource( nodid.toStdString(), outpin );
+    m_out = new eSource( nodid.toStdString(), m_outpin );
     setVolt(5.0);
-    //m_power = false;
-    //m_voltLow   = cero_doub;
 
     m_button = new QPushButton( );
     m_button->setMaximumSize( 16,16 );
@@ -66,15 +64,12 @@ LogicInput::LogicInput( QObject* parent, QString type, QString id )
              this,     SLOT  ( onbuttonclicked() ));
 }
 
-LogicInput::~LogicInput() {  delete m_button; delete m_out;}
+LogicInput::~LogicInput() {}
 
 void LogicInput::onbuttonclicked()
 {
-    //if( m_out->power() )
-    {
-        m_out->setOut( !m_out->out() );
-        update();
-    }
+    m_out->setOut( !m_out->out() );
+    update();
 }
 
 void LogicInput::setVolt( double v )
@@ -84,16 +79,9 @@ void LogicInput::setVolt( double v )
     update();
 }
 
-/*void LogicInput::setChanged( bool changed )
-{
-    m_changed = changed;
-
-    //if( !changed ) outpin->setChanged( false );
-}*/
-
 void LogicInput::remove()
 {
-    if( outpin->isConnected() ) (static_cast<Pin*>(outpin))->connector()->remove();
+    if( m_outpin->isConnected() ) m_outpin->connector()->remove();
     Component::remove();
 }
 
@@ -102,12 +90,11 @@ void LogicInput::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWi
 {
     Component::paint( p, option, widget );
 
-    if ( /* m_out->power() &&*/ m_out->out() )
+    if ( m_out->out() )
         p->setBrush( QColor( 255, 166, 0 ) );
     else
         p->setBrush( QColor( 230, 230, 255 ) );
 
-    //p->drawEllipse( -8, -8, 16, 16 );
     p->drawRoundedRect( QRectF( -8, -8, 16, 16 ), 2, 2);
 }
 

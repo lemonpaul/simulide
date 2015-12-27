@@ -35,20 +35,19 @@
 class AVRComponentPin : public McuComponentPin
 {
     Q_OBJECT
-	public:
+    public:
         AVRComponentPin( McuComponent *mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
-		~AVRComponentPin();
+        ~AVRComponentPin();
 
         void attach( avr_t * AvrProcessor );
 
         void set_pinVoltage( uint32_t value );
         void set_pinImpedance( uint32_t value );
-        void set_pwm( uint32_t value );
 
         static void out_hook( struct avr_irq_t* irq, uint32_t value, void* param )
         {
             Q_UNUSED(irq);
-            // get the pointer out of param and asign it to a new pointer variable
+            // get the pointer out of param and asign it to AVRComponentPin*
             AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
 
             ptrAVRComponentPin->set_pinVoltage(value);
@@ -57,7 +56,7 @@ class AVRComponentPin : public McuComponentPin
         static void ddr_hook( struct avr_irq_t* irq, uint32_t value, void* param )
         {
             Q_UNUSED(irq);
-            // get the pointer out of param and asign it to a new pointer variable
+            // get the pointer out of param and asign it to AVRComponentPin*
             AVRComponentPin * ptrAVRComponentPin = reinterpret_cast<AVRComponentPin *> (param);
 
             ptrAVRComponentPin->set_pinImpedance(value);
@@ -66,36 +65,24 @@ class AVRComponentPin : public McuComponentPin
         static void adc_hook( struct avr_irq_t* irq, uint32_t value, void* param )
         {
             Q_UNUSED(irq);
-            // get the pointer out of param and asign it to a new pointer variable
+            // get the pointer out of param and asign it to AVRComponentPin*
             AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
 
             int channel = int( value/524288 );
             ptrAVRComponentPin->adcread( channel );
         }
 
-        static void pwm_changed_hook(struct avr_irq_t * irq, uint32_t value, void * param)
-        {
-            Q_UNUSED(irq);
-            // get the pointer out of param and asign it to a new pointer variable
-            AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
-
-            ptrAVRComponentPin->set_pwm(value);
-        }
-
         void adcread( int channel );
         void resetOutput();
 
         void setVChanged();
-		
+
     protected:
         char m_port;
         int  m_pinN;
         int  m_channel;
-        int  m_pwmFreq;
-        int  m_pwmDuty;
 
         const QString m_esp;
-
 
         //from simavr
         //AVRComponent       *m_pAVRComponent;

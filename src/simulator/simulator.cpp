@@ -42,14 +42,22 @@ Simulator::Simulator( QObject* parent ) : QObject(parent)
     m_timerId   = 0;
 
     m_avrCpu = 0l;
+    #ifndef NO_PIC
+    m_picCpu = 0l;
+    #endif
 }
 Simulator::~Simulator() { }
 
-void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (20 ms, 50 Hz max)
+void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 ms, 20 Hz max)
 {                                             // Used for Leds, probes, for update at frame rate 50 fps
     e->accept();
+
     if( !m_isrunning ) return;
 
+    /*timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    long ns = ts.tv_nsec;*/
+        
     for( int i=0; i<m_reaStepsPT; i++ )     // Update at m_reaClock rate (100 us, 10 KHz max)
     {                                       // Used for reactive elements
         /*timespec ts;
@@ -60,12 +68,18 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (20 m
         {                                   // Used for all non-reactive elements
             m_step ++;
 
-            /*if( m_avrCpu )                  // Update at mcu clock speed rate ( 16 MHz max )
+            if( m_avrCpu )                  // Update at mcu clock speed rate ( 16 MHz max )
             {
                 for( int k=0; k<m_mcuStepsPT; k++ ) avr_run( m_avrCpu ); //avr.step();
-            }*/
+            }
+            #ifndef NO_PIC
+            if( m_picCpu )                  // Update at mcu clock speed rate ( 16 MHz max )
+            {
+                for( int k=0; k<m_mcuStepsPT; k++ ) pic.step();
+            }
+            #endif
 
-            for( int k=0; k<m_mcuStepsPT; k++ ) {if( m_avrCpu ) avr_run( m_avrCpu ); //avr.step();
+            //for( int k=0; k<m_mcuStepsPT; k++ ) {if( m_avrCpu ) avr_run( m_avrCpu ); //avr.step();
 
             if( !m_changed ) continue;      // Only calc matrix when something changed
             m_changed = false;
@@ -76,7 +90,6 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (20 m
                 pauseSim();
                 return;
             }                               // m_matix sets the eNode voltages
-            }
         }
 
         std::vector<eElement*>::iterator it;
@@ -87,11 +100,15 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (20 m
         long ns2 = ts.tv_nsec;
         std::cout << "solved in uS: " << (ns2-ns)/1000<<std::endl;*/
     }
-
+    
     for( unsigned int i=0; i<m_updateList.size(); i++ )
         m_updateList[i]->updateStep();
 
     OscopeWidget::self()->step();
+    
+    /*clock_gettime(CLOCK_REALTIME, &ts);
+    long ns2 = ts.tv_nsec;
+    std::cout << "solved in uS: " << (ns2-ns)/1000<<std::endl;*/
  }
 
 
@@ -101,6 +118,10 @@ void Simulator::runContinuous()
 
     if( avr.getLoadStatus() ) m_avrCpu = avr.getCpu();
     else                      m_avrCpu = 0l;
+        #ifndef NO_PIC
+    if( pic.getLoadStatus() ) m_picCpu = pic.getCpu();
+    else                      m_picCpu = 0l;
+    #endif
 
     for( unsigned int i=0; i<m_elementList.size(); i++ ) m_elementList[i]->initialize();
 
@@ -127,12 +148,12 @@ void Simulator::runContinuous()
         pauseSim();
         return;
     }
-
-    std::cout << "\nTimertick:        " << m_timerTick
-            << " mS \nrea Steps/tick:   " << m_reaStepsPT
-            << " \nsteps/rea:        " <<m_stepsPrea
-            << "\nmcuStepsPT:       " << m_mcuStepsPT
-            << std::endl;
+    OscopeWidget::self()->setOscopeTick( m_simurate );
+    std::cout << "\nTimertick:        "     << m_timerTick
+              << " mS \nrea Steps/tick:   " << m_reaStepsPT
+              << " \nsteps/rea:        "    << m_stepsPrea
+              << "\nmcuStepsPT:       "     << m_mcuStepsPT
+              << std::endl;
 
     m_isrunning = true;
     std::cout << "\n    Running \n"<<std::endl;
@@ -156,6 +177,7 @@ void Simulator::pauseSim()
         this->killTimer( m_timerId );
         m_timerId = 0;
     }
+    std::cout << "\n    Paused \n"<<std::endl;
 }
 
 void Simulator::simuRateChanged( int rate )
@@ -168,6 +190,7 @@ void Simulator::simuRateChanged( int rate )
         m_stepsPrea  = 100;
         m_mcuStepsPT = rate/1000000;
 
+        int timerSps = 1000/m_timerTick;
         if( rate < 1000000 )
         {
             m_mcuStepsPT = 1;
@@ -175,7 +198,7 @@ void Simulator::simuRateChanged( int rate )
             if( rate<m_reaClock )
             {
                 m_stepsPrea = 1;
-                int timerSps = 1000/m_timerTick;
+                //int timerSps = 1000/m_timerTick;
                 m_reaStepsPT = rate/timerSps;
                 if( rate<timerSps )
                 {
@@ -184,15 +207,20 @@ void Simulator::simuRateChanged( int rate )
                 }
             }
         }
+        
         if( m_isrunning ) { pauseSim(); runContinuous(); }
     }
 }
 
 void Simulator::setChanged( bool changed ) { m_changed = changed; }
+
 void Simulator::setNodeVolt( int enode, double v ) { m_eNodeList.at(enode)->setVolt( v ); }
+
 bool Simulator::isRunning()  { return m_isrunning; }
+
 //int  Simulator::simuRate()   { return m_simurate; }
-int  Simulator::reaClock()  { return m_reaClock; }
+int  Simulator::reaClock()  { return m_stepsPrea; /*m_reaClock;*/ }
+
 //int  Simulator::stepsPT()    { return m_reaStepsPT; }
 unsigned long long Simulator::step() { return m_step; }
 

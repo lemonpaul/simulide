@@ -27,8 +27,6 @@ ePin::ePin( string id, int index )
     m_enode    = 0l;
     m_enodeCon = 0l;
     m_connected = false;
-    //m_numConections = 0;
-    //reset();
 }
 ePin::~ePin()
 {

@@ -20,7 +20,7 @@
 #ifndef OSCOPEWIDGET_H
 #define OSCOPEWIDGET_H
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "renderarea.h"
 
@@ -43,6 +43,7 @@ class OscopeWidget : public QWidget
         void setData( int channel, int data );
         void setTicksPs( int tps );
         //void setButtonText( QString text );
+        void setOscopeTick( int tickUs );
 
     private:
  static OscopeWidget* m_pSelf;

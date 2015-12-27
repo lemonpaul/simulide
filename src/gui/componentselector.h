@@ -20,7 +20,7 @@
 #ifndef ComponentSelector_H
 #define ComponentSelector_H
 
-#include <QtGui>
+#include <QtWidgets>
 
 /**
 @short Allows selection of generic items for dragging / clicking

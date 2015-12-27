@@ -19,7 +19,6 @@
 	along with simavr.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include "sim_avr.h"
 #include "sim_core_declare.h"
 #include "avr_eeprom.h"
@@ -40,7 +39,7 @@ void usb162_reset(struct avr_t * avr);
 #define __ASSEMBLER__
 #include "avr/iousb162.h"
 
-struct mcu_t {
+const struct mcu_t {
 	avr_t			 core;
 	avr_eeprom_t 	eeprom;
 	avr_flash_t 	selfprog;
@@ -63,14 +62,14 @@ struct mcu_t {
 	AVR_SELFPROG_DECLARE(SPMCSR, SPMEN, SPM_READY_vect),
 	AVR_WATCHDOG_DECLARE(WDTCSR, WDT_vect),
 	.extint = {
-		AVR_EXTINT_DECLARE(0, 'D', PD0),
-		AVR_EXTINT_DECLARE(1, 'D', PD1),
-		AVR_EXTINT_DECLARE(2, 'D', PD2),
-		AVR_EXTINT_DECLARE(3, 'D', PD3),
-		AVR_EXTINT_DECLARE(4, 'C', PC7),
-		AVR_EXTINT_DECLARE(5, 'D', PD4),
-		AVR_EXTINT_DECLARE(6, 'D', PD6),
-		AVR_EXTINT_DECLARE(7, 'D', PD7),
+		AVR_EXTINT_MEGA_DECLARE(0, 'D', PD0, A),
+		AVR_EXTINT_MEGA_DECLARE(1, 'D', PD1, A),
+		AVR_EXTINT_MEGA_DECLARE(2, 'D', PD2, A),
+		AVR_EXTINT_MEGA_DECLARE(3, 'D', PD3, A),
+		AVR_EXTINT_MEGA_DECLARE(4, 'C', PC7, B),
+		AVR_EXTINT_MEGA_DECLARE(5, 'D', PD4, B),
+		AVR_EXTINT_MEGA_DECLARE(6, 'D', PD6, B),
+		AVR_EXTINT_MEGA_DECLARE(7, 'D', PD7, B),
 	},
 	.portb = {
 		.name = 'B', .r_port = PORTB, .r_ddr = DDRB, .r_pin = PINB,
@@ -90,9 +89,7 @@ struct mcu_t {
 		},
 		.r_pcint = PCMSK1,
 	},
-	.portd = {
-		.name = 'D', .r_port = PORTD, .r_ddr = DDRD, .r_pin = PIND,
-	},
+	AVR_IOPORT_DECLARE(d, 'D', D),
 
 	.uart1 = {
 		.disabled = AVR_IO_REGBIT(PRR1,PRUSART1),
@@ -229,22 +226,7 @@ struct mcu_t {
 			},
 		},
 	},
-	.spi = {
-
-		.r_spdr = SPDR,
-		.r_spcr = SPCR,
-		.r_spsr = SPSR,
-
-		.spe = AVR_IO_REGBIT(SPCR, SPE),
-		.mstr = AVR_IO_REGBIT(SPCR, MSTR),
-
-		.spr = { AVR_IO_REGBIT(SPCR, SPR0), AVR_IO_REGBIT(SPCR, SPR1), AVR_IO_REGBIT(SPSR, SPI2X) },
-		.spi = {
-			.enable = AVR_IO_REGBIT(SPCR, SPIE),
-			.raised = AVR_IO_REGBIT(SPSR, SPIF),
-			.vector = SPI_STC_vect,
-		},
-	},
+	AVR_SPI_DECLARE(0, 0),
 	.usb = {
 		.name='1',
 		.disabled=AVR_IO_REGBIT(PRR1, PRUSB),// bit in the PRR
@@ -261,7 +243,7 @@ struct mcu_t {
 
 static avr_t * make()
 {
-	return &mcu_usb162.core;
+	return avr_core_allocate(&mcu_usb162.core, sizeof(struct mcu_t));
 }
 
 avr_kind_t usb162 = {
@@ -272,8 +254,6 @@ avr_kind_t usb162 = {
 void usb162_init(struct avr_t * avr)
 {
 	struct mcu_t * mcu = (struct mcu_t*)avr;
-
-	printf("%s init\n", avr->mmcu);
 
 	avr_eeprom_init(avr, &mcu->eeprom);
 	avr_flash_init(avr, &mcu->selfprog);

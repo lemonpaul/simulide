@@ -59,13 +59,13 @@ void BaseProcessor::terminate()
     qDebug() <<"\nBaseProcessor::terminate "<<m_device<<m_symbolFile<<"\n";
     //emit terminated();
 
-    if( m_ramTable )
+    /*if( m_ramTable )
     {
         MainWindow::self()->ramTabWidgetLayout->removeWidget( m_ramTable );
         delete m_ramTable;
-    }
+    }*/
     m_loadStatus = false;
-    m_ramTable   = 0l;
+    //m_ramTable   = 0l;
     m_symbolFile = "";
     //m_device     = "";
 }
@@ -74,10 +74,15 @@ void BaseProcessor::initialized()
 {
     qDebug() << "Loaded: " << m_symbolFile;
 
-    //setRegisters();
+    setRegisters();
     m_loadStatus = true;
-    m_ramTable = new RamTable( this );
-    MainWindow::self()->ramTabWidgetLayout->addWidget( m_ramTable );
+    //qDebug() << m_ramTable;
+    if( m_ramTable == 0l )
+    {//qDebug() << "New RamTable ";
+        m_ramTable = new RamTable( this );
+        MainWindow::self()->ramTabWidgetLayout->addWidget( m_ramTable );
+        //qDebug() << m_ramTable;
+    }
 }
 
 QString BaseProcessor::getFileName() { return m_symbolFile; }

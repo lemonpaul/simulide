@@ -35,7 +35,7 @@ void eLatchD::initialize()
     if( !m_clockPin )
     {
         qDebug() << "eLatchD::initialize !m_clockPin";
-        for( int i=0; i<m_input.size(); i++ )
+        for( uint i=0; i<m_input.size(); i++ )
         {
             eNode* enode = m_input[i]->getEpin()->getEnode();
             if( enode ) enode->addToChangedList(this);

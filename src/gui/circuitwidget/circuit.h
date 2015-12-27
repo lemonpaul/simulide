@@ -20,7 +20,7 @@
 #ifndef CIRCUIT_H
 #define CIRCUIT_H
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QDomDocument>
 
 #include "simulator.h"

@@ -21,7 +21,7 @@
 #define PROBE_H
 
 #include "component.h"
-#include "e-element.h"
+#include "e-source.h"
 #include "pin.h"
 
 class LibraryItem;
@@ -45,8 +45,6 @@ class Probe : public Component, public eElement
 
         void setVolt( double volt );
 
-        //virtual void setChanged( bool changed );
-
         void updateStep();
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
@@ -69,8 +67,10 @@ class Probe : public Component, public eElement
 
         bool  m_showVolt;
 
-        Pin  *inputpin;
-        Label* m_dispvolt;
+        Pin   *m_inputpin;
+        Label *m_dispvolt;
+        
+        eSource* m_inSource;
 };
 
 

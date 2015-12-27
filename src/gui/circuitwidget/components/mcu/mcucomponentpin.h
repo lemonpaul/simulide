@@ -40,27 +40,18 @@ class McuComponentPin : public QObject, public eSource
         void move( int dx, int dy );
         //void moveLabel( int dx, int dy );
 
-        //virtual void changed(){;}
         void resetOutput();
 
     protected:
-        //float m_inputImp;
-        //float m_outImp;
-        //float m_imp;
-
         McuComponent  *m_mcuComponent;
         
         bool m_attached;
-        //eSource *m_out;
-        //Pin     *m_pin;
 
         double m_Rth;
         double m_Vth;
 
         QString m_type;
         QString m_id;
-
-        //QGraphicsSimpleTextItem* m_pinLabel;
 };
 
 #endif

@@ -26,9 +26,9 @@
 #include "Property.h"
 #include "EnumProperty.h"
 
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <QtCore/QMetaProperty>
-#include <QtGui/QItemEditorFactory>
+#include <QItemEditorFactory>
 
 struct PropertyPair
 {

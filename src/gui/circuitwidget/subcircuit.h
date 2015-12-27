@@ -20,7 +20,7 @@
 #ifndef SUBCIRCUIT_H
 #define SUBCIRCUIT_H
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "component.h"
 #include "package.h"

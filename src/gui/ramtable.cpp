@@ -22,13 +22,16 @@
 #include "utils.h"
 
 RamTable::RamTable( BaseProcessor *processor )
-    : QTableWidget( 20, 3 )
+    : QTableWidget( 40, 3 )
 {
     m_processor = processor;
-    m_numRegs = 20;
-    setColumnWidth(0, 50);
+    m_numRegs = 40;
+    
+    setColumnWidth(0, 100);
     setColumnWidth(1, 35);
-    setColumnWidth(2, 75);
+    setColumnWidth(2, 90);
+    
+    int row_heigh = 23;
 
     QTableWidgetItem *it;
 
@@ -43,8 +46,15 @@ RamTable::RamTable( BaseProcessor *processor )
             if( col>0 ) it->setFlags( Qt::ItemIsEnabled );
             setItem( row, col, it );
         }
+        QFont font = item( 0, 0 )->font();
+        font.setBold(true);
+        font.setPointSize( 11 );
+        for( int col=0; col<3; col++ ) item( row, col )->setFont( font );
+        
         item( row, 1 )->setText("---");
         item( row, 2 )->setText("---- ----");
+        
+        setRowHeight(row, row_heigh);
     }
 
     it = new QTableWidgetItem(0);
@@ -58,6 +68,16 @@ RamTable::RamTable( BaseProcessor *processor )
     it = new QTableWidgetItem(0);
     it->setText( tr("Binary") );
     setHorizontalHeaderItem( 2, it );
+    
+    QAction *loadVarSet = new QAction( QIcon(":/fileopen.png"),"loadVarSet", this);
+    connect( loadVarSet, SIGNAL(triggered()), this, SLOT(loadVarSet()) );
+    
+    QAction *saveVarSet = new QAction( QIcon(":/remove.png"),"saveVarSet", this);
+    connect( saveVarSet, SIGNAL(triggered()), this, SLOT(saveVarSet()) );
+    
+    horizontalHeader()->addAction( loadVarSet );
+    horizontalHeader()->addAction( saveVarSet );
+    horizontalHeader()->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     m_ramTimer = new QTimer(this);
     connect( m_ramTimer, SIGNAL(timeout()), this, SLOT(updateValues()) );
@@ -70,18 +90,44 @@ RamTable::RamTable( BaseProcessor *processor )
 }
 RamTable::~RamTable(){}
 
+void RamTable::loadVarSet()
+{
+    const QString dir = QCoreApplication::applicationDirPath()+"/data/varset";
+    QString fileName = QFileDialog::getOpenFileName( this, tr("Load File"), dir, tr("all files (*.*)"));
+    if (!fileName.isEmpty())
+    {
+        QStringList lines = fileToStringList( fileName, "RamTable::loadVarSet" );
+        int row = 0;
+        foreach( QString line, lines )
+        {
+            line.remove( " " );
+            if( line.isEmpty() ) continue;
+            item( row, 0 )->setText( line );
+            row++;
+            if( row >= m_numRegs ) break;
+        }
+    }
+}
+void RamTable::saveVarSet()
+{
+}
+
+
 void RamTable::updateValues()
 {
-    foreach( int _row, watchList.keys() )
+    if( m_processor )
     {
-        QString name = watchList[_row];
-
-        int value = m_processor->getRamValue( name );
-
-        if( value >= 0 )
+        foreach( int _row, watchList.keys() )
         {
-            item( _row, 1 )->setData( 0, value );
-            item( _row, 2 )->setData( 0, decToBase(value, 2, 8) );
+            QString name = watchList[_row];
+
+            int value = m_processor->getRamValue( name );
+
+            if( value >= 0 )
+            {
+                item( _row, 1 )->setData( 0, value );
+                item( _row, 2 )->setData( 0, decToBase(value, 2, 8) );
+            }
         }
     }
 }
@@ -90,7 +136,7 @@ void RamTable::addToWatch( QTableWidgetItem *it )
 {
     if( column(it) != 0 ) return;
     int _row = row(it);
-    QString name = it->text().remove(" ").remove("\t").toLower();
+    QString name = it->text().remove(" ").remove("\t").remove("*").toLower();
 
     if( name.isEmpty() )
     {
@@ -102,8 +148,12 @@ void RamTable::addToWatch( QTableWidgetItem *it )
     }
     else
     {
-        watchList[_row] = name;
-        verticalHeaderItem( _row )->setData( 0, m_processor->getRegAddress(name) );
+        int value = m_processor->getRegAddress(name);
+        if( value >= 0 )
+        {
+            watchList[_row] = name;
+            verticalHeaderItem( _row )->setData( 0, value );
+        }
     }
 }
 

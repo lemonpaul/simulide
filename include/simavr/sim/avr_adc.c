@@ -25,7 +25,9 @@
 #include "sim_time.h"
 #include "avr_adc.h"
 
-static avr_cycle_count_t avr_adc_int_raise(struct avr_t * avr, avr_cycle_count_t when, void * param)
+static avr_cycle_count_t
+avr_adc_int_raise(
+		struct avr_t * avr, avr_cycle_count_t when, void * param)
 {
 	avr_adc_t * p = (avr_adc_t *)param;
 	if (avr_regbit_get(avr, p->aden)) {
@@ -34,11 +36,15 @@ static avr_cycle_count_t avr_adc_int_raise(struct avr_t * avr, avr_cycle_count_t
 		avr_regbit_clear(avr, p->adsc);
 		p->first = 0;
 		p->read_status = 0;
+		if( p->adts_mode == avr_adts_free_running )
+			avr_raise_irq(p->io.irq + ADC_IRQ_IN_TRIGGER, 1);
 	}
 	return 0;
 }
 
-static uint8_t avr_adc_read_l(struct avr_t * avr, avr_io_addr_t addr, void * param)
+static uint8_t
+avr_adc_read_l(
+		struct avr_t * avr, avr_io_addr_t addr, void * param)
 {
 	avr_adc_t * p = (avr_adc_t *)param;
 
@@ -71,7 +77,7 @@ static uint8_t avr_adc_read_l(struct avr_t * avr, avr_io_addr_t addr, void * par
 			break;
 		case ADC_MUX_VCC4:
 			if ( !avr->vcc) {
-				printf("ADC Warning : missing VCC analog voltage\n");
+				AVR_LOG(avr, LOG_WARNING, "ADC: missing VCC analog voltage\n");
 			} else
 				reg = avr->vcc / 4;
 			break;
@@ -80,19 +86,19 @@ static uint8_t avr_adc_read_l(struct avr_t * avr, avr_io_addr_t addr, void * par
 	switch (ref) {
 		case ADC_VREF_VCC:
 			if (!avr->vcc)
-				printf("ADC Warning : missing VCC analog voltage\n");
+				AVR_LOG(avr, LOG_WARNING, "ADC: missing VCC analog voltage\n");
 			else
 				vref = avr->vcc;
 			break;
 		case ADC_VREF_AREF:
 			if (!avr->aref)
-				printf("ADC Warning : missing AREF analog voltage\n");
+				AVR_LOG(avr, LOG_WARNING, "ADC: missing AREF analog voltage\n");
 			else
 				vref = avr->aref;
 			break;
 		case ADC_VREF_AVCC:
 			if (!avr->avcc)
-				printf("ADC Warning : missing AVCC analog voltage\n");
+				AVR_LOG(avr, LOG_WARNING, "ADC: missing AVCC analog voltage\n");
 			else
 				vref = avr->avcc;
 			break;
@@ -105,7 +111,7 @@ static uint8_t avr_adc_read_l(struct avr_t * avr, avr_io_addr_t addr, void * par
 	reg = (reg * 0x3ff) / vref;	// scale to 10 bits ADC
 //	printf("ADC to 10 bits 0x%x %d\n", reg, reg);
 	if (reg > 0x3ff) {
-		printf("ADC Warning channel %d clipped %u/%u VREF %d\n", mux.kind, reg, 0x3ff, vref);
+		AVR_LOG(avr, LOG_WARNING, "ADC: channel %d clipped %u/%u VREF %d\n", mux.kind, reg, 0x3ff, vref);
 		reg = 0x3ff;
 	}
 	reg <<= shift;
@@ -125,7 +131,9 @@ static uint8_t avr_adc_read_l(struct avr_t * avr, avr_io_addr_t addr, void * par
  * So here if the H is read before the L, we still call the L to update the
  * register value.
  */
-static uint8_t avr_adc_read_h(struct avr_t * avr, avr_io_addr_t addr, void * param)
+static uint8_t
+avr_adc_read_h(
+		struct avr_t * avr, avr_io_addr_t addr, void * param)
 {
 	avr_adc_t * p = (avr_adc_t *)param;
 	// no "break" here on purpose
@@ -139,8 +147,67 @@ static uint8_t avr_adc_read_h(struct avr_t * avr, avr_io_addr_t addr, void * par
 	}
 }
 
-static void avr_adc_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
+static void
+avr_adc_configure_trigger(
+		struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
 {
+	avr_adc_t * p = (avr_adc_t *)param;
+	
+	uint8_t adate = avr_regbit_get(avr, p->adate);
+	uint8_t old_adts = p->adts_mode;
+	
+	static char * auto_trigger_names[] = {
+		"none",
+		"free_running",
+		"analog_comparator_0",
+		"analog_comparator_1",
+		"analog_comparator_2",
+		"analog_comparator_3",
+		"external_interrupt_0",
+		"timer_0_compare_match_a",
+		"timer_0_compare_match_b",
+		"timer_0_overflow",
+		"timer_1_compare_match_b",
+		"timer_1_overflow",
+		"timer_1_capture_event",
+		"pin_change_interrupt",
+		"psc_module_0_sync_signal",
+		"psc_module_1_sync_signal",
+		"psc_module_2_sync_signal",
+	};
+	
+	if( adate ) {
+		uint8_t adts = avr_regbit_get_array(avr, p->adts, ARRAY_SIZE(p->adts));
+		p->adts_mode = p->adts_op[adts];
+		
+		switch(p->adts_mode) {
+			case avr_adts_free_running: {
+				// do nothing at free running mode
+			}	break;
+			// TODO: implement the other auto trigger modes
+			default: {
+				AVR_LOG(avr, LOG_WARNING,
+						"ADC: unimplemented auto trigger mode: %s\n",
+						auto_trigger_names[p->adts_mode]);
+				p->adts_mode = avr_adts_none;
+			}	break;
+		}
+	} else {
+		// TODO: remove previously configured auto triggers
+		p->adts_mode = avr_adts_none;
+	}
+	
+	if( old_adts != p->adts_mode )
+		AVR_LOG(avr, LOG_TRACE, "ADC: auto trigger configured: %s\n",
+				auto_trigger_names[p->adts_mode]);
+}
+
+static void
+avr_adc_write_adcsra(
+		struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
+{
+	avr_adc_configure_trigger(avr, addr, v, param);
+	
 	avr_adc_t * p = (avr_adc_t *)param;
 	uint8_t adsc = avr_regbit_get(avr, p->adsc);
 	uint8_t aden = avr_regbit_get(avr, p->aden);
@@ -155,7 +222,7 @@ static void avr_adc_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t v, voi
 	if (!aden && avr_regbit_get(avr, p->aden)) {
 		// first conversion
 		p->first = 1;
-		printf("ADC Start AREF %d AVCC %d\n", avr->aref, avr->avcc);
+		AVR_LOG(avr, LOG_TRACE, "ADC: Start AREF %d AVCC %d\n", avr->aref, avr->avcc);
 	}
 	if (aden && !avr_regbit_get(avr, p->aden)) {
 		// stop ADC
@@ -178,7 +245,7 @@ static void avr_adc_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t v, voi
 
 		div = avr->frequency >> div;
 		if (p->first)
-			printf("ADC starting at %uKHz\n", div / 13 / 100);
+			AVR_LOG(avr, LOG_TRACE, "ADC: starting at %uKHz\n", div / 13 / 100);
 		div /= p->first ? 25 : 13;	// first cycle is longer
 
 		avr_cycle_timer_register(avr,
@@ -188,7 +255,16 @@ static void avr_adc_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t v, voi
 	avr_core_watch_write(avr, addr, v);
 }
 
-static void avr_adc_irq_notify(struct avr_irq_t * irq, uint32_t value, void * param)
+static void
+avr_adc_write_adcsrb(
+		struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
+{
+	avr_adc_configure_trigger(avr, addr, v, param);
+}
+
+static void
+avr_adc_irq_notify(
+		struct avr_irq_t * irq, uint32_t value, void * param)
 {
 	avr_adc_t * p = (avr_adc_t *)param;
 	avr_t * avr = p->io.avr;
@@ -202,7 +278,16 @@ static void avr_adc_irq_notify(struct avr_irq_t * irq, uint32_t value, void * pa
 		}	break;
 		case ADC_IRQ_IN_TRIGGER: {
 			if (avr_regbit_get(avr, p->adate)) {
-				// start a conversion
+				// start a conversion only if it's not running
+				// otherwise ignore the trigger
+				if(!avr_regbit_get(avr, p->adsc) ) {
+			  		uint8_t addr = p->adsc.reg;
+					if (addr) {
+						uint8_t val = avr->data[addr] | (1 << p->adsc.bit);
+						// write ADSC to ADCSRA
+						avr_adc_write_adcsra(avr, addr, val, param);
+					}
+				}
 			}
 		}	break;
 	}
@@ -257,7 +342,10 @@ void avr_adc_init(avr_t * avr, avr_adc_t * p)
 	// allocate this module's IRQ
 	avr_io_setirqs(&p->io, AVR_IOCTL_ADC_GETIRQ, ADC_IRQ_COUNT, NULL);
 
-	avr_register_io_write(avr, p->r_adcsra, avr_adc_write, p);
+	avr_register_io_write(avr, p->r_adcsra, avr_adc_write_adcsra, p);
+	// some ADCs don't have ADCSRB (atmega8/16/32)
+	if (p->r_adcsrb)
+		avr_register_io_write(avr, p->r_adcsrb, avr_adc_write_adcsrb, p);
 	avr_register_io_read(avr, p->r_adcl, avr_adc_read_l, p);
 	avr_register_io_read(avr, p->r_adch, avr_adc_read_h, p);
 }

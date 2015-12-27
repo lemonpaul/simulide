@@ -24,8 +24,8 @@
     <pin side="left" pos="18" type="open"  id="PD4"  label="D4"/>
     <pin side="left" pos="19" type="bidir" id="PD5"  label="D5"/>
     <pin side="left" pos="20" type="bidir" id="PD6"  label="D6"/>
-    <pin side="right"   pos="20" type="bidir" id="PD7"  label="D7"/>
     
+    <pin side="right"   pos="20" type="bidir" id="PD7"  label="D7"/>
     <pin side="right"   pos="19" type="bidir" id="PC0"  label="C0"/>
     <pin side="right"   pos="18" type="bidir" id="PC1"  label="C1"/>
     <pin side="right"   pos="17" type="bidir" id="PC2"  label="C2"/>

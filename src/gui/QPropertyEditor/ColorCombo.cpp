@@ -23,7 +23,7 @@
 
 #include "ColorCombo.h"
 
-#include <QtGui/QColorDialog>
+#include <QColorDialog>
 
 ColorCombo::ColorCombo(QWidget* parent /*= 0*/) : QComboBox(parent)
 {	
@@ -45,7 +45,9 @@ ColorCombo::~ColorCombo()
 
 QColor ColorCombo::color() const
 {
-	return qVariantValue<QColor>(itemData(currentIndex(), Qt::DecorationRole));
+	//return qVariantValue<QColor>(itemData(currentIndex(), Qt::DecorationRole)); // Qt4
+	//QColor color = itemData(currentIndex(), Qt::DecorationRole);
+	return itemData(currentIndex(), Qt::DecorationRole).value<QColor>();
 }
 
 void ColorCombo::setColor(QColor color)

@@ -34,7 +34,7 @@ LibraryItem* VoltSource::libraryItem()
         tr( "Sources" ),
         "voltsource.png",
         "Voltage Source",
-		VoltSource::construct );
+        VoltSource::construct );
 }
 
 VoltSource::VoltSource( QObject* parent, QString type, QString id )
@@ -42,19 +42,19 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
 {
     m_voltOut   = 0.0;
     //m_voltLow   = 0.0;
-    m_voltHight = 0.0;//5.0;
+    m_voltHight = 5.0;
 
-    //VoltWidget voltw = new VoltWidget();
     m_voltw.setFixedSize( 48,72 );
+    
     m_proxy = Circuit::self()->addWidget( &m_voltw );
     m_proxy->setParentItem( this );
     m_proxy->setPos( QPoint(-40, -64) );
-    m_proxy->setFlag(QGraphicsItem::ItemStacksBehindParent, true );
+    //m_proxy->setFlag(QGraphicsItem::ItemNegativeZStacksBehindParent, true );
 
     m_button = m_voltw.pushButton;
     m_dial   = m_voltw.dial;
 
-    m_button->setText( QString("%1").arg(float(int(m_voltHight*100))/100));
+    m_button->setText( QString("-- V") );
 
     QString nodid = id;
     nodid.append(QString("outnod"));
@@ -63,7 +63,8 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
 
     nodid.append("-eSource");
     m_out = new eSource( nodid.toStdString(), outpin );
-    //setVolt(5.0);
+    
+    setVolt(5.0);
 
     connect( m_button, SIGNAL(clicked()),
              this,     SLOT  (onbuttonclicked()) );
@@ -76,9 +77,15 @@ VoltSource::~VoltSource() { delete m_out; }
 
 void VoltSource::onbuttonclicked()
 {
-    m_out->setOut( m_button->isChecked() );
+    bool checked = m_button->isChecked();
+    m_out->setOut( checked );
 
-    QString msg = QString("%1 V").arg(float(int(m_voltOut*100))/100);
+    QString msg;
+    if( checked )
+        msg = QString("%1 V").arg(float(int(m_voltOut*100))/100);
+    else
+        msg = QString("-- V");
+        
     m_button->setText( msg );
 }
 
@@ -111,10 +118,13 @@ void VoltSource::remove()
 
 void VoltSource::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
-    p->drawRoundedRect( QRect( -40, -64, 48, 72 ), 1, 1 );
+    p->setBrush(Qt::white);
+    p->drawRoundedRect( QRect( -42, -66, 52, 76 ), 1, 1 );
+    //p->setBrush(Qt::darkGray);
+    p->fillRect( QRect( -42, -64, 50, 74 ), Qt::darkGray );
 
-    p->setBrush(Qt::darkGray);
-    p->drawRoundedRect( QRect( 8, -56, 8, 40 ), 1, 1 );
+    
+    //p->drawRoundedRect( QRect( 8, -56, 8, 40 ), 1, 1 );
 
     Component::paint( p, option, widget );
 }

@@ -23,7 +23,7 @@
  #include <QBrush>
  #include <QPen>
  #include <QPixmap>
- #include <QWidget>
+ #include <QtWidgets>
 
  class RenderArea : public QWidget
  {
@@ -38,6 +38,8 @@
          void setData( const int channel, int data );
          void printData();
          void drawVmark();
+         
+          void setOscopeTick( int tickUs );
 
      public slots:
          void setPen( const int channel, const QPen &pen );
@@ -59,6 +61,8 @@
          int m_width;
          int m_height;
          int m_sec;
+         
+         QString m_tick;
  };
 
  #endif

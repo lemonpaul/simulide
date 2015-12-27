@@ -20,7 +20,7 @@
 #ifndef MCUCOMPONENT_H
 #define MCUCOMPONENT_H
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "package.h"
 #include "baseprocessor.h"
@@ -29,7 +29,7 @@ class McuComponentPin;
 
 class McuComponent : public Package
 {
-	Q_OBJECT
+    Q_OBJECT
     Q_PROPERTY( QString  program  READ program WRITE setProgram DESIGNABLE true USER true )
     //Q_PROPERTY( int      Freq     READ freq    WRITE setFreq    DESIGNABLE true USER true )
 
@@ -45,7 +45,7 @@ class McuComponent : public Package
         //void setFreq( int freq )       { m_freq = freq; }
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
-	
+    
     public slots:
         virtual void terminate();
         virtual void remove();
@@ -54,7 +54,7 @@ class McuComponent : public Package
         void slotReload();
         void load( QString fileName );
 
-	protected:
+    protected:
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
         virtual void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )=0;

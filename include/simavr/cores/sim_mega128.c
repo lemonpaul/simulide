@@ -19,7 +19,6 @@
 	along with simavr.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include "sim_avr.h"
 #include "sim_core_declare.h"
 #include "avr_eeprom.h"
@@ -41,9 +40,9 @@ void m128_reset(struct avr_t * avr);
 #include "avr/iom128.h"
 
 /*
- * This is a template for all of the 128 devices, hopefuly
+ * This is a template for all of the 128 devices, hopefully
  */
-struct mcu_t {
+const struct mcu_t {
 	avr_t          core;
 	avr_eeprom_t 	eeprom;
 	avr_flash_t 	selfprog;
@@ -69,36 +68,22 @@ struct mcu_t {
 	AVR_SELFPROG_DECLARE(SPMCSR, SPMEN, SPM_READY_vect),
 	AVR_WATCHDOG_DECLARE_128(WDTCR, _VECTOR(0)),
 	.extint = {
-		AVR_EXTINT_DECLARE(0, 'D', PD0),
-		AVR_EXTINT_DECLARE(1, 'D', PD1),
-		AVR_EXTINT_DECLARE(2, 'D', PD2),
-		AVR_EXTINT_DECLARE(3, 'D', PD3),
-		AVR_EXTINT_DECLARE(4, 'E', PE4),
-		AVR_EXTINT_DECLARE(5, 'E', PE5),
-		AVR_EXTINT_DECLARE(6, 'E', PE6),
-		AVR_EXTINT_DECLARE(7, 'E', PE7),
+		AVR_EXTINT_MEGA_DECLARE(0, 'D', PD0, A),
+		AVR_EXTINT_MEGA_DECLARE(1, 'D', PD1, A),
+		AVR_EXTINT_MEGA_DECLARE(2, 'D', PD2, A),
+		AVR_EXTINT_MEGA_DECLARE(3, 'D', PD3, A),
+		AVR_EXTINT_MEGA_DECLARE(4, 'E', PE4, B),
+		AVR_EXTINT_MEGA_DECLARE(5, 'E', PE5, B),
+		AVR_EXTINT_MEGA_DECLARE(6, 'E', PE6, B),
+		AVR_EXTINT_MEGA_DECLARE(7, 'E', PE7, B),
 	},
-	.porta = {  // no PCINTs in atmega128
-		.name = 'A', .r_port = PORTA, .r_ddr = DDRA, .r_pin = PINA,
-	},
-	.portb = {
-		.name = 'B', .r_port = PORTB, .r_ddr = DDRB, .r_pin = PINB,
-	},
-	.portc = {
-		.name = 'C', .r_port = PORTC, .r_ddr = DDRC, .r_pin = PINC,
-	},
-	.portd = {
-		.name = 'D', .r_port = PORTD, .r_ddr = DDRD, .r_pin = PIND,
-	},
-	.porte = {
-		.name = 'E', .r_port = PORTE, .r_ddr = DDRE, .r_pin = PINE,
-	},
-	.portf = {
-		.name = 'F', .r_port = PORTF, .r_ddr = DDRF, .r_pin = PINF,
-	},
-	.portg = {
-		.name = 'G', .r_port = PORTG, .r_ddr = DDRG, .r_pin = PING,
-	},
+	AVR_IOPORT_DECLARE(a, 'A', A), // no PCINTs in atmega128
+	AVR_IOPORT_DECLARE(b, 'B', B),
+	AVR_IOPORT_DECLARE(c, 'C', C),
+	AVR_IOPORT_DECLARE(d, 'D', D),
+	AVR_IOPORT_DECLARE(e, 'E', E),
+	AVR_IOPORT_DECLARE(f, 'F', F),
+	AVR_IOPORT_DECLARE(g, 'G', G),
 
 	.uart0 = {
 	   // no PRUSART .disabled = AVR_IO_REGBIT(PRR,PRUSART0),
@@ -435,23 +420,7 @@ struct mcu_t {
 			.vector = TIMER3_CAPT_vect,
 		},
 	},
-	.spi = {
-
-		.r_spdr = SPDR,
-		.r_spcr = SPCR,
-		.r_spsr = SPSR,
-
-		.spe = AVR_IO_REGBIT(SPCR, SPE),
-		.mstr = AVR_IO_REGBIT(SPCR, MSTR),
-
-		.spr = { AVR_IO_REGBIT(SPCR, SPR0), AVR_IO_REGBIT(SPCR, SPR1), AVR_IO_REGBIT(SPSR, SPI2X) },
-		.spi = {
-			.enable = AVR_IO_REGBIT(SPCR, SPIE),
-			.raised = AVR_IO_REGBIT(SPSR, SPIF),
-			.vector = SPI_STC_vect,
-		},
-	},
-	
+	AVR_SPI_DECLARE(0, 0),
 	.twi = {
 
 		.r_twcr = TWCR,
@@ -473,6 +442,7 @@ struct mcu_t {
 		.twi = {
 			.enable = AVR_IO_REGBIT(TWCR, TWIE),
 			.raised = AVR_IO_REGBIT(TWCR, TWINT),
+			.raise_sticky = 1,
 			.vector = TWI_vect,
 		},
 	},
@@ -481,7 +451,7 @@ struct mcu_t {
 
 static avr_t * make()
 {
-        return &mcu_mega128.core;
+	return avr_core_allocate(&mcu_mega128.core, sizeof(struct mcu_t));
 }
 
 avr_kind_t mega128 = {
@@ -492,8 +462,6 @@ avr_kind_t mega128 = {
 void m128_init(struct avr_t * avr)
 {
 	struct mcu_t * mcu = (struct mcu_t*)avr;
-
-	printf("%s init\n", avr->mmcu);
 	
 	avr_eeprom_init(avr, &mcu->eeprom);
 	avr_flash_init(avr, &mcu->selfprog);

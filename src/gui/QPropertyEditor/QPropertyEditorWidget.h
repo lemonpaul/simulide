@@ -23,7 +23,7 @@
 #ifndef QPROPERTYEDITORWIDGET_H_
 #define QPROPERTYEDITORWIDGET_H_
 
-#include <QtGui/QTreeView>
+#include <QTreeView>
 
 class QPropertyModel;
 class Property;

@@ -23,7 +23,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication::setGraphicsSystem( "raster" );//native, raster, opengl
+    //QApplication::setGraphicsSystem( "raster" );//native, raster, opengl
     QApplication app(argc, argv);
     MainWindow window;
 

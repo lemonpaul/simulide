@@ -20,7 +20,7 @@
 #ifndef PACKAGE_H
 #define PACKAGE_H
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "component.h"
 #include "e-source.h"

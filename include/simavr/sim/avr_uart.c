@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "avr_uart.h"
 #include "sim_hex.h"
 
@@ -136,40 +137,46 @@ static void avr_uart_baud_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t 
 	int sb = 1 + avr_regbit_get(avr, p->usbs);
 	int word_size = 1 /* start */ + db /* data bits */ + 1 /* parity */ + sb /* stops */;
 
-	printf("UART-%c configured to %04x = %d bps (x%d), %d data %d stop\n",
+	AVR_LOG(avr, LOG_TRACE, "UART: %c configured to %04x = %d bps (x%d), %d data %d stop\n",
 			p->name, val, baud, avr_regbit_get(avr, p->u2x)?2:1, db, sb);
 	// TODO: Use the divider value and calculate the straight number of cycles
 	p->usec_per_byte = 1000000 / (baud / word_size);
-	printf("Roughtly %d usec per bytes\n", (int)p->usec_per_byte);
+	AVR_LOG(avr, LOG_TRACE, "UART: Roughly %d usec per bytes\n", (int)p->usec_per_byte);
 }
+
+static void avr_uart_udr_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
+{
+	avr_uart_t * p = (avr_uart_t *)param;
+
+	avr_core_watch_write(avr, addr, v);
+
+	if ( p->udrc.vector)
+		avr_regbit_clear(avr, p->udrc.raised);
+	avr_cycle_timer_register_usec(avr,
+			p->usec_per_byte, avr_uart_txc_raise, p); // should be uart speed dependent
+
+	if (p->flags & AVR_UART_FLAG_STDIO) {
+		const int maxsize = 256;
+		if (!p->stdio_out)
+			p->stdio_out = malloc(maxsize);
+		p->stdio_out[p->stdio_len++] = v < ' ' ? '.' : v;
+		p->stdio_out[p->stdio_len] = 0;
+		if (v == '\n' || p->stdio_len == maxsize) {
+			p->stdio_len = 0;
+			AVR_LOG(avr, LOG_TRACE, FONT_GREEN "%s\n" FONT_DEFAULT, p->stdio_out);
+		}
+	}
+	TRACE(printf("UDR%c(%02x) = %02x\n", p->name, addr, v);)
+	// tell other modules we are "outputting" a byte
+	if (avr_regbit_get(avr, p->txen))
+		avr_raise_irq(p->io.irq + UART_IRQ_OUTPUT, v);
+}
+
 
 static void avr_uart_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
 {
 	avr_uart_t * p = (avr_uart_t *)param;
 
-	if (addr == p->r_udr) {
-		avr_core_watch_write(avr, addr, v);
-
-		if ( p->udrc.vector)
-			avr_regbit_clear(avr, p->udrc.raised);
-		avr_cycle_timer_register_usec(avr,
-				p->usec_per_byte, avr_uart_txc_raise, p); // should be uart speed dependent
-
-		if (p->flags & AVR_UART_FLAG_STDIO) {
-			static char buf[128];
-			static int l = 0;
-			buf[l++] = v < ' ' ? '.' : v;
-			buf[l] = 0;
-			if (v == '\n' || l == 127) {
-				l = 0;
-				printf( FONT_GREEN "%s\n" FONT_DEFAULT, buf);
-			}
-		}
-		TRACE(printf("UDR%c(%02x) = %02x\n", p->name, addr, v);)
-		// tell other modules we are "outputing" a byte
-		if (avr_regbit_get(avr, p->txen))
-			avr_raise_irq(p->io.irq + UART_IRQ_OUTPUT, v);
-	}
 	if (p->udrc.vector && addr == p->udrc.enable.reg) {
 		/*
 		 * If enabling the UDRC interrupt, raise it immediately if FIFO is empty
@@ -190,9 +197,11 @@ static void avr_uart_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t v, vo
 		//uint8_t udre = avr_regbit_get(avr, p->udrc.raised);
 		uint8_t txc = avr_regbit_get(avr, p->txc.raised);
 
-		// no need to write this value in here, only the
-		// interrupt flags need clearing!
-		// avr_core_watch_write(avr, addr, v);
+                // setting u2x (double uart transmission speed) may also involve
+                // overwriting read only flags, therefore set u2x explicitly.
+                if(addr == p->u2x.reg) {
+                	avr_regbit_setto_raw(avr, p->u2x, v);
+                }
 
 		//avr_clear_interrupt_if(avr, &p->udrc, udre);
 		avr_clear_interrupt_if(avr, &p->txc, txc);
@@ -204,7 +213,7 @@ static void avr_uart_irq_input(struct avr_irq_t * irq, uint32_t value, void * pa
 	avr_uart_t * p = (avr_uart_t *)param;
 	avr_t * avr = p->io.avr;
 
-	// check to see fi receiver is enabled
+	// check to see if receiver is enabled
 	if (!avr_regbit_get(avr, p->rxen))
 		return;
 
@@ -230,7 +239,10 @@ void avr_uart_reset(struct avr_io_t *io)
 	avr_cycle_timer_cancel(avr, avr_uart_txc_raise, p);
 	uart_fifo_reset(&p->input);
 
-	// DEBUG allow printf without fidding with enabling the uart
+        avr_regbit_set(avr, p->ucsz);
+        avr_regbit_clear(avr, p->ucsz2);
+
+	// DEBUG allow printf without fiddling with enabling the uart
 	avr_regbit_set(avr, p->txen);
 	p->usec_per_byte = 100;
 }
@@ -287,7 +299,7 @@ void avr_uart_init(avr_t * avr, avr_uart_t * p)
 	// Only call callbacks when the value change...
 	p->io.irq[UART_IRQ_OUT_XOFF].flags |= IRQ_FLAG_FILTERED;
 
-	avr_register_io_write(avr, p->r_udr, avr_uart_write, p);
+	avr_register_io_write(avr, p->r_udr, avr_uart_udr_write, p);
 	avr_register_io_read(avr, p->r_udr, avr_uart_read, p);
 	// monitor code that reads the rxc flag, and delay it a bit
 	avr_register_io_read(avr, p->rxc.raised.reg, avr_uart_rxc_read, p);

@@ -43,8 +43,6 @@ class LogicInput : public Component
         double volt() const      { return m_voltHight; }
         void setVolt( double v );
 
-        //virtual void setChanged( bool changed );
-
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
@@ -53,9 +51,8 @@ class LogicInput : public Component
 
     private:
         double m_voltHight;
-        //double m_voltLow;
 
-        ePin    *outpin;
+        Pin     *m_outpin;
         eSource *m_out;
 
         QPushButton          *m_button;

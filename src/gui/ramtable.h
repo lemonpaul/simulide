@@ -20,7 +20,7 @@
 #ifndef RAMTABLE_H
 #define RAMTABLE_H
 
-#include <QtGui>
+#include <QtWidgets>
 
 class BaseProcessor;
 
@@ -35,6 +35,8 @@ class RamTable : public QTableWidget
 
     public slots:
         void updateValues();
+        void loadVarSet();
+        void saveVarSet();
 
     private slots:
         void addToWatch(QTableWidgetItem*);

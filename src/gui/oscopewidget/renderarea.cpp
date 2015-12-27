@@ -17,8 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
- #include <QtGui>
-
  #include "renderarea.h"
 
  RenderArea::RenderArea( QWidget *parent )
@@ -30,7 +28,7 @@
      setAutoFillBackground( true );
 
      m_width = 1000;
-     m_height = 150;
+     m_height = 180;
 
      QFont font;
      font.setPointSize(7);
@@ -40,7 +38,6 @@
      p.end();
 
      //drawBackground();
-
      for( int i=0; i<4; i++ )
      {
          m_data[i] = 0;
@@ -87,14 +84,14 @@
 
      sec.setNum(m_sec);
 
-     int base = m_height-20;
+     //int base = m_height-20;
 
-     p.drawLine( last, 5, last, base );
-     p.drawText( last-10, base-5, 10, 20, Qt::AlignHCenter, sec );
+     p.drawLine( last, 0, last, m_height );
+     //p.drawText( last-10, base-5, 10, 20, Qt::AlignHCenter, sec );
      p.end();
  }
 
- QSize RenderArea::minimumSizeHint() const  {  return QSize( 100, 100 );  }
+ QSize RenderArea::minimumSizeHint() const  {  return QSize( 100, 150 );  }
 
  QSize RenderArea::sizeHint() const  { return QSize( 400, 200 ); }
 
@@ -118,8 +115,8 @@
 
  void RenderArea::setData( const int channel, int data )
  {
-     data = data*(m_height-45)/500;
-     data = m_height-35-data;
+     data = (data/2+250)*m_height/520;
+     data = m_height-data-4;
      m_dataP[channel] = m_data[channel];
      m_data[channel] = data;
  }
@@ -133,17 +130,19 @@
      if( antialiased )
      {
          p.setRenderHint( QPainter::Antialiasing, true );
-         p.translate( +0.5, +0.5 );
+         //p.translate( +0.5, +0.5 );
      }
      int last = m_width-1;
+     
+     int zero = m_height/2;
 
      //p.setPen( QColor( 50, 50, 100 ) );
      p.setPen( QColor( 10, 15, 50 ) );
-     p.drawLine( last, 0, last, 149 ); // borra anterior
+     p.drawLine( last, 0, last, m_height ); // borra anterior
 
      p.setPen( QColor( 90, 90, 150 ) );
-     p.drawLine( last-1, m_height-34, last, m_height-34 ); // Linea de base ( 0 )
-     p.drawLine( last-1, m_height-33, last, m_height-33 );
+     p.drawLine( last-1, zero, last, zero ); // Linea de base ( 0 )
+     //p.drawLine( last-1, m_height-33, last, m_height-33 );
 
      for( int i=0; i<4; i++ )
      {
@@ -153,6 +152,27 @@
      }
      p.end();
  }
+ 
+ void RenderArea::setOscopeTick( int tickUs )
+{
+    QString unit = " S";
+    
+    int temp = tickUs/1e6;
+    
+    if( temp == 0 )
+    {
+        unit = " mS";
+        temp = tickUs/1e3;
+        if( temp == 0 )
+        {
+            unit = " uS";
+            temp = tickUs;
+        }
+    }
+    m_tick.setNum(temp);
+    m_tick += unit;
+    //qDebug() << m_tick;
+}
 
  void RenderArea::paintEvent( QPaintEvent * /* event */ )
  {
@@ -162,5 +182,9 @@
      int origX = width()-m_width;
      //int origy = 0; //height(),
      painter.drawPixmap( origX, 0, /*m_width, height(),*/ pixmap );
+     painter.setPen( QColor( 255, 255, 255 ) );
+     
+     painter.drawText( 0, 5, 100, 20, Qt::AlignHCenter, "Tick: "+m_tick );
+     
      painter.end();
  }

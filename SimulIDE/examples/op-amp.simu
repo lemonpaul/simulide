@@ -1,0 +1,27 @@
+<circuit type="simu">
+ 
+Probe-7: 
+<item labelrot="45" id="Probe-7" labelx="-32" labely="-24" Show_id="false" x="-324" y="-196" itemtype="Probe" Show_volt="true" objectName="Probe-7" rotation="-45"/>
+ 
+Probe-6: 
+<item labelrot="45" id="Probe-6" labelx="-32" labely="-24" Show_id="false" x="-156" y="-172" itemtype="Probe" Show_volt="true" objectName="Probe-6" rotation="-45"/>
+ 
+Volt. Source-4: 
+<item labelrot="0" Voltage="5" id="Volt. Source-4" labelx="0" labely="-24" Show_id="false" x="-388" y="-212" itemtype="Voltage Source" objectName="Volt. Source-4" rotation="0"/>
+ 
+Fixed Volt.-2: 
+<item labelrot="0" Voltage="2" id="Fixed Volt.-2" labelx="-64" labely="-24" Show_id="false" x="-388" y="-148" itemtype="Fixed Voltage" objectName="Fixed Volt.-2" rotation="0"/>
+ 
+OpAmp-1: 
+<item labelrot="0" id="OpAmp-1" labelx="0" labely="-24" Gain="1000" Show_id="false" x="-284" y="-156" itemtype="opAmp" objectName="OpAmp-1" rotation="0"/>
+ 
+Connector-3: 
+<item labelrot="0" endpinid="OpAmp-1inputInv" id="Connector-3" labelx="0" labely="-24" Show_id="false" x="-372" y="-148" itemtype="Connector" objectName="Connector-3" rotation="0" pointList="-372,-148,-308,-148" startpinid="Fixed Volt.-2-outnod" enodeid="enode-3"/>
+ 
+Connector-5: 
+<item labelrot="0" endpinid="OpAmp-1inputNinv" id="Connector-5" labelx="0" labely="-24" Show_id="false" x="-372" y="-212" itemtype="Connector" objectName="Connector-5" rotation="0" pointList="-372,-212,-340,-212,-340,-164,-308,-164" startpinid="Volt. Source-4outnod" enodeid="enode-5"/>
+ 
+Connector-8: 
+<item labelrot="0" endpinid="Probe-6inpin" id="Connector-8" labelx="0" labely="-24" Show_id="false" x="-260" y="-156" itemtype="Connector" objectName="Connector-8" rotation="0" pointList="-260,-156,-172,-156" startpinid="OpAmp-1output" enodeid="enode-8"/>
+ 
+</circuit>

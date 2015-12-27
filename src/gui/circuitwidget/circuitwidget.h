@@ -21,7 +21,7 @@
 #ifndef CIRCUITWIDGET_H
 #define CIRCUITWIDGET_H
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "circuitview.h"
 #include "oscopewidget.h"

@@ -41,7 +41,7 @@ Pin::Pin( int angle, const QPoint &pos, QString id, int index, Component* parent
 
     //if( angle == 0 ) xlabelpos = pos.x()-10;
 
-    rotate( 180-angle );
+    setRotation( 180-angle );
     const QFont sansFont( "Helvetica [Cronyx]", 6 );
     m_label = Circuit::self()->addSimpleText( id.toLatin1().data(), sansFont );
     m_label->setParentItem( parent /*this*/ );
@@ -65,7 +65,6 @@ void Pin::reset()
     setConnector( 0l );
     ePin::reset();
     //qDebug() << "ePin::reset new:" << m_numConections;
-    //m_msg = msg_dis;
     m_component->inStateChanged( m_index ); // Only used by node??
 }
 
@@ -74,31 +73,19 @@ double Pin::getVolt()
     return ePin::getVolt();
 }
 
-//void Pin::setChanged( bool changed ) { m_changed = changed; }
-
 void  Pin::setConnector( Connector* connector )
 {
     my_connector = connector;
     
     if( my_connector ) 
     {
-        //ePin::setEnode( connector->enode() );
         setCursor( Qt::ArrowCursor );
     }
     else               
     {
-        //ePin::setEnode( 0l );
         setCursor( Qt::CrossCursor );
     }
 }
-
-/*void Pin::setConnected( bool connected )
-{
-    ePin::m_connected = connected;
-    if( my_connector ) setCursor( Qt::ArrowCursor );
-    else             { setCursor( Qt::CrossCursor );
-                       my_connector = 0l; }
-}*/
 
 Connector* Pin::connector() { return my_connector; }
 
@@ -130,13 +117,34 @@ void Pin::setLabelPos()
 {
     QFontMetrics fm( m_label->font() );
 
-    int xlabelpos = pos().x()+m_length+2;
+    int xlabelpos = pos().x();
+    int ylabelpos = pos().y();
 
-    if( m_angle == 0 ) xlabelpos = pos().x() - fm.width(m_label->text())-m_length-2;//5*m_label->text().length();
+    if( m_angle == 0 )   // Right side
+    {
+        xlabelpos -= fm.width(m_label->text())+m_length+1;
+        ylabelpos -= 6;
+    }
+    if( m_angle == 90 )   // Top
+    {
+        xlabelpos += 5;
+        ylabelpos += m_length+1;
+        m_label->setRotation(m_angle);
+    }
+    if( m_angle == 180 )   // Left
+    {
+        xlabelpos += m_length+1;
+        ylabelpos -= 6;
+    }
+    if( m_angle == 270 )   //bottom
+    {
+        m_label->setRotation(m_angle);
+        xlabelpos -= 6;
+        ylabelpos -= m_length+1;
+        
+    }
 
-    //m_label->setX( xlabelpos );
-
-    m_label->setPos(xlabelpos, pos().y()-6 );
+    m_label->setPos(xlabelpos, ylabelpos );
 }
 
 void Pin::moveBy( int dx, int dy )
@@ -155,8 +163,6 @@ void Pin::setLength( int length )
 
 void Pin::setConPin( Pin* pin ){ m_conPin = pin; }
 Pin* Pin::conPin()             { return m_conPin; }
-
-//bool Pin::changed(){ return m_changed; }
 
 void Pin::setBoundingRect( QRect area )
 {

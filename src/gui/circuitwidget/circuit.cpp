@@ -60,6 +60,9 @@ Circuit::~Circuit()
 void Circuit::drawBackground ( QPainter*  painter, const QRectF & rect )
 {
     Q_UNUSED( rect );
+    /*painter->setBrush(QColor( 255, 255, 255 ) );
+    painter->drawRect( m_scenerect );*/
+    
     painter->setBrush(QColor( 250, 250, 230 ) );
     painter->drawRect( m_scenerect );
     painter->setPen( QColor( 230, 230, 230 ) );
@@ -152,7 +155,8 @@ void Circuit::loadCircuit( QString &fileName )
                     enodList.append( enode );
                 }
 
-                if( startpin == 0l || endpin == 0l) qDebug() << "\n   ERROR!!    Circuit::loadCircuit:    null Pin in " << id;
+                if( startpin == 0l || endpin == 0l) qDebug() 
+                    << "\n   ERROR!!    Circuit::loadCircuit:    null Pin in " << id;
                 else    // Create Connector
                 {
                     con = new Connector( this, type, id, startpin, endpin );
@@ -309,11 +313,20 @@ void Circuit::LoadProperties( QDomElement element, Component* Item )
             Item->setProperty( name, list );
             //qDebug() << "pointlist: " << list;
         }
-        else if ( metaproperty.type() == QVariant::Int    ) Item->setProperty( name, value.toInt() );
+        else if ( metaproperty.type() == QVariant::Int    ) 
+                  Item->setProperty( name, value.toInt() );
+                  
         //else if ( metaproperty.type() == QMetaType::Float ) Item->setProperty( name, value.toFloat() );
-        else if ( metaproperty.type() == QVariant::Double ) Item->setProperty( name, value.toDouble() );
-        else if ( metaproperty.type() == QVariant::PointF ) Item->setProperty( name, value.toPointF() );
-        else if ( metaproperty.type() == QVariant::Bool   ) Item->setProperty( name, value.toBool() );
+        
+        else if ( metaproperty.type() == QVariant::Double ) 
+                  Item->setProperty( name, value.toDouble() );
+            
+        else if ( metaproperty.type() == QVariant::PointF ) 
+                  Item->setProperty( name, value.toPointF() );
+            
+        else if ( metaproperty.type() == QVariant::Bool   ) 
+                  Item->setProperty( name, value.toBool() );
+                  
         else qDebug() << "    ERROR!!! Circuit::LoadProperties\n  unknown type:  "<<"name "<<name<<"   value "<<value ;
     }
     Item->setLabelPos();

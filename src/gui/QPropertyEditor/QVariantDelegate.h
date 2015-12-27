@@ -23,7 +23,7 @@
 #ifndef COLORSELECTIONBUTTON_H_
 #define COLORSELECTIONBUTTON_H_
 
-#include <QtGui/QItemDelegate>
+#include <QItemDelegate>
 
 class QSignalMapper;
 

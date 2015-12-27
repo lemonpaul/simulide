@@ -17,27 +17,26 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QtCore/QVariant>
-#include <QtGui>
+#include <QVariant>
 
 #include "voltwidget.h"
 
 VoltWidget::VoltWidget()
 {
     setupWidget();
+    
     setFixedSize( 60, 90 );
 }
 VoltWidget::~VoltWidget() {}
 
 void VoltWidget::setupWidget()
 {
-    dial = new QDial(this);
-    dial->setObjectName(QString::fromUtf8("dial"));
-    dial->setNotchesVisible(true);
+    DialWidget::setupWidget();
+    
     dial->setMinimum(0);
     dial->setMaximum(500);
     dial->setValue(000);
-    dial->setSingleStep(1);
+    dial->setSingleStep(10);
     
     pushButton = new QPushButton(this);
     pushButton->setObjectName( QString::fromUtf8("pushButton") );
@@ -47,11 +46,7 @@ void VoltWidget::setupWidget()
 
     QFont sansFont("Helvetica [Cronyx]", 8 );
     pushButton->setFont( sansFont );
-
-    verticalLayout = new QVBoxLayout(this);
-    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-    verticalLayout->setContentsMargins(0, 2, 0, 4);
-    verticalLayout->addWidget(dial);
+    
     verticalLayout->addWidget(pushButton);
     verticalLayout->setAlignment( pushButton, Qt::AlignHCenter );
 }

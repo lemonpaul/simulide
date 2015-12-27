@@ -21,7 +21,6 @@
 #define PIN_H
 
 #include "component.h"
-//#include "e-element.h"
 #include "e-pin.h"
 
 class Connector;
@@ -42,27 +41,19 @@ class Pin : public QObject, public QGraphicsItem, public ePin
         enum { Type = UserType + 3 };
         int type() const { return Type; }
 
-        //void init( int angle, const QPoint &pos, QString id, int index );
-
         QString itemID();
 
         void setLength( int length );
 
         void setBoundingRect( QRect area );
 
-        //void setConnected( bool );
-
         Connector* connector();
         void setConnector( Connector* c );
-        //bool haveCon() { return m_haveCon; }
 
         void setConPin( Pin* pin );
         Pin* conPin();
 
         double getVolt();
-
-        //void setChanged( bool changed );
-        //bool changed();
 
         void setLabelText( QString label );
         void setLabelPos();
@@ -84,7 +75,6 @@ class Pin : public QObject, public QGraphicsItem, public ePin
         int m_length;
 
         bool m_changed;
-        //bool m_haveCon;
 
         QString m_id;
 

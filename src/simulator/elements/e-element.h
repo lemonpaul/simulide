@@ -28,7 +28,7 @@ class eElement
 {
     public:
         eElement(string id=0);
-        ~eElement();
+        virtual ~eElement();
 
         virtual void initEpins();
         virtual void setNumEpins( int n );
@@ -41,14 +41,16 @@ class eElement
 
         virtual ePin* getEpin( int pin );
         virtual ePin* getEpin( QString pinName );
+        
+        virtual void setEpin( int num, ePin* pin );
 
         string getId(){ return m_elmId; }
 
-        const double cero_doub;
-        const double high_imp;
-        const double digital_high;
-        const double digital_low;
-        const double digital_threshold;
+        static const double cero_doub = 1e-20;
+        static const double high_imp = 1e20;
+        static const double digital_high = 5.0;
+        static const double digital_low = 0.0;
+        static const double digital_threshold = 2.5;
 
 
     protected:
