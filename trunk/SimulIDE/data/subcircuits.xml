@@ -1,0 +1,11 @@
+<!DOCTYPE SimulIDE>
+
+<itemlib>
+    <itemset category="Logic" type="Subcircuit">
+
+    <item name="74HC164" package="logic/74HC164.package" subcircuit="logic/74HC164.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC595" package="logic/74HC595.package" subcircuit="logic/74HC595.subcircuit" icon="ic2.png" ></item>
+
+    </itemset>
+</itemlib>
+

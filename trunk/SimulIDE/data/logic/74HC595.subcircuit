@@ -1,0 +1,48 @@
+<!DOCTYPE SimulIDE>
+
+<subcircuit enodes="8">
+
+    <item itemtype="eShiftReg" 
+    connections="
+    output0-eNode0 
+    output1-eNode1 
+    output2-eNode2 
+    output3-eNode3 
+    output4-eNode4 
+    output5-eNode5 
+    output6-eNode6 
+    output7-eNode7 
+    input0-packagePin10 
+    input1-packagePin14 
+    clock-packagePin13" >
+    </item>
+    
+    <item itemtype="eLatchD"
+    channels="8"
+    clocked="true"
+    tristate="true"
+    connections="
+    input0-eNode0 
+    input1-eNode1 
+    input2-eNode2 
+    input3-eNode3 
+    input4-eNode4 
+    input5-eNode5 
+    input6-eNode6 
+    input7-eNode7
+    packagePin15-eNode7 
+    
+    output0-packagePin9 
+    output1-packagePin0 
+    output2-packagePin1 
+    output3-packagePin2 
+    output4-packagePin3 
+    output5-packagePin4 
+    output6-packagePin5 
+    output7-packagePin6 
+    clock-packagePin12 
+    outEnable-packagePin11" >
+    </item>
+    
+</subcircuit>
+

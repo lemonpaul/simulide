@@ -1,0 +1,29 @@
+<!DOCTYPE SimulIDE>
+
+<subcircuit enodes="1">
+
+    <item itemtype="eShiftReg" 
+    connections="
+    output0-packagePin2 
+    output1-packagePin3 
+    output2-packagePin4 
+    output3-packagePin5 
+    output4-packagePin11 
+    output5-packagePin10 
+    output6-packagePin9 
+    output7-packagePin8 
+    input0-eNode0 
+    input1-packagePin12 
+    clock-packagePin13" >
+    </item>
+    
+    <item itemtype="eAndGate"
+    numInputs="2"
+    connections="
+    input0-packagePin0 
+    input1-packagePin1 
+    output0-eNode0" >
+    </item>
+    
+</subcircuit>
+
