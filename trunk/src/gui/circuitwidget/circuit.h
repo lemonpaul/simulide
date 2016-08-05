@@ -26,22 +26,30 @@
 #include "simulator.h"
 #include "e-node.h"
 
-//class Circuit;
 class Component;
 class Connector;
-//class ConnectorLine;
 class Pin;
 
 
 class Circuit : public QGraphicsScene
 {
     Q_OBJECT
+    Q_PROPERTY( int ReactStep READ reactStep WRITE setReactStep DESIGNABLE true USER true )
+    Q_PROPERTY( int Speed     READ circSpeed WRITE setCircSpeed DESIGNABLE true USER true )
 
     public:
         Circuit(qreal x, qreal y, qreal width, qreal height, QGraphicsView*  parent);
         ~Circuit();
 
         static Circuit*  self() { return m_pSelf; }
+        
+        int   reactStep();
+        void  setReactStep( int steps );
+        
+        int  circSpeed();
+        void setCircSpeed( int rate );
+        
+        void remove();
 
         void drawBackground(QPainter* painter, const QRectF &rect);
 
@@ -58,8 +66,6 @@ class Circuit : public QGraphicsScene
 
         QList<Component*>* compList() { return &m_compList; }
         QList<Component*>* conList()  { return &m_conList; }
-        //QList<eNode*>*   nodeList() { return &m_eNodeList;}
-
 
         /** a conector is been created*/
         void constarted( bool started) { m_con_started = started; }
@@ -78,7 +84,7 @@ class Circuit : public QGraphicsScene
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
     private:
-        void LoadProperties( QDomElement element, Component* Item );
+        void loadProperties( QDomElement element, Component* Item );
         void listToDom( QList<Component*>* complist );
 
         static Circuit*  m_pSelf;
@@ -89,19 +95,15 @@ class Circuit : public QGraphicsScene
         QGraphicsView* m_widget;
         Connector*     new_connector;
 
+        int  m_circRate;
         int  m_seqNumber;
         bool m_con_started;
-        bool m_changed;
+        //bool m_changed;
 
         QList<Component*> m_compList;   // Component list
         QList<Component*> m_conList;    // Connector list
-        //QList<Component*> m_updateList;
-        //QList<eNode*>     m_eNodeList;
-
-        //QBasicTimer m_timer;
 
         Simulator simulator;
-        //QThread simulatorThread;
 };
 
 #endif

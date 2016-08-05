@@ -22,37 +22,37 @@
 
 eDiode::eDiode( string id ) : eResistor(id )
 {
-    m_imped = 1;
-    m_threshold = 0.6;
+    m_imped = 0.6;
+    m_threshold = 0.7;
     m_resist = high_imp;
-
-    //Simulator::self()->addToRunList( this );
 }
-eDiode::~eDiode(){ /*Simulator::self()->remFromRunList( this ); */}
+eDiode::~eDiode()
+{ 
+}
 
 void eDiode::initialize()
 {
-    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToChangedList(this);
-    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToChangedList(this);
+    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToNoLinList(this);
+    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToNoLinList(this);
     eResistor::initialize();
 }
 
 void eDiode::setVChanged()
 {
-    m_pVolt  = m_ePin[0]->getVolt();
-    m_nVolt  = m_ePin[1]->getVolt();
-    //qDebug() << "eDiode::runStep " << m_pVolt << m_nVolt;
+    m_voltPN = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();;
 
     double deltaR = m_imped;
     double deltaV = m_threshold;
-    double voltPN = m_pVolt - m_nVolt;
-
-    if( voltPN < m_threshold )   // No conduce
+    
+    if( m_voltPN < m_threshold )   // No conduce
     {
-        deltaV = m_pVolt;
+        deltaV = m_voltPN;
+        //double delta = (m_threshold-m_voltPN)*50;
+        //deltaR = m_imped+pow(delta,3); 
         deltaR = high_imp;
+        //if( deltaR < m_imped ) detaR = m_imped;
     }
-    //qDebug() <<"eDiode::runStep,  deltaR: "<< deltaR << "  deltaV" <<deltaV;
+    //qDebug() <<"eDiode::setVChanged,  deltaR: "<< deltaR << "  deltaV" <<deltaV;
 
     if( deltaR != m_resist )
     {
@@ -73,7 +73,6 @@ void eDiode::setVChanged()
 void eDiode::setThreshold( double threshold )
 {
     m_threshold = threshold;
-    //update();
 }
 
 void eDiode::setRes( double resist )
@@ -83,12 +82,12 @@ void eDiode::setRes( double resist )
 
 void eDiode::updateVI()
 {
-    if( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() )
+    double volt = m_voltPN - m_deltaV;
+    if( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() && volt>0 )
     {
-        double volt = m_pVolt - m_nVolt - m_deltaV;
-        //if( volt < 0 ) volt = -volt;
         m_current = volt/m_resist;
         //qDebug() << " current " <<m_current<<volt<<m_deltaV;
     }
     else m_current = 0;
 }
+

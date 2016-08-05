@@ -3,22 +3,21 @@
 <itemlib>
     <itemset category="AVR" type="AVR">
 
-    <item name="attiny25"  package="avr/attiny85"  device="attiny25" ></item>
-    <item name="attiny45"  package="avr/attiny85"  device="attiny45" ></item>
-    <item name="attiny85"  package="avr/attiny85"  device="attiny85" ></item>
+    <item name="attiny25"  package="avr/attiny85"  data="avr/attiny85" device="attiny25" ></item>
+    <item name="attiny45"  package="avr/attiny85"  data="avr/attiny85" device="attiny45" ></item>
+    <item name="attiny85"  package="avr/attiny85"  data="avr/attiny85" device="attiny85" ></item>
 
-    <item name="atmega8"   package="avr/atmega328" device="atmega8" ></item>
-    <item name="atmega16"  package="avr/atmega32"  device="atmega16" ></item>
-    <item name="atmega32"  package="avr/atmega32"  device="atmega32" ></item>
-    <item name="atmega48"  package="avr/atmega328" device="atmega48" ></item>
-    <item name="atmega88"  package="avr/atmega328" device="atmega88" ></item>
-    <item name="atmega128" package="avr/atmega128" device="atmega128" ></item>
-    <item name="atmega164" package="avr/atmega164" device="atmega164" ></item>
-    <item name="atmega168" package="avr/atmega328" device="atmega168" ></item>
-    <item name="atmega169" package="avr/atmega169" device="atmega169" ></item>
-    <item name="atmega324" package="avr/atmega32"  device="atmega324" ></item>
-    <item name="atmega328" package="avr/atmega328" device="atmega328" ></item>
-    <item name="atmega644" package="avr/atmega32"  device="atmega644" ></item>
+    <item name="atmega8"   package="avr/atmega328" data="avr/atmega328" device="atmega8" ></item>
+    <item name="atmega16"  package="avr/atmega32"  data="avr/atmega32"  device="atmega16" ></item>
+    <item name="atmega32"  package="avr/atmega32"  data="avr/atmega32"  device="atmega32" ></item>
+    <item name="atmega48"  package="avr/atmega328" data="avr/atmega328" device="atmega48" ></item>
+    <item name="atmega88"  package="avr/atmega328" data="avr/atmega328" device="atmega88" ></item>
+    <item name="atmega128" package="avr/atmega128" data="avr/atmega128" device="atmega128" ></item>
+    <item name="atmega164" package="avr/atmega164" data="avr/atmega164" device="atmega164" ></item>
+    <item name="atmega168" package="avr/atmega328" data="avr/atmega328" device="atmega168" ></item>
+    <item name="atmega169" package="avr/atmega169" data="avr/atmega169" device="atmega169" ></item>
+    <item name="atmega328" package="avr/atmega328" data="avr/atmega328" device="atmega328" ></item>
+    <item name="atmega644" package="avr/atmega32"  data="avr/atmega32"  device="atmega644" ></item>
 
     </itemset>
 </itemlib>

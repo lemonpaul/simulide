@@ -57,10 +57,14 @@ class Pin : public QObject, public QGraphicsItem, public ePin
 
         void setLabelText( QString label );
         void setLabelPos();
+        void setLabelColor( QColor color );
 
         void moveBy( int dx, int dy );
 
         void reset();
+        
+        void findNodePins();
+        void findConnectedPins();
 
         virtual void paint( QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
@@ -74,7 +78,8 @@ class Pin : public QObject, public QGraphicsItem, public ePin
         int m_angle;
         int m_length;
 
-        bool m_changed;
+        //bool m_changed;
+        bool m_blocked;
 
         QString m_id;
 

@@ -29,16 +29,22 @@ class LibraryItem;
 class Inductor : public Component, public eInductor
 {
     Q_OBJECT
-    Q_PROPERTY( double H READ getH WRITE setH DESIGNABLE true USER true )
+    Q_PROPERTY( double Inductance  READ induc    WRITE setInduc   DESIGNABLE true USER true )
+    Q_PROPERTY( QString  Unit      READ unit     WRITE setUnit    DESIGNABLE true USER true )
+    Q_PROPERTY( bool     Show_Ind  READ showVal  WRITE setShowVal DESIGNABLE true USER true )
     
     public:
-        QRectF boundingRect() const { return QRect( -10, -10, 20, 20 ); }
 
         Inductor( QObject* parent, QString type, QString id );
         ~Inductor();
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
+        
+        double induc();
+        void  setInduc( double c );
+        
+        void setUnit( QString un );
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 

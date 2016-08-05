@@ -25,6 +25,8 @@
 
 class DialWidget : public QWidget
 {
+    Q_OBJECT
+    
     public:
         DialWidget();
         ~DialWidget();

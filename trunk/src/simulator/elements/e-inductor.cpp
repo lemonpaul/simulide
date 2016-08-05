@@ -20,36 +20,38 @@
 // Inductor model using backward euler  approximation
 // consists of a current source in parallel with a resistor.
 
-#include <cmath>
-
 #include "e-inductor.h"
 
 eInductor::eInductor( string id ) : eResistor( id )
 {
     m_ind = 1; // H
-    m_tStep = 1e-6*(double)Simulator::self()->reaClock(); //0.0001; //1/(double)Simulator::self()->reaClock();
+    m_tStep = (double)Simulator::self()->reaClock()/1e6;
     m_resist = m_ind/m_tStep;
     m_curSource = 0;
     m_volt = 0;
-
-    Simulator::self()->addToReacList( this );
 }
-eInductor::~eInductor(){ Simulator::self()->remFromReacList( this ); }
-
+eInductor::~eInductor()
+{
+}
 
 void eInductor::initialize()
 {
-    eResistor::initialize();
-    m_tStep = 1e-6*(double)Simulator::self()->reaClock();
+    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToChangedSlow(this);
+    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToChangedSlow(this);
+    
+    m_tStep = (double)Simulator::self()->reaClock()/1e6;
+    
     eResistor::setRes( m_ind/m_tStep );
+    eResistor::initialize();
 }
 
 void eInductor::setVChanged()
 {
     double volt = m_ePin[0]->getVolt() - m_ePin[1]->getVolt();
-
-    if( volt==0 ) return;
-    m_volt = volt;
+    
+    if( volt == 0 ) return;
+    //if( abs(m_volt-volt) < 1e-9 ) return;
+    //m_volt = volt;
 
     m_curSource += volt/m_resist;
 
@@ -59,7 +61,13 @@ void eInductor::setVChanged()
     m_ePin[1]->stampCurrent( m_curSource );
 }
 
-double eInductor::getH()             { return m_ind; }
-void  eInductor::setH( double h ) { m_ind = h; eResistor::setRes( m_ind/m_tStep ); 
-    /*qDebug() << "eInductor::setVChanged  m_tStep" << m_tStep <<" m_ind "<<m_ind<<" m_resist "<<m_resist;*/}
+double eInductor::ind()
+{ 
+    return m_ind; 
+}
+void  eInductor::setInd( double h ) 
+{ 
+    m_ind = h; 
+    eResistor::setRes( m_ind/m_tStep ); 
+}
 

@@ -72,7 +72,7 @@ void Package::initPackage()
     m_ePin.resize( m_numpins );
 
     m_area = QRect( 0, 0, 8*width, 8*height );
-    label->setPos( m_area.x(), m_area.y()-20);
+    m_idLabel->setPos( m_area.x(), m_area.y()-20);
 
     QDomNode node = root.firstChild();
 

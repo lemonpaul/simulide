@@ -50,6 +50,8 @@ class SevenSegment : public Component, public eElement
 
         void initialize();
         //void stamp();
+        
+        void remove();
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 

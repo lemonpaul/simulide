@@ -29,16 +29,22 @@ class LibraryItem;
 class Capacitor : public Component, public eCapacitor
 {
     Q_OBJECT
-    Q_PROPERTY( double uF READ uF WRITE setuF DESIGNABLE true USER true )
+    Q_PROPERTY( double Capacitance   READ capac    WRITE setCapac   DESIGNABLE true USER true )
+    Q_PROPERTY( QString  Unit        READ unit     WRITE setUnit    DESIGNABLE true USER true )
+    Q_PROPERTY( bool     Show_Cap    READ showVal  WRITE setShowVal DESIGNABLE true USER true )
     
     public:
-        QRectF boundingRect() const { return QRect( -10, -10, 20, 20 ); }
 
         Capacitor( QObject* parent, QString type, QString id );
         ~Capacitor();
 
         static Component* construct( QObject* parent, QString type, QString id );
-        static LibraryItem *libraryItem();
+        static LibraryItem* libraryItem();
+        
+        double capac();
+        void  setCapac( double c );
+        
+        void setUnit( QString un );
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
@@ -46,7 +52,6 @@ class Capacitor : public Component, public eCapacitor
         void remove();
 
     private:
-        //QGraphicsSimpleTextItem* m_labelcurr;
 };
 
 #endif

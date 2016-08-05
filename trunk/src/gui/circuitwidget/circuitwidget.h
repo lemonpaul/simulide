@@ -25,7 +25,8 @@
 
 #include "circuitview.h"
 #include "oscopewidget.h"
-
+#include "plotterwidget.h"
+#include "outpaneltext.h"
 
 class CircuitWidget : public QWidget
 {
@@ -41,9 +42,12 @@ class CircuitWidget : public QWidget
     public slots:
 
     private:
-        QVBoxLayout  *m_verticalLayout;
-        CircuitView  *m_circView;
-        OscopeWidget *m_oscope;
+        QVBoxLayout   m_verticalLayout;
+        QHBoxLayout   m_horizontLayout;
+        CircuitView   m_circView;
+        OutPanelText  m_outPanel;
+        OscopeWidget  m_oscope;
+        PlotterWidget m_plotter;
 };
 
 #endif

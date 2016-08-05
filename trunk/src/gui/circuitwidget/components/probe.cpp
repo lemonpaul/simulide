@@ -21,6 +21,9 @@
 #include "connector.h"
 #include "itemlibrary.h"
 #include "oscopewidget.h"
+#include "plotterwidget.h"
+
+bool Probe::m_oscopeBusy = false;
 
 Component* Probe::construct( QObject* parent, QString type, QString id )
 { return new Probe( parent, type, id ); }
@@ -38,23 +41,25 @@ LibraryItem* Probe::libraryItem()
 Probe::Probe( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eElement( id.toStdString() )
 {
-    m_showVolt = true;
-    m_labelx   = -32;
-    m_labely   = -24;
-    m_labelrot = 45;
-    setLabelPos();
+    m_haveOscope = false;
+    m_showVolt   = true;
+
+    setLabelPos(-32,-24, 45 ); // x, y, rot 
 
     m_voltIn   = cero_doub;
     m_voltTrig = 2.5;
-    m_oscopLine = -1;
-    m_oscopColor = QColor( 255, 255, 255 );
+    m_plotterLine = -1;
+    m_plotterColor = QColor( 255, 255, 255 );
 
     // Create volts Label
     m_dispvolt = new Label( this );
-    m_dispvolt->setPos( 14, 3 );
+    m_dispvolt->setPos( 16, -4 );
     m_dispvolt->setRotation( 45 );
-    m_dispvolt->setText( "0 V" );
-    m_dispvolt->setBrush( Qt::darkRed );
+    m_dispvolt->setPlainText( "0 V" );
+    m_dispvolt->setDefaultTextColor( Qt::darkRed );
+    //m_dispvolt->setEnabled( false );
+    //m_valLabel->setEnabled( false );
+    //m_valLabel->setVisible( false );
 
     // Create Input Pin
     m_ePin.resize(1);
@@ -74,7 +79,9 @@ Probe::Probe( QObject* parent, QString type, QString id )
 
     Simulator::self()->addToUpdateList( this );
 }
-Probe::~Probe() {}
+Probe::~Probe()
+{
+}
 
 void Probe::updateStep()
 {
@@ -130,40 +137,77 @@ void Probe::setVolt( double volt )
 
     m_voltIn = volt;
     int dispVolt = int(m_voltIn*100);
-    if( m_showVolt ) m_dispvolt->setText( QString("%1 V").arg(double(dispVolt)/100));
-    else             m_dispvolt->setText("");
+    if( m_showVolt ) m_dispvolt->setPlainText( QString("%1 V").arg(double(dispVolt)/100));
+    else             m_dispvolt->setPlainText("");
 
-    if( m_oscopLine > -1 ) OscopeWidget::self()->setData(m_oscopLine, dispVolt );
+    if( m_plotterLine > -1 ) PlotterWidget::self()->setData(m_plotterLine, dispVolt );
 
     update();       // Repaint
+}
+
+double Probe::getVolt()
+{
+    double volt = 0;
+    if( m_inputpin->isConnected() ) volt = m_inputpin->getVolt();
+    return volt;
 }
 
 void Probe::remove()
 {
-    slotOscopRem();
     Simulator::self()->remFromUpdateList( this );
-    if( m_inputpin->isConnected() )  m_inputpin->connector()->remove();
+    if( m_inputpin->isConnected() )
+    {
+        slotOscopRem();
+        m_inputpin->connector()->remove();
+    }
+    slotPlotterRem();
     Component::remove();
+}
+
+void Probe::slotPlotterAdd()
+{
+    m_plotterLine = PlotterWidget::self()->addChannel();
+    if( m_plotterLine < 0 ) return;
+
+    PlotterWidget::self()->setData( m_plotterLine, int(m_voltIn*100) );
+    m_plotterColor = PlotterWidget::self()->getColor( m_plotterLine );
+    update();       // Repaint
+}
+
+void Probe::slotPlotterRem()
+{
+    //qDebug() << m_plotterLine;
+    if( m_plotterLine < 0 ) return;
+
+    PlotterWidget::self()->remChannel( m_plotterLine );
+    m_plotterLine = -1;
+    update();       // Repaint
 }
 
 void Probe::slotOscopAdd()
 {
-    m_oscopLine = OscopeWidget::self()->addChannel();
-    if( m_oscopLine < 0 ) return;
-
-    OscopeWidget::self()->setData( m_oscopLine, int(m_voltIn*100) );
-    m_oscopColor = OscopeWidget::self()->getColor( m_oscopLine );
-    update();       // Repaint
+    if( m_oscopeBusy ) return; // Another probe is using oscope
+    
+    if( m_inputpin->isConnected() )
+    {
+        OscopeWidget::self()->setProbe( this );
+        OscopeWidget::self()->setVisible( true );
+        m_haveOscope = true;
+        m_oscopeBusy = true;
+    }
 }
 
 void Probe::slotOscopRem()
 {
-    //qDebug() << m_oscopLine;
-    if( m_oscopLine < 0 ) return;
-
-    OscopeWidget::self()->remChannel( m_oscopLine );
-    m_oscopLine = -1;
-    update();       // Repaint
+    if( !m_haveOscope ) return; // this probe is not using oscope
+    
+    //if( m_inputpin->isConnected() )
+    {
+        OscopeWidget::self()->setProbe( 0l );
+        OscopeWidget::self()->setVisible( false );
+        m_haveOscope = false;
+        m_oscopeBusy = false;
+    }
 }
 
 void Probe::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -171,11 +215,22 @@ void Probe::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     event->accept();
     QMenu *menu = new QMenu();
 
-    QAction *oscopAddAction = menu->addAction(QIcon(":/fileopen.png"),"Add to Oscope");
-    connect(oscopAddAction, SIGNAL(triggered()), this, SLOT(slotOscopAdd()));
+    QAction *plotterAddAction = menu->addAction(QIcon(":/fileopen.png"),"Add to Plotter");
+    connect(plotterAddAction, SIGNAL(triggered()), this, SLOT(slotPlotterAdd()));
 
-    QAction *oscopRemAction = menu->addAction(QIcon(":/fileopen.png"),"Remove from Oscope");
-    connect(oscopRemAction, SIGNAL(triggered()), this, SLOT(slotOscopRem()));
+    QAction *plotterRemAction = menu->addAction(QIcon(":/fileopen.png"),"Remove from Plotter");
+    connect(plotterRemAction, SIGNAL(triggered()), this, SLOT(slotPlotterRem()));
+    
+    if( m_inputpin->isConnected() )
+    {
+        menu->addSeparator();
+        
+        QAction *oscopAddAction = menu->addAction(QIcon(":/fileopen.png"),"Add to Oscope");
+        connect(oscopAddAction, SIGNAL(triggered()), this, SLOT(slotOscopAdd()));
+
+        QAction *oscopRemAction = menu->addAction(QIcon(":/fileopen.png"),"Remove from Oscope");
+        connect(oscopRemAction, SIGNAL(triggered()), this, SLOT(slotOscopRem()));
+    }
 
     menu->addSeparator();
 
@@ -190,11 +245,16 @@ void Probe::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget 
 {
     Component::paint( p, option, widget );
 
-    if( m_oscopLine > -1 )            p->setBrush( m_oscopColor );
+    if( m_plotterLine > -1 )            p->setBrush( m_plotterColor );
     else if ( m_voltIn > m_voltTrig)  p->setBrush( QColor( 255, 166, 0 ) );
     else                              p->setBrush( QColor( 230, 230, 255 ) );
 
     p->drawEllipse( -8, -8, 16, 16 );
+    if( m_haveOscope )
+    {
+        p->drawLine( -8, 0, 8, 0 );
+        p->drawLine(  0,-8, 0, 8 );
+    }
 }
 
 #include "moc_probe.cpp"

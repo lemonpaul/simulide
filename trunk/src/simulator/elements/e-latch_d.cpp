@@ -28,17 +28,19 @@ eLatchD::eLatchD( string id, int channels )
 {
     setNumChannels( channels );
 }
-eLatchD::~eLatchD(){}
+eLatchD::~eLatchD()
+{ 
+}
 
 void eLatchD::initialize()
 {
     if( !m_clockPin )
     {
-        qDebug() << "eLatchD::initialize !m_clockPin";
+        //qDebug() << "eLatchD::initialize !m_clockPin";
         for( uint i=0; i<m_input.size(); i++ )
         {
             eNode* enode = m_input[i]->getEpin()->getEnode();
-            if( enode ) enode->addToChangedList(this);
+            if( enode ) enode->addToChangedFast(this);
         }
     }
     eLogicDevice::initialize();
@@ -54,26 +56,22 @@ void eLatchD::setVChanged()
 {
     if( m_outEnablePin )
     {
-        bool outEn = outputEnabled();
-        for( int i=0; i<m_numOutputs; i++ )
-        {
-            if( outEn ) m_output[i]->setImp( m_outImp );
-            else        m_output[i]->setImp( high_imp );
-        }
+        bool outEn = eLogicDevice::outputEnabled();
+
+        if( outEn ) eLogicDevice::setOutImp( m_outImp );
+        else        eLogicDevice::setOutImp( high_imp );
+
     }
-    if( !m_clockPin || (getClockState()==Rising) )
+    if( !m_clockPin || (eLogicDevice::getClockState()==Rising) )
     {
         for( int i=0; i<m_numOutputs; i++ )
         {
-            bool state = m_inputState[i];
             double volt = m_input[i]->getVolt();
 
-            if     ( volt > m_inputHighV ) state = true;
-            else if( volt < m_inputLowV )  state = false;
+            if     ( volt > m_inputHighV ) m_inputState[i] = true;
+            else if( volt < m_inputLowV )  m_inputState[i] = false;
 
-            m_inputState[i] = state;
-
-            m_output[i]->setOut( state );
+            eLogicDevice::setOut( i, m_inputState[i] );
         }
     }
 }

@@ -26,7 +26,7 @@
 class Node : public Component
 {
     Q_OBJECT
-	public:
+    public:
         QRectF boundingRect() const { return QRect( -8, -8, 16, 16 ); }
 
         Node( QObject* parent, QString type, QString id );
@@ -39,8 +39,11 @@ class Node : public Component
         void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
     public slots:
-        void inStateChanged( int  );
+        void inStateChanged( int rem=1 );
         void remove();
+        
+    protected:
+        void contextMenuEvent(QGraphicsSceneContextMenuEvent* event){;}
 
     private:
         void joinConns( int co0, int c1);

@@ -48,8 +48,18 @@ class CircMatrix
         std::vector<std::vector<double> > m_circMatrix;
         std::vector<double> m_coefVect;
         std::vector<double> m_nodeVolt;
-
+        
         int m_numEnodes;
+        
+        std::vector<std::vector<double> > a;
+        std::vector<double> b;
+        std::vector<int> ipvt;
+        
+        bool m_admitChanged;
+        bool m_currChanged;
+
+        
 };
  #endif
+
 

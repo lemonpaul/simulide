@@ -36,15 +36,18 @@ class Component : public QObject, public QGraphicsItem
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 
-    Q_PROPERTY( QString  itemtype READ itemtype )
-    Q_PROPERTY( QString  id       READ itemID   WRITE setId      DESIGNABLE true USER true )
-    Q_PROPERTY( bool     Show_id  READ Show_id  WRITE setShow_id DESIGNABLE true USER true )
-    Q_PROPERTY( qreal    rotation READ rotation WRITE setRotation )
-    Q_PROPERTY( int      x        READ x        WRITE setX )
-    Q_PROPERTY( int      y        READ y        WRITE setY )
-    Q_PROPERTY( int      labelx   READ labelx   WRITE setLabelX )
-    Q_PROPERTY( int      labely   READ labely   WRITE setLabelY )
-    Q_PROPERTY( int      labelrot READ labelrot WRITE setLabelRot )
+    Q_PROPERTY( QString  itemtype  READ itemType )
+    Q_PROPERTY( QString  id        READ itemID    WRITE setId      DESIGNABLE true USER true )
+    Q_PROPERTY( bool     Show_id   READ showId    WRITE setShowId  DESIGNABLE true USER true )
+    Q_PROPERTY( qreal    rotation  READ rotation  WRITE setRotation )
+    Q_PROPERTY( int      x         READ x         WRITE setX )
+    Q_PROPERTY( int      y         READ y         WRITE setY )
+    Q_PROPERTY( int      labelx    READ labelx    WRITE setLabelX )
+    Q_PROPERTY( int      labely    READ labely    WRITE setLabelY )
+    Q_PROPERTY( int      labelrot  READ labelRot  WRITE setLabelRot )
+    Q_PROPERTY( int      valLabelx READ valLabelx WRITE setValLabelX )
+    Q_PROPERTY( int      valLabely READ valLabely WRITE setValLabelY )
+    Q_PROPERTY( int      valLabRot READ valLabRot WRITE setValLabRot )
 
     public:
         QRectF boundingRect() const { return m_area; }
@@ -55,11 +58,17 @@ class Component : public QObject, public QGraphicsItem
         enum { Type = UserType + 1 };
         int type() const { return Type; }
 
-        bool Show_id();
-        void setShow_id( bool show );
-
         QString itemID();
         void setId( QString id );
+        
+        bool showId();
+        void setShowId( bool show );
+        
+        bool showVal();
+        void setShowVal( bool show );
+        
+        QString unit();
+        void setUnit( QString un );
 
         int labelx();
         void setLabelX( int x );
@@ -67,12 +76,26 @@ class Component : public QObject, public QGraphicsItem
         int labely();
         void setLabelY( int y );
 
-        int labelrot();
+        int labelRot();
         void setLabelRot( int rot );
-
+        
+        void setLabelPos( int x, int y, int rot=0 );
         void setLabelPos();
+        
+        int valLabelx();
+        void setValLabelX( int x );
 
-        QString itemtype();
+        int valLabely();
+        void setValLabelY( int y );
+
+        int valLabRot();
+        void setValLabRot( int rot );
+        
+        void setValLabelPos();
+        
+        void updateLabel( Label* label, QString txt );
+
+        QString itemType();
         QString category();
         QIcon   icon();
 
@@ -89,20 +112,33 @@ class Component : public QObject, public QGraphicsItem
         void rotateCW();
         void rotateCCW();
         void rotateHalf();
-        void slotremove();
+        void slotRemove();
 
         virtual void remove();
 
     protected:
         void mousePressEvent(QGraphicsSceneMouseEvent* event);
+        void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
         void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
         void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
         void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
 
-        void setLabel();
+        //void setIdLabel();
+        //void setValLabel();
+        
+        //double value();
+        void setValue( double val );
+        
+        double m_value;
 
-        Label* label;
+        const QString multUnits;
+        QString m_unit;
+        QString m_mult;
+        double  m_unitMult;
+
+        Label* m_idLabel;
+        Label* m_valLabel;
 
         QString m_id;
         QString m_type;
@@ -111,37 +147,46 @@ class Component : public QObject, public QGraphicsItem
         QColor  m_color;
         QRectF  m_area;         // bounding rect
 
-        int m_labelx;
-        int m_labely;
-        int m_labelrot;
-
         bool m_showId;
-        bool m_changedPrev;
+        bool m_showVal;
 };
 
 typedef Component* (*createItemPtr)( QObject* parent, QString type, QString id );
 
 
-class Label : public QObject, public QGraphicsSimpleTextItem
+class Label : public QGraphicsTextItem
 {
+    friend class Component;
+    
     Q_OBJECT
     public:
         Label( Component* parent );
         ~Label();
 
+        void setLabelPos();
+        
+        //virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+
     public slots:
         void rotateCW();
         void rotateCCW();
         void rotate180();
+        void updateGeometry(int, int, int);
 
     protected:
+        void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
         void mousePressEvent(QGraphicsSceneMouseEvent* event);
         void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
         void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
+        void focusOutEvent(QFocusEvent *event);
 
     private:
         Component*  m_parentComp;
+        
+        int m_labelx;
+        int m_labely;
+        int m_labelrot;
 };
 #endif
 

@@ -32,38 +32,35 @@ QPropertyEditorWidget::QPropertyEditorWidget(QWidget* parent /*= 0*/) : QTreeVie
 {
     m_pSelf = this;
     m_model = new QPropertyModel(this);
-    setModel(m_model);
-    setItemDelegate(new QVariantDelegate(this));
+    setModel( m_model );
+    setItemDelegate( new QVariantDelegate(this) );
     setAlternatingRowColors(true);
     setIndentation(12);
     m_propertyObject = 0l;
 }
 
-
-QPropertyEditorWidget::~QPropertyEditorWidget()
-{
-}
+QPropertyEditorWidget::~QPropertyEditorWidget(){}
 
 void QPropertyEditorWidget::addObject(QObject* propertyObject)
 {
-	m_model->addItem(propertyObject);
-	expandToDepth(0);
+    m_model->addItem(propertyObject);
+    expandToDepth(0);
 }
 
 void QPropertyEditorWidget::setObject(QObject* propertyObject)
 {
     m_model->clear();
     if (propertyObject)
-        {
+    {
         addObject(propertyObject);
         m_propertyObject = propertyObject;
-        }
+    }
 }
 
 void QPropertyEditorWidget::updateObject(QObject* propertyObject)
 {
-	if (propertyObject)
-		m_model->updateItem(propertyObject);	
+    if( propertyObject )
+        m_model->updateItem(propertyObject);    
 }
 
 void QPropertyEditorWidget::clearView()
@@ -73,17 +70,17 @@ void QPropertyEditorWidget::clearView()
 
 void QPropertyEditorWidget::removeObject(QObject* propertyObject)
 {
-    if ( propertyObject == m_propertyObject)
+    if( propertyObject == m_propertyObject)
         m_model->clear();
 }
 
 void QPropertyEditorWidget::registerCustomPropertyCB(UserTypeCB callback)
 {
-	m_model->registerCustomPropertyCB(callback);
+    m_model->registerCustomPropertyCB(callback);
 }
 
 void QPropertyEditorWidget::unregisterCustomPropertyCB(UserTypeCB callback)
 {
-	m_model->unregisterCustomPropertyCB(callback);
+    m_model->unregisterCustomPropertyCB(callback);
 }
 

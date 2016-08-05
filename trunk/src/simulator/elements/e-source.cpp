@@ -29,10 +29,13 @@ eSource::eSource( string id, ePin* epin ) : eElement( id )
 
     m_voltHigh = cero_doub;
     m_voltLow  = cero_doub;
+    m_voltOut  = cero_doub;
     m_imp      = cero_doub;
     m_admit    = 1/m_imp;
 
-    m_scrEnode = new eNode( "scr" );
+    QString nodId = QString::fromStdString(id);
+
+    m_scrEnode = new eNode( nodId+"scr" );
     m_scrEnode->setNodeNumber(0);
     Simulator::self()->remFromEnodeList( m_scrEnode, /*delete=*/ false );
 }
@@ -52,28 +55,29 @@ void eSource::stamp()
 {
     //qDebug() <<"eSource::stamp"<< m_out;
     m_ePin[0]->stampAdmitance( m_admit );
-    setOut( m_out );
+    stampOutput();
 }
 
 void eSource::setVoltHigh( double v )
 {
     m_voltHigh = v;
-    if( m_out ) //setOut( true );
-    {
-        m_scrEnode->setVolt(v);
-
-        m_ePin[0]->stampCurrent( v/m_imp );
-    }
+    if( m_out ) m_voltOut = v;
 }
 
 void eSource::setVoltLow( double v )
 {
     m_voltLow = v;
-    if( !m_out ) setOut( false );
+    if( !m_out ) m_voltOut = v;
 }
 
-// Set output to hight(m_voltHight) or low(0)
-void eSource::setOut( bool out )
+void eSource::stampOutput()                               // Stamp Output
+{
+    m_scrEnode->setVolt(m_voltOut);
+
+    m_ePin[0]->stampCurrent( m_voltOut/m_imp );
+}
+
+void eSource::setOut( bool out )           // Set Output to Hight or Low
 {
     if( m_inverted ) m_out = !out;
     else             m_out =  out;
@@ -81,9 +85,7 @@ void eSource::setOut( bool out )
     double v = m_voltLow;
     if( m_out ) v = m_voltHigh;
 
-    m_scrEnode->setVolt(v);
-
-    m_ePin[0]->stampCurrent( v/m_imp );
+    m_voltOut = v;
 }
 
 void eSource::setInverted( bool inverted )
@@ -100,12 +102,6 @@ void eSource::setImp( double imp )
     m_admit = 1/m_imp;
     m_ePin[0]->stampAdmitance( m_admit );
 }
-
-/*void eSource::setPower( bool pow )
-{
-    if( pow ) setOut( m_out );
-    m_power = pow;
-}*/
 
 ePin* eSource::getEpin()
 {

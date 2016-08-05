@@ -32,38 +32,38 @@ inline ItemLibrary* itemLibrary();
 While the program is running, only one instance of this class is created.
 You can get it by calling itemLibrary()
 @short Holds the list of Items
-@author David Saxton
+@author David Saxton, Santiago Gonzalez
 */
 class ItemLibrary
 {
-	public:
-		~ItemLibrary();
+    public:
+        ~ItemLibrary();
 
-		/**
-		 * Returns a list of items in the library
-		 */
+        /**
+         * Returns a list of items in the library
+         */
         QList<LibraryItem*> items() { return m_items; }
 
 
-		/**
-		 * @return the LibraryItem for the item with the given type (id) const.
-		 */
+        /**
+         * @return the LibraryItem for the item with the given type (id) const.
+         */
         LibraryItem*  libraryItem( QString type ) const;
 
-	
+    
     protected:
-		ItemLibrary();
-	
+        ItemLibrary();
+    
         QList<LibraryItem*> m_items;
-		
+        
         friend ItemLibrary*  itemLibrary();
 };
 
 inline ItemLibrary* itemLibrary()
 {
-	// are we really sure we aren't calling new over and over again? 
+    // are we really sure we aren't calling new over and over again? 
     static ItemLibrary* _itemLibrary = new ItemLibrary();
-	return _itemLibrary;
+    return _itemLibrary;
 }
 
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2012 by santiago González                               *
+ *   Copyright (C) 2016 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -22,7 +22,8 @@
 
 #include <QtWidgets>
 
-#include "renderarea.h"
+#include "renderoscope.h"
+#include "probe.h"
 
 class OscopeWidget : public QWidget
 {
@@ -33,17 +34,17 @@ class OscopeWidget : public QWidget
         ~OscopeWidget();
 
  static OscopeWidget* self() { return m_pSelf; }
-
-        int  addChannel();
-        void remChannel( int channel );
-
-        QColor getColor( int channel );
-
+        
+        void setProbe( Probe* probe );
         void step();
-        void setData( int channel, int data );
+        void setData();
         void setTicksPs( int tps );
-        //void setButtonText( QString text );
         void setOscopeTick( int tickUs );
+        
+    public slots:
+        void speedChanged( int speed );
+        //void ampliChanged( int ampli );
+        void centeChanged( int offset );
 
     private:
  static OscopeWidget* m_pSelf;
@@ -52,18 +53,27 @@ class OscopeWidget : public QWidget
 
         QHBoxLayout* m_horizontalLayout;
         QVBoxLayout* m_verticalLayout;
-        QLineEdit*   m_chanLabel[4];
 
-        //RenderArea  m_value;
-        RenderArea*  m_oscope;
-
-        QColor m_color[4];
-
-        bool m_channel[4];
-        int  m_data[4];
-        int  m_numchan;
-        int  m_counter;
-        int  m_ticksPs;
+        RenderOscope*  m_rArea;
+        
+        bool newReading;
+        
+        int m_data[140];
+        int m_counter;
+        int m_ticksPs;
+        int m_tick;
+        int m_speed;
+        int m_offset;
+        int m_prevSpeed;
+        int m_prevOffset;
+        double m_ampli;
+        
+        
+        Probe* m_probe;
+        
+        QDial* m_speedDial;
+        //QDial* m_ampliDial;
+        QDial* m_centeDial;
 };
 
 #endif

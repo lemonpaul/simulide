@@ -14,9 +14,9 @@
     <pin side="right" pos="2" type="" id="Q0"  label="Q0"/>
     <pin side="right" pos="3" type="" id="DS"  label="DS"/>
     <pin side="right" pos="4" type="" id="OE"  label="OE"/>
-    <pin side="right" pos="5" type="" id="ST"  label="ST"/>
-    <pin side="right" pos="6" type="" id="SH"  label="SH"/>
-    <pin side="right" pos="7" type="" id="Rst" label="Rs"/>
+    <pin side="right" pos="5" type="" id="ST"  label="STC"/>
+    <pin side="right" pos="6" type="" id="SH"  label="SHC"/>
+    <pin side="right" pos="7" type="" id="Rst" label="MR"/>
     <pin side="right" pos="8" type="" id="Q7'" label="Q7'"/>
     
 </package>

@@ -24,7 +24,7 @@ eLed::eLed( string id ) : eDiode( id )
     m_threshold = 2.4;
 
     m_prevStep   = Simulator::self()->step();
-    m_maxCurrent = 0.02;
+    m_maxCurrent = 0.03;
     m_lastCurrent = 0.0;
 
     disp_brightness  = 0;
@@ -44,8 +44,6 @@ void eLed::updateVI()
     
     const unsigned long long step = Simulator::self()->step();
     int period = step - m_prevStep;    
-
-    //if( period == 0 ) period = 1;
 
     m_prevStep = step;
     lastUpdatePeriod += period;

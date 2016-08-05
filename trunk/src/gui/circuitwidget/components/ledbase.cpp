@@ -26,10 +26,16 @@ LedBase::LedBase( QObject* parent, QString type, QString id )
     m_ePin.resize(2);
 
     m_color = QColor( Qt::black );
+    
+    m_valLabel->setEnabled( false );
+    m_valLabel->setVisible( false );
 
     Simulator::self()->addToUpdateList( this );
 }
-LedBase::~LedBase(){ Simulator::self()->remFromUpdateList( this ); }
+LedBase::~LedBase()
+{ 
+    Simulator::self()->remFromUpdateList( this ); 
+}
 
 void LedBase::updateStep()
 {

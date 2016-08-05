@@ -24,7 +24,6 @@
 
 #include "e-element.h"
 #include "e-node.h"
-//#include "e-pin.h"
 
 class eSource : public eElement
 {
@@ -34,13 +33,14 @@ class eSource : public eElement
 
         void initialize();
         void stamp();
+        void stampOutput();
 
         double voltHight() { return m_voltHigh; }
         void  setVoltHigh( double v );
 
         double voltLow() { return m_voltLow; }
         void  setVoltLow( double v );
-
+        
         bool  out() { return m_out; }
         void  setOut( bool hight );
 
@@ -54,11 +54,11 @@ class eSource : public eElement
 
         ePin* getEpin();
 
-       // void setEpin( ePin* epin );
-
     protected:
+        
         double m_voltHigh;
         double m_voltLow;
+        double m_voltOut;
         double m_imp;
         double m_admit;
 

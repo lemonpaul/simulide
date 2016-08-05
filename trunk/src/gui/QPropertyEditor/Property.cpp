@@ -68,14 +68,15 @@ QWidget* Property::createEditor(QWidget *parent, const QStyleOptionViewItem& /*o
 		editor = new QSpinBox(parent);
                 editor->setProperty("minimum", -1e9);
                 editor->setProperty("maximum", 1e9);
-		connect(editor, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
+		//connect(editor, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
 		break;
     //case QMetaType::Float:
 	case QVariant::Double:	
 		editor = new QDoubleSpinBox(parent);
                 editor->setProperty("minimum", -1e9);
                 editor->setProperty("maximum", 1e9);
-		connect(editor, SIGNAL(valueChanged(double)), this, SLOT(setValue(double)));
+                editor->setProperty("decimals", 3);
+		//connect(editor, SIGNAL(valueChanged(double)), this, SLOT(setValue(double)));
 		break;			
 	default:
 		return editor;

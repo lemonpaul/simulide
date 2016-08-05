@@ -28,10 +28,12 @@
 class LibraryItem;
 //class DialWidget;
 
-class VoltSource : public Component
+class VoltSource : public Component, public eElement
 {
     Q_OBJECT
-    Q_PROPERTY( double Voltage  READ volt   WRITE setVolt   DESIGNABLE true USER true )
+    Q_PROPERTY( double  Voltage   READ volt    WRITE setVolt    DESIGNABLE true USER true )
+    Q_PROPERTY( QString Unit      READ unit    WRITE setUnit    DESIGNABLE true USER true )
+    Q_PROPERTY( bool    Show_Volt READ showVal WRITE setShowVal DESIGNABLE true USER true )
 
     public:
         QRectF boundingRect() const { return QRect( -42, -66, 52, 76 ); }
@@ -41,11 +43,13 @@ class VoltSource : public Component
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
+        
+        void updateStep();
 
         double volt() const      { return m_voltHight; }
-        void setVolt( double v );//{ m_voltHight = v; outpin->compChanged( msg_vth, m_voltOut ); }
-
-        //virtual void setChanged( bool changed );
+        void setVolt( double v );
+        
+        void setUnit( QString un );
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
@@ -55,6 +59,10 @@ class VoltSource : public Component
         virtual void remove();
 
     private:
+        void updateButton();
+        
+        bool m_changed;
+        
         double m_voltHight;
         double m_voltOut;
         Pin* outpin;

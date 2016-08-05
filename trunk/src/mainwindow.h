@@ -36,6 +36,8 @@ class MainWindow : public QMainWindow
         ~MainWindow();
 
         static MainWindow* self() { return m_pSelf; }
+        
+        void setRate( int rate );
 
         QTabWidget*  sidepanel;
         QSplitter*   splitter5;
@@ -45,12 +47,10 @@ class MainWindow : public QMainWindow
     public slots:
         void powerCircOn();
         void powerCircOff();
-        void reset();
-        void pause();
 
         void openCirc();
         void newCircuit();
-        bool saveCirc();
+        void saveCirc();
         bool saveCircAs();
 
     protected:
@@ -58,10 +58,7 @@ class MainWindow : public QMainWindow
 
     private slots:
         void about();
-        //void circCloseTab(int);
-
         void powerCirc();
-        void simuRateChanged( int rate );
 
     private:
 
@@ -76,45 +73,23 @@ class MainWindow : public QMainWindow
         void readSettings();
         void writeSettings();
 
-        //void loadFile( QString &fileName );
-        //void load( QString &fileName );
-        //void loadCircuit( QString &fileName );
-        //bool saveCircuit( QString &fileName );
-        //void listToDom( QList<Component*>* complist, QDomDocument* doc);
-        //void setCurrentFile(const QString &fileName);
-
         void applyStile();
 
         QString m_styleSheet;
 
-        QString m_curCirc;
-        QString m_lastCircDir;
+        QString     m_curCirc;
+        QString     m_lastCircDir;
         QStringList m_docList;
 
         CircuitWidget* m_circuit;
-        QSpinBox*      simuRate;
+        QLabel*        m_rateLabel; 
 
-        //QTabWidget * centralWidget;
-        //QTabWidget * circWidget;
         QPropertyEditorWidget* itemprop;
         ComponentSelector*     components;
 
         QLineEdit m_findLabel;
 
-        //QMenuBar* menubar;
-        //QMenu* fileMenu;
-        //QMenu* editMenu;
-        //QMenu* toolsMenu;
-        //QMenu* debugMenu;
-        //QMenu* circMenu;
-        //QMenu* helpMenu;
-
-        //QToolBar* fileToolBar;
-        //QToolBar* editToolBar;
-        //QToolBar* toolsToolBar;
-        //QToolBar* findToolBar;
         QToolBar* circToolBar;
-        //QToolBar* generalToolBar;
 
         QAction* exitAct;
         QAction* aboutAct;

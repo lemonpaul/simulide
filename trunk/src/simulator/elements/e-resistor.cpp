@@ -38,6 +38,7 @@ void eResistor::stamp()
     double admit = 1/m_resist;
     m_ePin[0]->stampAdmitance( admit );
     m_ePin[1]->stampAdmitance( admit );
+    //qDebug() << "eResistor::stamp" << m_resist;
 }
 
 double eResistor::res() { return m_resist; }

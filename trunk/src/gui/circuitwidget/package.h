@@ -37,11 +37,11 @@ class Package : public Component, public eElement
         virtual void initEpins(){;}
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
-	
+
     public slots:
         virtual void remove();
 
-	protected:
+    protected:
         virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
         virtual void addPin( QString id, QString type, QString label,

@@ -48,7 +48,7 @@ class eLogicDevice : public eElement
         double inputHighV() const          { return m_inputHighV; }
         void  setInputHighV( double volt ) { m_inputHighV = volt; }
 
-        double inputLowV() const          { return m_inputHighV; }
+        double inputLowV() const          { return m_inputLowV; }
         void  setInputLowV( double volt ) { m_inputLowV = volt; }
 
         double outHighV() const            { return m_outHighV; }
@@ -81,6 +81,7 @@ class eLogicDevice : public eElement
         void createOutputs( int outputs );
         void deleteInputs( int inputs );
         void deleteOutputs( int inputs );
+        void setOut( int num, bool out );
 
         double m_inputHighV;
         double m_inputLowV;

@@ -20,18 +20,16 @@
 #ifndef SWITCH_H
 #define SWITCH_H
 
-#include "e-resistor.h"
+#include "switch_base.h"
 #include "pin.h"
 
 class LibraryItem;
 
-class Switch : public Component, public eResistor
+class Switch : public SwitchBase
 {
     Q_OBJECT
-    //Q_PROPERTY( double Resistance READ res WRITE setRes DESIGNABLE true USER true )
-
+    
     public:
-        QRectF boundingRect() const { return QRectF( -11, -9, 22, 11 ); }
 
         Switch( QObject* parent, QString type, QString id );
         ~Switch();
@@ -39,19 +37,10 @@ class Switch : public Component, public eResistor
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
-        void setRes( double resist );
-
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
         void onbuttonclicked();
-        void remove();
-
-    private:
-        void stampAdmit( double admit );
-        
-        QPushButton          *m_button;
-        QGraphicsProxyWidget *m_proxy;
 };
 
 #endif

@@ -36,11 +36,11 @@ LibraryItem* LogicInput::libraryItem()
 }
 
 LogicInput::LogicInput( QObject* parent, QString type, QString id )
-    : Component( parent, type, id )
+    : Component( parent, type, id ), eElement( id.toStdString() )
 {
-    m_labelx = -64;
-    m_labely = -24;
-    setLabelPos();
+    setLabelPos(-64,-24 );
+    
+    m_changed = false;
 
     QString nodid = id;
     nodid.append(QString("-outnod"));
@@ -49,7 +49,11 @@ LogicInput::LogicInput( QObject* parent, QString type, QString id )
 
     nodid.append(QString("-eSource"));
     m_out = new eSource( nodid.toStdString(), m_outpin );
+    
+    m_unit = "V";
     setVolt(5.0);
+    m_valLabel->setPos(-16, 8);
+    setShowVal( true );
 
     m_button = new QPushButton( );
     m_button->setMaximumSize( 16,16 );
@@ -59,24 +63,46 @@ LogicInput::LogicInput( QObject* parent, QString type, QString id )
     m_proxy = Circuit::self()->addWidget( m_button );
     m_proxy->setParentItem( this );
     m_proxy->setPos( QPoint(-32, -8) );
+    
+    Simulator::self()->addToUpdateList( this );
 
     connect( m_button, SIGNAL( clicked() ),
              this,     SLOT  ( onbuttonclicked() ));
 }
 
-LogicInput::~LogicInput() {}
+LogicInput::~LogicInput() 
+{
+    Simulator::self()->remFromUpdateList( this );
+    delete m_out;
+}
 
 void LogicInput::onbuttonclicked()
 {
-    m_out->setOut( !m_out->out() );
-    update();
+    m_out->setOut( m_button->isChecked() );
+    m_changed = true;
+}
+
+void LogicInput::updateStep()
+{
+    if( m_changed ) 
+    {
+        m_out->stampOutput();
+        m_changed = false;
+    }
 }
 
 void LogicInput::setVolt( double v )
 {
-    m_voltHight = v;
-    m_out->setVoltHigh(v);
-    update();
+    Component::setValue( v );       // Takes care about units multiplier
+    m_voltHight = m_value*m_unitMult;
+    m_out->setVoltHigh( m_voltHight );
+    //update();
+}
+
+void LogicInput::setUnit( QString un ) 
+{
+    Component::setUnit( un );
+    setVolt( m_value*m_unitMult );
 }
 
 void LogicInput::remove()

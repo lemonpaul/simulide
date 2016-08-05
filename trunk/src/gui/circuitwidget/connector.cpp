@@ -51,7 +51,7 @@ Connector::Connector( QObject* parent, QString type, QString id, Pin* startpin, 
         m_endpinid = "";
     }
 
-    label->setVisible( false );
+    m_idLabel->setVisible( false );
 }
 Connector::~Connector() { }
 
@@ -285,22 +285,34 @@ void Connector::closeCon( Pin* endpin )
 
     eNode* startPinEnode = m_startPin->getEnode();
     eNode* endPinEnode   = m_endPin->getEnode();
+    
+    // We will get all ePins from stratPin and endPin nets an add to new eNode
+    m_startPin->setConPin( 0l );
+    m_endPin->setConPin( 0l );
 
-    QList<ePin*> epins; // we will get all epins from stratpin and endpin nets an add to new enode
+    QList<ePin*> epins; 
 
     if( startPinEnode==0l ) { m_startPin->setEnode( newEnode ); }
     else
     {
-        //qDebug() << "startPinEnode: " << startPinEnode->itemId() ;
-        epins = startPinEnode->getEpins();
+        // Get connected pins of old eNode and assing to new one.
+        // If old eNode ran out of pins will delete itself.
+        
+        // If it's a Node Pin,  get all connected Pins
+        m_startPin->findNodePins(); 
+        
+        // All connected pins will register in eNode 
+        epins = startPinEnode->getSubEpins();
+        
+        // Set new eNode, ePins will unregister from old eNode
         foreach( ePin* epin, epins ) epin->setEnode( newEnode );
     }
 
     if( endPinEnode==0l ) { m_endPin->setEnode( newEnode ); }
-    else if( endPinEnode!=startPinEnode )
+    else //if( endPinEnode!=startPinEnode )     // Same than startPinEnode
     {
-        //qDebug() << "endPinEnode: "  << endPinEnode->itemId() ;
-        epins = endPinEnode->getEpins();
+        m_endPin->findNodePins();
+        epins = endPinEnode->getSubEpins();
         foreach( ePin* epin, epins ) epin->setEnode( newEnode );
     }
 
@@ -327,9 +339,10 @@ void Connector::splitCon( int index, Pin* pin1, Pin* pin2 )
 
     QString type = QString("Connector");
     QString id = type;
+    id.append( "-" );
     id.append( Circuit::self()->newSceneId() );
 
-    Connector* new_connector = new Connector( 0, type, id, pin2 );
+    Connector* new_connector = new Connector( Circuit::self(), type, id, pin2 );
     Circuit::self()->addItem(new_connector);
 
     int newindex = 0;
@@ -348,9 +361,9 @@ void Connector::splitCon( int index, Pin* pin1, Pin* pin2 )
 
     if( index > 1 )  m_actLine = index-2;
     else             m_actLine = 0;
-
+    
     new_connector->closeCon( m_endPin );    // Close new_connector first please
-    closeCon( pin1 );                       // Then this
+    closeCon( pin1 );                       // Close this
 }
 
 void Connector::updateLines()

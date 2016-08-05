@@ -17,6 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "mainwindow.h"
 #include "avrboard.h"
 #include "avrcomponentpin.h"
 #include "avrprocessor.h"
@@ -46,6 +47,7 @@ LibraryItem* AVRBoard::libraryItem()
 AVRBoard::AVRBoard( QObject* parent, QString type, QString id )
     : McuComponent( parent, type, id )
 {
+    qDebug() << "        Initializing AVRBoard...";
     m_dataFile = "data/arduinos.xml";
     m_processor = AvrProcessor::self();
 
@@ -56,22 +58,33 @@ AVRBoard::AVRBoard( QObject* parent, QString type, QString id )
 
     initPackage();
     initBoard();
+    setFreq( 16 );
     //initBootloader();
+    qDebug() << "     ...AVRBoard OK\n";
+    
 }
 AVRBoard::~AVRBoard() 
 {
-    uart_pty_stop(&m_uart_pty);
+}
+
+void AVRBoard::remove()
+{
+    //uart_pty_stop(&m_uart_pty);
+    if( Simulator::self()->isRunning() ) MainWindow::self()->powerCircOff();
+    m_pinList.at(13)->pin()->setEnode( 0l );
+    Circuit::self()->compList()->removeOne( m_boardLed );
     delete m_ground;
-    delete m_groundEnode;
     delete m_groundpin;
-    delete m_boardLed;
-    delete m_boardLedEnode; 
+    Simulator::self()->remFromEnodeList( m_groundEnode, true );
+    Simulator::self()->remFromEnodeList( m_boardLedEnode, true );
+
+    McuComponent::remove();
 }
 
 void AVRBoard::initBootloader()
 {
-    struct avr_flash flash_data;
-    char boot_path[1024] = "data/arduino/ATmegaBOOT_168_atmega328.ihex";
+    /*struct avr_flash flash_data;
+    char boot_path[1024] = "data/arduino/ATmegaBOOT_168_atmega328.hex";
     uint32_t boot_base, boot_size;
     
     avr_t* avr = avr_make_mcu_by_name("atmega328p");
@@ -93,14 +106,17 @@ void AVRBoard::initBootloader()
     memcpy(avr->flash + boot_base, boot, boot_size);
     free(boot);
     avr->pc = boot_base;
-    /* end of flash, remember we are writing /code/ */
+    // end of flash, remember we are writing /code/ 
     avr->codeend = avr->flashend;
     avr->log = 1;
     
     ap->initialized();
     
+    attachPins();
+    //reset();
+    
     uart_pty_init(avr, &m_uart_pty);
-    uart_pty_connect(&m_uart_pty, '0');
+    uart_pty_connect(&m_uart_pty, '0');*/
 }
 
 void AVRBoard::initBoard()
@@ -116,21 +132,37 @@ void AVRBoard::initBoard()
         pin->setLength(0);
         pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false );
     }
-    // Create ground
-    QString newid = m_id;
-    newid.append(QString("-Gnod"));
-    QString id = newid;
-    m_groundEnode = new eNode(newid);
-    m_groundpin   = new ePin( id.append("-ePin").toStdString(), 0);
-    id = newid;
-    m_ground = new eSource( id.append("-eSource").toStdString(), m_groundpin );
-    //m_groundEnode->setNodeNumber(0);          // eNode0 = ground
+    
+    // Configure board ground eSources 
+    m_pinList.at(15)->setImp( 0.01 );
+    m_pinList.at(23)->setImp( 0.01 );
+    m_pinList.at(24)->setImp( 0.01 );
+    
+    // Configure board 12V eSource
+    McuComponentPin* pin = m_pinList.at(22);
+    pin->setImp( 0.1 );
+    pin->setVoltHigh( 12 );
+    pin->setVoltLow( 12 );
+    
+    // Configure board 5V eSource
+    pin = m_pinList.at(25);
+    pin->setImp( 0.1 );
+    pin->setVoltLow( 5 );
+    
+    // Configure board 3.3V eSource
+    pin = m_pinList.at(26);
+    pin->setImp( 0.1 );
+    pin->setVoltHigh( 3.3 );
+    pin->setVoltLow( 3.3 );
+    
+    // Create Led ground
+    m_groundEnode = new eNode(    m_id+"-Gnod");
+    m_groundpin   = new ePin(    (m_id+"-Gnod-ePin_ground").toStdString(), 0);
+    m_ground      = new eSource( (m_id+"-Gnod-eSource_ground").toStdString(), m_groundpin );
     m_groundpin->setEnode( m_groundEnode );
 
     // Create board led
-    newid = m_id;
-    newid.append(QString("boardled"));
-    m_boardLed = new LedSmd( this, "LEDSMD", newid, QRectF(0, 0, 4, 3) );
+    m_boardLed = new LedSmd( this, "LEDSMD", m_id+"boardled", QRectF(0, 0, 4, 3) );
     m_boardLed->setNumEpins(2);
     m_boardLed->setParentItem(this);
     m_boardLed->setPos( 35, 125 );
@@ -138,17 +170,16 @@ void AVRBoard::initBoard()
     m_boardLed->setMaxCurrent( 0.003 );
     m_boardLed->setRes( 1000 );
     
-    newid.append(QString("-eNode"));
-    m_boardLedEnode = new eNode(newid);
+    m_boardLedEnode = new eNode( m_id+"-boardLedeNode" );
     
-    ePin*  boardLedEpin0 = m_boardLed->getEpin(0);
-    ePin*  boardLedEpin1 = m_boardLed->getEpin(1);
+    ePin* boardLedEpin0 = m_boardLed->getEpin(0);
+    ePin* boardLedEpin1 = m_boardLed->getEpin(1);
 
     // Connect board led to ground
     boardLedEpin0->setEnode( m_boardLedEnode );
-    boardLedEpin0->setEnodeComp( m_groundEnode );
+    //boardLedEpin0->setEnodeComp( m_groundEnode );
     boardLedEpin1->setEnode( m_groundEnode );
-    boardLedEpin1->setEnodeComp( m_boardLedEnode );
+    //boardLedEpin1->setEnodeComp( m_boardLedEnode );
 
     // Connect board led to pin 13
     ePin* pin13 = m_pinList.at(13)->pin();

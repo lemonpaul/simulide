@@ -24,9 +24,9 @@
 McuComponentPin::McuComponentPin( McuComponent *mcuComponent, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
     : QObject( mcuComponent ), eSource( id.toStdString(), 0l )
 {
-    m_id = id;
-    m_Rth = high_imp;
-    m_Vth = cero_doub;
+    m_id   = id;
+    m_Rth  = high_imp;
+    m_Vth  = cero_doub;
     m_type = type;
     m_mcuComponent = mcuComponent;
     
@@ -49,23 +49,21 @@ McuComponentPin::~McuComponentPin()
 
 void McuComponentPin::terminate()
 {
-    if( m_ePin[0]->isConnected() )
-        m_ePin[0]->getEnode()->remFromChangedList(this);
-    
     m_attached = false;
 }
 
 void McuComponentPin::initialize()
 {
     if( m_ePin[0]->isConnected() && m_attached /*&& m_imp==high_imp*/)
-        m_ePin[0]->getEnode()->addToChangedList(this);
+        m_ePin[0]->getEnode()->addToChangedFast(this);
 
     eSource::initialize();
 }
 
 void McuComponentPin::resetOutput()
 {
-    setOut(false);
+    eSource::setOut(false);
+    eSource::stampOutput();
 }
 
 void McuComponentPin::move( int dx, int dy )

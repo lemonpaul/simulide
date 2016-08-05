@@ -38,11 +38,11 @@ LibraryItem* VoltSource::libraryItem()
 }
 
 VoltSource::VoltSource( QObject* parent, QString type, QString id )
-    : Component( parent, type, id )
+    : Component( parent, type, id ), eElement( id.toStdString() )
 {
-    m_voltOut   = 0.0;
-    //m_voltLow   = 0.0;
     m_voltHight = 5.0;
+    
+    m_changed = false;
 
     m_voltw.setFixedSize( 48,72 );
     
@@ -64,23 +64,40 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
     nodid.append("-eSource");
     m_out = new eSource( nodid.toStdString(), outpin );
     
+    m_unit = "V";
     setVolt(5.0);
+    m_valLabel->setPos(-26, 8);
+    setShowVal( true );
+    
+    Simulator::self()->addToUpdateList( this );
 
-    connect( m_button, SIGNAL(clicked()),
-             this,     SLOT  (onbuttonclicked()) );
+    connect( m_button, SIGNAL( clicked()),
+             this,     SLOT  ( onbuttonclicked()) );
 
-    connect( m_dial,   SIGNAL(valueChanged(int)),
-             this,     SLOT  (voltChanged(int)) );
+    connect( m_dial,   SIGNAL( valueChanged(int) ),
+             this,     SLOT  ( voltChanged(int)) );
 }
 
-VoltSource::~VoltSource() { delete m_out; }
+VoltSource::~VoltSource() 
+{ 
+    Simulator::self()->remFromUpdateList( this );
+    delete m_out; 
+}
 
-void VoltSource::onbuttonclicked()
+void VoltSource::updateStep()
 {
-    bool checked = m_button->isChecked();
-    m_out->setOut( checked );
+    if( m_changed ) 
+    {
+        m_out->stampOutput();
+        m_changed = false;
+    }
+}
 
+void VoltSource::updateButton()
+{
     QString msg;
+    bool checked = m_button->isChecked();
+    
     if( checked )
         msg = QString("%1 V").arg(float(int(m_voltOut*100))/100);
     else
@@ -89,26 +106,33 @@ void VoltSource::onbuttonclicked()
     m_button->setText( msg );
 }
 
+void VoltSource::onbuttonclicked()
+{
+    m_out->setOut( m_button->isChecked() );
+    updateButton();
+    m_changed = true;
+}
+
 void VoltSource::voltChanged( int volt )
 {
     m_voltOut = double( volt )/100;
-    m_out->setVoltHigh( double( volt )/100 );
-    onbuttonclicked();
+    m_out->setVoltHigh( m_voltOut );
+    updateButton();
+    m_changed = true;
 }
 
 void VoltSource::setVolt( double v )
 {
-    m_voltHight = v;
-    m_dial->setMaximum( int(v*100) );
-    //update();
+    Component::setValue( v );       // Takes care about units multiplier
+    m_voltHight = m_value*m_unitMult;
+    m_dial->setMaximum( int(m_voltHight*100) );
 }
 
-/*void VoltSource::setChanged( bool changed )
+void VoltSource::setUnit( QString un ) 
 {
-    m_changed = changed;
-
-    if( !changed ) outpin->setChanged( false );
-}*/
+    Component::setUnit( un );
+    setVolt( m_value*m_unitMult );
+}
 
 void VoltSource::remove()
 {

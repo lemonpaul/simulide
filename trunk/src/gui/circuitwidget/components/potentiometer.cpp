@@ -69,14 +69,22 @@ Potentiometer::Potentiometer( QObject* parent, QString type, QString id )
     m_resB.setEpin( 0, &m_pinB );
     m_resB.setEpin( 1, &m_ePinB );
 
+    m_unit = "Ω";
     setRes(1000);
+    m_valLabel->setPos( 10, -20);
+    setShowVal( true );
     resChanged( 500 );
+    
+    Simulator::self()->addToUpdateList( this );
 
     connect( m_dial, SIGNAL(valueChanged(int)),
              this,   SLOT  (resChanged(int)) );
 }
 
-Potentiometer::~Potentiometer() { }
+Potentiometer::~Potentiometer() 
+{ 
+    Simulator::self()->remFromUpdateList( this );
+}
 
 void Potentiometer::initialize()
 {
@@ -84,20 +92,43 @@ void Potentiometer::initialize()
     
     m_ePinA.setEnode(enod); // Set eNode to internal eResistors ePins
     m_ePinB.setEnode(enod);
+    m_changed = true;
+    updateStep();
+}
+
+void Potentiometer::updateStep()
+{
+    if( m_changed ) 
+    {
+        double res = m_dial->value();
+
+        m_resA.setRes( res );
+        m_resB.setRes( m_resist-res );
+        
+        m_changed = false;
+    }
 }
 
 void Potentiometer::resChanged( int res ) // Called when dial is rotated
 {
     //qDebug() << res << m_resist;
-    m_resA.setRes( res );
-    m_resB.setRes( m_resist-res );
+    m_changed = true;
 }
 
 void Potentiometer::setRes( double res ) // Called when property resistance is changed
 {
-    m_resist = res;
-    m_dial->setMaximum( int(res) );
+    Component::setValue( res );       // Takes care about units multiplier
+    m_resist = res*m_unitMult;
+    m_dial->setMaximum( int(m_resist) );
     //update();
+    
+    m_changed = true;
+}
+
+void Potentiometer::setUnit( QString un ) 
+{
+    Component::setUnit( un );
+    setRes( m_value );
 }
 
 void Potentiometer::remove()
@@ -122,3 +153,5 @@ void Potentiometer::paint( QPainter *p, const QStyleOptionGraphicsItem *option, 
 }
 
 #include "moc_potentiometer.cpp"
+
+

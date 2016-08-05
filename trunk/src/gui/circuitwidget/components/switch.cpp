@@ -29,40 +29,15 @@ LibraryItem* Switch::libraryItem()
 {
     return new LibraryItem(
             tr( "Switch" ),
-            tr( "Passive" ),
+            tr( "Switches" ),
             "switch.png",
             "Switch",
             Switch::construct);
 }
 
 Switch::Switch( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eResistor( id.toStdString() )
+    : SwitchBase( parent, type, id )
 {
-    QString nodid = m_id;
-    nodid.append(QString("lnod"));
-    QPoint nodpos = QPoint(-8-8,0);
-    m_ePin[0] = new Pin( 180, nodpos, nodid, 0, this);
-
-    nodid = m_id;
-    nodid.append(QString("rnod"));
-    nodpos = QPoint(8+8,0);
-    m_ePin[1] = new Pin( 0, nodpos, nodid, 1, this);
-
-    label->setText( QString("") );
-    label->setPos(-12,-24);
-    
-    m_resist = high_imp;                              // Open Switch
-    stampAdmit( 0 );
-    
-    m_button = new QPushButton( );
-    m_button->setMaximumSize( 16,16 );
-    m_button->setGeometry(-20,-16,16,16);
-    m_button->setCheckable( true );
-
-    m_proxy = Circuit::self()->addWidget( m_button );
-    m_proxy->setParentItem( this );
-    m_proxy->setPos( QPoint(-8, 4) );
-
     connect( m_button, SIGNAL( clicked() ),
              this,     SLOT  ( onbuttonclicked() ));
 }
@@ -73,28 +48,16 @@ void Switch::onbuttonclicked()
     if( m_resist == cero_doub )                      // switch is Closed
     {
         m_resist = high_imp;                              // Open Switch
-        stampAdmit( 0 );
+        //stampAdmit( 0 );
     }
     else                                            // Switch is Oppened
     {
         m_resist = cero_doub;                            // Close Switch
-        stampAdmit( high_imp );
+        //stampAdmit( high_imp );
     }
+    m_changed = true;
 
     update();
-}
-
-void Switch::stampAdmit( double admit )
-{
-    m_ePin[0]->stampAdmitance( admit );
-    m_ePin[1]->stampAdmitance( admit );
-}
-
-void Switch::remove()
-{
-    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
-    if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-    Component::remove();
 }
 
 void Switch::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
@@ -106,9 +69,9 @@ void Switch::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
     p->setPen(pen);
 
     if( m_resist == cero_doub )             // switch is closed
-        p->drawLine(-10.5, 0, 10.5, 0 );
+        p->drawLine(-10, 0, 10, -2 );
     else                                    // Switch is oppened
-        p->drawLine(-10.5, 0, 4, -8 );
+        p->drawLine(-10.5, 0, 8, -8 );
 }
 
 #include "moc_switch.cpp"

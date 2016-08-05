@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "mainwindow.h"
-#include "avrprocessor.h"
 #include "component.h"
 #include "circuit.h"
 #include "utils.h"
@@ -27,71 +26,62 @@ MainWindow *MainWindow::m_pSelf = 0l;
 
 MainWindow::MainWindow()
 {
-    qApp->setAttribute(Qt::AA_DontShowIconsInMenus, false);
-
     m_pSelf   = this;
     m_circuit = 0l;
 
-    //applyStile();
-
     createActions();
     createWidgets();
-    //createMenus();
     createToolBars();
-
-    //statusBar()->showMessage(tr("Ready"));
-
     readSettings();
 
     QString appPath = QCoreApplication::applicationDirPath();
 
-    if( m_lastCircDir.isEmpty() )  m_lastCircDir = appPath + "/examples/mega48_adc/mega48_adc.simu";
+    if( m_lastCircDir.isEmpty() )  m_lastCircDir = appPath + "/examples/Arduino/Voltimeter/voltimeter.simu";
 
-    //Circuit::self()->loadCircuit( m_lastCircDir );
-    m_curCirc = ""; //m_lastCircDir ;
-
-    //readSettings();
-    //stop();
+    //if( m_curCirc != "" ) Circuit::self()->loadCircuit( m_curCirc );
+    this->setWindowTitle("SimulIDE 0.0.3");
 }
 MainWindow::~MainWindow(){ }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    //if (maybesaveDoc())
-    {
-        writeSettings();
-        event->accept();
-    }
-    //else event->ignore();
+    writeSettings();
+    event->accept();
 }
 
 void MainWindow::readSettings()
 {
-    QSettings settings( "PicLinux", "SimulIDE" );
-    restoreGeometry( settings.value("geometry" ).toByteArray());
-    restoreState( settings.value("windowState" ).toByteArray());
+    QSettings                settings( "PicLinux", "SimulIDE_0.0.3" );
+    restoreGeometry(         settings.value("geometry" ).toByteArray());
+    restoreState(            settings.value("windowState" ).toByteArray());
     splitter3->restoreState( settings.value("splitter3/geometry" ).toByteArray());
     splitter5->restoreState( settings.value("splitter5/geometry").toByteArray());
-    m_docList    = settings.value( "lastDocs" ).toStringList();
-    m_lastCircDir = settings.value( "lastCircDir" ).toString();
+    m_docList    =           settings.value( "lastDocs" ).toStringList();
+    m_lastCircDir =          settings.value( "lastCircDir" ).toString();
+    //m_curCirc =              settings.value( "currentCircuit" ).toString();
 }
 
 void MainWindow::writeSettings()
 {
     // $HOME/.config/PicLinux/simulide.conf
-    QSettings settings("PicLinux", "SimulIDE");
+    QSettings settings("PicLinux", "SimulIDE_0.0.3");
     settings.setValue( "geometry", saveGeometry() );
     settings.setValue( "windowState", saveState() );
     settings.setValue( "splitter3/geometry", splitter3->saveState() );
     settings.setValue( "splitter5/geometry", splitter5->saveState() );
     settings.setValue( "lastDocs", m_docList );
     settings.setValue( "lastCircDir", m_lastCircDir );
+    //settings.setValue( "currentCircuit", m_curCirc );
 }
 
 void MainWindow::newCircuit()
 {
+    powerCircOff();
+    
     m_circuit->clear();
     m_curCirc = "";
+    
+    this->setWindowTitle("SimulIDE 0.0.3  -  New Circuit");
 }
 
 void MainWindow::openCirc()
@@ -107,13 +97,21 @@ void MainWindow::openCirc()
    
         m_curCirc = fileName;
         m_lastCircDir = fileName;
+        this->setWindowTitle("SimulIDE 0.0.3  -  "+fileName.split("/").last());
     }
 }
 
-bool MainWindow::saveCirc()
+void MainWindow::saveCirc()
 {
-    if( m_curCirc.isEmpty() ) return saveCircAs();
-    else                      return Circuit::self()->saveCircuit( m_curCirc );
+    bool saved = false;
+    if( m_curCirc.isEmpty() ) saved =  saveCircAs();
+    else                      saved =  Circuit::self()->saveCircuit( m_curCirc );
+    
+    if( saved ) 
+    {
+        QString fileName = m_curCirc;
+        this->setWindowTitle("SimulIDE 0.0.3  -  "+fileName.split("/").last());
+    }
 }
 
 bool MainWindow::saveCircAs()
@@ -125,43 +123,15 @@ bool MainWindow::saveCircAs()
 
     m_curCirc = fileName;
     m_lastCircDir = fileName;
-
-    return Circuit::self()->saveCircuit(fileName);
+    
+    bool saved = Circuit::self()->saveCircuit(fileName);
+    if( saved ) 
+    {
+        QString fileName = m_curCirc;
+        this->setWindowTitle("SimulIDE 0.0.3  -  "+fileName.split("/").last());
+    }
+    return saved;
 }
-
-/*void MainWindow::run()
-{
-    pauseAct->setEnabled( true );
-    stepAct->setEnabled( false );
-    stepOverAct->setEnabled( false );
-    runAct->setEnabled( false );
-}*/
-void MainWindow::pause()
-{
-    runAct->setEnabled( true );
-    stepAct->setEnabled( true );
-    //stepOverAct->setEnabled( true );
-    pauseAct->setEnabled( false );
-}
-void MainWindow::reset()
-{
-    runAct->setEnabled( true );
-    stepAct->setEnabled( true );
-    //stepOverAct->setEnabled( true );
-    pauseAct->setEnabled( false );
-    stopAct->setEnabled( true );
-}
-
-/*void MainWindow::stop()
-{
-
-    runAct->setEnabled( false );
-    stepAct->setEnabled( false );
-    stepOverAct->setEnabled( false );
-    pauseAct->setEnabled( false );
-    stopAct->setEnabled( false );
-    //powerCircOff();
-}*/
 
 void MainWindow::powerCirc()
 {
@@ -173,51 +143,25 @@ void MainWindow::powerCircOn()
 {
     powerCircAct->setIcon(QIcon(":/poweron.png"));
     powerCircAct->setIconText("On");
-    //Debugger::self()->setPower( true );
     Simulator::self()->runContinuous();
 }
 void MainWindow::powerCircOff()
 {
-    powerCircAct->setIcon(QIcon(":/poweroff.png"));
-    powerCircAct->setIconText("Off");
-    //Debugger::self()->setPower( false );
-    Simulator::self()->stopSim();
-}
-
-void MainWindow::simuRateChanged( int rate )
-{
-    Simulator::self()->simuRateChanged( rate );
-
-    if      ( rate > 1000 ) rate = 100;
-    else if ( rate > 500 )  rate = 50;
-    else if ( rate > 100 )  rate = 10;
-    else if ( rate > 50 )   rate = 5;
-    else                    rate = 1;
-
-    simuRate->setSingleStep( rate );
-}
-
-
-
-/*void MainWindow::loadFile( QString &fileName )
-{
-    if( fileName.isEmpty() ) return;
-
-    if( m_docList.contains(fileName) )
+    if( Simulator::self()->isRunning() )
     {
-        int count = docWidget->count();
-
-        for( int index=0; index<count; index++ )
-            if( docWidget->tabText(index) == strippedName(fileName) )
-                docWidget->setCurrentIndex(index);
-        return;
+        powerCircAct->setIcon(QIcon(":/poweroff.png"));
+        powerCircAct->setIconText("Off");
+        Simulator::self()->stopSim();
     }
-    load( fileName );
+}
 
-    m_lastDocDir = fileName;
-    m_docList.append(fileName);
-}*/
-
+void MainWindow::setRate( int rate )
+{
+    if( rate < 0 )
+        m_rateLabel->setText( "Circuit ERROR!!!" );
+    else 
+        m_rateLabel->setText( "Real Speed: "+QString::number(rate) +" %" );
+}
 
 void MainWindow::about()
 {
@@ -246,10 +190,8 @@ void MainWindow::createWidgets()
     sidepanel->setTabPosition( QTabWidget::West );
     splitter5->addWidget( sidepanel );
 
-
     components = new ComponentSelector( sidepanel );
     components->setObjectName(QString::fromUtf8("components"));
-    //components->setVisible(false);
     sidepanel->addTab( components, QString::fromUtf8("Components") );
 
     QWidget *ramTabWidget = new QWidget( this );
@@ -274,22 +216,8 @@ void MainWindow::createWidgets()
     splitter3->setOrientation( Qt::Vertical );
     splitter5->addWidget( splitter3 );
 
-    simuRate = new QSpinBox;
-    simuRate->setMaximum( 20000000 );
-    simuRate->setMinimum( 1 );
-    simuRate->setValue( 16000000 );
-    simuRate->setSuffix(" Hz");
-
-    connect(simuRate, SIGNAL(valueChanged(int)), this, SLOT  (simuRateChanged(int)));
-
-    /*circWidget = new QTabWidget( this );
-    circWidget->setObjectName("circWidget");
-    circWidget->setTabPosition( QTabWidget::North );
-    circWidget->setTabsClosable ( true );
-    circWidget->setMovable( true );
-    splitter5->addWidget( circWidget );*/
-    //connect( circWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(circCloseTab(int)));
-    //connect( circWidget, SIGNAL(currentChanged(int)), this, SLOT(documentWasModified(int)));
+    m_rateLabel = new QLabel( this );
+    m_rateLabel->setText( "Real Speed: 0 Hz" );
 
     baseWidgetLayout->addWidget( splitter5, 0, 0 );
 
@@ -306,52 +234,6 @@ void MainWindow::createWidgets()
 
 void MainWindow::createActions()
 {
-    /*exitAct = new QAction(QIcon::fromTheme("file-exit", QIcon(":/exit.png")),tr("E&xit"), this);
-    exitAct->setShortcut(tr("Ctrl+Q"));
-    exitAct->setStatusTip(tr("Exit the application"));
-    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));*/
-
-    /*runAct =  new QAction(QIcon(":/play.png"),tr("Run"), this);
-    runAct->setStatusTip(tr("Run to next breakpoint"));
-    connect(runAct, SIGNAL(triggered()), this, SLOT(run()));*/
-
-    /*stepAct = new QAction(QIcon(":/step.png"),tr("Step"), this);
-    stepAct->setStatusTip(tr("Step debugger"));
-    stepAct->setEnabled(true);
-    connect( stepAct, SIGNAL(triggered()), this, SLOT(step()) );*/
-
-
-    /*pauseAct = new QAction(QIcon(":/pause.png"),tr("Pause"), this);
-    pauseAct->setStatusTip(tr("Pause debugger"));
-    pauseAct->setEnabled(false);
-    connect( pauseAct, SIGNAL(triggered()), this, SLOT(pause()) );
-
-    resetAct = new QAction(QIcon(":/reset.png"),tr("Reset"), this);
-    resetAct->setStatusTip(tr("Reset debugger"));
-    resetAct->setEnabled(true);
-    connect( resetAct, SIGNAL(triggered()), this, SLOT(reset()) );
-
-    stopAct = new QAction(QIcon(":/stop.png"),tr("Stop"), this);
-    stopAct->setStatusTip(tr("Stop debugger"));
-    stopAct->setEnabled(false);
-    connect( stopAct, SIGNAL(triggered()), this, SLOT(stop()) );
-
-    compileAct = new QAction(QIcon(":/compile.png"),tr("Compile"), this);
-    compileAct->setStatusTip(tr("Compile Source"));
-    compileAct->setEnabled(true);
-    connect( compileAct, SIGNAL(triggered()), this, SLOT(compile()) );*/
-
-    /*aboutAct = new QAction(QIcon(":/info.png"),tr("&About"), this);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
-    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));*/
-
-    /*aboutQtAct = new QAction(QIcon(":/info.png"),tr("About &Qt"), this);
-    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));*/
-
-    //connect(m_codeEditor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
-    //connect(m_codeEditor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
-
     newCircAct = new QAction(QIcon(":/newcirc.png"), tr("New C&ircuit"), this);
     newCircAct->setShortcut(tr("Ctrl+I"));
     newCircAct->setStatusTip(tr("Create a new Circuit"));
@@ -377,67 +259,18 @@ void MainWindow::createActions()
     connect(powerCircAct, SIGNAL(triggered()), this, SLOT(powerCirc()));
 }
 
-void MainWindow::createMenus()
-{
-    /*fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->setObjectName("fileMenu");
-    fileMenu->addAction(newCircAct);
-    fileMenu->addSeparator();//..........................
-    fileMenu->addAction(openCircAct);
-    fileMenu->addAction(saveCircAct);
-    fileMenu->addAction(saveCircAsAct);
-    fileMenu->addSeparator();//..........................
-    fileMenu->addAction(exitAct);*/
-
-    /*editMenu = menuBar()->addMenu(tr("&Edit"));
-    editMenu->addAction(cutAct);
-    editMenu->addAction(copyAct);
-    editMenu->addAction(pasteAct);
-    editMenu->addSeparator();//..........................
-    editMenu->addAction(undoAct);
-    editMenu->addAction(redoAct);*/
-
-    //circMenu = menuBar()->addMenu(tr("Circuit"));
-
-    //debugMenu->addSeparator();//..........................
-    //circMenu->addAction(powerCircAct);
-
-    /*menuBar()->addSeparator();
-
-    helpMenu = menuBar()->addMenu(tr("&Help"));
-    helpMenu->addAction(aboutAct);
-    helpMenu->addAction(aboutQtAct);*/
-}
-
 void MainWindow::createToolBars()
 {
-    //fileToolBar = addToolBar(tr("File"));
-
     circToolBar->setObjectName("circToolBar");
     circToolBar->addAction(newCircAct);
     circToolBar->addAction(openCircAct);
     circToolBar->addAction(saveCircAct);
     circToolBar->addAction(saveCircAsAct);
-
-    circToolBar->addSeparator();//..........................
-
-    circToolBar->addWidget( simuRate );
     circToolBar->addSeparator();//..........................
     circToolBar->addAction(powerCircAct);
-
-
-    /*editToolBar = addToolBar(tr("Edit"));
-    editToolBar->setObjectName("editToolBar");
-    editToolBar->addAction(cutAct);
-    editToolBar->addAction(copyAct);
-    editToolBar->addAction(pasteAct);
-    editToolBar->addSeparator();//..........................
-    editToolBar->addAction(undoAct);
-    editToolBar->addAction(redoAct);*/
-
-    //toolsToolBar->addWidget( simuRate );
+    circToolBar->addSeparator();//..........................
+    circToolBar->addWidget( m_rateLabel );
 }
-
 
 void MainWindow::applyStile()
 {

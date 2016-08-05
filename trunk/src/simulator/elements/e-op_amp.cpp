@@ -1,8 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2003-2006 by David Saxton                               *
- *   david@bluehaze.org                                                    *
- *                                                                         *
- *   Copyright (C) 2010 by santiago González                               *
+ *   Copyright (C) 2016 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -16,9 +13,8 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #include "e-op_amp.h"
@@ -27,40 +23,85 @@ eOpAmp::eOpAmp( string id )
     : eElement( id )
 {
     m_ePin.resize(3);
-    m_lastVolt = 0;
+    m_gain = 1000;
+    
+    m_connected = false;
 }
-eOpAmp::~eOpAmp(){}
+eOpAmp::~eOpAmp()
+{ 
+}
 
 void eOpAmp::initialize()
 {
-    m_output->setVoltHigh(0);
+    m_lastOut = 0;
+    m_lastIn  = 0;
+    m_k = 1e-6/m_gain;
+    m_converged = true;
     
-    for( int i=0; i<3; i++ ) // Inputs ePin 0 1, output 2, power 3 4
+    if( m_ePin[0]->isConnected() )
     {
-        eNode* enode = m_ePin[i]->getEnode();
-        if( enode ) enode->addToChangedList(this);
+        m_ePin[0]->getEnode()->addToNoLinList(this);
+    }
+    if( m_ePin[1]->isConnected() )
+    {
+        m_ePin[1]->getEnode()->addToNoLinList(this);
     }
 }
 
 void eOpAmp::setVChanged() // Called when input pins nodes change volt
 {
-    double volt = ( m_ePin[0]->getVolt()-m_ePin[1]->getVolt() );
-    volt = volt*m_gain;
-    
-    
-    if     ( volt > m_voltPos ) volt = m_voltPos;
-    else if( volt < m_voltNeg ) volt = m_voltNeg;
-    
-    qDebug() << volt ;
-    qDebug() << m_lastVolt;
-    qDebug() << "--";
-    double deltaVolt = (volt-m_lastVolt)/2;
-    volt -= deltaVolt;
-    qDebug() << deltaVolt;
-    qDebug() << volt ;
-    qDebug() << "-----";
-    m_lastVolt = volt;
+    double vP = m_ePin[0]->getVolt();
+    double vN = m_ePin[1]->getVolt();
+    double vd = vP-vN;
 
-    m_output->setVoltHigh(volt);
+    //qDebug() << "lastIn " << m_lastIn << "vd " << vd ;
+    
+    double out = vd * m_gain;
+    if     ( out >= m_voltPos ) out = m_voltPos;
+    else if( out <= m_voltNeg ) out = m_voltNeg;
+    
+    //qDebug() << "lastOut " << m_lastOut << "out " << out << abs(out-m_lastOut)<< "<1e-5 ??";
+
+    if( abs(out-m_lastOut)<1e-5 )
+    {
+        m_converged = true;
+        return;
+    }
+
+    if( m_converged )                  // First step after a convergence
+    {
+        double dOut = -1e-6;
+        if( vd>0 ) dOut =  1e-6;
+        
+        out = m_lastOut + dOut;
+        m_converged = false;
+    }
+    else
+    {
+        if( m_lastIn != vd )
+        {
+            // We problably are in a close loop configuration
+            
+            // Input diff with last dOut
+            double dIn  = abs(m_lastIn-vd); 
+            
+            // Guess next converging output:
+            //dOut = (vd-out/m_gain)/dIn*1e-4;
+            out = (m_lastOut*dIn + vd*1e-6)/(dIn + m_k);
+        }
+        m_converged = true;
+    }
+    
+    if     ( out >= m_voltPos ) out = m_voltPos;
+    else if( out <= m_voltNeg ) out = m_voltNeg;
+    
+    //qDebug()<< "lastOut " << m_lastOut << "out " << out << "dOut" << dOut  << "converged" << m_converged;
+    
+    m_lastIn = vd;
+    m_lastOut = out;
+    
+    m_output->setVoltHigh(out);
+    m_output->stampOutput();
+
 }
 

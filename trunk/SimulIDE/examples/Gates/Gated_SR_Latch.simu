@@ -45,14 +45,14 @@ Connector-8:
 Connector-9: 
 <item labelrot="0" objectName="Connector-9" x="-244" startpinid="Or Gate-4-in0" y="-116" itemtype="Connector" pointList="-244,-116,-260,-116,-260,-140,-172,-140,-172,-188" rotation="0" labelx="0" labely="-24" endpinid="Node-10-1" Show_id="false" id="Connector-9" enodeid="enode-9"/>
  
-Connector11: 
-<item labelrot="0" objectName="Connector11" x="-172" startpinid="Node-10-2" y="-188" itemtype="Connector" pointList="-172,-188,-124,-188" rotation="0" labelx="0" labely="-24" endpinid="Probe-5inpin" Show_id="false" id="Connector11" enodeid="enode-9"/>
+Connector-11: 
+<item labelrot="0" objectName="Connector-11" x="-172" startpinid="Node-10-2" y="-188" itemtype="Connector" pointList="-172,-188,-124,-188" rotation="0" labelx="0" labely="-24" endpinid="Probe-5inpin" Show_id="false" id="Connector-11" enodeid="enode-9"/>
  
 Connector-12: 
 <item labelrot="0" objectName="Connector-12" x="-244" startpinid="Or Gate-3-in1" y="-180" itemtype="Connector" pointList="-244,-180,-260,-180,-260,-156,-164,-156,-164,-116" rotation="0" labelx="0" labely="-24" endpinid="Node-13-1" Show_id="false" id="Connector-12" enodeid="enode-12"/>
  
-Connector14: 
-<item labelrot="0" objectName="Connector14" x="-164" startpinid="Node-13-2" y="-116" itemtype="Connector" pointList="-164,-116,-124,-116" rotation="0" labelx="0" labely="-24" endpinid="Probe-6inpin" Show_id="false" id="Connector14" enodeid="enode-12"/>
+Connector-14: 
+<item labelrot="0" objectName="Connector-14" x="-164" startpinid="Node-13-2" y="-116" itemtype="Connector" pointList="-164,-116,-124,-116" rotation="0" labelx="0" labely="-24" endpinid="Probe-6inpin" Show_id="false" id="Connector-14" enodeid="enode-12"/>
  
 Connector-15: 
 <item labelrot="0" objectName="Connector-15" x="-276" startpinid="And Gate-1-out" y="-196" itemtype="Connector" pointList="-276,-196,-244,-196,-244,-196" rotation="0" labelx="0" labely="-24" endpinid="Or Gate-3-in0" Show_id="false" id="Connector-15" enodeid="enode-15"/>
@@ -72,7 +72,7 @@ Connector-21:
 Connector-23: 
 <item labelrot="0" objectName="Connector-23" x="-372" startpinid="Fixed Volt.-22-outnod" y="-148" itemtype="Connector" pointList="-372,-148,-340,-148" rotation="0" labelx="0" labely="-24" endpinid="Node-24-1" Show_id="false" id="Connector-23" enodeid="enode-23"/>
  
-Connector25: 
-<item labelrot="0" objectName="Connector25" x="-340" startpinid="Node-24-2" y="-148" itemtype="Connector" pointList="-340,-148,-340,-108,-324,-108" rotation="0" labelx="0" labely="-24" endpinid="And Gate-2-in0" Show_id="false" id="Connector25" enodeid="enode-23"/>
+Connector-25: 
+<item labelrot="0" objectName="Connector-25" x="-340" startpinid="Node-24-2" y="-148" itemtype="Connector" pointList="-340,-148,-340,-108,-324,-108" rotation="0" labelx="0" labely="-24" endpinid="And Gate-2-in0" Show_id="false" id="Connector-25" enodeid="enode-23"/>
  
 </circuit>

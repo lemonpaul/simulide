@@ -22,7 +22,7 @@
 #include "utils.h"
  
 ConnectorLine::ConnectorLine( int x1, int y1, int x2, int y2, Connector* connector )
-               : QGraphicsObject()
+             : QGraphicsObject()
 {
    setParent(connector);
    m_pConnector = connector;
@@ -122,9 +122,9 @@ void ConnectorLine::remove() { m_pConnector->remove(); }
 
 void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-   if( event->button() == Qt::LeftButton && m_pConnector->endPin() ) // If havent end pin means try to connect myself
+   if( event->button() == Qt::LeftButton && m_pConnector->endPin() ) // If havent endPin means try to connect myself
    {
-       if( event->modifiers() == Qt::ControlModifier )
+       if( event->modifiers() == Qt::ControlModifier )      // Move Line
        {
            event->accept();
 
@@ -133,7 +133,7 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
            grabMouse();
        }
-       else     // Add a graphic node here
+       else                // Connecting a wire here: Add a graphic Node
        {
            int index;
            int myindex = m_pConnector->lineList()->indexOf( this );
@@ -141,7 +141,7 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
            ConnectorLine* line;
 
-           if( ( (dy() == 0) && ( abs( point1.x()-m_p2X ) < 15 ) )                // point near the p2 corner
+           if( ( (dy() == 0) && ( abs( point1.x()-m_p2X ) < 15 ) ) // point near the p2 corner
              ||( (dx() == 0) && ( abs( point1.y()-m_p2Y ) < 15 ) ) )
            {
                if ( myindex == m_pConnector->lineList()->size()-1 )
@@ -154,7 +154,7 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
                index = myindex+1;
                line = m_pConnector->lineList()->at( index );
            }
-           else if( ( (dy() == 0) && ( abs( point1.x()-m_p1X ) < 15 ) )           // point near the p1 corner
+           else if( ( (dy() == 0) && ( abs( point1.x()-m_p1X ) < 15 ) ) // point near the p1 corner
                  || ( (dx() == 0) && ( abs( point1.y()-m_p1Y ) < 15 ) ) )
            {
                if ( myindex == 0 )
@@ -167,7 +167,7 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
                line = this;
                index = myindex;
            }
-           else                                                                    // split this line in two
+           else                                // split this line in two
            {
                event->accept();
 
@@ -185,7 +185,7 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
            id.append( "-" );
            id.append( Circuit::self()->newSceneId() );
 
-           Node* node = new Node( 0, type, id );                   // Now add the Node
+           Node* node = new Node( 0, type, id );     // Now add the Node
            node->setPos( point1.x(), point1.y());
            Circuit::self()->addItem( node );
 
@@ -199,15 +199,9 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
            node->getPin(1)->setEnode( enode );
 
            if( Circuit::self()->is_constarted() )   // A Connector wants to connect here (ends in a node)
-           {
-               //Circuit::self()->getNewConnector()->setEnode( enode ); // Set the eNode to the new connector
                Circuit::self()->closeconnector( node->getPin(1) );
-           }
            else                                     // A new Connector created here (starts in a node)
-           {
                Circuit::self()->newconnector( node->getPin(1) );      // start a new connector
-               //Circuit::self()->getNewConnector()->setEnode( enode ); // Set the eNode to the new connector
-           }
 
            if( pauseSim ) Simulator::self()->runContinuous();
        }

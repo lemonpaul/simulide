@@ -53,6 +53,7 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
 
         // Crea IRQ para recibir estado de pin: puerto "m_port", pin numero "m_pinN"
         avr_irq_t* stateIrq = avr_io_getirq( AvrProcessor, AVR_IOCTL_IOPORT_GETIRQ( m_port ),  m_pinN );
+        //qDebug()  << m_port << m_pinN;
         
         // Registra IRQ callback a funcion "out_hook" en clase "this"
         avr_irq_register_notify( stateIrq, out_hook, this );
@@ -80,50 +81,55 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
 
 void AVRComponentPin::setVChanged()
 {
-    if(!m_AvrProcessor) return;
+    if(!m_AvrProcessor) return;                     // No program loaded
+    
+    if( !m_ePin[0]->isConnected() )                 // Pin not connected
+        return;
 
-    if( m_imp!=high_imp ) return; // Nothing to do if pin is output
+    if( m_imp!=high_imp ) return;      // Nothing to do if pin is output
 
     float volt = m_ePin[0]->getVolt();
 
     //qDebug() << m_id << m_type << volt;
-    if( m_type == "mclr" )
+    if( m_id.startsWith("P") )                           // Is an IO Pin
+    {
+        if( volt  > 2.5 ) avr_raise_irq(m_Write_stat_irq, 1);
+        else              avr_raise_irq(m_Write_stat_irq, 0);
+    }
+    else if( m_type == "mclr" )
     {
         ;
         //if( volt > 3 )  m_mcuComponent->setMclr( true );
         //else            m_mcuComponent->setMclr( false );
     }
-    else if( m_type == "vcc" )  { if(m_AvrProcessor) m_AvrProcessor->vcc  = volt*1000;}
-    else if( m_type == "avcc" ) { if(m_AvrProcessor) m_AvrProcessor->avcc = volt*1000;}
-    else if( m_type == "aref" ) { if(m_AvrProcessor) m_AvrProcessor->aref = volt*1000;}
-    else
-    {
-        if( volt  > 2.5 ) avr_raise_irq(m_Write_stat_irq, 1);
-        else              avr_raise_irq(m_Write_stat_irq, 0);
-    }
+    else if( m_type == "vcc"  ) { m_AvrProcessor->vcc  = volt*1000;}
+    else if( m_type == "avcc" ) { m_AvrProcessor->avcc = volt*1000;}
+    else if( m_type == "aref" ) { m_AvrProcessor->aref = volt*1000;}
 }
 
 void AVRComponentPin::set_pinVoltage( uint32_t value )
 {
     //qDebug() << "Port" << m_port << m_id << "   estado: " << value;
 
-    setOut( value == 1 );
+    eSource::setOut( value == 1 );
+    eSource::stampOutput();
 }
 
 void AVRComponentPin::set_pinImpedance( uint32_t value )
 {
     //qDebug() << "Port" << m_port << m_id << "   salida: " << (value & ( 1<<m_pinN ));
-    if( value & (1 << m_pinN) )
+    
+    if( value & (1 << m_pinN) )                         // Pis is Output
     {
-        setImp( 40 );
-        /*if( m_ePin[0]->isConnected())
-            m_ePin[0]->getEnode()->remFromChangedList(this);*/
+        eSource::setImp( 40 );
+        if( m_ePin[0]->isConnected() && m_attached )
+            m_ePin[0]->getEnode()->remFromChangedFast(this);
     }
-    else
+    else                                                 // Pin is Input
     {
-        setImp( high_imp );
-        /*if( m_ePin[0]->isConnected() && m_attached )
-            m_ePin[0]->getEnode()->addToChangedList(this);*/
+        eSource::setImp( high_imp );
+        if( m_ePin[0]->isConnected() && m_attached )
+            m_ePin[0]->getEnode()->addToChangedFast(this);
     }
     //qDebug()<< m_id << "Port" << m_port << m_pinN << "   salida: " << (value and ( 1<<m_pinN ));
 }

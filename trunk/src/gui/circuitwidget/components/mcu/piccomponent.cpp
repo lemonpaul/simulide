@@ -47,6 +47,7 @@ PICComponent::PICComponent( QObject* parent, QString type, QString id )
     if( m_id.startsWith("PIC") ) m_id.replace( "PIC", "pic16f876" );
 
     initPackage();
+    setFreq( 20 );
 }
 PICComponent::~PICComponent() { }
 
@@ -67,5 +68,15 @@ void PICComponent::addPin( QString id, QString type, QString label, int pos, int
     m_pinList.append( new PICComponentPin( this, id, type, label, pos, xpos, ypos, angle ) );
 }
 
+void PICComponent::setFreq( int freq )
+{ 
+    if     ( freq < 1  ) freq = 1;
+    else if( freq > 50 ) freq = 50;
+    
+    Simulator::self()->setMcuClock( freq/4 );
+    m_freq = freq; 
+}
+
 #include "moc_piccomponent.cpp"
 #endif
+

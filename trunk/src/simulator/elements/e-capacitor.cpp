@@ -20,37 +20,37 @@
 // Capacitor model using backward euler  approximation
 // consists of a current source in parallel with a resistor.
 
-#include <cmath>
-
 #include "e-capacitor.h"
 
 eCapacitor::eCapacitor( string id ) : eResistor( id )
 {
-    m_cap = 1; // uF
-    m_tStep = 1e-6*(double)Simulator::self()->reaClock(); //0.0001; //1/(double)Simulator::self()->reaClock(); qDebug() << m_tStep;
-    m_resist = m_tStep/(m_cap*1e-6);// capacitance property(m_cap) is in uF, covert to F
+    m_cap = 0.00001; // Farads
+    m_resist = m_tStep/m_cap;
     m_curSource = 0;
     m_volt = 0;
-
-    Simulator::self()->addToReacList( this );
 }
-eCapacitor::~eCapacitor(){ Simulator::self()->remFromReacList( this ); }
-
+eCapacitor::~eCapacitor()
+{ 
+}
 
 void eCapacitor::initialize()
 {
+    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToChangedSlow(this);
+    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToChangedSlow(this);
+    
+    m_tStep = (double)Simulator::self()->reaClock()/1e6;
+    
+    eResistor::setRes( m_tStep/m_cap );
     eResistor::initialize();
-    m_tStep = 1e-6*(double)Simulator::self()->reaClock();
-    eResistor::setRes( m_tStep/(m_cap*1e-6) );
-    //qDebug() << m_tStep;
 }
 
 void eCapacitor::setVChanged()
 {
     double volt = m_ePin[0]->getVolt() - m_ePin[1]->getVolt();
-
-    if( volt==0 ) return;
-    m_volt = volt;
+    
+    if( volt == 0 ) return;
+    //if( abs(m_volt-volt) < 1e-9 ) return;
+    //m_volt = volt;
 
     m_curSource = -volt/m_resist;
 
@@ -60,7 +60,14 @@ void eCapacitor::setVChanged()
     m_ePin[1]->stampCurrent( m_curSource );
 }
 
-double eCapacitor::uF()             { return m_cap; }
-void  eCapacitor::setuF( double c ) { m_cap = c; eResistor::setRes( m_tStep/(m_cap*1e-6) ); 
-    /*qDebug() << "eCapacitor::setVChanged  m_tStep" << m_tStep <<" m_cap "<<m_cap<<" m_resist "<<m_resist;*/}
-
+double eCapacitor::cap()             
+{ 
+    return m_cap; 
+}
+void  eCapacitor::setCap( double c ) 
+{ 
+    m_cap = c; 
+    eResistor::setRes( m_tStep/m_cap ); 
+    
+    //qDebug() << "eCapacitor::setCap  m_tStep" << m_tStep << c <<" m_cap "<<m_cap<<" m_resist "<<m_resist;
+}

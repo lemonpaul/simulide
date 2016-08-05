@@ -26,8 +26,6 @@
 #include "pin.h"
 #include "utils.h"
 
-#include "avrprocessor.h"
-
 Circuit*  Circuit::m_pSelf = 0l;
 
 Circuit::Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  parent)
@@ -41,16 +39,62 @@ Circuit::Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  p
     m_pSelf = this;
 
     m_con_started = false;
-    m_changed = false;
     new_connector = 0l;
     m_seqNumber   = 1;
+    
+    setReactStep( 50 );
+    //setCircSpeed( 1e6 );
+
+    m_circRate = 1e6;
 }
 
 Circuit::~Circuit()
 {
-    // Avoid PropertyEditor problem: comps no unregistered
+    // Avoid PropertyEditor problem: comps not unregistered
+    
+    QPropertyEditorWidget::self()->removeObject( this );
+    
     foreach( Component* comp, m_compList )
+    {
         QPropertyEditorWidget::self()->removeObject( comp );
+    }
+}
+
+int Circuit::reactStep()
+{
+    return Simulator::self()->reaClock();
+}
+
+void  Circuit::setReactStep( int steps )
+{
+    Simulator::self()->setReaClock( steps );
+}
+
+int  Circuit::circSpeed()
+{
+    return m_circRate;
+}
+void Circuit::setCircSpeed( int rate )
+{
+    m_circRate = Simulator::self()->simuRateChanged( rate );
+}
+
+void Circuit::remove()
+{
+    //qDebug() << m_compList.size();
+    foreach( Component* comp, m_compList )
+    {
+        //qDebug() << "Circuit::remove" << comp->itemID();
+        
+        // Don't remove internal items
+        bool isNumber = false;
+        comp->itemID().split("-").last().toInt( &isNumber );
+        // Don't remove Graphical Nodes
+        bool isNode = comp->itemID().contains( "Node" );
+        
+        if( isNumber && !isNode )  comp->remove();
+    }
+        
 }
 /*void Circuit::setChanged()
 {
@@ -164,7 +208,7 @@ void Circuit::loadCircuit( QString &fileName )
                     //con->closeCon( endpin );
                     con->setEnode( enode );
 
-                    LoadProperties( element, con );
+                    loadProperties( element, con );
 
                     QStringList plist = con->pointList();   // add lines to connector
                     int p1x = plist.first().toInt();
@@ -188,7 +232,7 @@ void Circuit::loadCircuit( QString &fileName )
             else if( type == "Node")
             {
                 Node* fork = new Node( this, type, id );
-                LoadProperties( element, fork );
+                loadProperties( element, fork );
             }
             else if( type == "LEDSMD" ); // TODO: this type shouldnt be saved to circuit
                                          // bcos is created inside another component, for example boards
@@ -196,7 +240,7 @@ void Circuit::loadCircuit( QString &fileName )
             {
                 //qDebug() << type << id;
                 Component* Item = createItem( type, id );
-                LoadProperties( element, Item );
+                loadProperties( element, Item );
             }
         }
         //else
@@ -206,7 +250,6 @@ void Circuit::loadCircuit( QString &fileName )
         node = node.nextSibling();
     }
     m_widget->ensureVisible( itemsBoundingRect() );
-    m_changed = false;
 }
 
 bool Circuit::saveCircuit( QString &fileName )
@@ -239,7 +282,7 @@ bool Circuit::saveCircuit( QString &fileName )
     out << m_domDoc.toString();
     QApplication::restoreOverrideCursor();
 
-    m_changed = false;
+    //m_changed = false;
     return true;
 }
 
@@ -251,7 +294,11 @@ void Circuit::listToDom( QList<Component*>* complist )
     for (int i=0; i<count; i++)
     {
         Component* item = complist->at(i);
-        if ( item )
+        // Don't save internal items
+        bool isNumber = false;
+        item->objectName().split("-").last().toInt( &isNumber );
+        
+        if ( item && isNumber)
         {
             QDomElement pin = m_domDoc.createElement("item");
             const QMetaObject* metaobject = item->metaObject();
@@ -295,7 +342,7 @@ Component* Circuit::createItem( QString type, QString id )
     return 0l;
 }
 
-void Circuit::LoadProperties( QDomElement element, Component* Item )
+void Circuit::loadProperties( QDomElement element, Component* Item )
 {
     const QMetaObject* metaobject = Item->metaObject();
     int count = metaobject->propertyCount();
@@ -311,7 +358,6 @@ void Circuit::LoadProperties( QDomElement element, Component* Item )
         {
             QStringList list= value.toString().split(",");
             Item->setProperty( name, list );
-            //qDebug() << "pointlist: " << list;
         }
         else if ( metaproperty.type() == QVariant::Int    ) 
                   Item->setProperty( name, value.toInt() );
@@ -330,6 +376,8 @@ void Circuit::LoadProperties( QDomElement element, Component* Item )
         else qDebug() << "    ERROR!!! Circuit::LoadProperties\n  unknown type:  "<<"name "<<name<<"   value "<<value ;
     }
     Item->setLabelPos();
+    Item->setValLabelPos();
+    
     addItem(Item);
 
     int number = Item->objectName().split("-").last().toInt();
@@ -339,7 +387,7 @@ void Circuit::LoadProperties( QDomElement element, Component* Item )
 
 QString Circuit::newSceneId()
 {
-    return QString("%1").arg(m_seqNumber++) ;
+    return QString("%1").arg(++m_seqNumber) ;
 }
 
 void Circuit::newconnector( Pin*  startpin )
@@ -352,7 +400,7 @@ void Circuit::newconnector( Pin*  startpin )
     id.append( "-" );
     id.append( newSceneId() );
 
-    new_connector = new Connector( 0, type, id, startpin );
+    new_connector = new Connector( this, type, id, startpin );
 
     QPoint p1 = startpin->scenePos().toPoint();
     QPoint p2 = startpin->scenePos().toPoint();
@@ -372,6 +420,8 @@ void Circuit::mousePressEvent( QGraphicsSceneMouseEvent* event )
 {
     if( event->button() == Qt::LeftButton )
     {
+        QPropertyEditorWidget::self()->setObject( this );
+        
         if( m_con_started )  new_connector->incActLine() ;
     }
     if ( event->button() == Qt::RightButton )

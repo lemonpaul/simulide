@@ -39,6 +39,10 @@ class CircuitView : public QGraphicsView
         qreal scaleFactor() { return m_scalefactor; }
 
     public slots:
+        void saveImage();
+        
+    protected:
+        void contextMenuEvent(QContextMenuEvent* event);
 
     private:
         void wheelEvent(QWheelEvent *event);
@@ -55,7 +59,7 @@ class CircuitView : public QGraphicsView
         qreal      m_scalefactor;
         Component *m_enterItem;
         Circuit   *m_circuit;
-        QString    m_file;
+        //QString    m_file;
 };
 
 #endif

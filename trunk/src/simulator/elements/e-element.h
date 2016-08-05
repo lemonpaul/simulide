@@ -33,12 +33,6 @@ class eElement
         virtual void initEpins();
         virtual void setNumEpins( int n );
 
-        virtual void initialize(){;}
-        virtual void stamp(){;}
-
-        virtual void updateStep(){;}
-        virtual void setVChanged(){;}
-
         virtual ePin* getEpin( int pin );
         virtual ePin* getEpin( QString pinName );
         
@@ -46,8 +40,16 @@ class eElement
 
         string getId(){ return m_elmId; }
 
-        static const double cero_doub = 1e-20;
-        static const double high_imp = 1e20;
+        virtual void initialize(){;}
+        virtual void stamp(){;}
+
+        virtual void updateStep(){;}
+        virtual void setVChanged(){;}
+        
+        virtual bool converged() { return m_converged; }
+
+        static const double cero_doub = 1e-14;
+        static const double high_imp = 1e14;
         static const double digital_high = 5.0;
         static const double digital_low = 0.0;
         static const double digital_threshold = 2.5;
@@ -57,6 +59,8 @@ class eElement
         std::vector<ePin*> m_ePin;
 
         string m_elmId;
+        
+        bool m_converged;
 };
 
 #endif

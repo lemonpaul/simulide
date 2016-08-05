@@ -40,15 +40,13 @@ void eShiftReg::initEpins()
 void eShiftReg::initialize()
 {
     eNode* enode = m_input[1]->getEpin()->getEnode(); // m_input[1] = Reset pin
-    if( enode ) enode->addToChangedList(this);
+    if( enode ) enode->addToChangedFast(this);
 
     eLogicDevice::initialize();
 }
 
 void eShiftReg::setVChanged()
 {
-    if( !Simulator::self()->isRunning() )return;
-
     double volt = m_input[1]->getEpin()->getVolt();   // Reset pin volt.
 
     if     ( volt > m_inputHighV ) m_inputState[1] = true;
@@ -57,16 +55,18 @@ void eShiftReg::setVChanged()
     if( !(m_inputState[1]) )                  // Reset pin is active low
     {
         m_shiftReg.reset();   // Reset shift register if reset pin = Low
-        for( int i=0; i<8; i++ ) m_output[i]->setOut( false );// Set outputs
+        for( int i=0; i<8; i++ ) eLogicDevice::setOut( i, false );// Reset outputs
     }
     else
     {
         if( getClockState()==Rising )
         {
+            // Shift bits 7-1
             for( int i=7; i>0; i-- )
             {
                 m_shiftReg[i] = m_shiftReg[i-1];
-                m_output[i]->setOut( m_shiftReg[i] );// Set outputs
+                eLogicDevice::setOut( i, m_shiftReg[i] );// Set outputs
+                m_output[i]->stampOutput();
             }
             // Read data input pin & put in reg bit0
             volt = m_input[0]->getEpin()->getVolt(); // Reset pin volt.
@@ -76,7 +76,7 @@ void eShiftReg::setVChanged()
 
             m_shiftReg[0] = m_inputState[0];
 
-            m_output[0]->setOut( m_shiftReg[0] );
+            eLogicDevice::setOut( 0, m_shiftReg[0] ); 
         }
     }
 }

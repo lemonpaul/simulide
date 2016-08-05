@@ -33,8 +33,8 @@ class eInductor : public eResistor
         void initialize();
         void setVChanged();
 
-        double getH();
-        void   setH( double h );
+        double ind();
+        void   setInd( double h );
 
     protected:
         double m_ind;

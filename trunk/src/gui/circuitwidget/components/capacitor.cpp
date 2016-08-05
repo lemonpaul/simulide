@@ -41,6 +41,8 @@ Capacitor::Capacitor( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eCapacitor( id.toStdString() )
 {
     m_ePin.resize(2);
+    
+    m_area = QRectF( -10, -10, 20, 20 );
 
     QString nodid = m_id;
     nodid.append(QString("lnod"));
@@ -51,15 +53,19 @@ Capacitor::Capacitor( QObject* parent, QString type, QString id )
     m_ePin[0] = pin;
 
     nodid = m_id;
-    nodid.append(QString("rnod"));
+    nodid.append( QString("rnod") );
     nodpos = QPoint(16+8,0);
-    pin = new Pin( 0, nodpos, nodid, 1, this);
+    pin = new Pin( 0, nodpos, nodid, 1, this );
     pin->setLength(12);
     pin->setPos( 16, 0 );
     m_ePin[1] = pin;
+    
+    m_unit = "F";
+    setCapac( m_cap );
+    m_valLabel->setPos(-16, 8);
+    setShowVal( true );
 
-    label->setText( QString("") );
-    label->setPos(-16,-24);
+    m_idLabel->setPos(-16,-24);
 
     /*const QFont sansFont("Helvetica [Cronyx]", 7);
     m_labelcurr = Circuit::self()->addSimpleText( id.toLatin1().data(), sansFont );
@@ -69,6 +75,20 @@ Capacitor::Capacitor( QObject* parent, QString type, QString id )
     m_labelcurr->setText( QString("%1").arg(m_resist) );*/
 }
 Capacitor::~Capacitor(){}
+
+double Capacitor::capac() { return m_value; }
+
+void Capacitor::setCapac( double c ) 
+{ 
+    Component::setValue( c );       // Takes care about units multiplier
+    eCapacitor::setCap( m_value*m_unitMult );
+}
+
+void Capacitor::setUnit( QString un ) 
+{
+    Component::setUnit( un );
+    eCapacitor::setCap( m_value*m_unitMult );
+}
 
 void Capacitor::remove()
 {
