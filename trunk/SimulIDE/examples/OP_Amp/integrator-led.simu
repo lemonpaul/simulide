@@ -1,0 +1,78 @@
+<circuit type="simu">
+ 
+Node-14: 
+<item x="-116" y="-148" Show_id="false" itemtype="Node" valLabelx="0" rotation="0" valLabely="0" objectName="Node-14" valLabRot="0" labelrot="0" id="Node-14" labelx="6" labely="-18"/>
+ 
+Node-9: 
+<item x="-204" y="-108" Show_id="false" itemtype="Node" valLabelx="0" rotation="0" valLabely="0" objectName="Node-9" valLabRot="0" labelrot="0" id="Node-9" labelx="6" labely="-18"/>
+ 
+Capacitor-8: 
+<item x="-148" Unit=" uF" Show_Cap="true" y="-108" Show_id="false" itemtype="Capacitor" valLabelx="-18" rotation="0" valLabely="4" objectName="Capacitor-8" valLabRot="0" labelrot="0" id="Capacitor-8" labelx="0" labely="-24" Capacitance="10"/>
+ 
+Resistor-5: 
+<item x="-236" Unit=" kΩ" y="-108" Show_id="false" itemtype="Resistor" valLabelx="-21" rotation="0" valLabely="2" objectName="Resistor-5" Resistance="10" valLabRot="0" Show_res="true" labelrot="0" id="Resistor-5" labelx="0" labely="-24"/>
+ 
+Fixed Volt.-3: 
+<item x="-236" Unit=" V" y="-156" Show_id="false" itemtype="Fixed Voltage" valLabelx="-15" rotation="0" valLabely="-30" objectName="Fixed Volt.-3" valLabRot="0" labelrot="0" Show_Volt="true" Voltage="2.5" id="Fixed Volt.-3" labelx="-64" labely="-24"/>
+ 
+Volt. Source-2: 
+<item x="-300" Unit=" V" y="-108" Show_id="false" itemtype="Voltage Source" valLabelx="-28" rotation="0" valLabely="-89" objectName="Volt. Source-2" valLabRot="0" labelrot="0" Show_Volt="true" Voltage="5" id="Volt. Source-2" labelx="0" labely="-24"/>
+ 
+OpAmp-1: 
+<item x="-156" Gain="1000" y="-148" Show_id="false" itemtype="opAmp" valLabelx="0" rotation="0" valLabely="0" objectName="OpAmp-1" valLabRot="0" labelrot="0" id="OpAmp-1" labelx="0" labely="-24"/>
+ 
+Led-17: 
+<item x="84" y="-148" Show_id="false" itemtype="Led" valLabelx="0" rotation="0" valLabely="0" objectName="Led-17" valLabRot="0" labelrot="0" id="Led-17" threshold="2.4" MaxCurrent="0.05" labelx="0" labely="-24"/>
+ 
+OpAmp-18: 
+<item x="-52" Gain="1000" y="-148" Show_id="false" itemtype="opAmp" valLabelx="0" rotation="0" valLabely="0" objectName="OpAmp-18" valLabRot="0" labelrot="0" id="OpAmp-18" labelx="0" labely="-24"/>
+ 
+Ground (0 V)-19: 
+<item x="132" y="-92" Show_id="false" itemtype="Ground" valLabelx="0" rotation="0" valLabely="0" objectName="Ground (0 V)-19" valLabRot="0" labelrot="0" id="Ground (0 V)-19" labelx="0" labely="-24"/>
+ 
+Resistor-29: 
+<item x="28" Unit=" Ω" y="-148" Show_id="false" itemtype="Resistor" valLabelx="-18" rotation="0" valLabely="3" objectName="Resistor-29" Resistance="100" valLabRot="0" Show_res="true" labelrot="0" id="Resistor-29" labelx="0" labely="-24"/>
+ 
+Node-34: 
+<item x="-12" y="-148" Show_id="false" itemtype="Node" valLabelx="0" rotation="0" valLabely="0" objectName="Node-34" valLabRot="0" labelrot="0" id="Node-34" labelx="6" labely="-18"/>
+ 
+Connector-4: 
+<item x="-220" y="-156" Show_id="false" itemtype="Connector" valLabelx="-8" rotation="0" valLabely="-37" objectName="Connector-4" valLabRot="0" startpinid="Fixed Volt.-3-outnod" enodeid="enode-4" labelrot="0" endpinid="OpAmp-1inputNinv" id="Connector-4" pointList="-220,-156,-220,-156,-220,-156,-220,-156,-220,-156,-220,-156,-220,-156,-220,-156,-220,-156,-180,-156" labelx="0" labely="-24"/>
+ 
+Connector-6: 
+<item x="-284" y="-108" Show_id="false" itemtype="Connector" valLabelx="-4" rotation="0" valLabely="-96" objectName="Connector-6" valLabRot="0" startpinid="Volt. Source-2outnod" enodeid="enode-6" labelrot="0" endpinid="Resistor-5lnod" id="Connector-6" pointList="-284,-108,-284,-108,-284,-108,-284,-108,-284,-108,-284,-108,-284,-108,-284,-108,-284,-108,-252,-108" labelx="0" labely="-24"/>
+ 
+Connector-7: 
+<item x="-220" y="-108" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-7" valLabRot="0" startpinid="Resistor-5rnod" enodeid="enode-11" labelrot="0" endpinid="Node-9-0" id="Connector-7" pointList="-220,-108,-220,-108,-220,-108,-220,-108,-220,-108,-220,-108,-220,-108,-220,-108,-220,-108,-204,-108" labelx="0" labely="-24"/>
+ 
+Connector-10: 
+<item x="-204" y="-108" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-10" valLabRot="0" startpinid="Node-9-2" enodeid="enode-11" labelrot="0" endpinid="OpAmp-1inputInv" id="Connector-10" pointList="-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-140,-180,-140" labelx="0" labely="-24"/>
+ 
+Connector-11: 
+<item x="-204" y="-108" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-11" valLabRot="0" startpinid="Node-9-1" enodeid="enode-11" labelrot="0" endpinid="Capacitor-8lnod" id="Connector-11" pointList="-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-204,-108,-164,-108" labelx="0" labely="-24"/>
+ 
+Connector-13: 
+<item x="-132" y="-148" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-13" valLabRot="0" startpinid="OpAmp-1output" enodeid="enode15" labelrot="0" endpinid="Node-14-0" id="Connector-13" pointList="-132,-148,-132,-148,-132,-148,-132,-148,-132,-148,-132,-148,-132,-148,-132,-148,-132,-148,-116,-148" labelx="0" labely="-24"/>
+ 
+Connector-16: 
+<item x="-116" y="-148" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-16" valLabRot="0" startpinid="Node-14-1" enodeid="enode15" labelrot="0" endpinid="Capacitor-8rnod" id="Connector-16" pointList="-116,-148,-116,-148,-116,-148,-116,-148,-116,-148,-116,-148,-116,-108,-132,-108" labelx="0" labely="-24"/>
+ 
+Connector-20: 
+<item x="132" y="-108" Show_id="false" itemtype="Connector" valLabelx="21" rotation="0" valLabely="-13" objectName="Connector-20" valLabRot="0" startpinid="Ground (0 V)-19Gnod" enodeid="enode-20" labelrot="0" endpinid="Led-17rnod" id="Connector-20" pointList="132,-108,132,-108,132,-148,100,-148" labelx="0" labely="-24"/>
+ 
+Connector-30: 
+<item x="44" y="-148" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-30" valLabRot="0" startpinid="Resistor-29rnod" enodeid="enode-30" labelrot="0" endpinid="Led-17lnod" id="Connector-30" pointList="44,-148,44,-148,44,-148,44,-148,68,-148" labelx="0" labely="-24"/>
+ 
+Connector-31: 
+<item x="12" y="-148" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-31" valLabRot="0" startpinid="Resistor-29lnod" enodeid="enode-33" labelrot="0" endpinid="Node-34-0" id="Connector-31" pointList="12,-148,12,-148,12,-148,12,-148,-4,-148,-12,-148" labelx="0" labely="-24"/>
+ 
+Connector-33: 
+<item x="-76" y="-140" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-33" valLabRot="0" startpinid="OpAmp-18inputInv" enodeid="enode-33" labelrot="0" endpinid="Node-34-1" id="Connector-33" pointList="-76,-140,-76,-140,-76,-108,-12,-108,-12,-148" labelx="0" labely="-24"/>
+ 
+Connector-35: 
+<item x="-12" y="-148" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-35" valLabRot="0" startpinid="Node-34-2" enodeid="enode-33" labelrot="0" endpinid="OpAmp-18output" id="Connector-35" pointList="-12,-148,-12,-148,-12,-148,-12,-148,-12,-148,-12,-148,-28,-148" labelx="0" labely="-24"/>
+ 
+Connector-15: 
+<item x="-116" y="-148" Show_id="false" itemtype="Connector" valLabelx="0" rotation="0" valLabely="0" objectName="Connector-15" valLabRot="0" startpinid="Node-14-2" enodeid="enode15" labelrot="0" endpinid="OpAmp-18inputNinv" id="Connector-15" pointList="-116,-148,-116,-148,-116,-148,-116,-148,-116,-148,-116,-148,-92,-148,-92,-156,-76,-156" labelx="0" labely="-24"/>
+ 
+</circuit>

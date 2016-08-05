@@ -1,0 +1,48 @@
+<circuit type="simu">
+ 
+Node-14: 
+<item labely="-24" valLabelx="0" objectName="Node-14" valLabely="0" x="-420" y="-260" valLabRot="0" itemtype="Node" rotation="0" labelrot="0" Show_id="false" id="Node-14" labelx="0"/>
+ 
+Probe-12: 
+<item labely="-24" valLabelx="0" objectName="Probe-12" valLabely="0" x="-404" y="-300" valLabRot="0" Show_volt="true" itemtype="Probe" rotation="-45" labelrot="45" Show_id="false" id="Probe-12" labelx="-32"/>
+ 
+Node-8: 
+<item labely="-24" valLabelx="0" objectName="Node-8" valLabely="0" x="-324" y="-220" valLabRot="0" itemtype="Node" rotation="0" labelrot="0" Show_id="false" id="Node-8" labelx="0"/>
+ 
+Capacitor-5: 
+<item labely="-24" valLabelx="0" objectName="Capacitor-5" valLabely="0" x="-324" y="-172" valLabRot="0" Capacitance="10" Show_Cap="true" itemtype="Capacitor" rotation="90" Unit=" uF" labelrot="-90" Show_id="false" id="Capacitor-5" labelx="0"/>
+ 
+Resistor-4: 
+<item labely="-24" valLabelx="-19" objectName="Resistor-4" valLabely="-25" Resistance="4.7" x="-292" y="-220" valLabRot="0" itemtype="Resistor" rotation="0" Unit=" kΩ" Show_res="true" labelrot="0" Show_id="false" id="Resistor-4" labelx="0"/>
+ 
+OpAmp-3: 
+<item labely="-24" valLabelx="0" objectName="OpAmp-3" valLabely="0" x="-372" y="-228" valLabRot="0" itemtype="opAmp" rotation="-180" Gain="1000" labelrot="-180" Show_id="false" id="OpAmp-3" labelx="0"/>
+ 
+Arduino Uno-2: 
+<item labely="-137" valLabelx="0" objectName="Arduino Uno-2" valLabely="0" x="-252" y="-276" valLabRot="0" itemtype="Arduino" program="" Mhz="16" rotation="0" labelrot="0" Show_id="false" id="Arduino Uno-2" labelx="-38"/>
+ 
+Connector-6: 
+<item labely="-24" valLabelx="0" objectName="Connector-6" valLabely="0" enodeid="enode-10" x="-348" startpinid="OpAmp-3inputNinv" y="-220" valLabRot="0" itemtype="Connector" rotation="0" pointList="-348,-220,-324,-220" labelrot="0" Show_id="false" endpinid="Node-8-0" id="Connector-6" labelx="0"/>
+ 
+Connector-7: 
+<item labely="-24" valLabelx="0" objectName="Connector-7" valLabely="0" enodeid="enode-7" x="-276" startpinid="Resistor-4rnod" y="-220" valLabRot="0" itemtype="Connector" rotation="0" pointList="-276,-220,-244,-220" labelrot="0" Show_id="false" endpinid="Arduino Uno-2-PD5" id="Connector-7" labelx="0"/>
+ 
+Connector-9: 
+<item labely="-24" valLabelx="0" objectName="Connector-9" valLabely="0" enodeid="enode-10" x="-324" startpinid="Node-8-2" y="-220" valLabRot="0" itemtype="Connector" rotation="0" pointList="-324,-220,-308,-220" labelrot="0" Show_id="false" endpinid="Resistor-4lnod" id="Connector-9" labelx="0"/>
+ 
+Connector-10: 
+<item labely="-24" valLabelx="0" objectName="Connector-10" valLabely="0" enodeid="enode-10" x="-324" startpinid="Node-8-1" y="-220" valLabRot="0" itemtype="Connector" rotation="0" pointList="-324,-220,-324,-188" labelrot="0" Show_id="false" endpinid="Capacitor-5lnod" id="Connector-10" labelx="0"/>
+ 
+Connector-11: 
+<item labely="-24" valLabelx="0" objectName="Connector-11" valLabely="0" enodeid="enode-11" x="-324" startpinid="Capacitor-5rnod" y="-156" valLabRot="0" itemtype="Connector" rotation="0" pointList="-324,-156,-324,-132,-244,-132" labelrot="0" Show_id="false" endpinid="Arduino Uno-2-GND0" id="Connector-11" labelx="0"/>
+ 
+Connector-13: 
+<item labely="-24" valLabelx="0" objectName="Connector-13" valLabely="0" enodeid="enode-16" x="-420" startpinid="Probe-12inpin" y="-284" valLabRot="0" itemtype="Connector" rotation="0" pointList="-420,-284,-420,-260" labelrot="0" Show_id="false" endpinid="Node-14-0" id="Connector-13" labelx="0"/>
+ 
+Connector-15: 
+<item labely="-24" valLabelx="0" objectName="Connector-15" valLabely="0" enodeid="enode-16" x="-420" startpinid="Node-14-2" y="-260" valLabRot="0" itemtype="Connector" rotation="0" pointList="-420,-260,-420,-228,-396,-228" labelrot="0" Show_id="false" endpinid="OpAmp-3output" id="Connector-15" labelx="0"/>
+ 
+Connector-16: 
+<item labely="-24" valLabelx="0" objectName="Connector-16" valLabely="0" enodeid="enode-16" x="-420" startpinid="Node-14-1" y="-260" valLabRot="0" itemtype="Connector" rotation="0" pointList="-420,-260,-332,-260,-332,-236,-348,-236" labelrot="0" Show_id="false" endpinid="OpAmp-3inputInv" id="Connector-16" labelx="0"/>
+ 
+</circuit>
