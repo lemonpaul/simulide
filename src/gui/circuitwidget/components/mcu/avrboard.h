@@ -42,22 +42,25 @@ class AVRBoard : public McuComponent
         static LibraryItem * libraryItem();
 
         int getRamValue( int address );
-
+        
         void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
+        
+    public slots:
+        virtual void remove();
 
-private:
-    void attachPins();
-    void initBoard();
-    void initBootloader();
-    void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
+    private:
+        void attachPins();
+        void initBoard();
+        void initBootloader();
+        void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
 
-    eSource* m_ground;
-    eNode*   m_groundEnode;
-    ePin*    m_groundpin;
-    LedSmd*  m_boardLed;
-    eNode*   m_boardLedEnode;
-    
-    uart_pty_t m_uart_pty;
+        eSource* m_ground;
+        eNode*   m_groundEnode;
+        ePin*    m_groundpin;
+        LedSmd*  m_boardLed;
+        eNode*   m_boardLedEnode;
+        
+        uart_pty_t m_uart_pty;
 
 };
 #endif

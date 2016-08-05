@@ -21,6 +21,7 @@
 
 #include "mcucomponent.h"
 #include "mcucomponentpin.h"
+#include "outpaneltext.h"
 #include "connector.h"
 #include "mainwindow.h"
 
@@ -31,8 +32,8 @@ McuComponent::McuComponent( QObject* parent, QString type, QString id )
     m_symbolFile = "";
     m_device = "";
 
-    m_labelx = -38;
-    m_labely = -137;
+    setLabelPos(-38,-137 );
+    setShowId( true );
 
     m_color = QColor( 50, 50, 70 );
 
@@ -47,7 +48,6 @@ McuComponent::~McuComponent() {}
 void McuComponent::initPackage()
 {
     QString compName = m_id.split("-").first(); // for example: "atmega328-1" to: "atmega328"
-    label->setText( compName );
 
     //qDebug() << "McuComponent::initPackage datafile: " << m_dataFile;
 
@@ -78,16 +78,22 @@ void McuComponent::initPackage()
         QDomElement element = rNode.toElement();
         QDomNode    node    = element.firstChild();
 
-        while( !node.isNull() )                    // Find the "package" 
+        while( !node.isNull() ) 
         {
             QDomElement element = node.toElement();
             if( element.attribute("name")==compName )
             {
+                // Get package file
                 package = element.attribute( "package" );
                 m_dataFile = m_dataFile.replace( m_dataFile.split("/").last(), package.append(".package") );
-
+                
+                // Get device
                 m_device = element.attribute( "device" );
                 m_processor->setDevice( m_device );
+                
+                // Get data file
+                QString dataFile = element.attribute( "data" );
+                m_processor->setDataFile( dataFile );
 
                 break;
             }
@@ -98,6 +104,19 @@ void McuComponent::initPackage()
     if( m_device != "" ) Package::initPackage();
     else qDebug() << compName << "ERROR!! McuComponent::initPackage Package not Found: " << package;
 
+}
+
+int McuComponent::freq()
+{ 
+    return m_freq; 
+}
+void McuComponent::setFreq( int freq )
+{ 
+    if     ( freq < 1  ) freq = 1;
+    else if( freq > 50 ) freq = 50;
+    
+    Simulator::self()->setMcuClock( freq );
+    m_freq = freq; 
 }
 
 void McuComponent::reset()
@@ -118,11 +137,11 @@ void McuComponent::remove()
 {
     foreach( McuComponentPin* mcupin, m_pinList )
     {
-        Pin* pin = mcupin->pin(); //static_cast<Pin*>(mcupin->pin());
+        Pin* pin = mcupin->pin(); 
         if( pin->connector() ) pin->connector()->remove();
         //delete mcupin;
     }
-    terminate();
+    //terminate();
     m_pinList.clear();
 
     Component::remove();
@@ -137,11 +156,29 @@ void McuComponent::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 
     QAction* reloadAction = menu->addAction( QIcon(":/fileopen.png"),tr("Reload firmware") );
     connect( reloadAction, SIGNAL(triggered()), this, SLOT(slotReload()) );
+    
+    QAction* openTerminal = menu->addAction( QIcon(":/fileopen.png"),tr("Open Serial Term.") );
+    connect( openTerminal, SIGNAL(triggered()), this, SLOT(slotOpenTerm()) );
+    
+    QAction* closeTerminal = menu->addAction( QIcon(":/fileopen.png"),tr("Close Serial Term.") );
+    connect( closeTerminal, SIGNAL(triggered()), this, SLOT(slotCloseTerm()) );
 
     menu->addSeparator();
 
     Component::contextMenu( event, menu );
     menu->deleteLater();
+}
+
+void McuComponent::slotOpenTerm()
+{
+    OutPanelText::self()->setVisible( true );
+    m_processor->setUsart( true );
+}
+
+void McuComponent::slotCloseTerm()
+{
+    OutPanelText::self()->setVisible( false );
+    m_processor->setUsart( false );
 }
 
 void McuComponent::slotLoad()
@@ -168,13 +205,16 @@ void McuComponent::load( QString fileName )
     {
         attachPins();
         reset();
-
+        
         m_symbolFile = fileName;
 
         QSettings settings( "PicLinux", "SimulIDE" );   //*********  !!!!!!!!!!!!!!!!!  ****************
         settings.setValue( "lastFirmDir", m_symbolFile );
     }
+    else QMessageBox::warning( 0, tr("Error:"), tr("Could not load ")+ fileName );
+    
     if( pauseSim ) Simulator::self()->runContinuous();
+    
 }
 
 void McuComponent::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )

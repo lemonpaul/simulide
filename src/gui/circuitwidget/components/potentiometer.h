@@ -31,7 +31,9 @@ class LibraryItem;
 class Potentiometer : public Component, public eElement
 {
     Q_OBJECT
-    Q_PROPERTY( double Resistance  READ res   WRITE setRes   DESIGNABLE true USER true )
+    Q_PROPERTY( double Resistance READ res     WRITE setRes     DESIGNABLE true USER true )
+    Q_PROPERTY( QString Unit      READ unit    WRITE setUnit    DESIGNABLE true USER true )
+    Q_PROPERTY( bool    Show_res  READ showVal WRITE setShowVal DESIGNABLE true USER true )
 
     public:
 
@@ -42,9 +44,13 @@ class Potentiometer : public Component, public eElement
         static LibraryItem* libraryItem();
         
         void initialize();
+        
+        void updateStep();
 
-        double res() const      { return m_resist; }
-        void setRes( double v );//{ m_voltHight = v; outpin->compChanged( msg_vth, m_voltOut ); }
+        double res() const      { return m_value; }
+        void setRes( double v );
+        
+        void setUnit( QString un );
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
@@ -55,6 +61,8 @@ class Potentiometer : public Component, public eElement
     private:
         double m_resist;
         double m_voltOut;
+        
+        bool m_changed;
         
         Pin m_pinA;
         Pin m_pinM;

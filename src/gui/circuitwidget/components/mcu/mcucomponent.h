@@ -31,7 +31,7 @@ class McuComponent : public Package
 {
     Q_OBJECT
     Q_PROPERTY( QString  program  READ program WRITE setProgram DESIGNABLE true USER true )
-    //Q_PROPERTY( int      Freq     READ freq    WRITE setFreq    DESIGNABLE true USER true )
+    Q_PROPERTY( int      Mhz      READ freq    WRITE setFreq    DESIGNABLE true USER true )
 
     public:
 
@@ -41,8 +41,8 @@ class McuComponent : public Package
         QString program()   const      { return  m_symbolFile; }
         void setProgram( QString /*pro*/ ) {/* m_symbolFile = pro;*/ }
 
-        //int  freq()                    { return m_freq; }
-        //void setFreq( int freq )       { m_freq = freq; }
+        int  freq();
+        virtual void setFreq( int freq );
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
     
@@ -50,9 +50,12 @@ class McuComponent : public Package
         virtual void terminate();
         virtual void remove();
         virtual void reset();
+        virtual void load( QString fileName );
         void slotLoad();
         void slotReload();
-        void load( QString fileName );
+        void slotOpenTerm();
+        void slotCloseTerm();
+        
 
     protected:
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
@@ -60,11 +63,10 @@ class McuComponent : public Package
         virtual void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )=0;
         virtual void attachPins()=0;
         virtual void initPackage();
-        //virtual bool attachDevice();
 
         BaseProcessor* m_processor;
 
-        //int   m_freq;
+        int   m_freq;           // Clock Frequency Mhz
 
         QString m_device;       // Name of device
         QString m_symbolFile;   // firmware file loaded
@@ -73,4 +75,3 @@ class McuComponent : public Package
         QList<McuComponentPin*> m_pinList;
 };
 #endif
-

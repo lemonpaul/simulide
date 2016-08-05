@@ -22,24 +22,15 @@
 
 #include <QtWidgets>
 
-/**
-@short Allows selection of generic items for dragging / clicking
-@author David Saxton
-*/
+
 class ComponentSelector : public QTreeWidget
 {
     Q_OBJECT
-	public:
+    
+    public:
         ComponentSelector( QWidget* parent );
-		~ComponentSelector();
+        ~ComponentSelector();
 
-		/**
-		 * Adds a listview item to the ListView
-         * @param type the item type, eg "Resistor"
-		 * @param caption The displayed text
-		 * @param category The category it is in, eg "Integrated Circuits
-         * @param icon The icon to be displayed to the left of the text
-		 */
         void addItem( const QString &caption,
                       const QString &category,
                       const QString &icon,
@@ -49,11 +40,11 @@ class ComponentSelector : public QTreeWidget
 
         void mouseReleaseEvent(QMouseEvent*);
 
-	private slots:
+    private slots:
         void slotItemClicked( QTreeWidgetItem* item, int column );
 
-	private:
-	
+    private:
+    
         QStringList m_categories;
 };
 

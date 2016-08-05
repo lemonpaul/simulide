@@ -21,7 +21,7 @@
 #include "itemlibrary.h"
 
 ComponentSelector::ComponentSelector( QWidget* parent )
-	: QTreeWidget( parent )
+    : QTreeWidget( parent )
 {
     setDragEnabled(true);
     setDragDropMode(QAbstractItemView::DragOnly);
@@ -31,8 +31,8 @@ ComponentSelector::ComponentSelector( QWidget* parent )
     setCursor(Qt::OpenHandCursor);
     headerItem()->setHidden( true );
     setIconSize( QSize( 32, 24));
-	
-//    QWhatsThis::add( this, QString::fromUtf8( gettext("Add components to the circuit diagram by dragging them into the circuit.<br><br>To add more than one component of the same type, doubleclick on a component, and click repeatedly in the circuit to place the component. Right click to stop placement.<br><br>Some components (such as subcircuits) can be removed by right clicking on the item and selecting \"Remove\"." ) ) );
+    
+    //QWhatsThis::add( this, QString::fromUtf8( gettext("Drag a Component and drop it into the Circuit." ) ) );
 
     foreach( LibraryItem* libItem, itemLibrary()->items() )
     {
@@ -55,8 +55,18 @@ ComponentSelector::ComponentSelector( QWidget* parent )
 
     foreach( QString compSetName, compSetDir.entryList( QDir::Files ) )
     {
-        loadXml( compSetDir.absoluteFilePath(compSetName) );
-        qDebug() << "        Loaded Component set:  "<< compSetName;
+        if( compSetName == "pics.xml" )
+        {
+            #ifndef NO_PIC
+            loadXml( compSetDir.absoluteFilePath(compSetName) );
+            qDebug() << "        Loaded Component set:  "<< compSetName;
+            #endif
+        }
+        else
+        {
+            loadXml( compSetDir.absoluteFilePath(compSetName) );
+            qDebug() << "        Loaded Component set:  "<< compSetName;
+        }
     }
     qDebug() << "\n";
 
@@ -118,6 +128,7 @@ void ComponentSelector::addItem( const QString &caption, const QString &_categor
     QTreeWidgetItem *item =  new QTreeWidgetItem(0);
     QFont font = item->font(0);
     font.setPointSize(9);
+    font.setWeight( QFont::Bold );
     item->setFont( 0, font );
     item->setText( 0, caption );
     item->setFlags( QFlag(32) );
@@ -190,4 +201,4 @@ void ComponentSelector::slotItemClicked( QTreeWidgetItem *item, int column)
 
     drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
 }
-
+#include "moc_componentselector.cpp"

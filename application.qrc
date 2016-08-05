@@ -24,5 +24,10 @@
         <file alias="orgate.png">src/icons/components/orgate.png</file>
         <file alias="xorgate.png">src/icons/components/xorgate.png</file>
         <file alias="potentiometer.png">src/icons/components/potentiometer.png</file>
+        <file alias="push.png">src/icons/components/push.png</file>
+        <file alias="opamp.png">src/icons/components/opamp.png</file>
+        <file alias="pcd8544.png">src/icons/components/pcd8544.png</file>
+        <file alias="hd44780.png">src/icons/components/hd44780.png</file>
+        <file alias="font2.png">src/icons/font/font2.png</file>
     </qresource>
 </RCC>

@@ -36,7 +36,7 @@ eLogicDevice::eLogicDevice( string id )
     m_outLowV    = 0;
 
     m_inputImp = high_imp;
-    m_outImp   = 50;
+    m_outImp   = 40;
 
     m_clock = false;
     m_outEnable = true;
@@ -57,13 +57,15 @@ void eLogicDevice::initialize()
     if( m_clockPin )
     {
         eNode* enode = m_clockPin->getEpin()->getEnode();
-        if( enode ) enode->addToChangedList(this);
+        if( enode ) enode->addToChangedFast(this);
     }
     if( m_outEnablePin )
     {
         eNode* enode = m_outEnablePin->getEpin()->getEnode();
-        if( enode ) enode->addToChangedList(this);
+        if( enode ) enode->addToChangedFast(this);
     }
+    for( int i=0; i<m_numOutputs; i++ )
+        eLogicDevice::setOut( i, false );
 }
 
 int eLogicDevice::getClockState()
@@ -194,6 +196,12 @@ void eLogicDevice::setNumOuts( int outputs )
     else if( outputs < m_numOutputs ) deleteOutputs( m_numOutputs - outputs );
 }
 
+void eLogicDevice::setOut( int num, bool out )
+{
+    m_output[num]->setOut( out );
+    m_output[num]->stampOutput();
+}
+
 void eLogicDevice::setOutHighV( double volt )
 {
     m_outHighV = volt;
@@ -215,15 +223,23 @@ void eLogicDevice::setInputImp( double imp )
     m_inputImp = imp;
 
     for( int i=0; i<m_numInputs; i++ )
+    {
         m_input[i]->setImp( imp );
+        //m_input[i]->stampOutput();
+    }
 }
 
 void eLogicDevice::setOutImp( double imp )
 {
+    if( m_outImp == imp ) return;
+    
     m_outImp = imp;
 
     for( int i=0; i<m_numOutputs; i++ )
+    {
         m_output[i]->setImp( imp );
+        //m_output[i]->stampOutput();
+    }
 }
 
 /*ePin* eLogicDevice::getEpin( int pin )  // First InPuts, then OutPuts

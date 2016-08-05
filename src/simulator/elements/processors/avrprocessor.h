@@ -49,6 +49,17 @@ class AvrProcessor : public BaseProcessor
         
         avr_t* getCpu() { return m_avrProcessor; }
         void setCpu( avr_t* avrProc ) { m_avrProcessor = avrProc; }
+        
+        void uartOut( uint32_t value );
+        
+        static void uart_pty_in_hook( struct avr_irq_t* irq, uint32_t value, void* param )
+        {
+            Q_UNUSED(irq);
+            // get the pointer out of param and asign it to AvrProcessor*
+            AvrProcessor* ptrAvrProcessor = reinterpret_cast<AvrProcessor*> (param);
+            
+            ptrAvrProcessor->uartOut( value );
+        }
 
     private:
  static AvrProcessor *m_pSelf;

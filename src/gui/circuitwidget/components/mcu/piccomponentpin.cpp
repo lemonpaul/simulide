@@ -26,42 +26,43 @@ PICComponentPin::PICComponentPin( McuComponent* mcu, QString id, QString type, Q
     : McuComponentPin( mcu, id, type, label, pos, xpos, ypos, angle )
 {
     m_pos = pos;
-    m_channel = -1;
+    //m_channel = -1;
+    m_PicProcessor  = 0l;
     m_pStimulusNode = 0l;
-    m_pIOPIN = 0l;
+    m_pIOPIN        = 0l;
 }
 PICComponentPin::~PICComponentPin(){}
 
 void PICComponentPin::attach( pic_processor *PicProcessor )
 {
+    if( m_PicProcessor ) return;
+    
     m_PicProcessor = PicProcessor;
 
-    if( m_id.startsWith("R") )
+    if( m_id.startsWith("R") || m_id.startsWith("GP") )
     {
-        m_port = m_id.at(1).toAscii();
+        m_port = m_id.at(1).toLatin1();
         m_pinN = m_id.mid(2,1).toInt();
 
         IOPIN * iopin = m_PicProcessor->get_pin( m_pos );
 
-        if (!iopin)
+        if( !iopin )
         {
-            qDebug() << "PICComponentPin::attach : iopin is NULL" << endl;
+            qDebug() << "PICComponentPin::attach : iopin is NULL: "<< m_id << endl;
             return;
         }
-        
-        if (m_pStimulusNode)
+        if( m_pStimulusNode )
         {
             qDebug() << "PICComponentPin::attach :Already have a node stimulus" << endl;
             return;
         }
-        
-        if (m_pIOPIN)
+        if( m_pIOPIN )
         {
             qDebug() << "PICComponentPin::attach :Already have an iopin" << endl;
             return;
         }
         m_pIOPIN = iopin;
-        m_pStimulusNode = new Stimulus_Node(m_id.toAscii());
+        m_pStimulusNode = new Stimulus_Node(m_id.toLatin1());
         m_pStimulusNode->attach_stimulus(iopin);
         m_pStimulusNode->attach_stimulus(this);
 
@@ -77,11 +78,9 @@ void PICComponentPin::setVChanged()
 
     if( m_imp!=high_imp ) return;      // Nothing to do if pin is output
 
-    float volt = m_ePin[0]->getVolt();
+    double volt = m_ePin[0]->getVolt();
     
-    if (m_pStimulusNode)
-        m_pStimulusNode->set_nodeVoltage(volt);
-    return;
+    if (m_pStimulusNode) m_pStimulusNode->set_nodeVoltage(volt);
 }
 
 void PICComponentPin::set_nodeVoltage( double v )     // Called by Gpsim
@@ -91,13 +90,13 @@ void PICComponentPin::set_nodeVoltage( double v )     // Called by Gpsim
     else
         setImp( 40 );               // As Output set Impedance to 40 Ohm
 
-    setOut( v > 2.5 );
+    eSource::setOut( v > 2.5 );
+    eSource::stampOutput();
 }
 
 double PICComponentPin::get_Vth( )                    // Called by Gpsim
 {
     return m_ePin[0]->getVolt();
 }
-
 #include "moc_piccomponentpin.cpp"
 #endif

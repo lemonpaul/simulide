@@ -30,9 +30,9 @@ LibraryItem* Ground::libraryItem()
         return new LibraryItem(
         tr( "Ground (0 V)" ),
         tr( "Sources" ),
-		"ground.png",
+        "ground.png",
         "Ground",
-		Ground::construct );
+        Ground::construct );
 }
 
 Ground::Ground( QObject* parent, QString type, QString id )

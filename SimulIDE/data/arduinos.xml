@@ -3,7 +3,7 @@
 <itemlib>
     <itemset category="Boards" type="Arduino">
 
-    <item name="Arduino Uno"  package="arduino/arduino_uno" device="atmega328" icon="arduinoUno.png" ></item>
+    <item name="Arduino Uno"  package="arduino/arduino_uno" data="avr/atmega328" device="atmega328" icon="arduinoUno.png" ></item>
 
     </itemset>
 </itemlib>

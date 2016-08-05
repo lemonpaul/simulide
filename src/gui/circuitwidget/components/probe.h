@@ -39,11 +39,14 @@ class Probe : public Component, public eElement
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
+        
+static  bool  m_oscopeBusy;
 
         bool Show_volt();
         void setShow_volt( bool show );
 
         void setVolt( double volt );
+        double getVolt();
 
         void updateStep();
 
@@ -52,6 +55,9 @@ class Probe : public Component, public eElement
     public slots:
         virtual void remove();
 
+        void slotPlotterAdd();
+        void slotPlotterRem();
+        
         void slotOscopAdd();
         void slotOscopRem();
 
@@ -62,9 +68,10 @@ class Probe : public Component, public eElement
         double m_voltIn;
         double m_voltTrig;
 
-        int    m_oscopLine;
-        QColor m_oscopColor;
+        int    m_plotterLine;
+        QColor m_plotterColor;
 
+        bool  m_haveOscope;
         bool  m_showVolt;
 
         Pin   *m_inputpin;

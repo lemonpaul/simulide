@@ -25,63 +25,43 @@ BaseProcessor::BaseProcessor( QObject* parent )
      : QObject( parent )
 {
     m_loadStatus = false;
+    m_usartTerm  = false;
     m_ramTable   = 0l;
     m_symbolFile = "";
     m_device     = "";
-    //m_timerId   = 0;
 }
-BaseProcessor::~BaseProcessor() {}
-
-/*void BaseProcessor::runMcu()
+BaseProcessor::~BaseProcessor() 
 {
-    step();
-    //m_timerId = startTimer( 10 );
 }
-
-void BaseProcessor::stopMcu()
-{
-    if( m_timerId != 0 )
-    {
-        killTimer( m_timerId );
-        m_timerId = 0;
-    }
-}*/
-
-/*void BaseProcessor::timerEvent( QTimerEvent* e )
-{
-    e->accept();
-    step();
-}*/
-
 
 void BaseProcessor::terminate()
 {
     qDebug() <<"\nBaseProcessor::terminate "<<m_device<<m_symbolFile<<"\n";
-    //emit terminated();
 
-    /*if( m_ramTable )
+    if( m_ramTable )
     {
         MainWindow::self()->ramTabWidgetLayout->removeWidget( m_ramTable );
-        delete m_ramTable;
-    }*/
+        //delete m_ramTable;
+        m_ramTable   = 0l;
+    }
+    OutPanelText::self()->setVisible( false );
     m_loadStatus = false;
-    //m_ramTable   = 0l;
     m_symbolFile = "";
     //m_device     = "";
 }
 
 void BaseProcessor::initialized()
 {
-    qDebug() << "Loaded: " << m_symbolFile;
+    qDebug() << "\nBaseProcessor::initialized Loaded: " << m_symbolFile;
 
     setRegisters();
     m_loadStatus = true;
-    //qDebug() << m_ramTable;
+
     if( m_ramTable == 0l )
-    {//qDebug() << "New RamTable ";
+    {
         m_ramTable = new RamTable( this );
         MainWindow::self()->ramTabWidgetLayout->addWidget( m_ramTable );
-        //qDebug() << m_ramTable;
+        //qDebug() << "RmTable:" << m_ramTable;
     }
 }
 
@@ -91,6 +71,10 @@ void BaseProcessor::setDevice( QString device ) { m_device = device;}
 
 QString BaseProcessor::getDevice() { return m_device;}
 
+void BaseProcessor::setDataFile( QString datafile ) 
+{ 
+    m_dataFile = QCoreApplication::applicationDirPath()+"/data/"+datafile+".data";
+}
 
 void BaseProcessor::reset()
 {
@@ -100,14 +84,14 @@ void BaseProcessor::reset()
 
 int BaseProcessor::getRegAddress( QString name ) { return m_regsTable[name]; }
 
-QStringList BaseProcessor::getDefsList( QString fileName )
+/*QStringList BaseProcessor::getDefsList( QString fileName )
 {
     return QStringList( getRegsTable( fileName ).uniqueKeys() );
-}
+}*/
 
 void BaseProcessor::setRegisters()
 {
-    m_regsTable = getRegsTable( m_symbolFile );
+    m_regsTable = getRegsTable( m_dataFile );
 }
 
 #include "moc_baseprocessor.cpp"

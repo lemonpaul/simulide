@@ -48,6 +48,8 @@ class ePin
         void stampCurrent( double data );
 
         void reset();
+        
+        string getId() { return m_id; }
 
     protected:
         eNode* m_enode;

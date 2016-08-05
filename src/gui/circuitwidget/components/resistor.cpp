@@ -38,33 +38,45 @@ LibraryItem* Resistor::libraryItem()
 Resistor::Resistor( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eResistor( id.toStdString() )
 {
-    QString nodid = m_id;
-    nodid.append(QString("lnod"));
-    QPoint nodpos = QPoint(-8-8,0);
-    m_ePin[0] = new Pin( 180, nodpos, nodid, 0, this);
+    QString pinId = m_id;
+    pinId.append(QString("lnod"));
+    QPoint pinPos = QPoint(-8-8,0);
+    m_ePin[0] = new Pin( 180, pinPos, pinId, 0, this);
 
-    nodid = m_id;
-    nodid.append(QString("rnod"));
-    nodpos = QPoint(8+8,0);
-    m_ePin[1] = new Pin( 0, nodpos, nodid, 1, this);
+    pinId = m_id;
+    pinId.append(QString("rnod"));
+    pinPos = QPoint(8+8,0);
+    m_ePin[1] = new Pin( 0, pinPos, pinId, 1, this);
 
-    label->setText( QString("") );
-    label->setPos(-12,-24);
+    //m_idLabel->setText( QString("") );
+    m_idLabel->setPos(-12,-24);
+    
+    m_unit = "Ω";
+    setResist( m_resist );
+    m_valLabel->setPos(-16, 6);
+    setShowVal( true );
 
-    const QFont sansFont("Helvetica [Cronyx]", 4);
+    /*const QFont sansFont("Helvetica [Cronyx]", 4);
     m_labelcurr = Circuit::self()->addSimpleText( id.toLatin1().data(), sansFont );
     m_labelcurr->setParentItem( this );
     m_labelcurr->setPos(-9.2, -4.0 );
     //m_labelcurr->rotate( 180-dir );
-    m_labelcurr->setText( QString("%1").arg(/*resistance->*/res()) );
+    m_labelcurr->setText( QString("%1").arg(res()) );*/
 }
 Resistor::~Resistor(){}
 
+double Resistor::resist() { return m_value; }
 
-void Resistor::setRes( double resist )
+void Resistor::setResist( double r )
 {
-    eResistor::setRes( resist );
-    m_labelcurr->setText( QString("%1").arg(/*resistance->*/res()) );
+    Component::setValue( r );       // Takes care about units multiplier
+    eResistor::setRes( r*m_unitMult );
+}
+
+void Resistor::setUnit( QString un ) 
+{
+    Component::setUnit( un );
+    eResistor::setRes( m_value*m_unitMult );
 }
 
 void Resistor::remove()
@@ -77,19 +89,6 @@ void Resistor::remove()
 void Resistor::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
     Component::paint( p, option, widget );
-
-    /*if ( Simulator::self()->isAnimated() )
-    {
-        if ( rightpin->isConnected() and leftpin->isConnected() )
-        {
-            if ( m_current > 0 )
-                p->setBrush( Qt::darkGreen );
-            else
-                p->setBrush( Qt::green );
-        }
-    }
-    else*/
-        //p->setBrush( Qt::white );
 
     p->drawRect( -10.5, -4, 21, 8 );
 }

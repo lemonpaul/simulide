@@ -22,8 +22,6 @@
 
 #include "e-resistor.h"
 
-//class LibraryItem;
-
 class eDiode : public eResistor
 {
     public:
@@ -42,10 +40,10 @@ class eDiode : public eResistor
     protected:
         void updateVI();
 
-        double m_pVolt;
-        double m_nVolt;
+        double m_voltPN;
         double m_deltaV;
         double m_threshold;
         double m_imped;
 };
 #endif
+

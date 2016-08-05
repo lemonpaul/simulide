@@ -80,9 +80,11 @@ RamTable::RamTable( BaseProcessor *processor )
     horizontalHeader()->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     m_ramTimer = new QTimer(this);
-    connect( m_ramTimer, SIGNAL(timeout()), this, SLOT(updateValues()) );
+    connect( m_ramTimer, SIGNAL(timeout()), 
+             this,       SLOT(updateValues()) );
 
-    connect( this, SIGNAL(itemChanged(QTableWidgetItem*)  ), this, SLOT(addToWatch(QTableWidgetItem*)) );
+    connect( this, SIGNAL(itemChanged(QTableWidgetItem*)  ), 
+             this, SLOT(addToWatch(QTableWidgetItem*)) );
 
     m_ramTimer->start( 200 );
 
@@ -92,17 +94,18 @@ RamTable::~RamTable(){}
 
 void RamTable::loadVarSet()
 {
-    const QString dir = QCoreApplication::applicationDirPath()+"/data/varset";
-    QString fileName = QFileDialog::getOpenFileName( this, tr("Load File"), dir, tr("all files (*.*)"));
-    if (!fileName.isEmpty())
+    const QString dir = m_processor->getFileName();
+    //QCoreApplication::applicationDirPath()+"/data/varset";
+    QString fileName = QFileDialog::getOpenFileName( this, tr("Load VarSet"), dir, tr("VarSets (*.vst);;All files (*.*)"));
+    
+    if( !fileName.isEmpty() )
     {
         QStringList lines = fileToStringList( fileName, "RamTable::loadVarSet" );
-        int row = 0;
+        int row = -1;
         foreach( QString line, lines )
         {
             line.remove( " " );
-            if( line.isEmpty() ) continue;
-            item( row, 0 )->setText( line );
+            if( row >= 0 ) item( row, 0 )->setText( line );
             row++;
             if( row >= m_numRegs ) break;
         }
@@ -110,6 +113,34 @@ void RamTable::loadVarSet()
 }
 void RamTable::saveVarSet()
 {
+    const QString dir = m_processor->getFileName();
+    //QCoreApplication::applicationDirPath()+"/data/varset";
+    
+    QString fileName = QFileDialog::getSaveFileName( this, tr("Save VarSet"), dir,
+                                                 tr("VarSets (*.vst);;All files (*.*)"));
+    if( !fileName.isEmpty() )
+    {
+        if( !fileName.endsWith(".vst") ) fileName.append(".vst");
+
+        QFile file( fileName );
+
+        if( !file.open(QFile::WriteOnly | QFile::Text) )
+        {
+              QMessageBox::warning(0l, tr("RamTable::saveVarSet"),
+              tr("Cannot write file %1:\n%2.").arg(fileName).arg(file.errorString()));
+              return;
+        }
+
+        QTextStream out(&file);
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        
+        for( int row=0; row<m_numRegs; row++ )
+        {
+            QString name = item( row, 0 )->text();
+            out << name.toUpper() << "\n";
+        }
+        QApplication::restoreOverrideCursor();
+    }
 }
 
 

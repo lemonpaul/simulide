@@ -24,11 +24,13 @@
 Pin::Pin( int angle, const QPoint &pos, QString id, int index, Component* parent )
         : QObject(), QGraphicsItem( parent ), ePin( id.toStdString(), index )
 {
-    m_component = parent;
+    m_component  = parent;
+    m_blocked    = false;
     my_connector = 0l;
-    //m_length = 8;
-    m_angle  = angle;
-    m_id   = id;
+    m_conPin     = 0l;
+    m_enode      = 0l;
+    m_angle      = angle;
+    m_id         = id;
 
     m_area = QRect(-4, -4, 12, 8);
 
@@ -37,16 +39,12 @@ Pin::Pin( int angle, const QPoint &pos, QString id, int index, Component* parent
 
     setPos( pos );
 
-    //int xlabelpos = pos.x()+10;
-
-    //if( angle == 0 ) xlabelpos = pos.x()-10;
-
     setRotation( 180-angle );
     const QFont sansFont( "Helvetica [Cronyx]", 6 );
     m_label = Circuit::self()->addSimpleText( id.toLatin1().data(), sansFont );
     m_label->setParentItem( parent /*this*/ );
 
-    m_label->setText("");//( QString("%1 v").arg(m_volt) );
+    m_label->setText("");
     m_label->setBrush( QColor( 250, 250, 200 ) );
 
     setLength(8);
@@ -65,7 +63,27 @@ void Pin::reset()
     setConnector( 0l );
     ePin::reset();
     //qDebug() << "ePin::reset new:" << m_numConections;
-    m_component->inStateChanged( m_index ); // Only used by node??
+    m_component->inStateChanged( 1 );          // Used by node to remove
+}
+
+void Pin::findConnectedPins()     // Called by node,  for connected pins
+{
+    if( m_blocked ) return;
+    
+    if( m_connected )
+        m_enode->addSubEpin( this );// Notify that this pin is connected
+        
+    if( m_conPin ) 
+        m_conPin->findNodePins(); // Call pin at other side of Connector
+}
+
+void Pin::findNodePins()     // Called by connector closing or other pin
+{    
+    m_blocked = true;
+    if( m_connected )
+        m_enode->addSubEpin( this );// Notify that this pin is connected
+    m_component->inStateChanged( 0 );       // Used by node to find pins
+    m_blocked = false;
 }
 
 double Pin::getVolt()
@@ -77,14 +95,8 @@ void  Pin::setConnector( Connector* connector )
 {
     my_connector = connector;
     
-    if( my_connector ) 
-    {
-        setCursor( Qt::ArrowCursor );
-    }
-    else               
-    {
-        setCursor( Qt::CrossCursor );
-    }
+    if( my_connector ) setCursor( Qt::ArrowCursor );
+    else               setCursor( Qt::CrossCursor );
 }
 
 Connector* Pin::connector() { return my_connector; }
@@ -143,8 +155,12 @@ void Pin::setLabelPos()
         ylabelpos -= m_length+1;
         
     }
-
     m_label->setPos(xlabelpos, ylabelpos );
+}
+
+void Pin::setLabelColor( QColor color )
+{
+    m_label->setBrush( color );
 }
 
 void Pin::moveBy( int dx, int dy )

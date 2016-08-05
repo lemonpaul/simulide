@@ -81,7 +81,7 @@ int avr_init(avr_t * avr)
 
 	// cpu is in limbo before init is finished.
 	avr->state = cpu_Limbo;
-	avr->frequency = 1000000;	// can be overridden via avr_mcu_section
+	avr->frequency = 16000000;	// can be overridden via avr_mcu_section
 	avr_interrupt_init(avr);
 	if (avr->custom.init)
 		avr->custom.init(avr, avr->custom.data);

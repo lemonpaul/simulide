@@ -30,14 +30,16 @@ eGate::eGate( string id, int inputs )
     setInverted( false );
     //m_prevInputs = 0;
 }
-eGate::~eGate(){}
+eGate::~eGate()
+{
+}
 
 void eGate::initialize()
 {
     for( int i=0; i<m_numInputs; i++ )
     {
         eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedList(this);
+        if( enode ) enode->addToChangedFast(this);
     }
 }
 
@@ -54,7 +56,7 @@ void eGate::setVChanged()
 
     for( int i=0; i<m_numInputs; i++ )
     {
-        bool  state = false; // = m_inputState[i];
+        bool  state = m_inputState[i];
         double volt = m_input[i]->getVolt();
 
         if     ( volt > m_inputHighV ) state = true;
@@ -64,12 +66,12 @@ void eGate::setVChanged()
         m_inputState[i] = state;
     }
     //qDebug() << "eGate::setVChanged" << m_prevInputs << inputs; 
-    //if( m_prevInputs != inputs )
-    //{
-        m_output[0]->setOut( calcOutput( inputs ) );   // In each gate type
-        //m_prevInputs = inputs; 
-    //}
+    
+    m_output[0]->setOut( calcOutput( inputs ) );   // In each gate type
+    m_output[0]->stampOutput();
 }
 
-bool eGate::calcOutput( int inputs ) { return (inputs==m_numInputs); } // default for: Buffer, Inverter, And, Nand
-
+bool eGate::calcOutput( int inputs ) 
+{ 
+    return (inputs==m_numInputs); // Default for: Buffer, Inverter, And, Nand
+} 

@@ -55,7 +55,6 @@ typedef struct uart_pty_t {
 	avr_t *avr;		// keep it around so we can pause it
 
 	pthread_t	thread;
-    pthread_mutex_t    lock;
 	int			xon;
 
 	union {

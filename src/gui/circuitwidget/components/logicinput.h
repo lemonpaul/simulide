@@ -26,10 +26,12 @@
 
 class LibraryItem;
 
-class LogicInput : public Component
+class LogicInput : public Component, public eElement
 {
     Q_OBJECT
-    Q_PROPERTY( double Voltage  READ volt   WRITE setVolt   DESIGNABLE true USER true )
+    Q_PROPERTY( double   Voltage   READ volt    WRITE setVolt    DESIGNABLE true USER true )
+    Q_PROPERTY( QString  Unit      READ unit    WRITE setUnit    DESIGNABLE true USER true )
+    Q_PROPERTY( bool     Show_Volt READ showVal WRITE setShowVal DESIGNABLE true USER true )
 
     public:
         QRectF boundingRect() const { return QRect( -10, -10, 20, 20 ); }
@@ -39,9 +41,13 @@ class LogicInput : public Component
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
+        
+        void updateStep();
 
         double volt() const      { return m_voltHight; }
         void setVolt( double v );
+        
+        void setUnit( QString un );
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
@@ -51,6 +57,8 @@ class LogicInput : public Component
 
     private:
         double m_voltHight;
+        
+        bool m_changed;
 
         Pin     *m_outpin;
         eSource *m_out;

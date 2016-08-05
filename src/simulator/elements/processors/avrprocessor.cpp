@@ -25,6 +25,7 @@
 #include "sim_elf.h"
 #include "sim_hex.h"
 #include "sim_core.h"
+#include "avr_uart.h"
 
 AvrProcessor* AvrProcessor::m_pSelf = 0l;
 
@@ -33,7 +34,7 @@ AvrProcessor::AvrProcessor( QObject* parent ) : BaseProcessor( parent )
     m_pSelf = this;
     m_avrProcessor = 0l;
 }
-AvrProcessor::~AvrProcessor() { terminate();}
+AvrProcessor::~AvrProcessor() {}
 
 void AvrProcessor::terminate()
 {
@@ -45,9 +46,6 @@ void AvrProcessor::terminate()
 bool AvrProcessor::loadFirmware( QString fileN )
 {
     if ( fileN == "" ) return false;
-
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
 
     if( m_avrProcessor ) terminate();
 
@@ -119,23 +117,27 @@ bool AvrProcessor::loadFirmware( QString fileN )
         return false;
     }
     int started = avr_init( m_avrProcessor );
-    qDebug() << "AvrProcessor::loadFirmware Avr Init: "<< name << (started==0);
+    qDebug() << "\nAvrProcessor::loadFirmware Avr Init: "<< name << (started==0);
     avr_load_firmware( m_avrProcessor, &f );
 
-    if( f.flashbase ) m_avrProcessor->pc = f.flashbase; //printf( "Attempted to load a bootloader at %04x\n", f.flashbase );
+    if( f.flashbase ) m_avrProcessor->pc = f.flashbase;
 
     m_avrProcessor->frequency = 16000000;
     m_symbolFile = fileN;
+    
+    // Usart interface
+    avr_irq_t* src = avr_io_getirq(m_avrProcessor, AVR_IOCTL_UART_GETIRQ('0'), UART_IRQ_OUTPUT);
+    avr_irq_register_notify(src, uart_pty_in_hook, this);
+    
     initialized();
     
-    if( pauseSim ) Simulator::self()->runContinuous();
     return true;
 }
 
 void AvrProcessor::step()
 { 
-    avr_run( m_avrProcessor );
-    //m_avrProcessor->run(m_avrProcessor);
+    //avr_run( m_avrProcessor );
+    m_avrProcessor->run(m_avrProcessor);
 }
 
 void AvrProcessor::reset()
@@ -153,15 +155,16 @@ int AvrProcessor::getRamValue( QString name )
     int address = name.toInt( &isNumber );      // Try to convert to integer
 
     if( !isNumber ) {address = m_regsTable[name];  /* Is a register name*/}
+    
+    int value = m_avrProcessor->data[address];//_avr_get_ram( m_avrProcessor, address ); //
 
-    return m_avrProcessor->data[address];
+    return value;
 }
 
 QHash<QString, int> AvrProcessor::getRegsTable( QString lstFileName )// get register addresses from lst file
 {
     QHash<QString, int> regsTable;
 
-    lstFileName.replace( lstFileName.split(".").last(), "lst");
     QStringList lineList = fileToStringList( lstFileName, "AvrProcessor::setRegisters" );
 
     if( !regsTable.isEmpty() ) regsTable.clear();
@@ -216,4 +219,13 @@ QHash<QString, int> AvrProcessor::getRegsTable( QString lstFileName )// get regi
     return regsTable;
 }
 
+void AvrProcessor::uartOut( uint32_t value )
+{
+    if( !m_usartTerm ) return;
+
+    QString text;
+    OutPanelText::self()->appendText( text.append( value ) );
+}
+
 #include "moc_avrprocessor.cpp"
+

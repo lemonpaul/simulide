@@ -25,14 +25,9 @@ Node::Node( QObject* parent, QString type, QString id )
     : Component( parent, type, id )
 {
     setZValue(1e6);
-    m_labelx = 6;
-    m_labely = -18;
-    m_labelrot = 0;
+    
     m_color = QColor( Qt::black );
-
-    setLabelPos();
-    label->setText( "" );
-
+    
     QString nodid;
     QPoint nodpos;
 
@@ -48,36 +43,15 @@ Node::Node( QObject* parent, QString type, QString id )
 }
 Node::~Node(){}
 
-void Node::inStateChanged( int /*pin*/ ) // Called by pin when connector is removed
+void Node::inStateChanged( int rem ) // Called by pin when connector is removed
 {
-    remove();
-    /*int pinA, pinB;
-
-    switch( pin )
+    if( rem==1 ) remove();
+    else
     {
-        case 0:
-            pinA = 1; pinB = 2;
-            break;
-        case 1:
-            pinA = 0; pinB = 2;
-            break;
-        case 2:
-            pinA = 0; pinB = 1;
-            break;
+        for( int i=0; i< 3; i++)
+            if( m_pin[i]->isConnected() ) m_pin[i]->findConnectedPins();
     }
-    joinConns( pinA, pinB );
-
-    Circuit::self()->compList()->removeOne( this );
-    Circuit::self()->removeItem( this );*/
-    // should delete this, but connectors are deleted too.. why??
-    //this->deleteLater();
 }
-
-/*void Node::setChanged( bool changed )
-{
-    m_changed = changed;
-    if(! m_changed ) for( int i=0; i< 3; i++)  m_pin[i]->setChanged( false );
-}*/
 
 void Node::remove()
 {
@@ -96,18 +70,17 @@ void Node::remove()
     }
     //qDebug() << conectors << " connectors";
 
-    if( conectors == 2 ) { joinConns( con[0], con[1] ); }
-    else
+    if( conectors == 2 ) 
+    { 
+        joinConns( con[0], con[1] ); 
+        Circuit::self()->compList()->removeOne( this );
+        Circuit::self()->removeItem( this );
+    }
+    /*else
     {
         for( int i=0; i< 3; i++) // Remove all
         { if ( m_pin[i]->isConnected() ) m_pin[i]->connector()->remove(); }
-    }
-
-    //Component::remove();
-    Circuit::self()->compList()->removeOne( this );
-    Circuit::self()->removeItem( this );
-    // should delete this, but connectors are deleted too.. why??
-    //this->deleteLater();
+    }*/
 }
 
 void Node::joinConns( int c0, int c1 )
@@ -119,16 +92,8 @@ void Node::joinConns( int c0, int c1 )
     Connector* con1 = pin1->connector();
     con0->remNullLines();
     con1->remNullLines();
-
-    //eNode* enode = con0->enode();
-    Connector* con = new Connector( this, con0->itemtype(), con0->itemID(), pin0->conPin() );
-    //con->setEnode( enode );
-
-    /*eNode* newEnode = new eNode( enode->itemId() );
-    QList<ePin*> epins = enode->getEpins();
-    foreach( ePin* epin, epins ) epin->setEnode( newEnode );
-    Simulator::self()->remFromEnodeList( enode, true ); // Delete old eNode
-    con->setEnode( newEnode );*/
+    
+    Connector* con = new Connector( this, con0->itemType(), con0->itemID(), pin0->conPin() );
 
     QStringList list0 = con0->pointList();
     QStringList list1 = con1->pointList();
@@ -153,15 +118,7 @@ void Node::joinConns( int c0, int c1 )
     else while( !list1.isEmpty() ) plist.append(list1.takeFirst());
 
     con->setPointList( plist );
-    con0->setStartPin(0l);
-    con0->setEndPin(0l);
-    //qDebug() << "Node::joinConns removing con0" << con0->objectName();
-    con0->remove();
-    con1->setStartPin(0l);
-    con1->setEndPin(0l);
-    //qDebug() << "Node::joinConns removing con1" << con1->objectName();
-    con1->remove();
-
+    
     int p1x = plist.first().toInt();
     int p1y = plist.at(1).toInt();
     int p2x = plist.at(plist.size()-2).toInt();
@@ -181,9 +138,24 @@ void Node::joinConns( int c0, int c1 )
         p1x = p2x;
         p1y = p2y;
     }
+    
+    pin0->setEnode( 0l );
+    con0->setStartPin( 0l );
+    con0->setEndPin( 0l );
+    //qDebug() << "Node::joinConns removing con0" << con0->objectName();
+    con0->remove();
+    
+    pin1->setEnode( 0l );
+    con1->setStartPin( 0l );
+    con1->setEndPin( 0l );
+    //qDebug() << "Node::joinConns removing con1" << con1->objectName();
+    con1->remove();
 
     con->closeCon( pin1->conPin() );
     con->remNullLines();
+    
+    
+    
     Circuit::self()->addItem( con );
 }
 

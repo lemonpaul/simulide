@@ -22,10 +22,6 @@
 
 #include <QtGui>
 
-//#include <string>
-//#include <iostream>
-//#include <unordered_map>
-
 #include "e-pin.h"
 
 class eElement;
@@ -40,10 +36,17 @@ class eNode
 
         //void connectorChanged( int c ); // Keep the num of connectors using this eNode
         void addEpin( ePin* epin );
+        void addSubEpin( ePin* epin );
         void remEpin( ePin* epin );
 
-        void addToChangedList( eElement* el );
-        void remFromChangedList( eElement* el );
+        void addToChangedFast( eElement* el );
+        void remFromChangedFast( eElement* el );
+        
+        void addToChangedSlow( eElement* el );
+        void remFromChangedSlow( eElement* el );
+        
+        void addToNoLinList( eElement* el );
+        void remFromNoLinList( eElement* el );
 
         void stampCurrent( ePin* epin, double data );
         void stampAdmitance( ePin* epin, double data );
@@ -60,22 +63,33 @@ class eNode
         void stampMatrix();
 
         QList<ePin*> getEpins();
+        QList<ePin*> getSubEpins();
 
     private:
         QList<ePin*>     m_ePinList;
-        QList<eElement*> m_changedList;
+        QList<ePin*>     m_ePinSubList;
+        QList<eElement*> m_changedFast;
+        QList<eElement*> m_changedSlow;
+        QList<eElement*> m_nonLinear;
 
         QHash<ePin*, double> m_admitList;
         QHash<ePin*, double> m_currList;
         QHash<ePin*, int>    m_nodeList;
         //std::Hash<ePin*, double> m_pru;
-
-        bool m_initialized;
+        
+        QHash<int, double> admit;
+        double m_totalCurr;
+        double m_totalAdmit;
 
         double m_volt;
         int   m_nodeNum;
         int   m_numCons;
 
         QString m_id;
+        bool m_currChanged;
+        bool m_admitChanged;
+        //bool m_changed;
 };
 #endif
+
+

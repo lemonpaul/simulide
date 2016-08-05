@@ -44,7 +44,8 @@ eNode* ePin::getEnode()    { return m_enode; }
 void ePin::setEnode( eNode* enode )
 {
     if( enode == m_enode ) return;
-    //qDebug() << "ePin::setEnode" << enode;
+
+    //qDebug() << "ePin::setEnode" << QString::fromStdString(m_id) << enode;
 
     if( m_enode ) m_enode->remEpin( this );
     if( enode )   enode->addEpin( this );

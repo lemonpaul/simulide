@@ -43,10 +43,8 @@ AVRComponent::AVRComponent( QObject* parent, QString type, QString id )
 
     if( m_id.startsWith("AVR") ) m_id.replace( "AVR", "atmega328" );
 
-    /*connect( m_processor, SIGNAL(chipReset()),
-             this,        SLOT  (reset()) );*/
-
     initPackage();
+    setFreq( 16 );
 }
 AVRComponent::~AVRComponent() { }
 
@@ -60,6 +58,8 @@ void AVRComponent::attachPins()
         AVRComponentPin* pin = dynamic_cast<AVRComponentPin*>( m_pinList[i] );
         pin->attach( cpu );
     }
+    cpu->vcc  = 5000;
+    cpu->avcc = 5000;
 }
 
 void AVRComponent::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )

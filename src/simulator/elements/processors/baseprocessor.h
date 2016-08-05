@@ -23,6 +23,7 @@
 #include <QtGui>
 
 #include "ramtable.h"
+#include "outpaneltext.h"
 
 class BaseProcessor : public QObject
 {
@@ -33,35 +34,25 @@ class BaseProcessor : public QObject
 
         QString getFileName();
 
-        virtual void setDevice( QString device );
+        virtual void    setDevice( QString device );
         virtual QString getDevice();
+        
+        virtual void setDataFile( QString datafile );
 
         virtual bool loadFirmware( QString file )=0;
         virtual bool getLoadStatus() { return m_loadStatus; }
         virtual void terminate();
 
         virtual void step()=0;
-        //virtual void stepOver()=0;
-        //virtual bool runStep( bool run, bool over=false );// Run 1 step and returns actual source line number
         virtual void reset();
 
-        //virtual int getValidLine( int line )=0;
-        //virtual int getSourceLine()=0;                  // returns actual source line number
         virtual int getRamValue( QString name )=0;
         virtual int getRegAddress( QString name );
-        virtual QStringList getDefsList( QString fileName );
+        //virtual QStringList getDefsList( QString fileName );
+        
+        virtual void setUsart( bool usart ) { m_usartTerm = usart; }
         
         virtual void initialized();
-
-        //virtual void timerEvent( QTimerEvent* e );
-
-    //signals:
-        //void chipReset();
-        //void terminated();
-
-    //public slots:
-        //virtual void runMcu();
-        //virtual void stopMcu();
 
     protected:
         
@@ -69,17 +60,14 @@ class BaseProcessor : public QObject
         virtual QHash<QString, int> getRegsTable( QString lstFileName )=0;
 
         QString   m_symbolFile;
+        QString   m_dataFile;
         QString   m_device;
 
         RamTable *m_ramTable;
-
-        QHash<int, int>     m_asmToFlash;
-        QHash<int, int>     m_flashToAsm;
         QHash<QString, int> m_regsTable;
 
         bool m_loadStatus;
-
-        //int  m_timerId;
+        bool m_usartTerm;
 };
 
 #endif

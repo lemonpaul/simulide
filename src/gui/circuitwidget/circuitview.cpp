@@ -38,12 +38,13 @@ CircuitView::CircuitView( QWidget *parent )
     setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
     setCacheMode( CacheBackground );
     setRenderHint( QPainter::Antialiasing );
+    //setRenderHint( QPainter::SmoothPixmapTransform );
     setTransformationAnchor( AnchorUnderMouse );
     setResizeAnchor( AnchorUnderMouse );
     setDragMode( QGraphicsView::RubberBandDrag );
 
-    m_file = tr("document1.circuit");
-    setWindowTitle(m_file + "[*]");
+    //m_file = "";
+    //setWindowTitle(m_file + "[*]");
 
     setAcceptDrops(true);
 }
@@ -51,7 +52,11 @@ CircuitView::~CircuitView() { }
 
 void CircuitView::clear()
 {
-    if( m_circuit ) delete m_circuit;
+    if( m_circuit ) 
+    {
+        m_circuit->remove();
+        delete m_circuit;
+    }
     m_circuit = new Circuit( -800, -600, 1600, 1200, this );
     setScene( m_circuit );
     centerOn( 300, 200 );
@@ -83,7 +88,7 @@ void CircuitView::dragEnterEvent(QDragEnterEvent *event)
     m_enterItem->setPos( mapToScene( event->pos() ) );
     m_circuit->addItem( m_enterItem );
 
-    if( pauseSim ) Simulator::self()->runContinuous();
+    if( pauseSim ) Simulator::self()->resumeSim();
 }
 
 void CircuitView::dragMoveEvent(QDragMoveEvent *event)
@@ -116,12 +121,54 @@ void CircuitView::keyPressEvent( QKeyEvent *event )
 {
     if( event->key() == Qt::Key_Shift )
         setDragMode( QGraphicsView::ScrollHandDrag );
+    
+    QGraphicsView::keyPressEvent( event );
 }
 
 void CircuitView::keyReleaseEvent( QKeyEvent *event )
 {
     if( event->key() == Qt::Key_Shift )
         setDragMode( QGraphicsView::RubberBandDrag );
+        
+    QGraphicsView::keyReleaseEvent( event );
 }
 
+void CircuitView::contextMenuEvent(QContextMenuEvent* event)
+{
+    QGraphicsView::contextMenuEvent( event );
+
+    if( !event->isAccepted() )
+    {
+        QMenu menu;
+        
+        QAction* saveImgAct = menu.addAction( QIcon(":/savecirc.png"), tr("Save Circuit as Image") );
+        connect( saveImgAct, SIGNAL(triggered()), this, SLOT(saveImage()));
+
+        /*QAction* openCircAct = menu.addAction(QIcon(":/opencirc.png"), tr("Open Circuit") );
+        connect(openCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(openCirc()));
+
+        QAction* newCircAct = menu.addAction( QIcon(":/newcirc.png"), tr("New Circuit") );
+        connect( newCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(newCircuit()));
+
+        QAction* saveCircAct = menu.addAction(QIcon(":/savecirc.png"), tr("Save Circuit") );
+        connect(saveCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(saveCirc()));
+
+        QAction* saveCircAsAct = menu.addAction(QIcon(":/savecircas.png"),tr("Save Circuit As...") );
+        connect(saveCircAsAct, SIGNAL(triggered()), MainWindow::self(), SLOT(saveCircAs()));*/
+        
+        QPointF eventPos = mapToScene( event->globalPos() );
+
+        menu.exec( mapFromScene( eventPos ) );
+    }
+}
+
+void CircuitView::saveImage()
+{
+    QString fileName= QFileDialog::getSaveFileName(this, "Save image", QCoreApplication::applicationDirPath(), "BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)" );
+    if (!fileName.isNull())
+    {
+        QPixmap pixMap = this->grab();
+        pixMap.save(fileName);
+    }
+}
 #include "moc_circuitview.cpp"

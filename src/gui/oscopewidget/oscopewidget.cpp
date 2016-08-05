@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2012 by santiago González                               *
+ *   Copyright (C) 2016 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -28,93 +28,122 @@ OscopeWidget::OscopeWidget(  QWidget *parent  )
 
     this->setVisible( false );
 
-    setMinimumSize(QSize(200, 200));
-
-    m_color[0] = QColor( 190, 190, 0 );
-    m_color[1] = QColor( 240, 100, 10 );
-    m_color[2] = QColor( 50, 120, 255 );
-    m_color[3] = QColor( 30, 220, 150 );
+    setMaximumSize(QSize(256, 200));
+    setMinimumSize(QSize(256, 200));
 
     setupWidget();
 
-    m_oscope->setAntialiased(true);
+    m_prevSpeed = 10;
+    m_speed     = 10;
+    m_prevOffset = 0;
+    m_offset     = 0;
+    
+    m_ampli = 2.5;
 
+    newReading = true;
     m_ticksPs = 20;
     m_counter = 0;
-    m_numchan = 0;
+    m_tick    = 0;
+    m_probe   = 0l;
+    
 
-    for( int i=0; i<4; i++ )
-    {
-        m_data[i] = -1000;
-        m_channel[i] = false;
-    }
-    m_numchan = 1;
-    for( int i=0; i<1000; i++ ) step();
-    m_numchan = 0;
 }
 OscopeWidget::~OscopeWidget(){ }
 
-int OscopeWidget::addChannel()
+void OscopeWidget::setProbe( Probe* probe )
 {
-    for( int i=0; i<4; i++ )                   // Find available channel
-    {
-        if( m_channel[i] == true ) continue;
-
-        m_numchan++;                            // If channel available, inc used channels
-        m_channel[i] = true;                    // Set channel to busy
-        m_chanLabel[i]->setEnabled( true );      // Set channel label enabled
-        m_chanLabel[i]->setText( " 0.00 V" );
-        if( m_numchan > 0 ) setVisible( true ); // Set this visible if some channel active
-        return i;                               // return channel number assigned
-    }
-    return -1;                                  // -1 = not channel available
-}
-
-void OscopeWidget::remChannel( int channel )
-{
-    if( channel < 0 || channel > 3 || m_channel[channel] == false ) return; // Nothing to do
-
-    m_numchan--;                                // Decrease used channel
-    if( m_numchan == 0 ) setVisible( false );   // Hide this if no channel active
-    m_channel[channel] = false;                 // Set channel to not busy
-    m_chanLabel[channel]->setEnabled( false );   // Disable channel label
-    m_data[channel] = 0;                        // reset data
-    m_chanLabel[channel]->setText( "--.-- V" );
-    m_oscope->setData( channel, 0 );
-}
-
-QColor OscopeWidget::getColor( int channel )
-{
-    return m_color[channel];
+    m_probe = probe;
 }
 
 void OscopeWidget::step()
 {
-    if( m_numchan == 0 ) return; // No data to plot
-
-    if( ++m_counter == m_ticksPs )
+    if( m_counter < 140 ) 
     {
-        m_counter = 0;
-        m_oscope->drawVmark();
+        //m_rArea->drawBackground();
+        //m_rArea->update();
+        return;
     }
-    m_oscope->printData();
-    m_oscope->update();
+    
+    m_rArea->setTick( m_speed );
+    m_rArea->setData( m_data );
+    newReading = true;
+    m_counter = 0;
 }
 
-void OscopeWidget::setData( int channel, int data )
+void OscopeWidget::setData()
 {
-    if( data == m_data[channel] ) return;
+    if( !m_probe ) return;
+    if( m_counter == 140 ) return;
 
-    float vf = data;
-    vf = vf/100;
-    QString volt;
-    volt.setNum( vf );
-    if( !volt.contains(".") ) volt.append(".00");
-    else if( volt.split(".").last().length() == 1 ) volt.append("0");
-    volt.append( " V" );
-    m_chanLabel[channel]->setText( volt );   // Update volt Label
-    m_data[channel] = data;
-    m_oscope->setData( channel, data );
+static double lastData;
+static double max;
+//static double mid;
+static double min;
+static bool   up;
+static bool   down;
+static int offset;
+
+    //qDebug() << "OscopeWidget::setData" << m_speed << m_tick << m_counter << lastData << newReading;
+    if( newReading ) // Starting a new reading set
+    {
+        double data = m_probe->getVolt();
+        
+        if( data > max ) max = data;
+        if( data < min ) min = data;
+        //qDebug() << "OscopeWidget::setData"<< lastData << data << max << min << up << down;
+
+        if( (data-lastData)>0.2 )
+        {
+            if( up & down )
+            {
+                //mid = (max-min)/2;
+                if( (data>=m_ampli) /*& ((data-m_ampli)<0.2)*/ )// Rising edge
+                {
+                    //qDebug() << "..."  << data << max << m_ampli << min;
+                    m_tick = 0;
+                    m_counter = 0;
+                    up   = false;
+                    down = false;
+                    offset = 0;
+                    max = 0;
+                    min = 0;
+                    //mid = 0;
+                    newReading = false;
+                }
+                lastData = data;
+                return;
+            }
+            up = true;
+            lastData = data;
+        }
+        else if( (data-lastData)<-0.2 )
+        {
+            down = true;
+            lastData = data;
+        }
+
+        
+        return;
+    }
+    if( offset < m_offset )
+    {
+        offset++;
+    }
+    else 
+    {
+        if( ++m_tick == m_speed )
+        {
+            double data = m_probe->getVolt();
+      
+            //data += mid; // Center data
+            m_data[m_counter] = 160-data*28;
+            m_counter++;
+                
+                //qDebug() << "m_tick == m_speed" << m_counter << data;
+
+            m_tick = 0;
+        }
+    }
 }
 
 void OscopeWidget::setTicksPs( int tps )
@@ -124,68 +153,129 @@ void OscopeWidget::setTicksPs( int tps )
 
 void OscopeWidget::setOscopeTick( int tickUs )
 {
-    m_oscope->setOscopeTick( tickUs );
+    m_rArea->setTick( tickUs );
+}
+
+void OscopeWidget::speedChanged( int speed )
+{
+    if( speed > m_prevSpeed ) 
+    {
+        m_speed++;
+        if( m_speed > 2000 ) m_speed = 2000;
+    }
+    else
+    {
+        m_speed--;
+        if( m_speed < 1 ) m_speed = 1;
+    }
+    
+    m_prevSpeed = speed;
+
+    m_tick = 0;
+    m_counter = 0;
+}
+/*void OscopeWidget::ampliChanged( int ampli )
+{
+    m_ampli = ampli/10;
+}*/
+
+void OscopeWidget::centeChanged( int offset )
+{
+    if( offset < m_prevOffset ) 
+    {
+        m_offset += m_speed;
+        if( m_offset > 200*m_speed ) m_offset = 200*m_speed;
+    }
+    else
+    {
+        m_offset -= m_speed;
+        if( m_offset < 0 ) m_offset = 0;
+    }
+    
+    m_prevOffset = offset;
 }
 
 void OscopeWidget::setupWidget()
 {
     m_horizontalLayout = new QHBoxLayout( this );
-    m_horizontalLayout->setObjectName(tr("horizontalLayout"));
+    m_horizontalLayout->setObjectName( "horizontalLayout" );
     //m_horizontalLayout.setContentsMargins(0, 0, 0, 0);
     //m_horizontalLayout.setSpacing(0);
+    
     m_verticalLayout = new QVBoxLayout();
-    m_verticalLayout->setObjectName(tr("verticalLayout"));
+    m_verticalLayout->setObjectName( "verticalLayout" );
+    
+    QFrame* line = new QFrame(this);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    m_verticalLayout->addWidget(line);
+    
+    m_speedDial = new QDial(this);
+    m_speedDial->setObjectName( "speedDial" );
+    m_speedDial->setNotchesVisible(true);
+    m_speedDial->setWrapping(true);
+    m_speedDial->setMinimum(1);
+    m_speedDial->setMaximum(20);
+    //m_speedDial->setValue(10);
+    m_speedDial->setSingleStep(1);
+    m_verticalLayout->addWidget( m_speedDial );
+    
+    QLabel *speedLabel = new QLabel( "Tick", this );
+    speedLabel->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
+    QFont font = speedLabel->font();
+    font.setPointSize(9);
+    font.setBold(true);
+    speedLabel->setFont(font);
+    m_verticalLayout->addWidget( speedLabel );
+    
+    line = new QFrame(this);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    m_verticalLayout->addWidget(line);
+    
+    /*m_ampliDial = new QDial(this);
+    m_ampliDial->setObjectName(QString::fromUtf8("ampliDial"));
+    m_ampliDial->setNotchesVisible(true);
+    m_ampliDial->setMinimum(1);
+    m_ampliDial->setMaximum(100);
+    m_ampliDial->setValue(25);
+    m_ampliDial->setSingleStep(1);
+    m_verticalLayout->addWidget( m_ampliDial );*/
+    
+    m_centeDial = new QDial(this);
+    m_centeDial->setObjectName( "centeDial" );
+    m_centeDial->setNotchesVisible(true);
+    m_centeDial->setWrapping(true);
+    m_centeDial->setMinimum(1);
+    m_centeDial->setMaximum(20);
+    m_centeDial->setSingleStep(1);
+    m_verticalLayout->addWidget( m_centeDial );
+    
+    QLabel *centeLabel = new QLabel( "H-Center", this );
+    centeLabel->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
+    centeLabel->setFont(font);
+    m_verticalLayout->addWidget( centeLabel );
+    
+    line = new QFrame(this);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    m_verticalLayout->addWidget(line);
 
-    QFont font;
-    font.setPointSize(12);
-
-    for( int i=0; i<4; i++ )    // Create volt Labels
-    {
-        m_chanLabel[i] = new QLineEdit( this );
-        m_chanLabel[i]->setObjectName(QString::fromUtf8("voltLabel"+i));
-        m_chanLabel[i]->setGeometry(QRect(0, 0, 80, 27));
-        m_chanLabel[i]->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-        m_chanLabel[i]->setMaxLength(7);
-        m_chanLabel[i]->setFont(font);
-        m_chanLabel[i]->setAcceptDrops(false);
-        m_chanLabel[i]->setReadOnly(true);
-        m_chanLabel[i]->setText("--.-- V");
-        //m_chanLabel[i]->setFixedHeight(30);
-        m_chanLabel[i]->setFixedWidth(75);
-        m_chanLabel[i]->setVisible( true );
-        m_chanLabel[i]->setEnabled( false );
-
-        QPalette p = m_chanLabel[i]->palette();
-        p.setColor( QPalette::Active, QPalette::Base, m_color[i] );
-        //p.setColor( QPalette::Active, QPalette::Text, QColor( 10, 15, 50 ));
-        m_chanLabel[i]->setPalette(p);
-        m_verticalLayout->addWidget( m_chanLabel[i] );
-    }
     m_horizontalLayout->addLayout( m_verticalLayout );
 
-    //m_value.setObjectName(tr("value"));
-    //m_value.setFixedSize( 30, 150 );
-    //m_horizontalLayout.addWidget(&m_value);
+    m_rArea = new RenderOscope( 180, 180, this );
+    m_rArea->setObjectName(tr("oscope"));
 
-    m_oscope = new RenderArea( this );
-    m_oscope->setObjectName(tr("oscope"));
-    //m_oscope->setFixedHeight( 200 );
-    //QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    //m_oscope->setSizePolicy(sizePolicy);
-
-    QPen pen( m_color[0], 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
-
-    for( int i=0; i<4; i++ )
-    {
-        pen.setColor( m_color[i] );
-        m_oscope->setPen( i, pen );
-    }
-
-    m_horizontalLayout->addWidget(m_oscope);
+    m_horizontalLayout->addWidget(m_rArea);
     
-    
-
-    //QGridLayout* lo = new QGridLayout(this);
-    //lo->addLayout( &m_horizontalLayout, 0, 0 );
+    connect( m_speedDial, SIGNAL( valueChanged(int) ),
+             this,        SLOT  ( speedChanged(int)) );
+             
+    /*connect( m_ampliDial, SIGNAL( valueChanged(int) ),
+             this,        SLOT  ( ampliChanged(int)) );*/
+             
+    connect( m_centeDial, SIGNAL( valueChanged(int) ),
+             this,        SLOT  ( centeChanged(int)) );
 }
 
+#include "moc_oscopewidget.cpp"

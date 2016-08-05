@@ -33,8 +33,8 @@ class eCapacitor : public eResistor
         void initialize();
         void setVChanged();
 
-        double uF();
-        void  setuF( double c );
+        double cap();
+        void setCap( double c );
 
     protected:
         double m_cap;

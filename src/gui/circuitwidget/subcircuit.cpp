@@ -71,7 +71,7 @@ SubCircuit::~SubCircuit()
 void SubCircuit::initPackage()
 {
     QString compName = m_id.split("-").first(); // for example: "atmega328-1" to: "atmega328"
-    label->setText( compName );
+    m_idLabel->setPlainText( compName );
 
     QFile file( QCoreApplication::applicationDirPath()+"/data/"+m_dataFile );
     if( !file.open(QFile::ReadOnly | QFile::Text) )
@@ -244,10 +244,10 @@ void SubCircuit::initSubcircuit()
                     eDiode* ediode = static_cast<eDiode*>(ecomponent);
                     ediode->setThreshold( element.attribute( "threshold" ).toDouble() );
                 }
-                if( element.hasAttribute("uf") )
+                if( element.hasAttribute("capacitance") )
                 {
                     eCapacitor* ecapacitor = static_cast<eCapacitor*>(ecomponent);
-                    ecapacitor->setuF( element.attribute( "uf" ).toDouble() );
+                    ecapacitor->setCap( element.attribute( "capacitance" ).toDouble() );
                 }
                 if( element.hasAttribute("resistance") )
                 {

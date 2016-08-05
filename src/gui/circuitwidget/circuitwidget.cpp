@@ -22,27 +22,33 @@
 
 CircuitWidget::CircuitWidget( QWidget *parent, QToolBar* toolbar  )
     : QWidget( parent )
+    ,m_verticalLayout(this)
+    ,m_horizontLayout()
+    ,m_circView(this)
+    ,m_outPanel(this)
+    ,m_oscope(this)
+    ,m_plotter(this)
 {
-    m_circView = new CircuitView( this );
-    m_oscope   = new OscopeWidget( this );
+    m_verticalLayout.setObjectName(tr("verticalLayout"));
+    m_verticalLayout.setContentsMargins(0, 0, 0, 0);
+    m_verticalLayout.setSpacing(0);
 
-    m_verticalLayout = new QVBoxLayout( this );
-    m_verticalLayout->setObjectName(tr("verticalLayout"));
-    m_verticalLayout->setContentsMargins(0, 0, 0, 0);
-    m_verticalLayout->setSpacing(0);
+    m_verticalLayout.addWidget( toolbar );
+    m_verticalLayout.addWidget( &m_circView );
+    
+    m_verticalLayout.addLayout( &m_horizontLayout );
+    m_horizontLayout.addWidget( &m_oscope );
+    m_horizontLayout.addWidget( &m_plotter );
+    m_horizontLayout.addWidget( &m_outPanel );
 
-    m_verticalLayout->addWidget( toolbar );
-    m_verticalLayout->addWidget( m_circView );
-    m_verticalLayout->addWidget( m_oscope );
-
-    //QGridLayout* lo = new QGridLayout(this);
-    //lo->addLayout( &m_verticalLayout, 0, 0 );
+    //QGridLayout lo(this);
+    //lo.addLayout( &m_verticalLayout, 0, 0 );
 }
 CircuitWidget::~CircuitWidget() { }
 
 void CircuitWidget::clear()
 {
-    m_circView->clear();
+    m_circView.clear();
 }
 
 #include "moc_circuitwidget.cpp"

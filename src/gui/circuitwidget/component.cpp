@@ -23,38 +23,46 @@
 
 Component::Component( QObject* parent , QString type, QString id )
     : QObject(parent), QGraphicsItem()
+    ,multUnits( "TGMk munp" )
 {
-    m_showId = false;
-    m_id = id;
-
     setObjectName( id );
     //setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-
+    
+    m_unitMult = 1;
+    m_mult     = " ";
+    m_unit     = " ";
     m_type     = type;
-    m_labelx   = 0;
-    m_labely   = -24;
-    m_labelrot = 0;
-    m_color = QColor( Qt::white );
+    m_color    = QColor( Qt::white );
+    m_showId   = false;
+    m_id       = id;
+    
+    m_idLabel = new Label( this );
+    m_idLabel->setDefaultTextColor( Qt::darkBlue );
+    m_idLabel->m_labelx   = -16;
+    m_idLabel->m_labely   = -24;
+    m_idLabel->m_labelrot = 0;
+    m_idLabel->setLabelPos();
+    setShowId( false );
+    
+    m_valLabel = new Label( this );
+    m_valLabel->setDefaultTextColor( Qt::black );
+    m_valLabel->m_labelx   = 0;
+    m_valLabel->m_labely   = 0;
+    m_valLabel->m_labelrot = 0;
+    m_valLabel->setLabelPos();
+    QFont f;
+    f.setPointSize(9);
+    m_valLabel->setFont(f);
+    setShowVal( false );
 
-    label = new Label( this );
-    setLabelPos();
-    //label->setText( id );
-    label->setBrush( Qt::darkBlue );
-
-    setToolTip( QString("Left-Click and move this component") );
+    setToolTip( QString("Left-Click and Move this Component \nRight-Click for Context Menu \nSelect and change properties in Right Panel") );
     setCursor(Qt::OpenHandCursor);
     this->setFlag( QGraphicsItem::ItemIsSelectable, true );
 
-    if( type == "Connector" ) Circuit::self()->conList()->append( this ); // Connectors at end of list
+    if( type == "Connector" ) Circuit::self()->conList()->append( this );
     else                      Circuit::self()->compList()->prepend( this );
 }
 Component::~Component(){}
-
-void Component::setLabel()
-{
-    if( m_showId ) label->setText( m_id );
-    else           label->setText( " " );
-}
 
 void Component::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
@@ -74,6 +82,15 @@ void Component::mousePressEvent(QGraphicsSceneMouseEvent* event)
         QPropertyEditorWidget::self()->setObject( this );
         setCursor( Qt::ClosedHandCursor );
         grabMouse();
+    }
+}
+
+void Component::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* event )
+{
+    if ( event->button() == Qt::LeftButton )
+    {
+        QPropertyEditorWidget::self()->setObject( this );
+        QPropertyEditorWidget::self()->setVisible( true );
     }
 }
 
@@ -122,7 +139,7 @@ void Component::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 void Component::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu )
 {
     QAction* removeAction = menu->addAction( QIcon( ":/remove.png"),"Remove" );
-    connect( removeAction, SIGNAL( triggered()), this, SLOT(slotremove()) );
+    connect( removeAction, SIGNAL( triggered()), this, SLOT(slotRemove()) );
 
     QAction* rotateCWAction = menu->addAction( QIcon( ":/rotateCW.png"),"Rotate CW" );
     connect( rotateCWAction, SIGNAL( triggered()), this, SLOT(rotateCW()));
@@ -136,7 +153,7 @@ void Component::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu 
     menu->exec(event->screenPos());
 }
 
-void Component::slotremove()
+void Component::slotRemove()
 {
     setSelected( true );
     Circuit::self()->removeItems();
@@ -147,53 +164,167 @@ void Component::remove()
     QPropertyEditorWidget::self()->removeObject( this );
     Circuit::self()->compList()->removeOne( this );
     Circuit::self()->removeItem( this );
-    this->deleteLater();
+    //this->deleteLater();
 }
 
 void Component::rotateCW()
 {
     setRotation( rotation() + 90);
-    label->rotateCCW();
+    m_idLabel->rotateCCW();
     emit moved();
 }
 
 void Component::rotateCCW()
 {
     setRotation( rotation() - 90);
-    label->rotateCW();
+    m_idLabel->rotateCW();
     emit moved();
 }
 
 void Component::rotateHalf()
 {
     setRotation( rotation() - 180);
-    label->rotate180();
+    m_idLabel->rotate180();
     emit moved();
+}
+
+void Component::updateLabel( Label* label, QString txt )
+{
+    if     ( label == m_idLabel ) m_id = txt;
+    else if( label == m_valLabel )
+    {
+        QString value = "";
+        int x;
+        for( x=0; x<txt.length(); ++x ) 
+        {
+            QChar atx = txt.at(x);
+            if( atx.isDigit() ) value.append( atx );
+            else break;
+        }
+        QString unit = txt.mid( x, txt.length() );
+        
+        setUnit( unit );
+        setValue( value.toDouble() );
+        
+    }
+}
+
+void Component::setLabelPos( int x, int y, int rot )
+{
+    m_idLabel->m_labelx = x;
+    m_idLabel->m_labely = y;
+    m_idLabel->m_labelrot = rot;
+    m_idLabel->setLabelPos();
 }
 
 void Component::setLabelPos()
 {
-    label->setX( m_labelx );
-    label->setY( m_labely );
-    label->setRotation( m_labelrot );
+    m_idLabel->setLabelPos();
 }
 
-bool Component::Show_id()               {return m_showId;}
-void Component::setShow_id( bool show ) {  m_showId = show; setLabel(); }
+void Component::setValLabelPos()
+{
+    m_valLabel->setLabelPos();
+}
+
+void Component::setValue( double val) 
+{ 
+    if( val == 0 ) val = 1e-12;
+    val = val*m_unitMult;
+    
+    int index = 4;   // We are in bare units "TGMK munp"
+    m_unitMult = 1;
+    while( val >= 1000 )
+    {
+        index--;
+        m_unitMult = m_unitMult*1000;
+        val = val/1000;
+    }
+    while( val < 1 )
+    {
+        index++;
+        m_unitMult = m_unitMult/1000;
+        val = val*1000;
+    }
+    m_mult = multUnits.at( index );
+    if( m_mult != " " ) m_mult.prepend( " " );
+    m_value = val;
+    m_valLabel->setPlainText( QString::number(m_value)+m_mult+m_unit );
+}
+
+QString Component::unit()                { return m_mult+m_unit; }
+void Component::setUnit( QString un ) 
+{ 
+    QString mul = " ";
+    un.replace( " ", "" );
+    if( un.size() > 0 ) 
+    {
+        mul = un.at(0);
+        
+        double unitMult = 1e12;        // We start in Tera units "TGMk munp"
+        
+        for( int x=0; x<9; x++ )
+        {
+            if( mul == multUnits.at(x) ) 
+            {
+                m_unitMult = unitMult;
+                m_mult     = mul;
+                if( m_mult != " " ) m_mult.prepend( " " );
+                m_valLabel->setPlainText( QString::number(m_value)+m_mult+m_unit );
+                return;
+            }
+            unitMult = unitMult/1000;
+        }
+    }
+    m_unitMult = 1;
+    m_mult     = " ";
+    m_valLabel->setPlainText( QString::number(m_value)+m_mult+m_unit );
+}
+
+/*void Component::setIdLabel()
+{
+    m_idLabel->setPlainText( m_id );
+    
+    if( m_showId ) m_idLabel->setVisible( true );
+    else           m_idLabel->setVisible( false );
+}*/
+
+bool Component::showId()               { return m_showId; }
+void Component::setShowId( bool show ) 
+{ 
+    m_idLabel->setVisible( show );
+    m_showId = show;
+}
+
+bool Component::showVal()               { return m_showVal;}
+void Component::setShowVal( bool show ) 
+{ 
+    m_valLabel->setVisible( show );
+    m_showVal = show; 
+}
 
 QString Component::itemID()         { return  m_id; }
-void Component::setId( QString id ) {  m_id = id; setLabel(); }
+void Component::setId( QString id ) {  m_id = id; m_idLabel->setPlainText( m_id ); }
 
-int Component::labelx()            { return m_labelx; }
-void Component::setLabelX( int x ) { m_labelx = x; }
+int Component::labelx()            { return m_idLabel->m_labelx; }
+void Component::setLabelX( int x ) { m_idLabel->m_labelx = x; }
 
-int Component::labely()            { return m_labely; }
-void Component::setLabelY( int y ) { m_labely = y; }
+int Component::labely()            { return m_idLabel->m_labely; }
+void Component::setLabelY( int y ) { m_idLabel->m_labely = y; }
 
-int Component::labelrot()              { return m_labelrot; }
-void Component::setLabelRot( int rot ) { m_labelrot = rot; }
+int Component::labelRot()              { return m_idLabel->m_labelrot; }
+void Component::setLabelRot( int rot ) { m_idLabel->m_labelrot = rot; }
 
-QString Component::itemtype()  { return m_type; }
+int Component::valLabelx()            { return m_valLabel->m_labelx; }
+void Component::setValLabelX( int x ) { m_valLabel->m_labelx = x; }
+
+int Component::valLabely()            { return m_valLabel->m_labely; }
+void Component::setValLabelY( int y ) { m_valLabel->m_labely = y; }
+
+int Component::valLabRot()              { return m_valLabel->m_labelrot; }
+void Component::setValLabRot( int rot ) { m_valLabel->m_labelrot = rot; }
+
+QString Component::itemType()  { return m_type; }
 QString Component::category()  { return m_category; }
 QIcon   Component::icon()      { return m_icon; }
 
@@ -227,18 +358,44 @@ void Component::paint( QPainter* painter, const QStyleOptionGraphicsItem* option
 // CLASS Label  *****************************************************************************
 
 Label::Label( Component* parent )
-    : QObject(parent), QGraphicsSimpleTextItem( parent )
+    : QGraphicsTextItem( parent )
 {
     m_parentComp = parent;
+    m_labelrot = 0;
     setCursor( Qt::OpenHandCursor );
+    
+    connect(document(), SIGNAL(contentsChange(int, int, int)),
+            this,       SLOT(updateGeometry(int, int, int)));
 }
 Label::~Label() { }
+
+void Label::updateGeometry(int, int, int)
+{
+    setTextWidth(-1);
+    setTextWidth( boundingRect().width() );
+}
+
+void Label::focusOutEvent(QFocusEvent *event)
+{
+    setTextInteractionFlags(Qt::NoTextInteraction);
+    m_parentComp->updateLabel( this, document()->toPlainText() );
+    
+    QGraphicsTextItem::focusOutEvent(event);
+}
+
+void Label::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    if( !isEnabled() ) return;
+    setTextInteractionFlags(Qt::TextEditorInteraction);
+
+    QGraphicsTextItem::mouseDoubleClickEvent(event);
+
+}
 
 void Label::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     if ( event->button() == Qt::LeftButton )
     {
-        //QPropertyEditorWidget::self()->setObject( this );
         event->accept();
         setCursor( Qt::ClosedHandCursor );
         grabMouse();
@@ -249,8 +406,8 @@ void Label::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     event->accept();
     setPos(  pos() + mapToItem( m_parentComp, event->pos() ) - mapToItem( m_parentComp, event->lastPos() ) );
-    m_parentComp->setLabelX( int(pos().x()) );
-    m_parentComp->setLabelY( int(pos().y()) );
+    m_labelx = int(pos().x());
+    m_labely = int(pos().y());
 }
 
 void Label::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
@@ -277,22 +434,37 @@ void Label::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
     /*QAction* selectedAction = */menu.exec(event->screenPos());
 }
 
+void Label::setLabelPos()
+{
+    setX( m_labelx );
+    setY( m_labely );
+    setRotation( m_labelrot );
+    adjustSize();
+}
+
 void Label::rotateCW()
 {
     setRotation( rotation() + 90 );
-    m_parentComp->setLabelRot( int(rotation()) );
+    m_labelrot = int(rotation()) ;
 }
 
 void Label::rotateCCW()
 {
     setRotation( rotation() - 90 );
-    m_parentComp->setLabelRot( int(rotation()) );
+    m_labelrot = int(rotation()) ;
 }
 
 void Label::rotate180()
 {
     setRotation( rotation() - 180 );
-    m_parentComp->setLabelRot( int(rotation()) );
+    m_labelrot = int(rotation()) ;
 }
+
+/*void Label::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    painter->setBrush( Qt::blue );
+    painter->drawRect( boundingRect() );
+    QGraphicsTextItem::paint( painter, option, widget );
+}*/
 
 #include "moc_component.cpp"

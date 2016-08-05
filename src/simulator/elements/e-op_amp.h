@@ -1,8 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2003-2006 by David Saxton                               *
- *   david@bluehaze.org                                                    *
- *                                                                         *
- *   Copyright (C) 2010 by santiago González                               *
+ *   Copyright (C) 2016 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -16,9 +13,8 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #ifndef EOPAMP_H
@@ -43,16 +39,16 @@ class eOpAmp : public eElement
         
     protected:
         eSource* m_output;
-        eResistor* m_inResistor;
-        //eSource* m_inputInv;
-        //eSource* m_inputNinv;
-        //eSource* m_powerPos;
-        //eSource* m_powerNeg;
+        
+        bool m_connected;
         
         double m_gain;
+        double m_k;
         double m_voltPos;
         double m_voltNeg;
-        double m_lastVolt;
+        //double m_lastDOut;
+        double m_lastOut;
+        double m_lastIn;
 };
 
 

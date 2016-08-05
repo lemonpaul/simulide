@@ -133,13 +133,13 @@ int main(int argc, char *argv[])
 						printf("Load HEX eeprom %08x, %d\n", chunk[ci].baseaddr, f.eesize);
 					}
 				}
-			} /*else {
+			} else {
 				if (elf_read_firmware(filename, &f) == -1) {
 					fprintf(stderr, "%s: Unable to load firmware from file %s\n",
 							argv[0], filename);
 					exit(1);
 				}
-			}*/
+			}
 		}
 	}
 

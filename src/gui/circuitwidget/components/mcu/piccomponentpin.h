@@ -25,10 +25,9 @@
 #include <qstring.h>
 #include <stdint.h>
 
-#include "gpsim/stimuli.h"
-
 #include "mcucomponentpin.h"
 
+#include "gpsim/stimuli.h"
 #include "gpsim/ioports.h"
 #include "gpsim/pic-processor.h"
 #include "gpsim/stimuli.h"
@@ -52,7 +51,7 @@ class PICComponentPin : public McuComponentPin, public stimulus
     protected:
         char m_port;
         int  m_pinN;
-        int  m_channel;
+        //int  m_channel;
         int  m_pos;
 
         //const QString m_esp;

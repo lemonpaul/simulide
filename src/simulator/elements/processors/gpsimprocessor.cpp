@@ -20,6 +20,7 @@
  ***************************************************************************/
 #ifndef NO_PIC
 #include "gpsimprocessor.h"
+#include "simulator.h"
 #include "utils.h"
 
 // GpSim includes
@@ -42,75 +43,80 @@ GpsimProcessor::GpsimProcessor() : BaseProcessor()
         int init = initialize_gpsim_core();
         initialization_is_complete();
         m_DoneGpsimInit = (init==0);
-        if( m_DoneGpsimInit ) qDebug() << "\n    ...GpSim Initialization is complete\n\n";
+        
+        if( m_DoneGpsimInit ) 
+            qDebug() << "\n    ...GpSim Initialization is complete\n\n";
         else
-        {
             qDebug() << "\n    ...Error!!! GpSim Initialization Failed!!!\n\n";
-            //return false;
-        }
     }
-    //exec();
 }
-GpsimProcessor::~GpsimProcessor(){ terminate(); }
+GpsimProcessor::~GpsimProcessor(){}
 
 void GpsimProcessor::terminate()
 {
+    //qDebug() << "GpsimProcessor::terminate";
     BaseProcessor::terminate();
-    if( m_pPicProcessor ) delete m_pPicProcessor; /*m_pPicProcessor->reset(EXIT_RESET);*/
+    if( m_pPicProcessor ) 
+    {
+        delete m_pPicProcessor;//reset(EXIT_RESET);
+    }
     m_pPicProcessor = 0l;
 }
-
-/*void GpsimProcessor::run()
-{
-    while( m_running );
-    qDebug() << "GpsimProcessor::run -> exit";
-    if( m_pPicProcessor ) m_pPicProcessor->reset(EXIT_RESET);
-}*/
 
 bool GpsimProcessor::loadFirmware( QString fileN )
 {
     if( fileN == "" ) return false;
     
     m_symbolFile = fileN.replace( fileN.split(".").last(), "cod" );
+    
+    //qDebug() << m_device;
 
-    QString lstFile = m_symbolFile;
-
-    if( !QFile::exists(lstFile.replace(lstFile.split(".").last(), "lst") ) )
-    {
-        QMessageBox::warning( 0, tr("File Not Found"), tr("The lst file \"%1\" was not found.").arg(lstFile) );
-        return false;
-    }
     if( !QFile::exists(m_symbolFile) )
     {
         QMessageBox::warning( 0, tr("File Not Found"), tr("The cod file \"%1\" was not found.").arg(m_symbolFile) );
         return false;
     }
+    
+    if( m_pPicProcessor )
+    {
+        m_symbolFile = fileN.replace( fileN.split(".").last(), "hex" );
+        const char *fileName = m_symbolFile.toLatin1();
+        FILE       *pFile    = fopen( fileName, "r" );
+        const char *procName = m_device.toLatin1();
+        m_loadStatus = m_pPicProcessor->LoadProgramFile( fileName, pFile, procName );
+    }
+    else
+    {
+        const char *fileName = m_symbolFile.toLatin1();
+        FILE       *pFile    = fopen( fileName, "r" );
+        Processor  *tempProc = 0l;
+        qDebug() << m_symbolFile << fileName;
+        m_loadStatus = ( ProgramFileTypeList::GetList().LoadProgramFile( &tempProc, fileName, pFile ) );
+        m_pPicProcessor = dynamic_cast<pic_processor*>(tempProc);
+    }
 
-    const char *fileName = m_symbolFile.toAscii();
-    FILE       *pFile    = fopen( fileName, "r" );
-    Processor  *tempProc = 0l;
-
-    m_loadStatus = ( ProgramFileTypeList::GetList().LoadProgramFile( &tempProc, fileName, pFile ) );
+    /*m_pPicProcessor->finish();
+    const char *procName = m_device.toLatin1();
+    m_loadStatus = m_pPicProcessor->LoadProgramFile( fileName, pFile, procName );*/
 
     if( !m_loadStatus )
     {
-        QMessageBox::warning( 0, tr("Unkown Error:"),  tr("Could not Load: \"%1\"").arg(m_symbolFile) );
+        //QMessageBox::warning( 0, tr("Unkown Error:"),  tr("Could not Load: \"%1\"").arg(m_symbolFile) );
         return false;
     }
-    m_pPicProcessor = dynamic_cast<pic_processor*>(tempProc);
-    //m_lastDir = m_symbolFile;
-    //m_lastDir = m_lastDir.replace(m_symbolFile.split("/").last(), "");
-
-    qDebug() << "\nLoaded: " << m_symbolFile.toAscii(); //<<m_pPicProcessor->program_memory_size()
-    //QString device = m_pPicProcessor->name().c_str();
+    QString name = m_pPicProcessor->name().c_str();
+    qDebug() << "GpsimProcessor::loadFirmware      Device: " << name;
 
     //if ( device.split("-").first().toUpper() == m_device )
     {
         //if( needAtach ) attachPins();
         //m_ready = m_loadStatus && m_haveMclr && m_haveVdd;
-        reset();
+        //reset();
     }
-    setRegisters();
+    m_lastTrmtBit = 0; // for usart
+    
+    initialized();
+    
     return true;
     /*else
     {
@@ -132,62 +138,109 @@ bool GpsimProcessor::loadFirmware( QString fileN )
     //qDebug() << "PC: " << cpupc << "line:" << m_pPicProcessor->pma->get_src_line(cpupc);
 }
 
-void GpsimProcessor::step()                 // Run 1 step and returns actual source line number
+void GpsimProcessor::step()                 // Run 1 step 
 {
     //if( !m_loadStatus ) return 0;       // No program loaded
+    if( m_usartTerm ) readUsart();
     m_pPicProcessor->step_cycle();
+    
 }
 
 void GpsimProcessor::reset()
 {
     if( !m_loadStatus ) return;
-    m_pPicProcessor->reset(SIM_RESET); // POR_RESET  MCLR_RESET EXIT_RESET
+    m_pPicProcessor->reset( POR_RESET ); // POR_RESET  MCLR_RESET EXIT_RESET
     BaseProcessor::reset();
 }
 
 int GpsimProcessor::getRamValue( QString name ) // Returns the value stored in Ram address
 {
-    return m_pPicProcessor->rma[ getRegAddress( name )].get_value();
+    if( m_regsTable.isEmpty() ) return -1;
+
+    bool isNumber = false;
+    int address = name.toInt( &isNumber );  // Try to convert to integer
+
+    if( !isNumber ) address = m_regsTable[name];   // Is a register name
+    
+    int value = m_pPicProcessor->rma[address].get_value();
+
+    return value;
 }
 
 QHash<QString, int>  GpsimProcessor::getRegsTable( QString lstFileName )// get register addresses from lst file
 {
-    //QString lstFileName = m_symbolFile;
-    lstFileName.replace( lstFileName.split(".").last(), "lst");
+    QHash<QString, int> regsTable;
+
     QStringList lineList = fileToStringList( lstFileName, "GpsimProcessor::setRegisters" );
 
-    if( !m_regsTable.isEmpty() ) m_regsTable.clear();
+    if( !regsTable.isEmpty() ) regsTable.clear();
 
     foreach( QString line, lineList )
     {
-        if( line.contains("EQU") )      // This line contains a definition
+        line = line.toLower().replace("\t"," ").replace("="," ");
+        if( line.contains("equ ") )      // This line contains a definition
         {
-            QStringList wordList = line.split(QRegExp("\\s+")); // Split in words
-            QString temp;
             QString name    = "";
             QString addrtxt = "";
             int address   = 0;
             bool isNumber = false;
 
-            foreach( QString word , wordList )
-            {
-                if( word == "EQU" ) name = temp.toLower(); // When find "EQU", name is the prev word
-                if( temp == "EQU" ) addrtxt = word;        // if prev is "EQU", address is this word
-                temp = word;
-            }
-            if( addrtxt.startsWith("H") )                  // IS hexadecimal??
-            {
-                addrtxt.remove("H").remove("'");           // Get the digits
-                address = addrtxt.toInt( &isNumber, 16 );  // Base 16
-            }
-            else address = addrtxt.toInt( &isNumber );
+            line.remove("equ");
+            QStringList wordList = line.split(QRegExp("\\s+")); // Split in words
+            while( name.isEmpty() ) name = wordList.takeFirst();
 
-            if( isNumber ) m_regsTable.insert(name, address); // If found a valid address add to map
-            //qDebug() << name << address;
+            while( addrtxt.isEmpty() ) addrtxt = wordList.takeFirst();
+
+            int base = 10;
+
+            address = addrtxt.toInt( &isNumber, base );
+
+            if( isNumber ) regsTable.insert(name, address); // If found a valid address add to map
+            //qDebug() << name << address<<"\n";
         }
     }
-    return m_regsTable;
+    return regsTable;
+}
+
+void GpsimProcessor::readUsart()
+{
+static int txreg;
+static int txreg0;
+
+    int txstaReg = getRamValue( "txsta" );
+    if( !(txstaReg & 32) ) return;                           // TXEN bit
+    
+    //int pir1Reg = getRamValue( "pir1" );
+    //bool txifBit = pir1Reg & 16;
+    
+    bool trmtBit = txstaReg & 2;
+    
+    txreg = getRamValue( "txreg" );
+    
+    //txreg = getRamValue( "txreg" );
+    QString text = "";
+    if( txreg != txreg0  )
+    {
+        if( !m_lastTrmtBit & !trmtBit ) text.append( txreg );
+        txreg0 = txreg;
+        //qDebug() << "GpsimProcessor::readUsart:.... " << text;
+    }
+    if( m_lastTrmtBit != trmtBit ) 
+    {
+        
+        if(  m_lastTrmtBit & !trmtBit ) text.append( txreg );
+        m_lastTrmtBit = trmtBit;
+        //qDebug() << "GpsimProcessor::readUsart: " << text;
+    }
+    if( text !="" ) 
+    {
+        OutPanelText::self()->appendText( text );
+        //qDebug() << "GpsimProcessor::readUsart: " << text << " txifBit " << txifBit;
+        //qDebug() << m_lastTrmtBit << trmtBit;
+    }
 }
 
 #include "moc_gpsimprocessor.cpp"
 #endif
+
+

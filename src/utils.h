@@ -122,6 +122,16 @@ inline QPointF togrid( QPointF point )
     return point;
 }
 
+inline QPoint togrid( QPoint point )
+{
+    int valor;
+    valor = snapToGrid( (int)point.x() );
+    point.rx() = valor;
+    valor = snapToGrid( (int)point.y() );
+    point.ry() = valor;
+    return point;
+}
+
 inline int getAlignment( QPointF p1, QPointF p2 )
 {
     int align = 0;

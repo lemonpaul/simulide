@@ -31,30 +31,53 @@ CircMatrix::~CircMatrix(){}
 
 void CircMatrix::createMatrix( int numEnodes )
 {
-    // Clear matrix
-    for( int i=0; i<m_numEnodes; i++ )
-    {
-        for( int j=0; j<m_numEnodes; j++ ) m_circMatrix[i][j] = 0;
-        m_coefVect[i] = 0;
-    }
-
     m_numEnodes = numEnodes;
+    
     m_circMatrix.clear();
+    m_nodeVolt.clear();
+    m_coefVect.clear();
+    
+    a.clear();
+    b.clear();
+    ipvt.clear();
+
     m_circMatrix.resize( m_numEnodes , std::vector<double>( m_numEnodes , 0 ) );
     m_nodeVolt.resize( m_numEnodes , 0 );
     m_coefVect.resize( m_numEnodes , 0 );
+    
+    
+    a.resize( m_numEnodes , std::vector<double>( m_numEnodes , 0 ) );
+    b.resize( m_numEnodes , 0 );
+    ipvt.resize( m_numEnodes , 0 );
+    
+    // Initialize Matrixs & Vectors
+    for( int i=0; i<m_numEnodes; i++ )
+    {
+        for( int j=0; j<m_numEnodes; j++ )
+        {
+             m_circMatrix[i][j] = 0;
+             a[i][j] = 0;
+         }
+        m_coefVect[i] = 0;
+        m_nodeVolt[i] = 0;
+        ipvt[i] = 0;
+        b[i] = 0;
+    }
+    
+    m_admitChanged = false;
+    m_currChanged  = false;
 }
 
 void CircMatrix::stampMatrix( int row, int col, double value )
 {
     //std::cout <<"CircMatrix::stampMatrix"<< row<<col<<value<<std::endl;
-    Simulator::self()->setChanged( true );
+    m_admitChanged = true;
     m_circMatrix[row-1][col-1] = value;
 }
 
 void CircMatrix::stampCoef( int row, double value )
 {
-    Simulator::self()->setChanged( true );
+    m_currChanged = true;
     m_coefVect[row-1] = value;
     //std::cout<<"\n row: "<<row <<  "value:"<< value<<std::endl;
     //std::cout<< "coefs:\n" << m_coefVect << std::endl;
@@ -62,97 +85,105 @@ void CircMatrix::stampCoef( int row, double value )
 
 bool CircMatrix::solveMatrix()
 {
+    if( !m_admitChanged && !m_currChanged ) return true;
+    //if(!m_admitChanged )
+    //qDebug() <<"---------" << m_admitChanged << m_currChanged;
+    
     int n = m_numEnodes;
-    int ipvt[m_numEnodes];
-    double b[m_numEnodes];
-    double a[m_numEnodes][m_numEnodes];
 
     for( int i=0; i<m_numEnodes; i++)
     {
-        for( int j=0; j<m_numEnodes; j++)
+        if( m_admitChanged )
         {
-            a[i][j] = m_circMatrix[i][j];
-           // std::cout << matriz[i][j] << "\t";
+            for( int j=0; j<m_numEnodes; j++)
+            {
+                a[i][j] = m_circMatrix[i][j];
+               // std::cout << matriz[i][j] << "\t";
+            }
         }
         b[i] = m_coefVect[i];
+        //m_coefVect[i] = 0;
         //std::cout << "\t"<< coef[i] << std::endl;
     }
-
+    
+    if( m_admitChanged )
+    {
     // factors a matrix into upper and lower triangular matrices by
     // gaussian elimination.  On entry, a[0..n-1][0..n-1] is the
     // matrix to be factored.  ipvt[] returns an integer vector of pivot
     // indices, used in the lu_solve() routine.
 
-    double scaleFactors[n];
-    int i,j,k;
+        double scaleFactors[n];
+        int i,j,k;
 
-    // divide each row by its largest element, keeping track of the
-    // scaling factors
-    for( i = 0; i != n; i++ )
-    {
-        double largest = 0;
-        for( j = 0; j != n; j++ )
+        // divide each row by its largest element, keeping track of the
+        // scaling factors
+        for( i = 0; i != n; i++ )
         {
-            double x = std::abs( a[i][j] );
-            if( x > largest ) largest = x;
-        }
-        // if all zeros, it's a singular matrix
-        if( largest == 0 ) return false;
-        scaleFactors[i] = 1.0/largest;
-    }
-
-    // use Crout's method; loop through the columns
-    for( j=0; j!=n; j++ )
-    {
-        // calculate upper triangular elements for this column
-        for( i=0; i!=j; i++ )
-        {
-            double q = a[i][j];
-            for( k=0; k!=i; k++ ) q -= a[i][k]*a[k][j];
-
-            a[i][j] = q;
-        }
-
-        // calculate lower triangular elements for this column
-        double largest = 0;
-        int largestRow = -1;
-        for( i = j; i != n; i++ )
-        {
-            double q = a[i][j];
-            for( k = 0; k != j; k++ ) q -= a[i][k]*a[k][j];
-
-            a[i][j] = q;
-            double x = std::abs( q );
-            if( x >= largest )
+            double largest = 0;
+            for( j = 0; j != n; j++ )
             {
-                largest = x;
-                largestRow = i;
+                double x = std::abs( a[i][j] );
+                if( x > largest ) largest = x;
             }
+            // if all zeros, it's a singular matrix
+            if( largest == 0 ) return false;
+            scaleFactors[i] = 1.0/largest;
         }
 
-        // pivoting
-        if( j != largestRow )
+        // use Crout's method; loop through the columns
+        for( j=0; j!=n; j++ )
         {
-            double x;
-            for( k = 0; k != n; k++ )
+            // calculate upper triangular elements for this column
+            for( i=0; i!=j; i++ )
             {
-                x = a[largestRow][k];
-                a[largestRow][k] = a[j][k];
-                a[j][k] = x;
+                double q = a[i][j];
+                for( k=0; k!=i; k++ ) q -= a[i][k]*a[k][j];
+
+                a[i][j] = q;
             }
-            scaleFactors[largestRow] = scaleFactors[j];
-        }
 
-        // keep track of row interchanges
-        ipvt[j] = largestRow;
+            // calculate lower triangular elements for this column
+            double largest = 0;
+            int largestRow = -1;
+            for( i = j; i != n; i++ )
+            {
+                double q = a[i][j];
+                for( k = 0; k != j; k++ ) q -= a[i][k]*a[k][j];
 
-        // avoid zeros
-        if( a[j][j] == 0.0 ) a[j][j]=1e-18;
+                a[i][j] = q;
+                double x = std::abs( q );
+                if( x >= largest )
+                {
+                    largest = x;
+                    largestRow = i;
+                }
+            }
 
-        if( j != n-1 )
-        {
-            double mult = 1.0/a[j][j];
-            for( i = j+1; i != n; i++ ) a[i][j] *= mult;
+            // pivoting
+            if( j != largestRow )
+            {
+                double x;
+                for( k = 0; k != n; k++ )
+                {
+                    x = a[largestRow][k];
+                    a[largestRow][k] = a[j][k];
+                    a[j][k] = x;
+                }
+                scaleFactors[largestRow] = scaleFactors[j];
+            }
+
+            // keep track of row interchanges
+            ipvt[j] = largestRow;
+
+            // avoid zeros
+            if( a[j][j] == 0.0 ) a[j][j]=1e-18;
+
+            if( j != n-1 )
+            {
+                double mult = 1.0/a[j][j];
+                for( i = j+1; i != n; i++ ) a[i][j] *= mult;
+            }
         }
     }
 
@@ -160,6 +191,7 @@ bool CircMatrix::solveMatrix()
 // previously performed by solveMatrix.  On input, b[0..n-1] is the right
 // hand side of the equations, and on output, contains the solution.
 
+    int i;
     // find first nonzero b element
     for( i=0; i!=n; i++ )
     {
@@ -193,6 +225,9 @@ bool CircMatrix::solveMatrix()
 
         b[i] = tot/a[i][i];
     }
+    m_admitChanged = false;
+    m_currChanged  = false;
+    
     for( int i=0; i<m_numEnodes; i++ )  Simulator::self()->setNodeVolt( i, b[i] );
     return true;
 }
@@ -210,3 +245,4 @@ void CircMatrix::printMatrix()
         std::cout << std::endl;
     }
 }
+

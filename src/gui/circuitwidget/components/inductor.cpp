@@ -41,6 +41,8 @@ Inductor::Inductor( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eInductor( id.toStdString() )
 {
     m_ePin.resize(2);
+    
+    m_area = QRectF( -10, -10, 20, 20 );
 
     QString nodid = m_id;
     nodid.append(QString("lnod"));
@@ -57,12 +59,29 @@ Inductor::Inductor( QObject* parent, QString type, QString id )
     pin->setLength(4.5);
     pin->setPos( 16, 0 );
     m_ePin[1] = pin;
+    
+    m_unit = "H";
+    setInduc( m_ind );
+    m_valLabel->setPos(-16, 6);
+    setShowVal( true );
 
-    label->setText( QString("") );
-    label->setPos(-16,-24);
+    m_idLabel->setPos(-16,-24);
 }
 Inductor::~Inductor(){}
 
+double Inductor::induc() { return m_value; }
+
+void Inductor::setInduc( double i ) 
+{ 
+    Component::setValue( i );       // Takes care about units multiplier
+    eInductor::setInd( m_value*m_unitMult );
+}
+
+void Inductor::setUnit( QString un ) 
+{
+    Component::setUnit( un );
+    eInductor::setInd( m_value*m_unitMult );
+}
 void Inductor::remove()
 {
     if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
@@ -87,7 +106,6 @@ void Inductor::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidg
     startAngle = 225 * 16;
     spanAngle = -270 * 16;
     p->drawArc(rectangle2, startAngle, spanAngle);
-    
     
     QRectF rectangle3(2,-4.5, 10, 10 );
     startAngle = 225 * 16;

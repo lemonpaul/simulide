@@ -46,6 +46,9 @@ class GpsimProcessor : public BaseProcessor
 
         int  getRamValue( QString name );
         
+        void readUsart();
+        
+        
         pic_processor* getCpu() { return m_pPicProcessor; }
 
     private:
@@ -56,6 +59,7 @@ class GpsimProcessor : public BaseProcessor
         pic_processor *m_pPicProcessor;
 
         bool m_DoneGpsimInit;
+        bool m_lastTrmtBit;
 };
 #endif
 #endif

@@ -25,14 +25,13 @@
 class LedBase : public Component, public eLed
 {
     Q_OBJECT
-    Q_PROPERTY( double threshold     READ threshold     WRITE setThreshold     DESIGNABLE true USER true )
+    Q_PROPERTY( double threshold  READ threshold  WRITE setThreshold  DESIGNABLE true USER true )
     Q_PROPERTY( double MaxCurrent READ maxCurrent WRITE setMaxCurrent DESIGNABLE true USER true )
 
     public:
         LedBase( QObject* parent, QString type, QString id );
         ~LedBase();
 
-        //void saveState();
         void updateStep();
 
         double threshold()                     { return eLed::threshold(); }
@@ -47,8 +46,6 @@ class LedBase : public Component, public eLed
         void remove();
 
     protected:
-        //double m_prevpVolt;
-        //double m_prevnVolt;
         virtual void drawBackground( QPainter *p )=0;
         virtual void drawForeground( QPainter *p )=0;
 };

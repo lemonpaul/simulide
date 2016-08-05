@@ -28,7 +28,9 @@ class LibraryItem;
 class Resistor : public Component, public eResistor
 {
     Q_OBJECT
-    Q_PROPERTY( double Resistance READ res WRITE setRes DESIGNABLE true USER true )
+    Q_PROPERTY( double Resistance READ resist   WRITE setResist  DESIGNABLE true USER true )
+    Q_PROPERTY( QString  Unit     READ unit     WRITE setUnit    DESIGNABLE true USER true )
+    Q_PROPERTY( bool     Show_res READ showVal  WRITE setShowVal DESIGNABLE true USER true )
 
     public:
         QRectF boundingRect() const { return QRectF( -11, -4.5, 22, 9 ); }
@@ -39,7 +41,10 @@ class Resistor : public Component, public eResistor
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
-        void setRes( double resist );
+        double resist();
+        void setResist( double r );
+        
+        void setUnit( QString un );
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
@@ -48,7 +53,6 @@ class Resistor : public Component, public eResistor
 
     private:
         //void updateVI();
-        //eResistor *resistance;
 
         QGraphicsSimpleTextItem* m_labelcurr;
 };

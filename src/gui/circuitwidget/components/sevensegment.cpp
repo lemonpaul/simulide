@@ -19,7 +19,9 @@
 
 #include "sevensegment.h"
 #include "itemlibrary.h"
+#include "connector.h"
 #include "pin.h"
+
 
 Component* SevenSegment::construct( QObject* parent, QString type, QString id )
 {
@@ -40,7 +42,7 @@ SevenSegment::SevenSegment( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eElement( id.toStdString() )
 {
     setId( id );
-    label->setPos( 30, -70);
+    m_idLabel->setPos( 30, -70);
 
     m_color = QColor(0,0,0);
     m_commonCathode = true;
@@ -153,6 +155,7 @@ void SevenSegment::initialize()
 void SevenSegment::deleteDisplay( int dispNumber )
 {
     Pin* pin = static_cast<Pin*>(m_commonPin[dispNumber]);
+    if( pin->isConnected() ) pin->connector()->remove();
     pin->deleteLater();
 
     for( int i=0; i<8; i++ ) m_segment[dispNumber*8+i]->deleteLater();
@@ -184,7 +187,7 @@ void SevenSegment::createDisplay( int dispNumber )
         lsmd->setParentItem(this);
         lsmd->setEnabled(false);
         lsmd->setNumEpins(2);
-        lsmd->setMaxCurrent( 0.015 );
+        lsmd->setMaxCurrent( 0.02 );
 
         m_anodePin[dispNumber*8+i]= lsmd->getEpin(0);
         m_cathodePin[dispNumber*8+i] = lsmd->getEpin(1);
@@ -203,6 +206,16 @@ void SevenSegment::createDisplay( int dispNumber )
     m_segment[dispNumber*8+5]->setRotation(96);
     m_segment[dispNumber*8+6]->setPos( x-6.5, 0 );
     m_segment[dispNumber*8+7]->setPos( x+12, 19 );
+}
+
+void SevenSegment::remove()
+{
+    for( int i=0; i<m_numDisplays; i++ ) deleteDisplay( i );
+    
+    for( int i=0; i<8; i++ )
+        if( m_ePin[i]->isConnected() ) (static_cast<Pin*>(m_ePin[i]))->connector()->remove();
+        
+    Component::remove();
 }
 
 void SevenSegment::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
