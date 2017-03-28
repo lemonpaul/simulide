@@ -1,0 +1,17 @@
+[
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "/home/user/arduino-1.8.0/hardware/arduino/avr/cores/arduino"
+  },
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "/home/user/arduino-1.8.0/hardware/arduino/avr/variants/standard"
+  },
+  {
+    "Sourcefile": "/home/user/Escritorio/simulide_0.1.4/release/SimulIDE_0.1.4-Lin64-NO_PIC/data/codeeditor/buildIno/sketch/Blink.ino.cpp",
+    "Include": "",
+    "Includepath": ""
+  }
+]

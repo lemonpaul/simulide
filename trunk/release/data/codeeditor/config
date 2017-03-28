@@ -1,0 +1,6 @@
+
+# Path to gcbasic folder:
+gcbasic_Path: /home/user/gcbasic
+
+# Path to arduino folder:
+arduino_Path: /home/user/arduino-1.8.0

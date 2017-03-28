@@ -1,0 +1,132 @@
+<circuit type="simu">
+ 
+Fixed Volt.-12: 
+<item labely="-24" y="-92" labelx="-64" Voltage="5" Show_id="false" hflip="1" valLabelx="-16" valLabRot="0" id="Fixed Volt.-12" rotation="0" Show_Volt="false" valLabely="8" itemtype="Fixed Voltage" Unit=" V" labelrot="0" objectName="Fixed Volt.-12" x="-428" vflip="1"/>
+ 
+Fixed Volt.-11: 
+<item labely="-24" y="-108" labelx="-64" Voltage="5" Show_id="false" hflip="1" valLabelx="-16" valLabRot="0" id="Fixed Volt.-11" rotation="0" Show_Volt="false" valLabely="8" itemtype="Fixed Voltage" Unit=" V" labelrot="0" objectName="Fixed Volt.-11" x="-428" vflip="1"/>
+ 
+Fixed Volt.-10: 
+<item labely="-24" y="-124" labelx="-64" Voltage="5" Show_id="false" hflip="1" valLabelx="-16" valLabRot="0" id="Fixed Volt.-10" rotation="0" Show_Volt="false" valLabely="8" itemtype="Fixed Voltage" Unit=" V" labelrot="0" objectName="Fixed Volt.-10" x="-428" vflip="1"/>
+ 
+Fixed Volt.-9: 
+<item labely="-24" y="-140" labelx="-64" Voltage="5" Show_id="false" hflip="1" valLabelx="-16" valLabRot="0" id="Fixed Volt.-9" rotation="0" Show_Volt="false" valLabely="8" itemtype="Fixed Voltage" Unit=" V" labelrot="0" objectName="Fixed Volt.-9" x="-428" vflip="1"/>
+ 
+Bcd To Dec.-8: 
+<item Input_Low_V="2.5" labely="-24" y="-124" labelx="-16" Show_id="false" hflip="1" valLabelx="0" valLabRot="0" Input_Imped="100000000000000" Out_Low_V="0" tristate="true" id="Bcd To Dec.-8" rotation="0" Inverted="false" valLabely="0" itemtype="BcdToDec" Input_High_V="2.5" Out_Imped="40" labelrot="0" Out_High_V="5" objectName="Bcd To Dec.-8" x="-356" vflip="1"/>
+ 
+DecToBcd-7: 
+<item Input_Low_V="2.5" labely="-24" y="-116" labelx="-16" Show_id="false" hflip="1" valLabelx="0" valLabRot="0" Input_Imped="100000000000000" Out_Low_V="0" tristate="true" id="DecToBcd-7" rotation="0" valLabely="0" itemtype="DecToBcd" Input_High_V="2.5" Out_Imped="40" Invert_Inputs="false" labelrot="0" Out_High_V="5" objectName="DecToBcd-7" x="-164" vflip="1"/>
+ 
+Out Bus-6: 
+<item Input_Low_V="2.5" labely="-24" y="-148" labelx="-16" Show_id="false" hflip="1" valLabelx="0" valLabRot="0" Input_Imped="100000000000000" id="Out Bus-6" rotation="0" valLabely="0" itemtype="OutBus" Input_High_V="2.5" labelrot="0" objectName="Out Bus-6" Num_Bits="9" x="-316" vflip="-1"/>
+ 
+In Bus-5: 
+<item labely="-24" y="-148" labelx="-16" Show_id="false" hflip="1" valLabelx="0" valLabRot="0" Out_Low_V="0" id="In Bus-5" rotation="-180" valLabely="0" itemtype="InBus" Out_Imped="40" labelrot="0" Out_High_V="5" objectName="In Bus-5" Num_Bits="9" x="-204" vflip="1"/>
+ 
+7-4: 
+<item labelrot="0" y="-116" x="-60" valLabRot="0" id="7-4" valLabely="0" labelx="-16" objectName="7-4" itemtype="7-Seg BCD" labely="-24" vflip="1" rotation="0" valLabelx="0" Show_id="false" hflip="1"/>
+ 
+Out Bus-3: 
+<item Input_Low_V="2.5" labely="-24" y="-108" labelx="-16" Show_id="false" hflip="1" valLabelx="0" valLabRot="0" Input_Imped="100000000000000" id="Out Bus-3" rotation="0" valLabely="0" itemtype="OutBus" Input_High_V="2.5" labelrot="0" objectName="Out Bus-3" Num_Bits="4" x="-132" vflip="1"/>
+ 
+In Bus-2: 
+<item labely="-24" y="-132" labelx="-16" Show_id="false" hflip="1" valLabelx="0" valLabRot="0" Out_Low_V="0" id="In Bus-2" rotation="-180" valLabely="0" itemtype="InBus" Out_Imped="40" labelrot="0" Out_High_V="5" objectName="In Bus-2" Num_Bits="4" x="-100" vflip="1"/>
+ 
+Connector-13: 
+<item labely="-24" y="-148" labelx="-16" enodeid="Circ_eNode-14" startpinid="Out Bus-6-out" pointList="-308,-148,-212,-148" Show_id="false" hflip="1" valLabelx="0" endpinid="In Bus-5-out" valLabRot="0" id="Connector-13" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-13" x="-308" vflip="1"/>
+ 
+Connector-15: 
+<item labely="-24" y="-148" labelx="-16" enodeid="Circ_eNode-16" startpinid="Bcd To Dec.-8-pinR02" pointList="-332,-148,-324,-148" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-6-in8" valLabRot="0" id="Connector-15" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-15" x="-332" vflip="1"/>
+ 
+Connector-17: 
+<item labely="-24" y="-140" labelx="-16" enodeid="Circ_eNode-18" startpinid="Bcd To Dec.-8-pinR03" pointList="-332,-140,-324,-140" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-6-in7" valLabRot="0" id="Connector-17" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-17" x="-332" vflip="1"/>
+ 
+Connector-19: 
+<item labely="-24" y="-132" labelx="-16" enodeid="Circ_eNode-20" startpinid="Bcd To Dec.-8-pinR04" pointList="-332,-132,-324,-132" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-6-in6" valLabRot="0" id="Connector-19" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-19" x="-332" vflip="1"/>
+ 
+Connector-21: 
+<item labely="-24" y="-124" labelx="-16" enodeid="Circ_eNode-22" startpinid="Bcd To Dec.-8-pinR05" pointList="-332,-124,-324,-124" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-6-in5" valLabRot="0" id="Connector-21" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-21" x="-332" vflip="1"/>
+ 
+Connector-23: 
+<item labely="-24" y="-116" labelx="-16" enodeid="Circ_eNode-24" startpinid="Bcd To Dec.-8-pinR06" pointList="-332,-116,-324,-116" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-6-in4" valLabRot="0" id="Connector-23" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-23" x="-332" vflip="1"/>
+ 
+Connector-25: 
+<item labely="-24" y="-108" labelx="-16" enodeid="Circ_eNode-26" startpinid="Bcd To Dec.-8-pinR07" pointList="-332,-108,-324,-108" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-6-in3" valLabRot="0" id="Connector-25" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-25" x="-332" vflip="1"/>
+ 
+Connector-27: 
+<item labely="-24" y="-100" labelx="-16" enodeid="Circ_eNode-28" startpinid="Bcd To Dec.-8-pinR08" pointList="-332,-100,-324,-100" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-6-in2" valLabRot="0" id="Connector-27" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-27" x="-332" vflip="1"/>
+ 
+Connector-29: 
+<item labely="-24" y="-92" labelx="-16" enodeid="Circ_eNode-30" startpinid="Bcd To Dec.-8-pinR09" pointList="-332,-92,-324,-92" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-6-in1" valLabRot="0" id="Connector-29" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-29" x="-332" vflip="1"/>
+ 
+Connector-31: 
+<item labely="-24" y="-84" labelx="-16" enodeid="Circ_eNode-32" startpinid="Bcd To Dec.-8-pinR10" pointList="-332,-84,-324,-84" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-6-in0" valLabRot="0" id="Connector-31" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-31" x="-332" vflip="1"/>
+ 
+Connector-33: 
+<item labely="-24" y="-148" labelx="-16" enodeid="Circ_eNode-34" startpinid="In Bus-5-in8" pointList="-196,-148,-188,-148" Show_id="false" hflip="1" valLabelx="0" endpinid="DecToBcd-7-pinL01" valLabRot="0" id="Connector-33" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-33" x="-196" vflip="1"/>
+ 
+Connector-35: 
+<item labely="-24" y="-132" labelx="-16" enodeid="Circ_eNode-36" startpinid="In Bus-5-in6" pointList="-196,-132,-188,-132" Show_id="false" hflip="1" valLabelx="0" endpinid="DecToBcd-7-pinL03" valLabRot="0" id="Connector-35" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-35" x="-196" vflip="1"/>
+ 
+Connector-37: 
+<item labely="-24" y="-140" labelx="-16" enodeid="Circ_eNode-38" startpinid="In Bus-5-in7" pointList="-196,-140,-188,-140" Show_id="false" hflip="1" valLabelx="0" endpinid="DecToBcd-7-pinL02" valLabRot="0" id="Connector-37" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-37" x="-196" vflip="1"/>
+ 
+Connector-39: 
+<item labely="-24" y="-124" labelx="-16" enodeid="Circ_eNode-40" startpinid="In Bus-5-in5" pointList="-196,-124,-188,-124" Show_id="false" hflip="1" valLabelx="0" endpinid="DecToBcd-7-pinL04" valLabRot="0" id="Connector-39" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-39" x="-196" vflip="1"/>
+ 
+Connector-41: 
+<item labely="-24" y="-116" labelx="-16" enodeid="Circ_eNode-42" startpinid="In Bus-5-in4" pointList="-196,-116,-188,-116" Show_id="false" hflip="1" valLabelx="0" endpinid="DecToBcd-7-pinL05" valLabRot="0" id="Connector-41" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-41" x="-196" vflip="1"/>
+ 
+Connector-43: 
+<item labely="-24" y="-108" labelx="-16" enodeid="Circ_eNode-44" startpinid="In Bus-5-in3" pointList="-196,-108,-188,-108" Show_id="false" hflip="1" valLabelx="0" endpinid="DecToBcd-7-pinL06" valLabRot="0" id="Connector-43" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-43" x="-196" vflip="1"/>
+ 
+Connector-45: 
+<item labely="-24" y="-100" labelx="-16" enodeid="Circ_eNode-46" startpinid="In Bus-5-in2" pointList="-196,-100,-188,-100" Show_id="false" hflip="1" valLabelx="0" endpinid="DecToBcd-7-pinL07" valLabRot="0" id="Connector-45" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-45" x="-196" vflip="1"/>
+ 
+Connector-47: 
+<item labely="-24" y="-92" labelx="-16" enodeid="Circ_eNode-48" startpinid="In Bus-5-in1" pointList="-196,-92,-188,-92" Show_id="false" hflip="1" valLabelx="0" endpinid="DecToBcd-7-pinL08" valLabRot="0" id="Connector-47" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-47" x="-196" vflip="1"/>
+ 
+Connector-49: 
+<item labely="-24" y="-84" labelx="-16" enodeid="Circ_eNode-50" startpinid="In Bus-5-in0" pointList="-196,-84,-180,-84" Show_id="false" hflip="1" valLabelx="0" endpinid="DecToBcd-7-pinL09" valLabRot="0" id="Connector-49" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-49" x="-196" vflip="1"/>
+ 
+Connector-51: 
+<item labely="-24" y="-132" labelx="-16" enodeid="Circ_eNode-52" startpinid="DecToBcd-7-pinR03" pointList="-140,-132,-140,-132" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-3-in0" valLabRot="0" id="Connector-51" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-51" x="-140" vflip="1"/>
+ 
+Connector-53: 
+<item labely="-24" y="-132" labelx="-16" enodeid="Circ_eNode-54" startpinid="In Bus-2-in3" pointList="-92,-132,-92,-140,-84,-140" Show_id="false" hflip="1" valLabelx="0" endpinid="7-4-pinL00" valLabRot="0" id="Connector-53" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-53" x="-92" vflip="1"/>
+ 
+Connector-55: 
+<item labely="-24" y="-124" labelx="-16" enodeid="Circ_eNode-56" startpinid="In Bus-2-in2" pointList="-92,-124,-84,-124" Show_id="false" hflip="1" valLabelx="0" endpinid="7-4-pinL02" valLabRot="0" id="Connector-55" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-55" x="-92" vflip="1"/>
+ 
+Connector-57: 
+<item labely="-24" y="-108" labelx="-16" enodeid="Circ_eNode-58" startpinid="In Bus-2-in0" pointList="-92,-108,-92,-92,-84,-92" Show_id="false" hflip="1" valLabelx="0" endpinid="7-4-pinL06" valLabRot="0" id="Connector-57" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-57" x="-92" vflip="1"/>
+ 
+Connector-59: 
+<item labely="-24" y="-108" labelx="-16" enodeid="Circ_eNode-60" startpinid="Out Bus-3-out" pointList="-124,-108,-116,-108,-116,-132,-108,-132" Show_id="false" hflip="1" valLabelx="0" endpinid="In Bus-2-out" valLabRot="0" id="Connector-59" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-59" x="-124" vflip="1"/>
+ 
+Connector-61: 
+<item labely="-24" y="-124" labelx="-16" enodeid="Circ_eNode-62" startpinid="DecToBcd-7-pinR04" pointList="-140,-124,-140,-124" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-3-in1" valLabRot="0" id="Connector-61" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-61" x="-140" vflip="1"/>
+ 
+Connector-63: 
+<item labely="-24" y="-116" labelx="-16" enodeid="Circ_eNode-64" startpinid="DecToBcd-7-pinR05" pointList="-140,-116,-140,-116" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-3-in2" valLabRot="0" id="Connector-63" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-63" x="-140" vflip="1"/>
+ 
+Connector-65: 
+<item labely="-24" y="-108" labelx="-16" enodeid="Circ_eNode-66" startpinid="DecToBcd-7-pinR06" pointList="-140,-108,-140,-108" Show_id="false" hflip="1" valLabelx="0" endpinid="Out Bus-3-in3" valLabRot="0" id="Connector-65" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-65" x="-140" vflip="1"/>
+ 
+Connector-67: 
+<item labely="-24" y="-116" labelx="-16" enodeid="Circ_eNode-68" startpinid="In Bus-2-in1" pointList="-92,-116,-84,-116,-84,-108" Show_id="false" hflip="1" valLabelx="0" endpinid="7-4-pinL04" valLabRot="0" id="Connector-67" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-67" x="-92" vflip="1"/>
+ 
+Connector-69: 
+<item labely="-24" y="-140" labelx="-16" enodeid="Circ_eNode-70" startpinid="Fixed Volt.-9-outnod" pointList="-412,-140,-388,-140,-388,-132,-380,-132" Show_id="false" hflip="1" valLabelx="0" endpinid="Bcd To Dec.-8-in0" valLabRot="0" id="Connector-69" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-69" x="-412" vflip="1"/>
+ 
+Connector-71: 
+<item labely="-24" y="-124" labelx="-16" enodeid="Circ_eNode-72" startpinid="Fixed Volt.-10-outnod" pointList="-412,-124,-380,-124" Show_id="false" hflip="1" valLabelx="0" endpinid="Bcd To Dec.-8-in1" valLabRot="0" id="Connector-71" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-71" x="-412" vflip="1"/>
+ 
+Connector-73: 
+<item labely="-24" y="-108" labelx="-16" enodeid="Circ_eNode-74" startpinid="Fixed Volt.-11-outnod" pointList="-412,-108,-396,-108,-396,-116,-380,-116" Show_id="false" hflip="1" valLabelx="0" endpinid="Bcd To Dec.-8-in2" valLabRot="0" id="Connector-73" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-73" x="-412" vflip="1"/>
+ 
+Connector-75: 
+<item labely="-24" y="-92" labelx="-16" enodeid="Circ_eNode-76" startpinid="Fixed Volt.-12-outnod" pointList="-412,-92,-388,-92,-388,-108,-380,-108" Show_id="false" hflip="1" valLabelx="0" endpinid="Bcd To Dec.-8-in3" valLabRot="0" id="Connector-75" rotation="0" valLabely="0" itemtype="Connector" labelrot="0" objectName="Connector-75" x="-412" vflip="1"/>
+ 
+</circuit>

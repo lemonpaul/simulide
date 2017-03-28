@@ -1,0 +1,36 @@
+<circuit type="simu">
+ 
+Node-5: 
+<item id="Node-5" Show_id="false" labelx="-16" valLabelx="0" objectName="Node-5" labelrot="0" rotation="0" x="-260" y="-228" valLabRot="0" hflip="1" labely="-24" itemtype="Node" valLabely="0" vflip="1"/>
+ 
+7-4: 
+<item id="7-4" Show_id="false" labelx="-16" valLabelx="0" objectName="7-4" labelrot="0" rotation="0" x="-204" y="-212" valLabRot="0" hflip="1" labely="-24" itemtype="7-Seg BCD" valLabely="0" vflip="1"/>
+ 
+74XX90-3: 
+<item id="7490" Show_id="true" labelx="0" valLabelx="0" objectName="74XX90-3" labelrot="0" rotation="0" x="-316" y="-252" valLabRot="0" hflip="1" labely="66" itemtype="Ic74" valLabely="0" vflip="1"/>
+ 
+Clock-2: 
+<item Voltage="5" x="-300" valLabRot="0" labelrot="0" valLabelx="-16" valLabely="8" labelx="-64" rotation="0" y="-292" itemtype="Clock" Show_Volt="true" Unit=" V" hflip="1" Freq="1" vflip="1" labely="-24" objectName="Clock-2" id="Clock-2" Show_id="false"/>
+ 
+Connector-6: 
+<item x="-284" valLabRot="0" labelrot="0" valLabelx="0" valLabely="0" labelx="-16" startpinid="Clock-2-outnod" rotation="0" y="-292" itemtype="Connector" pointList="-284,-292,-268,-292,-268,-244,-276,-244" enodeid="Circ_eNode-7" hflip="1" vflip="1" labely="-24" objectName="Connector-6" id="Connector-6" Show_id="false" endpinid="74XX90-3-CP0"/>
+ 
+Connector-8: 
+<item x="-276" valLabRot="0" labelrot="0" valLabelx="0" valLabely="0" labelx="-16" startpinid="74XX90-3-Q0" rotation="0" y="-228" itemtype="Connector" pointList="-276,-228,-260,-228" enodeid="Circ_eNode-9" hflip="1" vflip="1" labely="-24" objectName="Connector-8" id="Connector-8" Show_id="false" endpinid="Node-5-0"/>
+ 
+Connector-10: 
+<item x="-260" valLabRot="0" labelrot="0" valLabelx="0" valLabely="0" labelx="-16" startpinid="Node-5-2" rotation="0" y="-228" itemtype="Connector" pointList="-260,-228,-260,-260,-332,-260,-332,-244,-324,-244" enodeid="Circ_eNode-9" hflip="1" vflip="1" labely="-24" objectName="Connector-10" id="Connector-10" Show_id="false" endpinid="74XX90-3-CP1"/>
+ 
+Connector-11: 
+<item x="-260" valLabRot="0" labelrot="0" valLabelx="0" valLabely="0" labelx="-16" startpinid="Node-5-1" rotation="0" y="-228" itemtype="Connector" pointList="-260,-228,-260,-188,-228,-188" enodeid="Circ_eNode-9" hflip="1" vflip="1" labely="-24" objectName="Connector-11" id="Connector-11" Show_id="false" endpinid="7-4-pinL06"/>
+ 
+Connector-12: 
+<item x="-276" valLabRot="0" labelrot="0" valLabelx="0" valLabely="0" labelx="-16" startpinid="74XX90-3-Q1" rotation="0" y="-204" itemtype="Connector" pointList="-276,-204,-228,-204" enodeid="Circ_eNode-13" hflip="1" vflip="1" labely="-24" objectName="Connector-12" id="Connector-12" Show_id="false" endpinid="7-4-pinL04"/>
+ 
+Connector-14: 
+<item x="-276" valLabRot="0" labelrot="0" valLabelx="0" valLabely="0" labelx="-16" startpinid="74XX90-3-Q2" rotation="0" y="-196" itemtype="Connector" pointList="-276,-196,-244,-196,-244,-220,-228,-220" enodeid="Circ_eNode-15" hflip="1" vflip="1" labely="-24" objectName="Connector-14" id="Connector-14" Show_id="false" endpinid="7-4-pinL02"/>
+ 
+Connector-16: 
+<item x="-276" valLabRot="0" labelrot="0" valLabelx="0" valLabely="0" labelx="-16" startpinid="74XX90-3-Q3" rotation="0" y="-220" itemtype="Connector" pointList="-276,-220,-252,-220,-252,-236,-228,-236" enodeid="Circ_eNode-17" hflip="1" vflip="1" labely="-24" objectName="Connector-16" id="Connector-16" Show_id="false" endpinid="7-4-pinL00"/>
+ 
+</circuit>

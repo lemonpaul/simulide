@@ -1,0 +1,48 @@
+<circuit type="simu">
+ 
+Fixed Volt.-17: 
+<item Show_id="false" labelrot="0" y="-140" objectName="Fixed Volt.-17" Show_Volt="true" Voltage="5" Unit=" V" x="-372" valLabelx="-16" rotation="0" vflip="1" itemtype="Fixed Voltage" valLabely="8" id="Fixed Volt.-17" labelx="-64" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Fixed Volt.-15: 
+<item Show_id="false" labelrot="0" y="-252" objectName="Fixed Volt.-15" Show_Volt="true" Voltage="5" Unit=" V" x="-372" valLabelx="-16" rotation="0" vflip="1" itemtype="Fixed Voltage" valLabely="8" id="Fixed Volt.-15" labelx="-64" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Probe-13: 
+<item labely="-16" labelx="16" labelrot="45" itemtype="Probe" y="-188" valLabely="0" x="-180" valLabRot="45" hflip="1" id="Probe-13" valLabelx="16" objectName="Probe-13" Show_id="false" rotation="-45" vflip="1" Show_volt="true"/>
+ 
+Fixed Volt.-11: 
+<item Show_id="false" labelrot="0" y="-60" objectName="Fixed Volt.-11" Show_Volt="true" Voltage="5" Unit=" V" x="-372" valLabelx="-16" rotation="0" vflip="1" itemtype="Fixed Voltage" valLabely="8" id="Fixed Volt.-11" labelx="-64" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Fixed Volt.-9: 
+<item Show_id="false" labelrot="0" y="-76" objectName="Fixed Volt.-9" Show_Volt="true" Voltage="5" Unit=" V" x="-372" valLabelx="-16" rotation="0" vflip="1" itemtype="Fixed Voltage" valLabely="8" id="Fixed Volt.-9" labelx="-64" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Fixed Volt.-7: 
+<item Show_id="false" labelrot="0" y="-92" objectName="Fixed Volt.-7" Show_Volt="true" Voltage="5" Unit=" V" x="-372" valLabelx="-16" rotation="0" vflip="1" itemtype="Fixed Voltage" valLabely="8" id="Fixed Volt.-7" labelx="-64" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Fixed Volt.-3: 
+<item Show_id="false" labelrot="0" y="-172" objectName="Fixed Volt.-3" Show_Volt="true" Voltage="5" Unit=" V" x="-372" valLabelx="-16" rotation="0" vflip="1" itemtype="Fixed Voltage" valLabely="8" id="Fixed Volt.-3" labelx="-64" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Mux-2: 
+<item Show_id="false" labelrot="0" y="-164" Out_Low_V="0" objectName="Mux-2" Input_High_V="2.5" Out_High_V="5" Input_Imped="100000000000000" Out_Imped="40" x="-276" valLabelx="0" rotation="0" vflip="1" itemtype="Mux" valLabely="0" id="Mux-2" labelx="-16" valLabRot="0" Input_Low_V="2.5" hflip="1" labely="-24"/>
+ 
+Connector-4: 
+<item pointList="-356,-172,-300,-172" Show_id="false" labelrot="0" y="-172" objectName="Connector-4" endpinid="Mux-2-pinL04" startpinid="Fixed Volt.-3-outnod" x="-356" valLabelx="0" rotation="0" vflip="1" itemtype="Connector" valLabely="0" id="Connector-4" labelx="-16" enodeid="enode-4" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Connector-8: 
+<item pointList="-356,-92,-284,-92,-284,-116" Show_id="false" labelrot="0" y="-92" objectName="Connector-8" endpinid="Mux-2-pinD01" startpinid="Fixed Volt.-7-outnod" x="-356" valLabelx="0" rotation="0" vflip="1" itemtype="Connector" valLabely="0" id="Connector-8" labelx="-16" enodeid="enode-8" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Connector-10: 
+<item pointList="-356,-76,-276,-76,-276,-116" Show_id="false" labelrot="0" y="-76" objectName="Connector-10" endpinid="Mux-2-pinD02" startpinid="Fixed Volt.-9-outnod" x="-356" valLabelx="0" rotation="0" vflip="1" itemtype="Connector" valLabely="0" id="Connector-10" labelx="-16" enodeid="enode-10" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Connector-12: 
+<item pointList="-356,-60,-268,-60,-268,-116" Show_id="false" labelrot="0" y="-60" objectName="Connector-12" endpinid="Mux-2-pinD03" startpinid="Fixed Volt.-11-outnod" x="-356" valLabelx="0" rotation="0" vflip="1" itemtype="Connector" valLabely="0" id="Connector-12" labelx="-16" enodeid="enode-12" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Connector-14: 
+<item pointList="-196,-172,-252,-172" Show_id="false" labelrot="0" y="-172" objectName="Connector-14" endpinid="Mux-2-pinR04" startpinid="Probe-13-inpin" x="-196" valLabelx="0" rotation="0" vflip="1" itemtype="Connector" valLabely="0" id="Connector-14" labelx="-16" enodeid="enode-14" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Connector-16: 
+<item pointList="-356,-252,-276,-252,-276,-212" Show_id="false" labelrot="0" y="-252" objectName="Connector-16" endpinid="Mux-2-pinU02" startpinid="Fixed Volt.-15-outnod" x="-356" valLabelx="0" rotation="0" vflip="1" itemtype="Connector" valLabely="0" id="Connector-16" labelx="-16" enodeid="enode-16" valLabRot="0" hflip="1" labely="-24"/>
+ 
+Connector-18: 
+<item pointList="-356,-140,-300,-140" Show_id="false" labelrot="0" y="-140" objectName="Connector-18" endpinid="Mux-2-pinL08" startpinid="Fixed Volt.-17-outnod" x="-356" valLabelx="0" rotation="0" vflip="1" itemtype="Connector" valLabely="0" id="Connector-18" labelx="-16" enodeid="enode-18" valLabRot="0" hflip="1" labely="-24"/>
+ 
+</circuit>

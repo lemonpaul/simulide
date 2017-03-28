@@ -1,0 +1,42 @@
+<circuit type="simu">
+ 
+Fixed Volt.-18: 
+<item Unit=" V" id="Fixed Volt.-18" Show_Volt="true" hflip="1" valLabely="8" labely="-24" valLabelx="-16" objectName="Fixed Volt.-18" labelrot="0" itemtype="Fixed Voltage" y="-84" rotation="0" Show_id="false" labelx="-64" valLabRot="0" vflip="1" Voltage="5" x="-444"/>
+ 
+74HC151-7: 
+<item rotation="0" labelrot="0" hflip="1" objectName="74HC151-7" Show_id="true" x="-348" valLabelx="0" labelx="0" vflip="1" itemtype="Ic74" id="74HC151-7" valLabRot="0" y="-140" labely="-20" valLabely="0"/>
+ 
+Probe-6: 
+<item rotation="-45" Show_volt="true" labelrot="45" hflip="1" objectName="Probe-6" Show_id="false" x="-396" valLabelx="16" labelx="16" vflip="1" itemtype="Probe" id="Probe-6" valLabRot="45" y="-116" labely="-16" valLabely="0"/>
+ 
+Fixed Volt.-5: 
+<item Unit=" V" id="Fixed Volt.-5" Show_Volt="true" hflip="1" valLabely="8" labely="-24" valLabelx="-16" objectName="Fixed Volt.-5" labelrot="0" itemtype="Fixed Voltage" y="-164" rotation="0" Show_id="false" labelx="-64" valLabRot="0" vflip="1" Voltage="5" x="-404"/>
+ 
+Fixed Volt.-4: 
+<item Unit=" V" id="Fixed Volt.-4" Show_Volt="true" hflip="1" valLabely="8" labely="-24" valLabelx="-16" objectName="Fixed Volt.-4" labelrot="0" itemtype="Fixed Voltage" y="-44" rotation="0" Show_id="false" labelx="-64" valLabRot="0" vflip="1" Voltage="5" x="-388"/>
+ 
+Fixed Volt.-3: 
+<item Unit=" V" id="Fixed Volt.-3" Show_Volt="true" hflip="1" valLabely="8" labely="-24" valLabelx="-16" objectName="Fixed Volt.-3" labelrot="0" itemtype="Fixed Voltage" y="-28" rotation="0" Show_id="false" labelx="-64" valLabRot="0" vflip="1" Voltage="5" x="-388"/>
+ 
+Fixed Volt.-2: 
+<item Unit=" V" id="Fixed Volt.-2" Show_Volt="true" hflip="1" valLabely="8" labely="-24" valLabelx="-16" objectName="Fixed Volt.-2" labelrot="0" itemtype="Fixed Voltage" y="-12" rotation="0" Show_id="false" labelx="-64" valLabRot="0" vflip="1" Voltage="5" x="-388"/>
+ 
+Connector-8: 
+<item id="Connector-8" hflip="1" startpinid="74HC151-7-Y" valLabely="0" labely="-24" enodeid="Circ_eNode-9" valLabelx="0" objectName="Connector-8" labelrot="0" itemtype="Connector" y="-100" rotation="0" Show_id="false" labelx="-16" valLabRot="0" vflip="1" pointList="-356,-100,-412,-100" endpinid="Probe-6-inpin" x="-356"/>
+ 
+Connector-10: 
+<item id="Connector-10" hflip="1" startpinid="Fixed Volt.-5-outnod" valLabely="0" labely="-24" enodeid="Circ_eNode-11" valLabelx="0" objectName="Connector-10" labelrot="0" itemtype="Connector" y="-164" rotation="0" Show_id="false" labelx="-16" valLabRot="0" vflip="1" pointList="-388,-164,-372,-164,-372,-132,-356,-132" endpinid="74HC151-7-I3" x="-388"/>
+ 
+Connector-12: 
+<item id="Connector-12" hflip="1" startpinid="Fixed Volt.-4-outnod" valLabely="0" labely="-24" enodeid="Circ_eNode-13" valLabelx="0" objectName="Connector-12" labelrot="0" itemtype="Connector" y="-44" rotation="0" Show_id="false" labelx="-16" valLabRot="0" vflip="1" pointList="-372,-44,-300,-44,-300,-76,-308,-76" endpinid="74HC151-7-S2" x="-372"/>
+ 
+Connector-14: 
+<item id="Connector-14" hflip="1" startpinid="Fixed Volt.-3-outnod" valLabely="0" labely="-24" enodeid="Circ_eNode-15" valLabelx="0" objectName="Connector-14" labelrot="0" itemtype="Connector" y="-28" rotation="0" Show_id="false" labelx="-16" valLabRot="0" vflip="1" pointList="-372,-28,-292,-28,-292,-84,-308,-84" endpinid="74HC151-7-S1" x="-372"/>
+ 
+Connector-16: 
+<item id="Connector-16" hflip="1" startpinid="Fixed Volt.-2-outnod" valLabely="0" labely="-24" enodeid="Circ_eNode-17" valLabelx="0" objectName="Connector-16" labelrot="0" itemtype="Connector" y="-12" rotation="0" Show_id="false" labelx="-16" valLabRot="0" vflip="1" pointList="-372,-12,-284,-12,-284,-92,-308,-92" endpinid="74HC151-7-S0" x="-372"/>
+ 
+Connector-19: 
+<item id="Connector-19" hflip="1" startpinid="Fixed Volt.-18-outnod" valLabely="0" labely="-24" enodeid="enode-19" valLabelx="0" objectName="Connector-19" labelrot="0" itemtype="Connector" y="-84" rotation="0" Show_id="false" labelx="-16" valLabRot="0" vflip="1" pointList="-428,-84,-356,-84" endpinid="74HC151-7-E" x="-428"/>
+ 
+</circuit>

@@ -1,0 +1,20 @@
+<!DOCTYPE SimulIDE>
+
+<itemlib>
+    
+    <itemset category="IC 74" type="Ic74">
+
+    <item name="74HC42"  package="logic/74HC42.package"  subcircuit="logic/74HC42.subcircuit"  icon="ic2.png" ></item>
+    <item name="74XX90"  package="logic/74XX90.package"  subcircuit="logic/74XX90.subcircuit"  icon="ic2.png" ></item>
+    <item name="74XX92"  package="logic/74XX92.package"  subcircuit="logic/74XX92.subcircuit"  icon="ic2.png" ></item>
+    <item name="74XX93"  package="logic/74XX93.package"  subcircuit="logic/74XX93.subcircuit"  icon="ic2.png" ></item>
+    <item name="74HC151" package="logic/74XX151.package" subcircuit="logic/74XX151.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC164" package="logic/74XX164.package" subcircuit="logic/74XX164.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC573" package="logic/74XX573.package" subcircuit="logic/74XX573.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC574" package="logic/74XX574.package" subcircuit="logic/74XX574.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC595" package="logic/74XX595.package" subcircuit="logic/74XX595.subcircuit" icon="ic2.png" ></item>
+    
+    </itemset>
+    
+</itemlib>
+

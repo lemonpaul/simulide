@@ -1,0 +1,36 @@
+<circuit type="simu">
+ 
+Fixed Volt.-11: 
+<item hflip="1" x="-372" id="Fixed Volt.-11" labely="-24" objectName="Fixed Volt.-11" itemtype="Fixed Voltage" Unit=" V" y="-20" labelrot="0" labelx="-64" vflip="1" valLabelx="-16" valLabRot="0" Show_Volt="true" rotation="0" Show_id="false" Voltage="5" valLabely="8"/>
+ 
+Fixed Volt.-10: 
+<item hflip="1" x="-372" id="Fixed Volt.-10" labely="-24" objectName="Fixed Volt.-10" itemtype="Fixed Voltage" Unit=" V" y="-36" labelrot="0" labelx="-64" vflip="1" valLabelx="-16" valLabRot="0" Show_Volt="true" rotation="0" Show_id="false" Voltage="5" valLabely="8"/>
+ 
+Fixed Volt.-8: 
+<item hflip="1" x="-372" id="Fixed Volt.-8" labely="-24" objectName="Fixed Volt.-8" itemtype="Fixed Voltage" Unit=" V" y="-52" labelrot="0" labelx="-64" vflip="1" valLabelx="-16" valLabRot="0" Show_Volt="true" rotation="0" Show_id="false" Voltage="5" valLabely="8"/>
+ 
+Fixed Volt.-5: 
+<item hflip="1" x="-372" id="Fixed Volt.-5" labely="-24" objectName="Fixed Volt.-5" itemtype="Fixed Voltage" Unit=" V" y="-124" labelrot="0" labelx="-64" vflip="1" valLabelx="-16" valLabRot="0" Show_Volt="true" rotation="0" Show_id="false" Voltage="5" valLabely="8"/>
+ 
+Fixed Volt.-3: 
+<item hflip="1" x="-372" id="Fixed Volt.-3" labely="-24" objectName="Fixed Volt.-3" itemtype="Fixed Voltage" Unit=" V" y="-196" labelrot="0" labelx="-64" vflip="1" valLabelx="-16" valLabRot="0" Show_Volt="true" rotation="0" Show_id="false" Voltage="5" valLabely="8"/>
+ 
+Demux-2: 
+<item hflip="1" Out_Imped="40" x="-268" id="Demux-2" Input_High_V="2.5" labely="-24" Out_Low_V="0" objectName="Demux-2" itemtype="Demux" y="-124" labelrot="0" Out_High_V="5" labelx="-16" Input_Imped="100000000000000" vflip="1" valLabelx="0" valLabRot="0" rotation="0" Show_id="false" valLabely="0" Input_Low_V="2.5"/>
+ 
+Connector-4: 
+<item hflip="1" x="-356" id="Connector-4" labely="-24" endpinid="Demux-2-pinU02" objectName="Connector-4" itemtype="Connector" pointList="-356,-196,-268,-196,-268,-172" y="-196" labelrot="0" labelx="-16" startpinid="Fixed Volt.-3-outnod" vflip="1" enodeid="enode-4" valLabelx="0" valLabRot="0" rotation="0" Show_id="false" valLabely="0"/>
+ 
+Connector-6: 
+<item hflip="1" x="-356" id="Connector-6" labely="-24" endpinid="Demux-2-pinL05" objectName="Connector-6" itemtype="Connector" pointList="-356,-124,-292,-124" y="-124" labelrot="0" labelx="-16" startpinid="Fixed Volt.-5-outnod" vflip="1" enodeid="enode-6" valLabelx="0" valLabRot="0" rotation="0" Show_id="false" valLabely="0"/>
+ 
+Connector-9: 
+<item hflip="1" x="-356" id="Connector-9" labely="-24" endpinid="Demux-2-pinD01" objectName="Connector-9" itemtype="Connector" pointList="-356,-52,-276,-52,-276,-76" y="-52" labelrot="0" labelx="-16" startpinid="Fixed Volt.-8-outnod" vflip="1" enodeid="enode-9" valLabelx="0" valLabRot="0" rotation="0" Show_id="false" valLabely="0"/>
+ 
+Connector-12: 
+<item hflip="1" x="-356" id="Connector-12" labely="-24" endpinid="Demux-2-pinD02" objectName="Connector-12" itemtype="Connector" pointList="-356,-36,-268,-36,-268,-76" y="-36" labelrot="0" labelx="-16" startpinid="Fixed Volt.-10-outnod" vflip="1" enodeid="enode-12" valLabelx="0" valLabRot="0" rotation="0" Show_id="false" valLabely="0"/>
+ 
+Connector-13: 
+<item hflip="1" x="-356" id="Connector-13" labely="-24" endpinid="Demux-2-pinD03" objectName="Connector-13" itemtype="Connector" pointList="-356,-20,-260,-20,-260,-76" y="-20" labelrot="0" labelx="-16" startpinid="Fixed Volt.-11-outnod" vflip="1" enodeid="enode-13" valLabelx="0" valLabRot="0" rotation="0" Show_id="false" valLabely="0"/>
+ 
+</circuit>
