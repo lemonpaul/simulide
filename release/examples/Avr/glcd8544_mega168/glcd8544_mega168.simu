@@ -1,0 +1,66 @@
+<circuit type="simu">
+ 
+atmega168-2: 
+<item x="-356" y="-292" labely="-27" rotation="0" valLabely="0" itemtype="AVR" id="atmega168" valLabelx="0" valLabRot="0" labelrot="0" objectName="atmega168-2" Mhz="16" labelx="-27" vflip="0" hflip="0" program="" Show_id="true"/>
+ 
+Pcd8544-3: 
+<item x="-220" y="-276" labely="-77" rotation="0" valLabely="0" itemtype="Pcd8544" id="Display-1" valLabelx="0" valLabRot="0" labelrot="0" objectName="Pcd8544-3" labelx="-35" vflip="0" hflip="0" Show_id="true"/>
+ 
+Pcd8544-4: 
+<item x="-116" y="-276" labely="-76" rotation="0" valLabely="0" itemtype="Pcd8544" id="Display-2" valLabelx="0" valLabRot="0" labelrot="0" objectName="Pcd8544-4" labelx="-35" vflip="0" hflip="0" Show_id="true"/>
+ 
+Node-10: 
+<item x="-188" y="-204" labely="-24" rotation="0" valLabely="0" itemtype="Node" id="Node-10" valLabelx="0" valLabRot="0" labelrot="0" objectName="Node-10" labelx="-16" vflip="0" hflip="0" Show_id="false"/>
+ 
+Node-13: 
+<item x="-204" y="-212" labely="-24" rotation="0" valLabely="0" itemtype="Node" id="Node-13" valLabelx="0" valLabRot="0" labelrot="0" objectName="Node-13" labelx="-16" vflip="0" hflip="0" Show_id="false"/>
+ 
+Node-16: 
+<item x="-220" y="-220" labely="-24" rotation="0" valLabely="0" itemtype="Node" id="Node-16" valLabelx="0" valLabRot="0" labelrot="0" objectName="Node-16" labelx="-16" vflip="0" hflip="0" Show_id="false"/>
+ 
+Node-24: 
+<item x="-252" y="-228" labely="-24" rotation="0" valLabely="0" itemtype="Node" id="Node-24" valLabelx="0" valLabRot="0" labelrot="0" objectName="Node-24" labelx="-16" vflip="0" hflip="0" Show_id="false"/>
+ 
+Connector-7: 
+<item enodeid="enode-18" valLabelx="0" valLabRot="0" y="-220" startpinid="atmega168-2-PB6" endpinid="Node-16-0" id="Connector-7" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-364,-220,-380,-220,-380,-148,-292,-148,-292,-220,-220,-220" rotation="0" objectName="Connector-7" labelx="-16" x="-364" valLabely="0" itemtype="Connector"/>
+ 
+Connector-8: 
+<item enodeid="enode-15" valLabelx="0" valLabRot="0" y="-212" startpinid="atmega168-2-PB5" endpinid="Node-13-0" id="Connector-8" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-316,-212,-204,-212" rotation="0" objectName="Connector-8" labelx="-16" x="-316" valLabely="0" itemtype="Connector"/>
+ 
+Connector-9: 
+<item enodeid="enode-12" valLabelx="0" valLabRot="0" y="-204" startpinid="atmega168-2-PB4" endpinid="Node-10-0" id="Connector-9" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-316,-204,-188,-204" rotation="0" objectName="Connector-9" labelx="-16" x="-316" valLabely="0" itemtype="Connector"/>
+ 
+Connector-11: 
+<item enodeid="enode-12" valLabelx="0" valLabRot="0" y="-204" startpinid="Node-10-2" endpinid="Pcd8544-3-PinScl" id="Connector-11" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-188,-204,-188,-236" rotation="0" objectName="Connector-11" labelx="-16" x="-188" valLabely="0" itemtype="Connector"/>
+ 
+Connector-12: 
+<item enodeid="enode-12" valLabelx="0" valLabRot="0" y="-204" startpinid="Node-10-1" endpinid="Pcd8544-4-PinScl" id="Connector-12" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-188,-204,-84,-204,-84,-236" rotation="0" objectName="Connector-12" labelx="-16" x="-188" valLabely="0" itemtype="Connector"/>
+ 
+Connector-14: 
+<item enodeid="enode-15" valLabelx="0" valLabRot="0" y="-212" startpinid="Node-13-2" endpinid="Pcd8544-3-PinSi" id="Connector-14" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-204,-212,-204,-236" rotation="0" objectName="Connector-14" labelx="-16" x="-204" valLabely="0" itemtype="Connector"/>
+ 
+Connector-15: 
+<item enodeid="enode-15" valLabelx="0" valLabRot="0" y="-212" startpinid="Node-13-1" endpinid="Pcd8544-4-PinSi" id="Connector-15" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-204,-212,-100,-212,-100,-236" rotation="0" objectName="Connector-15" labelx="-16" x="-204" valLabely="0" itemtype="Connector"/>
+ 
+Connector-17: 
+<item enodeid="enode-18" valLabelx="0" valLabRot="0" y="-220" startpinid="Node-16-2" endpinid="Pcd8544-3-PinDc" id="Connector-17" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-220,-220,-220,-236" rotation="0" objectName="Connector-17" labelx="-16" x="-220" valLabely="0" itemtype="Connector"/>
+ 
+Connector-18: 
+<item enodeid="enode-18" valLabelx="0" valLabRot="0" y="-220" startpinid="Node-16-1" endpinid="Pcd8544-4-PinDc" id="Connector-18" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-220,-220,-116,-220,-116,-236" rotation="0" objectName="Connector-18" labelx="-16" x="-220" valLabely="0" itemtype="Connector"/>
+ 
+Connector-22: 
+<item enodeid="enode-22" valLabelx="0" valLabRot="0" y="-196" startpinid="atmega168-2-PB3" endpinid="Pcd8544-3-PinCs" id="Connector-22" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-316,-196,-236,-196,-236,-236" rotation="0" objectName="Connector-22" labelx="-16" x="-316" valLabely="0" itemtype="Connector"/>
+ 
+Connector-5: 
+<item enodeid="enode-26" valLabelx="0" valLabRot="0" y="-212" startpinid="atmega168-2-PB7" endpinid="Node-24-0" id="Connector-5" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-364,-212,-372,-212,-372,-156,-300,-156,-300,-228,-252,-228" rotation="0" objectName="Connector-5" labelx="-16" x="-364" valLabely="0" itemtype="Connector"/>
+ 
+Connector-25: 
+<item enodeid="enode-26" valLabelx="0" valLabRot="0" y="-228" startpinid="Node-24-2" endpinid="Pcd8544-3-PinRst" id="Connector-25" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-252,-228,-252,-236" rotation="0" objectName="Connector-25" labelx="-16" x="-252" valLabely="0" itemtype="Connector"/>
+ 
+Connector-26: 
+<item enodeid="enode-26" valLabelx="0" valLabRot="0" y="-228" startpinid="Node-24-1" endpinid="Pcd8544-4-PinRst" id="Connector-26" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-252,-228,-148,-228,-148,-236" rotation="0" objectName="Connector-26" labelx="-16" x="-252" valLabely="0" itemtype="Connector"/>
+ 
+Connector-27: 
+<item enodeid="enode-27" valLabelx="0" valLabRot="0" y="-188" startpinid="atmega168-2-PB2" endpinid="Pcd8544-4-PinCs" id="Connector-27" labelrot="0" vflip="0" hflip="0" Show_id="false" labely="-24" pointList="-316,-188,-132,-188,-132,-236" rotation="0" objectName="Connector-27" labelx="-16" x="-316" valLabely="0" itemtype="Connector"/>
+ 
+</circuit>

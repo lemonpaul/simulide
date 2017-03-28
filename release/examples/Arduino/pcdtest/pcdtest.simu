@@ -1,0 +1,24 @@
+<circuit type="simu">
+ 
+Pcd8544-3: 
+<item x="-372" y="-300" labely="-24" rotation="0" valLabely="0" itemtype="Pcd8544" id="Pcd8544-3" valLabelx="0" valLabRot="0" labelrot="0" objectName="Pcd8544-3" labelx="-16" vflip="1" hflip="1" Show_id="false"/>
+ 
+Arduino Uno-2: 
+<item x="-284" y="-244" labely="-24" rotation="0" valLabely="0" itemtype="Arduino" id="Arduino Uno" valLabelx="0" valLabRot="0" labelrot="0" objectName="Arduino Uno-2" Mhz="16" labelx="54" vflip="1" hflip="1" program="" Show_id="true"/>
+ 
+Connector-4: 
+<item enodeid="enode-4" valLabelx="0" valLabRot="0" y="-260" startpinid="Pcd8544-3-PinRst" endpinid="Arduino Uno-2-PD3" id="Connector-4" labelrot="0" vflip="1" hflip="1" Show_id="false" labely="-24" pointList="-404,-260,-404,-204,-276,-204" rotation="0" objectName="Connector-4" labelx="-16" x="-404" valLabely="0" itemtype="Connector"/>
+ 
+Connector-5: 
+<item enodeid="enode-5" valLabelx="0" valLabRot="0" y="-260" startpinid="Pcd8544-3-PinCs" endpinid="Arduino Uno-2-PD4" id="Connector-5" labelrot="0" vflip="1" hflip="1" Show_id="false" labely="-24" pointList="-388,-260,-388,-196,-276,-196" rotation="0" objectName="Connector-5" labelx="-16" x="-388" valLabely="0" itemtype="Connector"/>
+ 
+Connector-6: 
+<item enodeid="enode-6" valLabelx="0" valLabRot="0" y="-260" startpinid="Pcd8544-3-PinDc" endpinid="Arduino Uno-2-PD5" id="Connector-6" labelrot="0" vflip="1" hflip="1" Show_id="false" labely="-24" pointList="-372,-260,-372,-188,-276,-188" rotation="0" objectName="Connector-6" labelx="-16" x="-372" valLabely="0" itemtype="Connector"/>
+ 
+Connector-7: 
+<item enodeid="enode-7" valLabelx="0" valLabRot="0" y="-260" startpinid="Pcd8544-3-PinSi" endpinid="Arduino Uno-2-PD6" id="Connector-7" labelrot="0" vflip="1" hflip="1" Show_id="false" labely="-24" pointList="-356,-260,-356,-180,-276,-180" rotation="0" objectName="Connector-7" labelx="-16" x="-356" valLabely="0" itemtype="Connector"/>
+ 
+Connector-8: 
+<item enodeid="enode-8" valLabelx="0" valLabRot="0" y="-260" startpinid="Pcd8544-3-PinScl" endpinid="Arduino Uno-2-PD7" id="Connector-8" labelrot="0" vflip="1" hflip="1" Show_id="false" labely="-24" pointList="-340,-260,-340,-172,-276,-172" rotation="0" objectName="Connector-8" labelx="-16" x="-340" valLabely="0" itemtype="Connector"/>
+ 
+</circuit>
