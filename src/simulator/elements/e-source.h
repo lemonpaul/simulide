@@ -20,7 +20,6 @@
 #ifndef ESOURCE_H
 #define ESOURCE_H
 
-#include <QObject>
 
 #include "e-element.h"
 #include "e-node.h"
@@ -28,10 +27,10 @@
 class eSource : public eElement
 {
     public:
-        eSource( string id, ePin* epin );
+        eSource( std::string id, ePin* epin );
         virtual ~eSource();
 
-        void initialize();
+        virtual void initialize();
         void stamp();
         void stampOutput();
 
@@ -53,6 +52,9 @@ class eSource : public eElement
         double getVolt();
 
         ePin* getEpin();
+        ePin* getEpin( QString pinName );
+
+        void  createPin();
 
     protected:
         

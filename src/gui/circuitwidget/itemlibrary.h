@@ -49,12 +49,17 @@ class ItemLibrary
          * @return the LibraryItem for the item with the given type (id) const.
          */
         LibraryItem*  libraryItem( QString type ) const;
+        
+        void loadItems();
+        
+        void loadPlugins();
 
     
     protected:
         ItemLibrary();
-    
+        
         QList<LibraryItem*> m_items;
+        QStringList m_plugins;
         
         friend ItemLibrary*  itemLibrary();
 };

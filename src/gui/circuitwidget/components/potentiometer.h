@@ -56,7 +56,7 @@ class Potentiometer : public Component, public eElement
 
     public slots:
         void resChanged( int volt );
-        virtual void remove();
+        void remove();
 
     private:
         double m_resist;

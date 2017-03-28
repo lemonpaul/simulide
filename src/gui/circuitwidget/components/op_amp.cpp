@@ -1,6 +1,6 @@
 /***************************************************************************
  *                                                                         *
- *   Copyright (C) 2010 by santiago González                               *
+ *   Copyright (C) 2016 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -45,31 +45,27 @@ OpAmp::OpAmp( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eOpAmp( id.toStdString() )
 {
     m_area = QRect( -18, -8*2, 36, 8*2*2 );
+    
     setGain( 1000 );
     m_voltPos = 5;
     m_voltNeg = 0;
     
+    m_pin.resize( 3 );
+    
     QString newId = id;
-    //newId.append(QString("-eResistor"));
-    //m_inResistor = new eResistor( newId.toStdString() );
+    
+    newId.append(QString("-inputNinv"));
+    m_pin[0] = new Pin( 180, QPoint(-16-8,-8), newId, 0, this );
+    m_pin[0]->setLabelText( "+" );
+    m_pin[0]->setLabelColor( QColor( 0, 0, 0 ) );
+    m_ePin[0] = m_pin[0];
     
     newId = id;
-    newId.append(QString("inputNinv"));
-    Pin* newPin = new Pin( 180, QPoint(-16-8,-8), newId, 0, this );
-    newPin->setLabelText( "+" );
-    newPin->setLabelColor( QColor( 0, 0, 0 ) );
-    m_ePin[0] = newPin;
-    //m_inResistor->setEpin( 0, m_ePin[0] );
-    //newId.append("-eSource");
-    //m_inputNinv = new eSource( newId.toStdString(), m_ePin[0] );
-    //m_inputNinv->setImp( high_imp );
-    
-    newId = id;
-    newId.append(QString("inputInv"));
-    newPin = new Pin( 180, QPoint(-16-8,8), newId, 1, this );
-    newPin->setLabelText( " -" );
-    newPin->setLabelColor( QColor( 0, 0, 0 ) );
-    m_ePin[1] = newPin;
+    newId.append(QString("-inputInv"));
+    m_pin[1] = new Pin( 180, QPoint(-16-8,8), newId, 1, this );
+    m_pin[1]->setLabelText( " -" );
+    m_pin[1]->setLabelColor( QColor( 0, 0, 0 ) );
+    m_ePin[1] = m_pin[1];
     //m_inResistor->setEpin( 1, m_ePin[1] );
     //newId.append("-eSource");
     //m_inputInv = new eSource( newId.toStdString(), m_ePin[1] );
@@ -88,8 +84,9 @@ OpAmp::OpAmp( QObject* parent, QString type, QString id )
     m_powerNeg = new eSource( newId.toStdString(), m_ePin[3] );*/
     
     newId = id;
-    newId.append(QString("output"));
-    m_ePin[2] = new Pin( 0, QPoint(16+8,0), newId, 2, this );
+    newId.append(QString("-output"));
+    m_pin[2] = new Pin( 0, QPoint(16+8,0), newId, 2, this );
+    m_ePin[2] = m_pin[2];
     newId.append("-eSource");
     m_output = new eSource( newId.toStdString(), m_ePin[2] );
     //m_output->setImp( 40 );
@@ -103,14 +100,6 @@ OpAmp::~OpAmp()
     //delete m_inputInv;
     //delete m_inputNinv;
     //delete m_inResistor;
-}
-
-void OpAmp::remove()
-{
-    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
-    if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-    if( m_ePin[2]->isConnected() ) (static_cast<Pin*>(m_ePin[2]))->connector()->remove();
-    Component::remove();
 }
 
 void OpAmp::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

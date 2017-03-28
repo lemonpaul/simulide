@@ -1,7 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2003-2006 by David Saxton                               *
- *   david@bluehaze.org                                                    *
- *                                                                         *
  *   Copyright (C) 2010 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
@@ -16,19 +13,15 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #include "e-gate.h"
 
-eGate::eGate( string id, int inputs )
+eGate::eGate( std::string id, int inputs )
     : eLogicDevice( id )
 {
-    createPins( inputs, 1 );         // From eLogicDevice
-    setInverted( false );
-    //m_prevInputs = 0;
 }
 eGate::~eGate()
 {
@@ -43,32 +36,19 @@ void eGate::initialize()
     }
 }
 
-void eGate::setInverted( bool inverted )
-{
-    m_inverted = inverted;
-    m_output[0]->setInverted( inverted );
-}
-
-
 void eGate::setVChanged()
 {
     int  inputs = 0;
 
     for( int i=0; i<m_numInputs; i++ )
     {
-        bool  state = m_inputState[i];
-        double volt = m_input[i]->getVolt();
-
-        if     ( volt > m_inputHighV ) state = true;
-        else if( volt < m_inputLowV )  state = false;
+        bool  state = eLogicDevice::getInputState( i );
 
         if( state ) inputs++;
-        m_inputState[i] = state;
     }
     //qDebug() << "eGate::setVChanged" << m_prevInputs << inputs; 
     
-    m_output[0]->setOut( calcOutput( inputs ) );   // In each gate type
-    m_output[0]->stampOutput();
+    eLogicDevice::setOut( 0, calcOutput( inputs ) );// In each gate type
 }
 
 bool eGate::calcOutput( int inputs ) 

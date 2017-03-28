@@ -42,10 +42,18 @@ class ComponentSelector : public QTreeWidget
 
     private slots:
         void slotItemClicked( QTreeWidgetItem* item, int column );
+        void slotContextMenu(const QPoint&);
+        void slotUnistallItem();
+        void slotIstallItem();
 
     private:
+        void LoadLibraryItems();
+        void LoadCompSet();
     
         QStringList m_categories;
+        //QStringList m_loaded;
+        
+        QString m_lastItemClicked;
 };
 
 #endif

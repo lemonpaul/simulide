@@ -20,10 +20,10 @@
 #ifndef MCUCOMPONENTPIN_H
 #define MCUCOMPONENTPIN_H
 
-#include "component.h"
+#include "mcucomponent.h"
 #include "e-source.h"
 #include "pin.h"
-#include "mcucomponent.h"
+
 
 class McuComponentPin : public QObject, public eSource
 {
@@ -34,21 +34,28 @@ class McuComponentPin : public QObject, public eSource
 
         Pin* pin() const { return ( static_cast<Pin*>(m_ePin[0]) ); }
 
-        void initialize();
+        virtual void initialize();
         void terminate();
 
         void move( int dx, int dy );
         //void moveLabel( int dx, int dy );
 
         void resetOutput();
+        
+        int angle() { return m_angle;}
+        
+        QString ptype() { return m_type; }
 
     protected:
-        McuComponent  *m_mcuComponent;
+        McuComponent* m_mcuComponent;
         
         bool m_attached;
 
         double m_Rth;
         double m_Vth;
+        
+        int m_pinType;
+        int m_angle;
 
         QString m_type;
         QString m_id;

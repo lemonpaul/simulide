@@ -36,6 +36,7 @@ class OscopeWidget : public QWidget
  static OscopeWidget* self() { return m_pSelf; }
         
         void setProbe( Probe* probe );
+        void clear();
         void step();
         void setData();
         void setTicksPs( int tps );
@@ -60,6 +61,7 @@ class OscopeWidget : public QWidget
         
         int m_data[140];
         int m_counter;
+        int m_newReadCount;
         int m_ticksPs;
         int m_tick;
         int m_speed;

@@ -48,7 +48,7 @@ RamTable::RamTable( BaseProcessor *processor )
         }
         QFont font = item( 0, 0 )->font();
         font.setBold(true);
-        font.setPointSize( 11 );
+        font.setPointSize( 10 );
         for( int col=0; col<3; col++ ) item( row, col )->setFont( font );
         
         item( row, 1 )->setText("---");
@@ -137,7 +137,7 @@ void RamTable::saveVarSet()
         for( int row=0; row<m_numRegs; row++ )
         {
             QString name = item( row, 0 )->text();
-            out << name.toUpper() << "\n";
+            out << name << "\n";
         }
         QApplication::restoreOverrideCursor();
     }
@@ -150,24 +150,42 @@ void RamTable::updateValues()
     {
         foreach( int _row, watchList.keys() )
         {
+            m_currentRow = _row;
             QString name = watchList[_row];
+            
+            m_processor->updateRamValue( name );
 
-            int value = m_processor->getRamValue( name );
+            //int value = m_processor->getRamValue( name );
 
-            if( value >= 0 )
+            /*if( value >= 0 )
             {
                 item( _row, 1 )->setData( 0, value );
                 item( _row, 2 )->setData( 0, decToBase(value, 2, 8) );
-            }
+            }*/
         }
     }
+}
+
+void RamTable::setItemValue( int col, QString value  )
+{
+    item( m_currentRow, col )->setData( 0, value );
+}
+
+void RamTable::setItemValue( int col, float value  )
+{
+    item( m_currentRow, col )->setData( 0, value );
+}
+
+void RamTable::setItemValue( int col, int value  )
+{
+    item( m_currentRow, col )->setData( 0, value );
 }
 
 void RamTable::addToWatch( QTableWidgetItem *it )
 {
     if( column(it) != 0 ) return;
     int _row = row(it);
-    QString name = it->text().remove(" ").remove("\t").remove("*").toLower();
+    QString name = it->text().remove(" ").remove("\t").remove("*");//.toLower();
 
     if( name.isEmpty() )
     {

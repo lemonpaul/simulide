@@ -26,6 +26,11 @@ int main(int argc, char *argv[])
     //QApplication::setGraphicsSystem( "raster" );//native, raster, opengl
     QApplication app(argc, argv);
     MainWindow window;
+    
+    QRect screenGeometry = QApplication::desktop()->screenGeometry();
+    int x = (screenGeometry.width()-window.width()) / 2;
+    int y = (screenGeometry.height()-window.height()) / 2;
+    window.move(x, y);
 
     window.show();
     return app.exec();

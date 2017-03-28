@@ -13,30 +13,26 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #include "connector.h"
+#include "circuit.h"
 #include "gate.h"
 
 
 Gate::Gate( QObject* parent, QString type, QString id, int inputs )
-       : Component( parent, type, id ), eGate( id.toStdString(), inputs )
-{
-    m_inputPin.resize( m_numInputs );
+       : Component( parent, type, id ), eGate( id.toStdString(), 0 )
+{    
+    setNumInps( inputs );                           // Create Input Pins
     
-    for( int i=0; i<m_numInputs; i++ )
-        m_inputPin[i] = new Pin( 180, QPoint(-16-8,-8*m_numInputs+i*16+8 )
-                          , m_id+"-in"+QString::number(i), i, this );
-    
-    m_outputPin = new Pin( 0, QPoint( 16+8,-8*m_numOutputs+0*16+8 )
+    m_outputPin = new Pin( 0, QPoint( 16+8,-8+0*16+8 )
                           , m_id+"-out", 1, this );
+                          
+    eLogicDevice::createOutput( m_outputPin );
 }
 Gate::~Gate(){
-    for( int i=0; i<m_numInputs; i++ ) delete m_inputPin[i];
-    delete m_outputPin;
 }
 
 void Gate::remove()
@@ -49,46 +45,28 @@ void Gate::remove()
     Component::remove();
 }
 
-void Gate::initialize()
-{
-    // get eNode for each Gate pin and assing to eGate ePins
-    eNode* enod;
-    for( int i=0; i<m_numInputs; i++ )
-    {
-       enod = m_inputPin[i]->getEnode();
-       m_input[i]->getEpin()->setEnode(enod);
-    }
-    
-    enod = m_outputPin->getEnode();
-    m_output[0]->getEpin()->setEnode(enod);
-    
-    eGate::initialize();
-}
-
 void Gate::setNumInps( int inputs )
 {
+    if( inputs == m_numInputs ) return;
     if( inputs < 1 ) return;
-    for( int i=0; i<m_numInputs; i++ ) delete m_inputPin[i];
-        
-    eLogicDevice::setNumInps( inputs );
-    
-    m_inputPin.resize( m_numInputs );
-    
-    for( int i=0; i<m_numInputs; i++ )
-        m_inputPin[i] = new Pin( 180, QPoint(-16-8,-8*m_numInputs+i*16+8 )
-                          , m_id+"-in"+QString::number(i), i, this );
-}
 
-void Gate::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
-{
-    if( m_inverted )
+    for( int i=0; i<m_numInputs; i++ )
     {
-        Component::paint( p, option, widget );
-        QPen pen = p->pen();
-        pen.setWidth(2);
-        p->setPen(pen);
-        QRect rect( 14,-3, 6, 6 );     // Paint and draw circle of inverted pin
-        p->drawEllipse(rect);
+        if( m_inputPin[i]->isConnected() ) m_inputPin[i]->connector()->remove();
+        Circuit::self()->removeItem( m_inputPin[i] );
+        m_inputPin[i]->reset();
+        delete m_inputPin[i];
+    }
+    eLogicDevice::deleteInputs( m_numInputs );
+
+    m_inputPin.resize( inputs );
+
+    for( int i=0; i<inputs; i++ )
+    {
+        m_inputPin[i] = new Pin( 180, QPoint(-16-8,-8*inputs+i*16+8 )
+                               , m_id+"-in"+QString::number(i), i, this );
+
+        eLogicDevice::createInput( m_inputPin[i] );
     }
 }
 

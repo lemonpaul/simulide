@@ -1,7 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2003-2006 by David Saxton                               *
- *   david@bluehaze.org                                                    *
- *                                                                         *
  *   Copyright (C) 2010 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
@@ -16,15 +13,15 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #include <sstream>
+#include <QDebug>
 #include "e-logic_device.h"
 
-eLogicDevice::eLogicDevice( string id )
+eLogicDevice::eLogicDevice( std::string id )
     : eElement( id )
 {
     m_numInputs  = 0;
@@ -38,17 +35,25 @@ eLogicDevice::eLogicDevice( string id )
     m_inputImp = high_imp;
     m_outImp   = 40;
 
-    m_clock = false;
+    m_invInputs = false;
+    m_inverted  = false;
+    m_clockInv  = false;
+    m_clock     = false;
     m_outEnable = true;
-    m_clockPin = 0l;
+    m_inEnable  = true;
+
+    m_clockPin     = 0l;
     m_outEnablePin = 0l;
+    m_inEnablePin  = 0l;
 }
 eLogicDevice::~eLogicDevice()
 {
-    m_output.clear();
-    m_input.clear();
+    foreach( eSource* esource, m_output ) delete esource;
+    foreach( eSource* esource, m_input ) delete esource;
+
     if( m_clockPin )     delete m_clockPin;
     if( m_outEnablePin ) delete m_outEnablePin;
+    if( m_inEnablePin )  delete m_inEnablePin;
 }
 
 void eLogicDevice::initialize()
@@ -56,6 +61,8 @@ void eLogicDevice::initialize()
     // Register for callBack when eNode volt change on clock or OE pins
     if( m_clockPin )
     {
+        m_clock = false;
+        
         eNode* enode = m_clockPin->getEpin()->getEnode();
         if( enode ) enode->addToChangedFast(this);
     }
@@ -64,26 +71,13 @@ void eLogicDevice::initialize()
         eNode* enode = m_outEnablePin->getEpin()->getEnode();
         if( enode ) enode->addToChangedFast(this);
     }
+    if( m_inEnablePin )
+    {
+        eNode* enode = m_inEnablePin->getEpin()->getEnode();
+        if( enode ) enode->addToChangedFast(this);
+    }
     for( int i=0; i<m_numOutputs; i++ )
         eLogicDevice::setOut( i, false );
-}
-
-int eLogicDevice::getClockState()
-{
-    if( !m_clockPin ) return Low;
-
-    int cState = 1;
-    if( m_clock ) cState = 2;
-
-    double volt = m_clockPin->getVolt(); // Clock pin volt.
-
-    if     ( volt > m_inputHighV ) m_clock = true;
-    else if( volt < m_inputLowV )  m_clock = false;
-
-    if( m_clock ) cState++;
-    else          cState--;
-
-    return cState;
 }
 
 bool eLogicDevice::outputEnabled()
@@ -98,14 +92,48 @@ bool eLogicDevice::outputEnabled()
     return m_outEnable;
 }
 
+void eLogicDevice::setOutputEnabled( bool enabled )
+{
+    double imp = 1e28;
+    if( enabled ) imp = m_outImp;
+    
+    for( int i=0; i<m_numOutputs; i++ ) m_output[i]->setImp( imp );
+}
+
+bool eLogicDevice::inputEnabled()
+{
+    if( !m_inEnablePin ) return true;
+
+    double volt = m_inEnablePin->getVolt();
+
+    if     ( volt > m_inputHighV ) m_inEnable = true;   // Active high
+    else if( volt < m_inputLowV )  m_inEnable = false;
+
+    return m_inEnable;
+}
+
 void eLogicDevice::createClockPin()
 {
     std::stringstream sspin;
-    sspin << m_elmId << "clockPin";
+    sspin << m_elmId << "-ePin-clock";
     ePin* epin = new ePin( sspin.str(), 0 );
 
+    createClockeSource( epin );
+}
+
+void eLogicDevice::createClockPin( ePin* epin )
+{
+    std::stringstream sspin;
+    sspin << m_elmId << "-ePin-clock";
+    epin->setId( sspin.str() );
+
+    createClockeSource( epin );
+}
+
+void eLogicDevice::createClockeSource( ePin* epin )
+{
     std::stringstream ssesource;
-    ssesource << m_elmId << "eSourceClock";
+    ssesource << m_elmId << "-eSource-clock";
     m_clockPin = new eSource( ssesource.str(), epin );
     m_clockPin->setImp( m_inputImp );
 }
@@ -113,19 +141,80 @@ void eLogicDevice::createClockPin()
 void eLogicDevice::createOutEnablePin()
 {
     std::stringstream sspin;
-    sspin << m_elmId << "outEnablePin";
+    sspin << m_elmId << "-ePin-outEnable";
     ePin* epin = new ePin( sspin.str(), 0 );
 
+    createOutEnableeSource( epin );
+}
+
+void eLogicDevice::createOutEnablePin( ePin* epin )
+{
+    std::stringstream sspin;
+    sspin << m_elmId << "-ePin-outEnable";
+    epin->setId( sspin.str() );
+
+    createOutEnableeSource( epin );
+}
+
+void eLogicDevice::createOutEnableeSource( ePin* epin )
+{
     std::stringstream ssesource;
-    ssesource << m_elmId << "eSourceOutEnable";
+    ssesource << m_elmId << "-eSource-outEnable";
     m_outEnablePin = new eSource( ssesource.str(), epin );
     m_outEnablePin->setImp( m_inputImp );
+    epin->setInverted( true );
+}
+
+void eLogicDevice::createInEnablePin()
+{
+    std::stringstream sspin;
+    sspin << m_elmId << "-ePin-inputEnable";
+    ePin* epin = new ePin( sspin.str(), 0 );
+
+    createInEnableeSource( epin );
+}
+void eLogicDevice::createInEnablePin( ePin* epin )
+{
+    std::stringstream sspin;
+    sspin << m_elmId << "-ePin-inputEnable";
+    epin->setId( sspin.str() );
+
+    createInEnableeSource( epin );
+}
+
+void eLogicDevice::createInEnableeSource( ePin* epin )
+{
+    std::stringstream ssesource;
+    ssesource << m_elmId << "-eSource-inputEnable";
+    m_inEnablePin = new eSource( ssesource.str(), epin );
+    m_inEnablePin->setImp( m_inputImp );
 }
 
 void eLogicDevice::createPins( int inputs, int outputs )
 {
     setNumInps( inputs );
     setNumOuts( outputs );
+}
+
+void eLogicDevice::createInput( ePin* epin )
+{
+    //qDebug() << "eLogicDevice::createInput"<<QString::fromStdString(m_elmId)<<m_numInputs;
+    int totalInps  = m_numInputs + 1;
+    m_input.resize( totalInps );
+    
+    std::stringstream sspin;
+    sspin << m_elmId << "-ePin-input" << m_numInputs;
+    epin->setId( sspin.str() );
+
+    std::stringstream ssesource;
+    ssesource << m_elmId << "-eSource-input" << m_numInputs;
+    m_input[m_numInputs] = new eSource( ssesource.str(), epin );
+    m_input[m_numInputs]->setImp( m_inputImp );
+
+    m_inputState.resize( totalInps );
+    m_inputState[m_numInputs] = false;
+    
+    m_numInputs = totalInps;
 }
 
 void eLogicDevice::createInputs( int inputs )
@@ -136,16 +225,34 @@ void eLogicDevice::createInputs( int inputs )
     for( int i=m_numInputs; i<totalInps; i++ )
     {
         std::stringstream sspin;
-        sspin << m_elmId << "ePinInput" << i;
+        sspin << m_elmId << "-ePin-input" << i;
         ePin* epin = new ePin( sspin.str(), i );
 
         std::stringstream ssesource;
-        ssesource << m_elmId << "eSourceInput" << i;
+        ssesource << m_elmId << "-eSource-input" << i;
         m_input[i] = new eSource( ssesource.str(), epin );
         m_input[i]->setImp( m_inputImp );
         //m_inputState[i] = false;
     }
     m_numInputs = totalInps;
+}
+
+void eLogicDevice::createOutput( ePin* epin )
+{
+    int totalOuts = m_numOutputs + 1;
+    m_output.resize( totalOuts );
+
+    std::stringstream sspin;
+    sspin << m_elmId << "-ePin-output" << m_numOutputs;
+    epin->setId( sspin.str() );
+
+    std::stringstream ssesource;
+    ssesource << m_elmId << "-eSource-output" << m_numOutputs;
+    m_output[m_numOutputs] = new eSource( ssesource.str(), epin );
+    m_output[m_numOutputs]->setVoltHigh( m_outHighV );
+    m_output[m_numOutputs]->setImp( m_outImp );
+
+    m_numOutputs = totalOuts;
 }
 
 void eLogicDevice::createOutputs( int outputs )
@@ -156,11 +263,11 @@ void eLogicDevice::createOutputs( int outputs )
     for( int i=m_numOutputs; i<totalOuts; i++ )
     {
         std::stringstream sspin;
-        sspin << m_elmId << "ePinOutput" << i;
+        sspin << m_elmId << "-ePin-output" << i;
         ePin* epin = new ePin( sspin.str(), i );
 
         std::stringstream ssesource;
-        ssesource << m_elmId << "eSourceOutput" << i;
+        ssesource << m_elmId << "-eSource-output" << i;
         m_output[i] = new eSource( ssesource.str(), epin );
         m_output[i]->setVoltHigh( m_outHighV );
         m_output[i]->setImp( m_outImp );
@@ -170,16 +277,26 @@ void eLogicDevice::createOutputs( int outputs )
 
 void eLogicDevice::deleteInputs( int inputs )
 {
-    m_numInputs -= inputs;
+    if( m_numInputs-inputs < 0 ) inputs = m_numInputs;
 
-    for( int i=0; i<inputs; i++ ) m_input.pop_back();
+    for( int i=m_numInputs-1; i>m_numInputs-inputs-1; i-- )
+    {
+        delete m_input[i];
+        m_input.pop_back();
+    }
+    m_numInputs -= inputs;
 }
 
 void eLogicDevice::deleteOutputs( int outputs )
 {
-    m_numOutputs -= outputs;
+    if( m_numOutputs-outputs < 0 ) outputs = m_numOutputs;
 
-    for( int i=0; i<outputs; i++ ) m_output.pop_back();
+    for( int i=m_numOutputs-1; i>m_numOutputs-outputs-1; i-- )
+    {
+        delete m_output[i];
+        m_output.pop_back();
+    }
+    m_numOutputs -= outputs;
 }
 
 void eLogicDevice::setNumInps( int inputs )
@@ -242,6 +359,60 @@ void eLogicDevice::setOutImp( double imp )
     }
 }
 
+void eLogicDevice::setInverted( bool inverted )
+{
+    m_inverted = inverted;
+    for( int i=0; i<m_numOutputs; i++ )
+    {
+        m_output[i]->setInverted( inverted );
+    }
+}
+
+void eLogicDevice::setInvertInps( bool invert )
+{
+    m_invInputs = invert;
+    for( int i=0; i<m_numInputs; i++ )
+    {
+        m_input[i]->setInverted( invert );
+    }
+}
+
+int eLogicDevice::getClockState()
+{
+    if( !m_clockPin ) return CLow;
+
+    int cState = 0;
+
+    bool clock = m_clock;
+    double volt = m_clockPin->getVolt(); // Clock pin volt.
+
+    if     ( volt > m_inputHighV ) clock = true;
+    else if( volt < m_inputLowV )  clock = false;
+
+    if( m_clockInv ) clock = !clock;
+
+    if     (!m_clock &&  clock ) cState = 1;
+    else if( m_clock &&  clock ) cState = 2;
+    else if( m_clock && !clock ) cState = 3;
+
+    m_clock = clock;
+
+    return cState;
+}
+
+bool eLogicDevice::getInputState( int input )
+{
+    double volt = m_input[input]->getVolt();
+    bool  state = m_inputState[input];
+
+    if     ( volt > m_inputHighV ) state = true;
+    else if( volt < m_inputLowV )  state = false;
+
+    if( m_input[input]->isInverted() ) state = !state;
+    m_inputState[input] = state;
+    
+    return state;
+}
 /*ePin* eLogicDevice::getEpin( int pin )  // First InPuts, then OutPuts
 {
     //qDebug() << "eLogicDevice::getEpin " << pin;
@@ -252,6 +423,10 @@ void eLogicDevice::setOutImp( double imp )
 ePin* eLogicDevice::getEpin( QString pinName )
 {
     //qDebug() << "eLogicDevice::getEpin" << pinName;
+    if( pinName.contains("inputEnable") )
+    {
+        return m_inEnablePin->getEpin();
+    }
     if( pinName.contains("input") )
     {
         int pin = pinName.remove("input").toInt();
@@ -272,5 +447,6 @@ ePin* eLogicDevice::getEpin( QString pinName )
     {
         return m_outEnablePin->getEpin();
     }
+    
     return eElement::getEpin( pinName );
 }

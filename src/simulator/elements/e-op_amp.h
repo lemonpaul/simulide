@@ -21,14 +21,13 @@
 #define EOPAMP_H
 
 #include "e-element.h"
-#include "e-resistor.h"
 #include "e-source.h"
 
 class eOpAmp : public eElement
 {
     public:
 
-        eOpAmp( string id );
+        eOpAmp( std::string id );
         virtual ~eOpAmp();
 
         virtual void initialize();

@@ -17,6 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QDomDocument>
+
 #include "componentselector.h"
 #include "itemlibrary.h"
 
@@ -34,46 +36,60 @@ ComponentSelector::ComponentSelector( QWidget* parent )
     
     //QWhatsThis::add( this, QString::fromUtf8( gettext("Drag a Component and drop it into the Circuit." ) ) );
 
-    foreach( LibraryItem* libItem, itemLibrary()->items() )
+    LoadLibraryItems();
+
+    LoadCompSet();
+    
+    setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect( this, SIGNAL(customContextMenuRequested(const QPoint&)),
+             this, SLOT  (slotContextMenu(const QPoint&)));
+
+    connect( this, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
+             this, SLOT  (slotItemClicked(QTreeWidgetItem*, int)) );
+}
+ComponentSelector::~ComponentSelector() { }
+
+void ComponentSelector::LoadLibraryItems()
+{
+    QList<LibraryItem*> itemList = itemLibrary()->items();
+    
+    foreach( LibraryItem* libItem, itemList )
     {
-        QString category = libItem->category();
-        if( category != "")
+        //if( !m_loaded.contains(libItem->name()) )
         {
-            QString icon = ":/";
-            icon.append(libItem->iconfile());
-            addItem( libItem->name(), category, icon, libItem->type() );
+            QString category = libItem->category();
+            if( category != "")
+            {
+                QString icon = ":/"+libItem->iconfile();
+                addItem( libItem->name(), category, icon, libItem->type() );
+            }
+            //m_loaded << libItem->name();
         }
     }
+}
 
+void ComponentSelector::LoadCompSet()
+{
     // Load Component sets, located at applicationDirPath/data/*.xml
     QDir compSetDir( qApp->applicationDirPath() );
 
     compSetDir.cd( "data" );
     compSetDir.setNameFilters( QStringList( "*.xml" ) );
 
-    qDebug() << "\n    Loading Component sets at:  "<<compSetDir.absolutePath()<<"\n";
+    qDebug() << "\n    Loading Component sets at:\n"<<compSetDir.absolutePath()<<"\n";
 
     foreach( QString compSetName, compSetDir.entryList( QDir::Files ) )
     {
-        if( compSetName == "pics.xml" )
-        {
-            #ifndef NO_PIC
-            loadXml( compSetDir.absoluteFilePath(compSetName) );
-            qDebug() << "        Loaded Component set:  "<< compSetName;
-            #endif
-        }
-        else
+        //if( !m_loaded.contains(compSetName) )
         {
             loadXml( compSetDir.absoluteFilePath(compSetName) );
+            //m_loaded << compSetName;
             qDebug() << "        Loaded Component set:  "<< compSetName;
         }
     }
     qDebug() << "\n";
-
-    connect( this, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
-             this, SLOT  (slotItemClicked(QTreeWidgetItem*, int)) );
 }
-ComponentSelector::~ComponentSelector() { }
 
 void ComponentSelector::loadXml( const QString &setFile )
 {
@@ -145,10 +161,11 @@ void ComponentSelector::addItem( const QString &caption, const QString &_categor
         QFont font = titulo->font(0);
         font.setPointSize(11);
         font.setWeight(75);
+        titulo->setIcon( 0, QIcon(":/null-0.png") );
         titulo->setFont( 0, font );
         titulo->setText( 0, _category );
-        titulo->setTextColor( 0, QColor( 98, 91, 108 )/*QColor(255, 230, 200)*/ );
-        //titulo->setBackground( 0, QBrush(QColor(75, 75, 130)) );
+        titulo->setTextColor( 0, QColor( 110, 95, 50 )/*QColor(255, 230, 200)*/ );
+        titulo->setBackground( 0, QBrush(QColor(240, 235, 245)) );
         titulo->setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
         addTopLevelItem( titulo );
         titulo->setExpanded(true);
@@ -177,7 +194,7 @@ void ComponentSelector::addItem( const QString &caption, const QString &_categor
     titulo->addChild( item );
 }
 
-void ComponentSelector::mouseReleaseEvent(QMouseEvent *)
+void ComponentSelector::mouseReleaseEvent(QMouseEvent *event)
 {
     setCursor( Qt::OpenHandCursor );
 }
@@ -186,19 +203,114 @@ void ComponentSelector::mouseReleaseEvent(QMouseEvent *)
 void ComponentSelector::slotItemClicked( QTreeWidgetItem *item, int column)
 {
     Q_UNUSED(column);
-
+    
     if (!item) return;
-
-    QMimeData *mimeData = new QMimeData;
+    
     QString type = item->data(0, Qt::UserRole).toString();
+    m_lastItemClicked = type;
+    
+    if( type == "" ) return;
+    
+    QMimeData *mimeData = new QMimeData;
+    
     mimeData->setText( item->text(0) );
     mimeData->setHtml( type );              // esto hay que revisarlo
-
-    if( type=="" ) return;
-
+    
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
 
     drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
 }
+
+void ComponentSelector::slotContextMenu(const QPoint& point)
+{
+    QMenu menu;
+    
+    QAction* uninstallAction = menu.addAction( QIcon(":/fileopen.png"),tr("Uninstall ")+m_lastItemClicked );
+    connect( uninstallAction, SIGNAL(triggered()), this, SLOT(slotUnistallItem()) );
+    
+    QAction* installAction = menu.addAction( QIcon(":/fileopen.png"),tr("Install New Component") );
+    connect( installAction, SIGNAL(triggered()), this, SLOT(slotIstallItem()) );
+
+    //menu->addSeparator();
+    
+    menu.exec(mapToGlobal(point));
+}
+
+void ComponentSelector::slotUnistallItem()
+{
+    qDebug() << "slotUnistallItem"<<m_lastItemClicked;
+    qDebug() << "data/plugins/"+m_lastItemClicked.toUpper()+"uninstall";
+    
+    QFile fIn( "data/plugins/"+m_lastItemClicked.toUpper()+"uninstall" );
+    if( fIn.open( QFile::ReadOnly | QFile::Text ) ) 
+    {
+        QTextStream sIn(&fIn);
+        while (!sIn.atEnd())
+        {
+            QFile file( sIn.readLine() );
+            file.remove();
+        }
+        fIn.close();
+        fIn.remove();
+        clear();
+        m_categories.clear();
+        itemLibrary()->loadItems();
+        itemLibrary()->loadPlugins();
+        LoadLibraryItems();
+        LoadCompSet();
+    } 
+    else 
+    { 
+        qDebug() << "ComponentSelector::slotUnistallItem:\n Error Opening Output File\n"; 
+        qDebug()<<fIn.errorString();
+    }
+    
+}
+
+void ComponentSelector::slotIstallItem()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"),
+                                             "plugins",
+                                             QFileDialog::ShowDirsOnly
+                                           | QFileDialog::DontResolveSymlinks
+                                           | QFileDialog::HideNameFilterDetails );
+
+    QString dir2 = dir;
+    QFile fOut("data/plugins/"+dir2.remove("plugin").split("/").last().toUpper()+"uninstall");
+    if( fOut.open( QFile::WriteOnly | QFile::Text ) ) 
+    {
+        QTextStream fileList(&fOut);
+    
+        QDirIterator it(dir, QDirIterator::Subdirectories);
+        while(it.hasNext()) 
+        {
+            QString origFile = it.next();
+            if( it.fileInfo().isFile() )
+            {
+                QString destFile = origFile;
+                destFile = destFile.remove(dir+"/");
+                
+                QFileInfo fi( destFile );
+                QDir destDir = fi.dir();
+
+                destDir.mkpath( destDir.absolutePath() );
+                
+                QFile::copy( origFile, destFile );
+                
+                fileList << destFile << '\n';
+                //qDebug() << destFile;
+            }
+        }
+        fOut.close();
+        clear();
+        m_categories.clear();
+        itemLibrary()->loadItems();
+        itemLibrary()->loadPlugins();
+        LoadLibraryItems();
+        LoadCompSet();
+    }
+    else { qDebug() << "ComponentSelector::slotIstallItem:\n Error Opening Output File\n"; }
+}
+
 #include "moc_componentselector.cpp"

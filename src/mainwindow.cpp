@@ -18,16 +18,20 @@
  ***************************************************************************/
 
 #include "mainwindow.h"
-#include "component.h"
 #include "circuit.h"
 #include "utils.h"
 
 MainWindow *MainWindow::m_pSelf = 0l;
 
 MainWindow::MainWindow()
+          : QMainWindow()
+          , m_settings( "SimulIDE", "SimulIDE-0.0.4" )
 {
+    setWindowIcon( QIcon(":/simulide.png") );
     m_pSelf   = this;
     m_circuit = 0l;
+    m_version = "SimulIDE-0.0.4";
+    
 
     createActions();
     createWidgets();
@@ -39,39 +43,36 @@ MainWindow::MainWindow()
     if( m_lastCircDir.isEmpty() )  m_lastCircDir = appPath + "/examples/Arduino/Voltimeter/voltimeter.simu";
 
     //if( m_curCirc != "" ) Circuit::self()->loadCircuit( m_curCirc );
-    this->setWindowTitle("SimulIDE 0.0.3");
+    
+    this->setWindowTitle(m_version);
 }
 MainWindow::~MainWindow(){ }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    newCircuit();
     writeSettings();
     event->accept();
 }
 
 void MainWindow::readSettings()
 {
-    QSettings                settings( "PicLinux", "SimulIDE_0.0.3" );
-    restoreGeometry(         settings.value("geometry" ).toByteArray());
-    restoreState(            settings.value("windowState" ).toByteArray());
-    splitter3->restoreState( settings.value("splitter3/geometry" ).toByteArray());
-    splitter5->restoreState( settings.value("splitter5/geometry").toByteArray());
-    m_docList    =           settings.value( "lastDocs" ).toStringList();
-    m_lastCircDir =          settings.value( "lastCircDir" ).toString();
-    //m_curCirc =              settings.value( "currentCircuit" ).toString();
+    restoreGeometry(         m_settings.value("geometry" ).toByteArray());
+    restoreState(            m_settings.value("windowState" ).toByteArray());
+    m_Centralsplitter->restoreState( m_settings.value("Centralsplitter/geometry").toByteArray());
+    m_docList    =           m_settings.value( "lastDocs" ).toStringList();
+    m_lastCircDir =          m_settings.value( "lastCircDir" ).toString();
+    //m_curCirc =              m_settings.value( "currentCircuit" ).toString();
 }
 
 void MainWindow::writeSettings()
 {
-    // $HOME/.config/PicLinux/simulide.conf
-    QSettings settings("PicLinux", "SimulIDE_0.0.3");
-    settings.setValue( "geometry", saveGeometry() );
-    settings.setValue( "windowState", saveState() );
-    settings.setValue( "splitter3/geometry", splitter3->saveState() );
-    settings.setValue( "splitter5/geometry", splitter5->saveState() );
-    settings.setValue( "lastDocs", m_docList );
-    settings.setValue( "lastCircDir", m_lastCircDir );
-    //settings.setValue( "currentCircuit", m_curCirc );
+    m_settings.setValue( "geometry", saveGeometry() );
+    m_settings.setValue( "windowState", saveState() );
+    m_settings.setValue( "Centralsplitter/geometry", m_Centralsplitter->saveState() );
+    m_settings.setValue( "lastDocs", m_docList );
+    m_settings.setValue( "lastCircDir", m_lastCircDir );
+    //m_settings.setValue( "currentCircuit", m_curCirc );
 }
 
 void MainWindow::newCircuit()
@@ -81,7 +82,7 @@ void MainWindow::newCircuit()
     m_circuit->clear();
     m_curCirc = "";
     
-    this->setWindowTitle("SimulIDE 0.0.3  -  New Circuit");
+    this->setWindowTitle(m_version+"  -  New Circuit");
 }
 
 void MainWindow::openCirc()
@@ -97,7 +98,7 @@ void MainWindow::openCirc()
    
         m_curCirc = fileName;
         m_lastCircDir = fileName;
-        this->setWindowTitle("SimulIDE 0.0.3  -  "+fileName.split("/").last());
+        this->setWindowTitle(m_version+"  -  "+fileName.split("/").last());
     }
 }
 
@@ -110,7 +111,7 @@ void MainWindow::saveCirc()
     if( saved ) 
     {
         QString fileName = m_curCirc;
-        this->setWindowTitle("SimulIDE 0.0.3  -  "+fileName.split("/").last());
+        this->setWindowTitle(m_version+"  -  "+fileName.split("/").last());
     }
 }
 
@@ -128,7 +129,7 @@ bool MainWindow::saveCircAs()
     if( saved ) 
     {
         QString fileName = m_curCirc;
-        this->setWindowTitle("SimulIDE 0.0.3  -  "+fileName.split("/").last());
+        this->setWindowTitle(m_version+"  -  "+fileName.split("/").last());
     }
     return saved;
 }
@@ -147,7 +148,7 @@ void MainWindow::powerCircOn()
 }
 void MainWindow::powerCircOff()
 {
-    if( Simulator::self()->isRunning() )
+    //if( Simulator::self()->isRunning() )
     {
         powerCircAct->setIcon(QIcon(":/poweroff.png"));
         powerCircAct->setIconText("Off");
@@ -181,56 +182,56 @@ void MainWindow::createWidgets()
     baseWidgetLayout->setContentsMargins(0, 0, 0, 0);
     baseWidgetLayout->setObjectName("gridLayout");
 
-    splitter5 = new QSplitter( this );
-    splitter5->setObjectName("splitter5");
-    splitter5->setOrientation( Qt::Horizontal );
+    m_Centralsplitter = new QSplitter( this );
+    m_Centralsplitter->setObjectName("Centralsplitter");
+    m_Centralsplitter->setOrientation( Qt::Horizontal );
 
-    sidepanel = new QTabWidget( this );
-    sidepanel->setObjectName("sidepanel");
-    sidepanel->setTabPosition( QTabWidget::West );
-    splitter5->addWidget( sidepanel );
+    m_sidepanel = new QTabWidget( this );
+    m_sidepanel->setObjectName("sidepanel");
+    m_sidepanel->setTabPosition( QTabWidget::West );
+    m_Centralsplitter->addWidget( m_sidepanel );
 
-    components = new ComponentSelector( sidepanel );
+    components = new ComponentSelector( m_sidepanel );
     components->setObjectName(QString::fromUtf8("components"));
-    sidepanel->addTab( components, QString::fromUtf8("Components") );
+    m_sidepanel->addTab( components, QString::fromUtf8("Components") );
 
-    QWidget *ramTabWidget = new QWidget( this );
-    ramTabWidget->setObjectName("ramTabWidget");
-    ramTabWidgetLayout = new QGridLayout( ramTabWidget );
-    ramTabWidgetLayout->setSpacing(0);
-    ramTabWidgetLayout->setContentsMargins(0, 0, 0, 0);
-    ramTabWidgetLayout->setObjectName("ramTabWidgetLayout");
-    sidepanel->addTab( ramTabWidget, tr("RamTable")  );
+    m_ramTabWidget = new QWidget( this );
+    m_ramTabWidget->setObjectName("ramTabWidget");
+    m_ramTabWidgetLayout = new QGridLayout( m_ramTabWidget );
+    m_ramTabWidgetLayout->setSpacing(0);
+    m_ramTabWidgetLayout->setContentsMargins(0, 0, 0, 0);
+    m_ramTabWidgetLayout->setObjectName("ramTabWidgetLayout");
+    m_sidepanel->addTab( m_ramTabWidget, tr("RamTable")  );
 
-    itemprop = new QPropertyEditorWidget( this );
-    itemprop->setObjectName(QString::fromUtf8("properties"));
-    sidepanel->addTab( itemprop, QString::fromUtf8("Properties") );
+    m_itemprop = new QPropertyEditorWidget( this );
+    m_itemprop->setObjectName(QString::fromUtf8("properties"));
+    m_sidepanel->addTab( m_itemprop, QString::fromUtf8("Properties") );
 
-    circToolBar = new QToolBar( this );
-    m_circuit = new CircuitWidget( this, circToolBar );
+    m_circToolBar = new QToolBar( this );
+    m_circuit = new CircuitWidget( this, m_circToolBar );
     m_circuit->setObjectName(QString::fromUtf8("circuit"));
-    splitter5->addWidget( m_circuit );
+    m_Centralsplitter->addWidget( m_circuit );
 
-    splitter3 = new QSplitter( this );      //Editor doc+outmsg
-    splitter3->setObjectName("splitter3");
-    splitter3->setOrientation( Qt::Vertical );
-    splitter5->addWidget( splitter3 );
-
+    //m_editorWindow = new EditorWindow( this );
+    //m_Centralsplitter->addWidget( m_editorWindow );
+    
     m_rateLabel = new QLabel( this );
-    m_rateLabel->setText( "Real Speed: 0 Hz" );
+    m_rateLabel->setText( "Real Speed: 0 %" );
 
-    baseWidgetLayout->addWidget( splitter5, 0, 0 );
+    baseWidgetLayout->addWidget( m_Centralsplitter, 0, 0 );
 
     QList<int> sizes;
     sizes << 150 << 350 << 500;
-    splitter5->setSizes( sizes );
+    m_Centralsplitter->setSizes( sizes );
 
     sizes.clear();
     sizes << 700 << 150;
-    splitter3->setSizes( sizes );
+    //splitter3->setSizes( sizes );
 
     this->showMaximized();
+
 }
+
 
 void MainWindow::createActions()
 {
@@ -261,15 +262,15 @@ void MainWindow::createActions()
 
 void MainWindow::createToolBars()
 {
-    circToolBar->setObjectName("circToolBar");
-    circToolBar->addAction(newCircAct);
-    circToolBar->addAction(openCircAct);
-    circToolBar->addAction(saveCircAct);
-    circToolBar->addAction(saveCircAsAct);
-    circToolBar->addSeparator();//..........................
-    circToolBar->addAction(powerCircAct);
-    circToolBar->addSeparator();//..........................
-    circToolBar->addWidget( m_rateLabel );
+    m_circToolBar->setObjectName("m_circToolBar");
+    m_circToolBar->addAction(newCircAct);
+    m_circToolBar->addAction(openCircAct);
+    m_circToolBar->addAction(saveCircAct);
+    m_circToolBar->addAction(saveCircAsAct);
+    m_circToolBar->addSeparator();//..........................
+    m_circToolBar->addAction(powerCircAct);
+    m_circToolBar->addSeparator();//..........................
+    m_circToolBar->addWidget( m_rateLabel );
 }
 
 void MainWindow::applyStile()

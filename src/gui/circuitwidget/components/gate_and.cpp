@@ -30,7 +30,7 @@ LibraryItem* AndGate::libraryItem()
 {
     return new LibraryItem(
         tr( "And Gate" ),
-        tr( "Gates" ),
+        tr( "Logic" ),
         "andgate.png",
         "And Gate",
         AndGate::construct );
@@ -51,8 +51,6 @@ void AndGate::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     p->setPen(pen);
 
     p->drawChord( -48, boundingRect().y(), 64, boundingRect().height(), -1440/*-16*90*/, 2880/*16*180*/ );
-    
-    Gate::paint( p, option, widget );            // draw inverted circle
 }
 
 #include "moc_gate_and.cpp"

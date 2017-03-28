@@ -36,7 +36,7 @@ class VoltSource : public Component, public eElement
     Q_PROPERTY( bool    Show_Volt READ showVal WRITE setShowVal DESIGNABLE true USER true )
 
     public:
-        QRectF boundingRect() const { return QRect( -42, -66, 52, 76 ); }
+        QRectF boundingRect() const { return QRect( -44, -68, 56, 80 ); }
 
         VoltSource( QObject* parent, QString type, QString id );
         ~VoltSource();

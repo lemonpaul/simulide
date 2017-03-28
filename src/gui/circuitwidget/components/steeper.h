@@ -55,6 +55,9 @@ class Steeper : public Component, public eElement
         void updateStep();
         
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
+        
+    public slots:
+        virtual void remove();
 
     protected:
         int m_steps;

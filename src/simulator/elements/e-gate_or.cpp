@@ -23,7 +23,7 @@
 
 #include "e-gate_or.h"
 
-eOrGate::eOrGate( string id, int inputs ) : eGate( id, inputs ) {}
+eOrGate::eOrGate( std::string id, int inputs ) : eGate( id, inputs ) {}
 eOrGate::~eOrGate(){}
 
 bool eOrGate::calcOutput( int inputs )

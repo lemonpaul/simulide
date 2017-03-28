@@ -1,9 +1,0 @@
-<!DOCTYPE SimulIDE>
-
-<itemlib>
-    <itemset category="PIC" type="PIC">
-
-    <item name="pic16f876" package="pic/pic16f876" device="pic16f876" ></item>
-
-    </itemset>
-</itemlib>

@@ -29,8 +29,6 @@ class LedSmd : public LedBase
     Q_OBJECT
 
     public:
-        //QRectF boundingRect() const { return m_area; }
-
         LedSmd( QObject* parent, QString type, QString id, QRectF area );
         ~LedSmd();
 

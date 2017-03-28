@@ -17,21 +17,14 @@
  *                                                                         *
  ***************************************************************************/
 
-//#include <qstringlist.h>
-
 #include "package.h"
 #include "pin.h"
 #include "connector.h"
-#include "mainwindow.h"
-
-#include "e-resistor.h"
+#include <QDomDocument>
 
 Package::Package( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eElement( id.toStdString() )
 {
-    //m_labelx = -38;
-    //m_labely = -137;
-
     m_color = QColor( 50, 50, 70 );
 }
 Package::~Package() {}
@@ -44,7 +37,8 @@ void Package::initPackage()
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
           QMessageBox::warning(0, "Package::initPackage",
-          tr("Cannot read file %1:\n%2.").arg(m_dataFile).arg(file.errorString()));
+          tr("Cannot read file:\n%1:\n%2.").arg(m_dataFile).arg(file.errorString()));
+          m_error = 1;
           return;
     }
 
@@ -52,8 +46,9 @@ void Package::initPackage()
     if( !domDoc.setContent(&file) )
     {
          QMessageBox::warning(0, "Package::initPackage",
-         tr("Cannot set file %1\nto DomDocument") .arg(m_dataFile));
+         tr("Cannot set file:\n%1\nto DomDocument") .arg(m_dataFile));
          file.close();
+         m_error = 1;
          return;
     }
     file.close();
@@ -62,7 +57,9 @@ void Package::initPackage()
 
     if( root.tagName()!="package" )
     {
-        qDebug() << " Package::initPackage Error reading Package file: " << m_dataFile;
+        QMessageBox::warning(0, "Package::initPackage",
+         tr("Error reading Package file:\n%1\nNo valid Package") .arg(m_dataFile));
+        m_error = 1;
         return;
     }
 
@@ -72,7 +69,9 @@ void Package::initPackage()
     m_ePin.resize( m_numpins );
 
     m_area = QRect( 0, 0, 8*width, 8*height );
-    m_idLabel->setPos( m_area.x(), m_area.y()-20);
+    //setTransformOriginPoint( boundingRect().center() );
+    setLabelPos( m_area.x(), m_area.y()-20, 0);
+    setShowId( true );
 
     QDomNode node = root.firstChild();
 

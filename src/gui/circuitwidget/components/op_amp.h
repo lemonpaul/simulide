@@ -45,7 +45,6 @@ class OpAmp : public Component, public eOpAmp
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
         
     public slots:
-        void remove();
 };
 
 

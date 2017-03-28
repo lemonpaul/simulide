@@ -28,8 +28,8 @@ OscopeWidget::OscopeWidget(  QWidget *parent  )
 
     this->setVisible( false );
 
-    setMaximumSize(QSize(256, 200));
-    setMinimumSize(QSize(256, 200));
+    setMaximumSize(QSize(300, 200));
+    setMinimumSize(QSize(300, 200));
 
     setupWidget();
 
@@ -55,6 +55,12 @@ void OscopeWidget::setProbe( Probe* probe )
     m_probe = probe;
 }
 
+void OscopeWidget::clear()
+{
+    for( int i=0; i<140; i++ ) m_data[i] = 160;
+    m_rArea->setData( m_data );
+}
+
 void OscopeWidget::step()
 {
     if( m_counter < 140 ) 
@@ -67,6 +73,7 @@ void OscopeWidget::step()
     m_rArea->setTick( m_speed );
     m_rArea->setData( m_data );
     newReading = true;
+    m_newReadCount = 0;
     m_counter = 0;
 }
 
@@ -116,13 +123,17 @@ static int offset;
             up = true;
             lastData = data;
         }
-        else if( (data-lastData)<-0.2 )
+        else if( (data-lastData) < -0.2 )
         {
             down = true;
             lastData = data;
         }
 
-        
+        if( ++m_newReadCount == 100000 )  // No reading: Clear Screen
+        {
+           m_newReadCount = 0;
+           clear();
+        }
         return;
     }
     if( offset < m_offset )

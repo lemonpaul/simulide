@@ -23,7 +23,7 @@
 
 #include "e-gate_xor.h"
 
-eXorGate::eXorGate( string id, int inputs ) : eGate( id, inputs ) {}
+eXorGate::eXorGate( std::string id, int inputs ) : eGate( id, inputs ) {}
 eXorGate::~eXorGate(){}
 
 bool eXorGate::calcOutput( int inputs )

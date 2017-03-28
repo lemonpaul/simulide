@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "mcucomponentpin.h"
-#include "mcucomponent.h"
 
 
 McuComponentPin::McuComponentPin( McuComponent *mcuComponent, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
@@ -28,6 +27,8 @@ McuComponentPin::McuComponentPin( McuComponent *mcuComponent, QString id, QStrin
     m_Rth  = high_imp;
     m_Vth  = cero_doub;
     m_type = type;
+    m_pinType = 0;
+    m_angle = angle;
     m_mcuComponent = mcuComponent;
     
     m_attached = false;
@@ -54,7 +55,13 @@ void McuComponentPin::terminate()
 
 void McuComponentPin::initialize()
 {
-    if( m_ePin[0]->isConnected() && m_attached /*&& m_imp==high_imp*/)
+    if( m_pinType == 1 )
+    {
+        //eSource::setImp( high_imp );// All  IO Pins should be inputs at start-up
+        eSource::setOut(false);
+    }
+    
+    if( m_ePin[0]->isConnected() && m_attached )
         m_ePin[0]->getEnode()->addToChangedFast(this);
 
     eSource::initialize();

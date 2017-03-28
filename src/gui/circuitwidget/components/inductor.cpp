@@ -45,7 +45,7 @@ Inductor::Inductor( QObject* parent, QString type, QString id )
     m_area = QRectF( -10, -10, 20, 20 );
 
     QString nodid = m_id;
-    nodid.append(QString("lnod"));
+    nodid.append(QString("-lPin"));
     QPoint nodpos = QPoint(-16-8,0);
     Pin* pin = new Pin( 180, nodpos, nodid, 0, this);
     pin->setLength(4.5);
@@ -53,7 +53,7 @@ Inductor::Inductor( QObject* parent, QString type, QString id )
     m_ePin[0] = pin;
 
     nodid = m_id;
-    nodid.append(QString("rnod"));
+    nodid.append(QString("-rPin"));
     nodpos = QPoint(16+8,0);
     pin = new Pin( 0, nodpos, nodid, 1, this);
     pin->setLength(4.5);
@@ -62,17 +62,17 @@ Inductor::Inductor( QObject* parent, QString type, QString id )
     
     m_unit = "H";
     setInduc( m_ind );
-    m_valLabel->setPos(-16, 6);
+    setValLabelPos(-16, 6, 0);
     setShowVal( true );
 
-    m_idLabel->setPos(-16,-24);
+    setLabelPos(-16,-24, 0);
 }
 Inductor::~Inductor(){}
 
 double Inductor::induc() { return m_value; }
 
 void Inductor::setInduc( double i ) 
-{ 
+{     
     Component::setValue( i );       // Takes care about units multiplier
     eInductor::setInd( m_value*m_unitMult );
 }

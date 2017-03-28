@@ -20,17 +20,18 @@
 #ifndef AVRCOMPONENTPIN_H
 #define AVRCOMPONENTPIN_H
 
-#include <qstring.h>
 #include <stdint.h>
 
 #include "mcucomponentpin.h"
 
+//simavr includes
 #include "sim_avr.h"
-#include "avr_ioport.h"
 #include "sim_irq.h"
-//#include "avr_adc.h"
+#include "sim_io.h"
+#include "avr_adc.h"
+#include "avr_ioport.h"
+#include "avr_timer.h"
 
-//class AVRComponent;
 
 class AVRComponentPin : public McuComponentPin
 {
@@ -62,17 +63,7 @@ class AVRComponentPin : public McuComponentPin
             ptrAVRComponentPin->set_pinImpedance(value);
         }
 
-        static void adc_hook( struct avr_irq_t* irq, uint32_t value, void* param )
-        {
-            Q_UNUSED(irq);
-            // get the pointer out of param and asign it to AVRComponentPin*
-            AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
-
-            int channel = int( value/524288 );
-            ptrAVRComponentPin->adcread( channel );
-        }
-
-        void adcread( int channel );
+        void adcread();
         void resetOutput();
 
         void setVChanged();
@@ -81,15 +72,16 @@ class AVRComponentPin : public McuComponentPin
         char m_port;
         int  m_pinN;
         int  m_channel;
-
-        const QString m_esp;
+        
+        int  m_prevVolt;
 
         //from simavr
         //AVRComponent       *m_pAVRComponent;
         avr_ioport_state_t  m_avrPin;
-        avr_t              *m_AvrProcessor;
-        avr_irq_t          *m_Write_stat_irq;
-        //avr_irq_t          *m_Write_adc_irq;
+        
+        avr_t*     m_AvrProcessor;
+        avr_irq_t* m_Write_stat_irq;
+        avr_irq_t* m_Write_adc_irq;
 };
 
 #endif

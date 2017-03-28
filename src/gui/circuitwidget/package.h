@@ -20,10 +20,8 @@
 #ifndef PACKAGE_H
 #define PACKAGE_H
 
-#include <QtWidgets>
-
 #include "component.h"
-#include "e-source.h"
+#include "e-element.h"
 
 
 class Package : public Component, public eElement
@@ -50,7 +48,6 @@ class Package : public Component, public eElement
         virtual void initPackage();
 
         int   m_numpins;
-        //QList<eSource*> m_pinList;
 
         QString m_dataFile;     // file containig package defs
 };

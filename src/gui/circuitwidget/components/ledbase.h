@@ -21,33 +21,38 @@
 #define LEDBASE_H
 
 #include "e-led.h"
+#include "e-source.h"
+#include "component.h"
 
 class LedBase : public Component, public eLed
 {
     Q_OBJECT
     Q_PROPERTY( double threshold  READ threshold  WRITE setThreshold  DESIGNABLE true USER true )
     Q_PROPERTY( double MaxCurrent READ maxCurrent WRITE setMaxCurrent DESIGNABLE true USER true )
+    Q_PROPERTY( double Resistance READ res        WRITE setRes        DESIGNABLE true USER true )
+    Q_PROPERTY( bool   Grounded   READ grounded   WRITE setGrounded   DESIGNABLE true USER true )
 
     public:
         LedBase( QObject* parent, QString type, QString id );
         ~LedBase();
 
         void updateStep();
-
-        double threshold()                     { return eLed::threshold(); }
-        void  setThreshold( double threshold ) { eLed::setThreshold( threshold );}
-
-        double maxCurrent()                   { return eLed::maxCurrent(); }
-        void  setMaxCurrent( double current ) { eLed::setMaxCurrent( current ); }
+        
+        bool grounded();
+        void setGrounded( bool grounded );
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
-        void remove();
+        virtual void remove();
 
     protected:
         virtual void drawBackground( QPainter *p )=0;
         virtual void drawForeground( QPainter *p )=0;
+        
+        bool     m_grounded;
+        eSource* m_ground;
+        eNode*   m_scrEnode;
 };
 
 #endif

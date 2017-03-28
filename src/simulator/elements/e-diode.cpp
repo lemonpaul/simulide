@@ -17,13 +17,16 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QDebug>
+
 #include "e-diode.h"
+#include "e-node.h"
 
-
-eDiode::eDiode( string id ) : eResistor(id )
+eDiode::eDiode( std::string id ) : eResistor(id )
 {
     m_imped = 0.6;
     m_threshold = 0.7;
+    m_zenerV = 0;
     m_resist = high_imp;
 }
 eDiode::~eDiode()
@@ -32,6 +35,12 @@ eDiode::~eDiode()
 
 void eDiode::initialize()
 {
+    m_resist = high_imp;
+    m_converged = true;
+    m_voltPN  = 0;
+    m_deltaV  = 0;
+    m_current = 0;
+
     if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToNoLinList(this);
     if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToNoLinList(this);
     eResistor::initialize();
@@ -39,25 +48,31 @@ void eDiode::initialize()
 
 void eDiode::setVChanged()
 {
-    m_voltPN = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();;
+    m_voltPN = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
+    m_converged = true;
+    
+    //if( abs(m_voltPN) < 1e-9 ) m_voltPN = 0;
 
     double deltaR = m_imped;
     double deltaV = m_threshold;
-    
-    if( m_voltPN < m_threshold )   // No conduce
+
+    if( m_voltPN <= m_threshold )   // Not conducing
     {
-        deltaV = m_voltPN;
-        //double delta = (m_threshold-m_voltPN)*50;
-        //deltaR = m_imped+pow(delta,3); 
-        deltaR = high_imp;
-        //if( deltaR < m_imped ) detaR = m_imped;
+        if( (m_zenerV > 0)&(m_voltPN <-m_zenerV) ) 
+            deltaV =-m_zenerV;
+        else                        
+        {
+            deltaV = 0;//cero_doub;//m_voltPN;
+            deltaR = high_imp;
+        }
     }
-    //qDebug() <<"eDiode::setVChanged,  deltaR: "<< deltaR << "  deltaV" <<deltaV;
+    //qDebug() <<"eDiode::setVChanged,  deltaR: "<< deltaR << "  deltaV" << deltaV << "m_voltPN" << m_voltPN ;
 
     if( deltaR != m_resist )
     {
         m_resist = deltaR;
         eResistor::stamp();
+        m_converged = false;
     }
     if( deltaV != m_deltaV )
     {
@@ -75,18 +90,41 @@ void eDiode::setThreshold( double threshold )
     m_threshold = threshold;
 }
 
+double eDiode::res()
+{
+    return m_imped;
+}
+
 void eDiode::setRes( double resist )
 {
+    if( resist == 0 ) resist = 0.6;
     m_imped = resist;
+}
+
+void  eDiode::setZenerV( double zenerV ) 
+{ 
+    if( zenerV > 0 ) m_zenerV = zenerV; 
+    else             m_zenerV = 0;
+    setResSafe( m_resist );
 }
 
 void eDiode::updateVI()
 {
-    double volt = m_voltPN - m_deltaV;
-    if( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() && volt>0 )
+    if( !m_converged ) return;
+
+    if( m_resist == high_imp ) 
     {
-        m_current = volt/m_resist;
-        //qDebug() << " current " <<m_current<<volt<<m_deltaV;
+        m_current = 0;
+        return;
+    }
+    if( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() )
+    {
+        double volt = m_voltPN - m_deltaV;
+        if( volt>0 )
+        {
+            m_current = volt/m_resist;
+            //qDebug() << " current " <<m_current<<volt<<m_deltaV;
+        }
     }
     else m_current = 0;
 }

@@ -19,45 +19,47 @@
 
 #include "component.h"
 #include "connector.h"
+#include "circuit.h"
 #include "utils.h"
+
+int Component::m_error = 0;
 
 Component::Component( QObject* parent , QString type, QString id )
     : QObject(parent), QGraphicsItem()
     ,multUnits( "TGMk munp" )
 {
-    setObjectName( id );
     //setCacheMode(QGraphicsItem::DeviceCoordinateCache);
     
     m_unitMult = 1;
-    m_mult     = " ";
-    m_unit     = " ";
-    m_type     = type;
-    m_color    = QColor( Qt::white );
-    m_showId   = false;
-    m_id       = id;
+    m_Hflip  = 1;
+    m_Vflip  = 1;
+    m_mult   = " ";
+    m_unit   = " ";
+    m_type   = type;
+    m_color  = QColor( Qt::white );
+    m_showId = false;
     
     m_idLabel = new Label( this );
     m_idLabel->setDefaultTextColor( Qt::darkBlue );
-    m_idLabel->m_labelx   = -16;
-    m_idLabel->m_labely   = -24;
-    m_idLabel->m_labelrot = 0;
-    m_idLabel->setLabelPos();
+    setLabelPos(-16,-24, 0);
     setShowId( false );
     
     m_valLabel = new Label( this );
     m_valLabel->setDefaultTextColor( Qt::black );
-    m_valLabel->m_labelx   = 0;
-    m_valLabel->m_labely   = 0;
-    m_valLabel->m_labelrot = 0;
-    m_valLabel->setLabelPos();
+    setValLabelPos( 0, 0, 0);
     QFont f;
     f.setPointSize(9);
     m_valLabel->setFont(f);
     setShowVal( false );
+    
+    setObjectName( id );
+    setId(id);
 
-    setToolTip( QString("Left-Click and Move this Component \nRight-Click for Context Menu \nSelect and change properties in Right Panel") );
+    //setToolTip( QString("Left-Click and Move this Component \nRight-Click for Context Menu \nSelect and change properties in Right Panel") );
     setCursor(Qt::OpenHandCursor);
     this->setFlag( QGraphicsItem::ItemIsSelectable, true );
+    
+    setTransformOriginPoint( boundingRect().center() );
 
     if( type == "Connector" ) Circuit::self()->conList()->append( this );
     else                      Circuit::self()->compList()->prepend( this );
@@ -103,14 +105,16 @@ void Component::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     {
         QPointF delta = togrid(event->scenePos()) - togrid(event->lastScenePos());
 
-        QGraphicsItem* item;
-        foreach( item , itemlist )
+        foreach( QGraphicsItem* item , itemlist )
         {
             ConnectorLine* line =  qgraphicsitem_cast<ConnectorLine* >( item );
-            if( line->objectName() == "" )  line->move( delta ); //qDebug () <<line->objectName();
 
-            Component* comp =  qgraphicsitem_cast<Component* >( item );
-            if( comp ) comp->move( delta );
+            if( line->objectName() == "" )  line->move( delta ); //qDebug () <<line->objectName();
+            else
+            {
+                Component* comp =  qgraphicsitem_cast<Component* >( item );
+                if( comp ) comp->move( delta );
+            }
         }
     }
 }
@@ -138,8 +142,14 @@ void Component::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
 void Component::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu )
 {
+    m_eventpoint = mapToScene( togrid(event->pos()) );
+
+    QAction* copyAction = menu->addAction(QIcon(":/copy.png"),"Copy");
+    connect( copyAction, SIGNAL( triggered()), this, SLOT(slotCopy()) );
+
     QAction* removeAction = menu->addAction( QIcon( ":/remove.png"),"Remove" );
     connect( removeAction, SIGNAL( triggered()), this, SLOT(slotRemove()) );
+    menu->addSeparator();
 
     QAction* rotateCWAction = menu->addAction( QIcon( ":/rotateCW.png"),"Rotate CW" );
     connect( rotateCWAction, SIGNAL( triggered()), this, SLOT(rotateCW()));
@@ -147,44 +157,79 @@ void Component::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu 
     QAction* rotateCCWAction = menu->addAction(QIcon( ":/rotateCCW.png"),"Rotate CCW" );
     connect( rotateCCWAction, SIGNAL( triggered()), this, SLOT(rotateCCW()) );
 
-    QAction* rotateHalfAction = menu->addAction(QIcon(":/rotateCCW.png"),"Rotate 180");
+    QAction* rotateHalfAction = menu->addAction(QIcon(":/rotate180.png"),"Rotate 180");
     connect( rotateHalfAction, SIGNAL( triggered()), this, SLOT(rotateHalf()) );
+    
+    QAction* H_flipAction = menu->addAction(QIcon(":/hflip.png"),"Horizontal Flip");
+    connect( H_flipAction, SIGNAL( triggered()), this, SLOT(H_flip()) );
+    
+    QAction* V_flipAction = menu->addAction(QIcon(":/vflip.png"),"Vertical Flip");
+    connect( V_flipAction, SIGNAL( triggered()), this, SLOT(V_flip2()) );
 
     menu->exec(event->screenPos());
 }
 
+void Component::slotCopy()
+{
+    setSelected( true );
+    Circuit::self()->copy( m_eventpoint );
+}
+
 void Component::slotRemove()
 {
+    if( !isSelected() ) Circuit::self()->clearSelection();
     setSelected( true );
     Circuit::self()->removeItems();
 }
 
 void Component::remove()
 {
+    for( uint i=0; i<m_pin.size(); i++ )               // Remove connectors attached
+        if( m_pin[i]->isConnected() ) m_pin[i]->connector()->remove();
+        
     QPropertyEditorWidget::self()->removeObject( this );
     Circuit::self()->compList()->removeOne( this );
     Circuit::self()->removeItem( this );
-    //this->deleteLater();
+    this->deleteLater();
+}
+
+void Component::H_flip()
+{
+    m_Hflip = -m_Hflip;
+    setflip();
+}
+
+void Component::V_flip()
+{
+}
+
+void Component::V_flip2()
+{
+    m_Vflip = -m_Vflip;
+    setflip();
 }
 
 void Component::rotateCW()
 {
     setRotation( rotation() + 90);
-    m_idLabel->rotateCCW();
+    //m_idLabel->rotateCCW();
+    //m_valLabel->rotateCCW();
     emit moved();
 }
 
 void Component::rotateCCW()
 {
     setRotation( rotation() - 90);
-    m_idLabel->rotateCW();
+    //m_idLabel->rotateCW();
+    //m_valLabel->rotateCW();
     emit moved();
 }
 
 void Component::rotateHalf()
 {
     setRotation( rotation() - 180);
-    m_idLabel->rotate180();
+    //m_idLabel->rotate180();
+    //m_valLabel->rotate180();
     emit moved();
 }
 
@@ -222,6 +267,14 @@ void Component::setLabelPos()
     m_idLabel->setLabelPos();
 }
 
+void Component::setValLabelPos( int x, int y, int rot )
+{
+    m_valLabel->m_labelx = x;
+    m_valLabel->m_labely = y;
+    m_valLabel->m_labelrot = rot;
+    m_valLabel->setLabelPos();
+}
+
 void Component::setValLabelPos()
 {
     m_valLabel->setLabelPos();
@@ -229,7 +282,7 @@ void Component::setValLabelPos()
 
 void Component::setValue( double val) 
 { 
-    if( val == 0 ) val = 1e-12;
+    if( val < 0 ) val = 1e-12;
     val = val*m_unitMult;
     
     int index = 4;   // We are in bare units "TGMK munp"
@@ -324,6 +377,30 @@ void Component::setValLabelY( int y ) { m_valLabel->m_labely = y; }
 int Component::valLabRot()              { return m_valLabel->m_labelrot; }
 void Component::setValLabRot( int rot ) { m_valLabel->m_labelrot = rot; }
 
+int Component::hflip()            { return m_Hflip; }
+void Component::setHflip( int hf )
+{ 
+    if(( hf != 1 )&( hf != -1 )) hf = 1;
+    m_Hflip = hf;
+    setflip();
+}
+        
+int Component::vflip(){ return m_Vflip; }
+void Component::setVflip( int vf )
+{ 
+    if(( vf != 1 )&( vf != -1 )) vf = 1;
+    m_Vflip = vf; 
+    setflip();
+}
+
+void Component::setflip()
+{
+    setTransform(QTransform::fromScale( m_Hflip, m_Vflip ));
+    m_idLabel->setTransform(QTransform::fromScale( m_Hflip, m_Vflip ));
+    m_valLabel->setTransform(QTransform::fromScale( m_Hflip, m_Vflip ));
+    emit moved();
+}
+
 QString Component::itemType()  { return m_type; }
 QString Component::category()  { return m_category; }
 QIcon   Component::icon()      { return m_icon; }
@@ -364,15 +441,21 @@ Label::Label( Component* parent )
     m_labelrot = 0;
     setCursor( Qt::OpenHandCursor );
     
+    this->document()->setDocumentMargin(0);
+    
     connect(document(), SIGNAL(contentsChange(int, int, int)),
             this,       SLOT(updateGeometry(int, int, int)));
+    //document()->setDefaultStyleSheet( QString("p {max-width: 500px;}") );
+    //document()->set
 }
 Label::~Label() { }
 
 void Label::updateGeometry(int, int, int)
 {
-    setTextWidth(-1);
-    setTextWidth( boundingRect().width() );
+    document()->setTextWidth(-1);
+    //setTextWidth( boundingRect().width() );
+    //setItemSize(boundingRect().width(), boundingRect().height());
+    //adjustSize();
 }
 
 void Label::focusOutEvent(QFocusEvent *event)
@@ -444,20 +527,36 @@ void Label::setLabelPos()
 
 void Label::rotateCW()
 {
+    if( !isEnabled() ) return;
     setRotation( rotation() + 90 );
     m_labelrot = int(rotation()) ;
 }
 
 void Label::rotateCCW()
 {
+    if( !isEnabled() ) return;
     setRotation( rotation() - 90 );
     m_labelrot = int(rotation()) ;
 }
 
 void Label::rotate180()
 {
+    if( !isEnabled() ) return;
     setRotation( rotation() - 180 );
     m_labelrot = int(rotation()) ;
+}
+
+void Label::H_flip( int hf )
+{
+    if( !isEnabled() ) return;
+    setTransform(QTransform::fromScale(hf, 1));
+    //m_idLabel->rotateCCW();
+}
+
+void Label::V_flip( int vf )
+{
+    if( !isEnabled() ) return;
+    setTransform(QTransform::fromScale(1, vf));
 }
 
 /*void Label::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

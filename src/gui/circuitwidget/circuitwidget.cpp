@@ -25,9 +25,10 @@ CircuitWidget::CircuitWidget( QWidget *parent, QToolBar* toolbar  )
     ,m_verticalLayout(this)
     ,m_horizontLayout()
     ,m_circView(this)
-    ,m_outPanel(this)
+    ,m_terminal(this)
     ,m_oscope(this)
     ,m_plotter(this)
+    ,m_serialPortWidget(this)
 {
     m_verticalLayout.setObjectName(tr("verticalLayout"));
     m_verticalLayout.setContentsMargins(0, 0, 0, 0);
@@ -39,10 +40,8 @@ CircuitWidget::CircuitWidget( QWidget *parent, QToolBar* toolbar  )
     m_verticalLayout.addLayout( &m_horizontLayout );
     m_horizontLayout.addWidget( &m_oscope );
     m_horizontLayout.addWidget( &m_plotter );
-    m_horizontLayout.addWidget( &m_outPanel );
-
-    //QGridLayout lo(this);
-    //lo.addLayout( &m_verticalLayout, 0, 0 );
+    m_horizontLayout.addWidget( &m_terminal );
+    m_horizontLayout.addWidget( &m_serialPortWidget );
 }
 CircuitWidget::~CircuitWidget() { }
 

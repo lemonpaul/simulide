@@ -39,7 +39,7 @@ Ground::Ground( QObject* parent, QString type, QString id )
     : Component( parent, type, id )
 {
     QString nodid = id;
-    nodid.append(QString("Gnod"));
+    nodid.append(QString("-Gnd"));
     QPoint nodpos = QPoint( 0, -16 );
     groundpin = new Pin( 90, nodpos, nodid, 0, this);
 

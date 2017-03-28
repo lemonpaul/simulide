@@ -20,10 +20,12 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
-#include <QtGui>
+//#include <QtGui>
 
 #include "ramtable.h"
-#include "outpaneltext.h"
+#include "terminalwidget.h"
+
+class RamTable;
 
 class BaseProcessor : public QObject
 {
@@ -31,7 +33,9 @@ class BaseProcessor : public QObject
     public:
         BaseProcessor( QObject* parent=0 );
         ~BaseProcessor();
-
+        
+ static BaseProcessor* self() { return m_pSelf; }
+ 
         QString getFileName();
 
         virtual void    setDevice( QString device );
@@ -43,32 +47,47 @@ class BaseProcessor : public QObject
         virtual bool getLoadStatus() { return m_loadStatus; }
         virtual void terminate();
 
+        virtual void setSteps( int steps );
         virtual void step()=0;
-        virtual void reset();
+        virtual void stepOne()=0;
+        virtual void reset()=0;
+        virtual int  pc()=0;
 
         virtual int getRamValue( QString name )=0;
+        virtual int getRamValue( int address )=0;
         virtual int getRegAddress( QString name );
-        //virtual QStringList getDefsList( QString fileName );
+        virtual void addWatchVar( QString name, int address, QString type );
+        virtual void updateRamValue( QString name );
         
         virtual void setUsart( bool usart ) { m_usartTerm = usart; }
+        virtual void setSerPort( bool serport ) { m_serialPort = serport; }
+        virtual void uartOut( uint32_t value );
+        virtual void uartIn( uint32_t value );
         
         virtual void initialized();
 
     protected:
-        
+ static BaseProcessor* m_pSelf;
+ 
         virtual void setRegisters();
-        virtual QHash<QString, int> getRegsTable( QString lstFileName )=0;
+        virtual int  validate( int address )=0;
 
-        QString   m_symbolFile;
-        QString   m_dataFile;
-        QString   m_device;
+        QString m_symbolFile;
+        QString m_dataFile;
+        QString m_device;
+        
+        int m_mcuStepsPT;
 
-        RamTable *m_ramTable;
-        QHash<QString, int> m_regsTable;
+        RamTable* m_ramTable;
+        QHash<QString, int> m_regsTable;     // int max 32 bits
+        QHash<QString, float> m_floatTable;  // float 32 bits
+        QHash<QString, QString> m_typeTable;
 
         bool m_loadStatus;
         bool m_usartTerm;
+        bool m_serialPort;
 };
+
 
 #endif
 

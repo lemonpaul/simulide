@@ -17,13 +17,15 @@
  *                                                                         *
  ***************************************************************************/
  
-#include <qtconcurrentrun.h>
+#include <iostream>
 
 #include "simulator.h"
+#include "matrixsolver.h"
 #include "e-element.h"
 #include "oscopewidget.h"
 #include "plotterwidget.h"
 #include "outpaneltext.h"
+#include "mcucomponent.h"
 #include "mainwindow.h"
 
 
@@ -41,20 +43,45 @@ Simulator::Simulator( QObject* parent ) : QObject(parent)
     m_timerId    = 0;
     m_lastStep   = 0;
     m_lastRefTime = 0;
+    m_stepsPrea  = 50;
+    m_stepsNolin = 10;
     m_mcuStepsPT = 16;
     m_simuRate   = 1000000;
-
-    m_avrCpu = 0l;
-#ifndef NO_PIC
-    m_picCpu = 0l;
-#endif
     
+    //QThread      matrixThread;
+    //m_matrix.moveToThread( &m_mcuThread );
+    
+    //m_avr.moveToThread( &m_mcuThread );
+    //m_avrCpu = 0l;
+    
+#ifndef NO_PIC
+    //m_pic.moveToThread( &m_mcuThread );
+    //m_picCpu = 0l;
+#endif
+    //m_mcuThread.start();
+    //matrixThread.start();
     m_RefTimer.start();
 }
 Simulator::~Simulator() 
 { 
-    m_CircuitFuture.waitForFinished(); 
+    m_CircuitFuture.waitForFinished();
+    //m_mcuThread.quit();
+    //Sm_mcuThread.wait();
+    //m_mcuThread.deletelater();
     //m_RefTimer.invalidate();
+}
+
+inline void Simulator::solveMatrix()
+{
+    foreach( eNode* node,  m_eChangedNodeList ) node->stampMatrix();
+    m_eChangedNodeList.clear();
+    
+    if( !m_matrix.solveMatrix() )            // Try to solve matrix,
+    {                                     // if fail stop simulation
+        std::cout << "Simulator::runStep, Failed to solve Matrix" << std::endl;
+        MainWindow::self()->powerCircOff();//stopSim();
+        MainWindow::self()->setRate( -1 );
+    }                                // m_matrix sets the eNode voltages
 }
 
 void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 ms, 20 Hz max)
@@ -62,8 +89,9 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 m
     e->accept();
     if( !m_isrunning ) return;
     
-    // Run Circuit in a paralle thread
+    // Run Circuit in a parallel thread
     m_CircuitFuture.waitForFinished();
+    foreach( eElement* el, m_updateList ) el->updateStep();
     m_CircuitFuture = QtConcurrent::run( this, &Simulator::runCircuit );
     //runCircuit();
 
@@ -73,8 +101,6 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 m
 
     if( deltaRefTime >= 1e9 )          // We want steps per Sec = 1e9 ns
     {
-        //deltaRefTime = deltaRefTime/1e6;
-        //qint64 stepsPerSec = (m_step-m_lastStep)*m_mcuStepsPT*1e3/deltaRefTime;
         qint64 stepsPerSec = (m_step-m_lastStep)*1e9/deltaRefTime;
         MainWindow::self()->setRate( (stepsPerSec*100)/m_simuRate );
         m_lastStep    = m_step;
@@ -83,92 +109,95 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 m
     // Run Graphic Elements
     PlotterWidget::self()->step();
     OscopeWidget::self()->step();
-    OutPanelText::self()->step();
-    foreach( eElement* el, m_updateList ) el->updateStep();
+    TerminalWidget::self()->step();
 }
-        
+
 void Simulator::runCircuit()
 {
     for( int i=0; i<m_circuitRate; i++ )
     {
+        if( !m_isrunning ) return;
         m_step ++;
         
-        // Run Slow Elements
-        if( ++m_slowCounter == m_stepsPrea ) 
+        // Run Reactive Elements
+        if( ++m_reacCounter == m_stepsPrea )
         {
-            m_slowCounter = 0;
+            m_reacCounter = 0;
             
-            foreach( eElement* el, m_changedSlow ) el->setVChanged();  
-            m_changedSlow.clear();
+            foreach( eElement* el, m_reactiveList ) el->setVChanged();
+            m_reactiveList.clear();
         }
+        // Run Sinchronized to Simulation Clock elements
+        foreach( eElement* el, m_simuClock ) el->setVChanged();
         OscopeWidget::self()->setData();
-        
-        // Run Mcus
-        if( m_avrCpu ) for( int k=0; k<m_mcuStepsPT; k++ ) m_avrCpu->run(m_avrCpu);//avr_run( m_avrCpu ); //avr.step();
-    #ifndef NO_PIC
-        if( m_picCpu ) for( int k=0; k<m_mcuStepsPT; k++ ) pic.step();
-    #endif
         
         // Run Fast elements
         foreach( eElement* el, m_changedFast ) el->setVChanged();
         m_changedFast.clear();
+        
+        if( !m_eChangedNodeList.isEmpty() ) { solveMatrix(); }
+        if( !m_isrunning ) return;
+        // Run Mcus
+        //foreach( BaseProcessor* proc, m_mcuList ) proc->step();
+        if( BaseProcessor::self() ) BaseProcessor::self()->step();
+        //if( m_avrCpu ) m_avr.step(); //m_avrCpu->run(m_avrCpu);//avr_run( m_avrCpu ); //avr.step();
+    #ifndef NO_PIC
+        //if( m_picCpu ) m_pic.step();
+    #endif
 
-        // Solve Matrix
-        foreach( eNode* node,  m_eNodeList ) node->stampMatrix();
-
-        if( !m_matrix.solveMatrix() )            // Try to solve matrix,
-        {                                     // if fail stop simulation
-            std::cout << "Simulator::runStep, Failed to solve Matrix" << std::endl;
-            stopSim();
-            return;                  // m_matrix sets the eNode voltages
-        }
         // Run Non-Linear elements 
-        if( !m_nonLinear.isEmpty() )
+        if( ++m_noLinCounter == m_stepsNolin )
         {
-            foreach( eElement* el, m_nonLinear ) el->setVChanged();
-            m_nonLinear.clear();
-            // Solve Matrix
-            foreach( eNode* node,  m_eNodeList ) node->stampMatrix();
+            m_noLinCounter = 0;
+            int counter = 0;
+            while( !m_nonLinear.isEmpty() ) // Run untill all converged
+            {
+                foreach( eElement* el, m_nonLinear ) el->setVChanged();
+                m_nonLinear.clear();
 
-            if( !m_matrix.solveMatrix() )            // Try to solve matrix,
-            {                                     // if fail stop simulation
-                std::cout << "Simulator::runStep, Failed to solve Matrix" << std::endl;
-                MainWindow::self()->powerCircOff(); //stopSim();
-                return;                  // m_matrix sets the eNode voltages
+                if( !m_eChangedNodeList.isEmpty() ) { solveMatrix(); }
+                if( !m_isrunning ) return;
+
+                if( ++counter > 20 ) break; // Limit the number of loops
             }
+            //if( counter > 0 ) qDebug() << "\nSimulator::runCircuit  Non-Linear Solved in steps:"<<counter;
         }
     }
  }
+ 
+void Simulator::runExtraStep()
+{
+    if( !m_eChangedNodeList.isEmpty() ) { solveMatrix(); }
+    
+    // Run Fast elements
+    foreach( eElement* el, m_changedFast ) el->setVChanged();
+    m_changedFast.clear();
+}
 
 void Simulator::runContinuous()
 {
     // Get Mcus
-    if( avr.getLoadStatus() ) m_avrCpu = avr.getCpu();
-    else                      m_avrCpu = 0l;
+    //if( m_avr.getLoadStatus() ) m_avrCpu = m_avr.getCpu();
+    //else                        m_avrCpu = 0l;
 #ifndef NO_PIC
-    if( pic.getLoadStatus() ) m_picCpu = pic.getCpu();
-    else                      m_picCpu = 0l;
+    //if( m_pic.getLoadStatus() ) m_picCpu = m_pic.getCpu();
+    //else                        m_picCpu = 0l;
 #endif
 
+    m_nonLinear.clear();
+    m_changedFast.clear();
+    m_reactiveList.clear();
+    m_eChangedNodeList.clear();
+
+    //qDebug()<< "Simulator::runContinuous"<< m_elementList.size()<<m_eNodeList.size();
     // Initialize all Elements
-    foreach( eElement* el, m_elementList ) el->initialize();
-    
-    // Initialize eNodes
-    qDebug() <<"Initialize eNodes";
-    m_numEnodes = m_eNodeList.size(); 
-    for( int i=0; i<m_numEnodes; i++ )
-    {
-        eNode* enode = m_eNodeList.at(i);
-        enode->setNodeNumber( i+1 );
-        enode->initialize();
-    }
-    std::cout << "\n" << m_numEnodes << " eNodes" << std::endl;
-    
-    // Initialize Circuit
-    m_matrix.createMatrix( m_numEnodes );
-    foreach( eElement* el, m_elementList ) el->initialize();
-    foreach( eElement* el, m_elementList ) el->stamp();
-    foreach( eNode* node,  m_eNodeList   ) node->stampMatrix();
+    foreach( eElement* el, m_elementList ) {/*std::cout << el->getId()<<std::endl*/;el->initialize();}
+    //foreach (eNode* enode, m_eNodeList ) {
+    //    qDebug() << enode->itemId();
+    //}
+    // Initialize Matrix
+    m_matrix.createMatrix( m_eNodeList, m_elementList );
+    m_matrix.simplify();
 
     // Try to solve matrix, if fail stop simulation
     if( !m_matrix.solveMatrix() )                
@@ -176,12 +205,14 @@ void Simulator::runContinuous()
         std::cout << "Simulator::runContinuous, Failed to solve Matrix"
                   <<  std::endl;
         MainWindow::self()->powerCircOff();
+        MainWindow::self()->setRate( -1 );
         //pauseSim();
         return;
     }
     //m_matrix.printMatrix();
     
-    m_slowCounter = 0;
+    m_reacCounter  = 0;
+    m_noLinCounter = 0;
     
     simuRateChanged( m_simuRate );
     
@@ -192,19 +223,18 @@ void Simulator::runContinuous()
 
 void Simulator::stopSim()
 {
-    m_CircuitFuture.waitForFinished();
+    OscopeWidget::self()->clear();
 
     if( !m_isrunning ) return;
     
     pauseSim();
     
     foreach( eNode* node,  m_eNodeList  ) node->setVolt( 0 ); //clear voltages
+    foreach( eElement* el, m_elementList ) el->initialize();
     foreach( eElement* el, m_updateList ) el->updateStep();
-    if( m_avrCpu ) avr_reset( m_avrCpu ); 
-#ifndef NO_PIC
-    if( m_picCpu ) pic.reset();
-#endif
-    
+
+    if( McuComponent::self() ) McuComponent::self()->reset();
+
     MainWindow::self()->setRate( 0 );
 }
 
@@ -259,8 +289,9 @@ int Simulator::simuRateChanged( int rate )
               << "\nMcu     Rate:     " << m_mcuStepsPT
               << std::endl
               << "\nSimulation Speed: " << m_simuRate
-              << "\nReactive   Speed: " << m_simuRate/m_stepsPrea
+              /*<< "\nReactive   Speed: " << m_simuRate/m_stepsPrea*/
               << "\nReactive SubRate: " << m_stepsPrea
+              << "\nNoLinear Subrate: " << m_stepsNolin
               << std::endl;
 
     
@@ -277,7 +308,7 @@ int Simulator::simuRateChanged( int rate )
     m_changed = changed; 
 }*/
 
-void Simulator::setNodeVolt( int enode, double v ) 
+/*void Simulator::setNodeVolt( int enode, double v ) 
 { 
     if( isnan(v) )
     {
@@ -286,7 +317,7 @@ void Simulator::setNodeVolt( int enode, double v )
         return;
     }
     m_eNodeList.at(enode)->setVolt( v ); 
-}
+}*/
 
 bool Simulator::isRunning()  
 { 
@@ -310,9 +341,29 @@ void Simulator::setReaClock( int value )
     
     if( running ) runContinuous();
 }
+
+int  Simulator::noLinClock()
+{
+    return m_stepsNolin;
+}
+
+void Simulator::setNoLinClock( int value )
+{
+    bool running = m_isrunning;
+    if( running ) stopSim();
+
+    if     ( value < 1  ) value = 1;
+    else if( value > 50 ) value = 50;
+
+    m_stepsNolin = value;
+
+    if( running ) runContinuous();
+}
 void Simulator::setMcuClock( int value )
 {
     m_mcuStepsPT = value;
+    BaseProcessor::self()->setSteps( value );
+    //m_pic.setSteps( value );
 }
 
 //int  Simulator::stepsPT()    { return m_reaStepsPT; }
@@ -324,54 +375,54 @@ unsigned long long Simulator::step()
 
 void Simulator::addToEnodeList( eNode* nod )
 {
-    m_eNodeList.push_back( nod );
+    if( !m_eNodeList.contains(nod) ) m_eNodeList.append( nod );
 }
 
 void Simulator::remFromEnodeList( eNode* nod, bool del )
 {
-    std::vector<eNode*>::iterator it;
-
-    for( it=m_eNodeList.begin(); it!=m_eNodeList.end(); it++ )
-        if( *it == nod ) { m_eNodeList.erase(it); break; }
+    if( m_eNodeList.contains(nod) )m_eNodeList.removeOne( nod );
 
     if( del ){ delete nod; }
 }
 
+void Simulator::addToChangedNodeList( eNode* nod )
+{
+    if( !m_eChangedNodeList.contains(nod) ) m_eChangedNodeList.append( nod );
+}
+void Simulator::remFromChangedNodeList( eNode* nod ) 
+{ 
+    m_eChangedNodeList.removeOne( nod ); 
+}
+
 void Simulator::addToElementList( eElement* el )
 {
-    m_elementList.push_back( el );
+    if( !m_elementList.contains(el) ) m_elementList.append(el);
 }
 
 void Simulator::remFromElementList( eElement* el )
 {
-    std::vector<eElement*>::iterator it;
-
-    for( it=m_elementList.begin(); it!=m_elementList.end(); it++ )
-        if( *it == el ) { m_elementList.erase(it); break; }
+    if( m_elementList.contains(el) )m_elementList.removeOne(el);
 }
 
 void Simulator::addToUpdateList( eElement* el )
 {
-    m_updateList.push_back( el );
+    if( !m_updateList.contains(el) ) m_updateList.append(el);
 }
 
 void Simulator::remFromUpdateList( eElement* el )
 {
-    std::vector<eElement*>::iterator it;
-
-    for( it=m_updateList.begin(); it!=m_updateList.end(); it++ )
-        if( *it == el ) { m_updateList.erase(it); break; }
+    m_updateList.removeOne(el); 
 }
 
-/*void Simulator::addToReactive( eElement* el )   
+void Simulator::addToSimuClockList( eElement* el )   
 { 
-    if( !m_reactiveList.contains(el) ) m_reactiveList.append(el); 
+    if( !m_simuClock.contains(el) ) m_simuClock.append(el); 
 }
 
-void Simulator::remFromReactive( eElement* el ) 
+void Simulator::remFromSimuClockList( eElement* el ) 
 { 
-    m_reactiveList.removeOne(el); 
-}*/
+    m_simuClock.removeOne(el); 
+}
 
 void Simulator::addToChangedFast( eElement* el )   
 { 
@@ -383,14 +434,14 @@ void Simulator::remFromChangedFast( eElement* el )
     m_changedFast.removeOne(el); 
 }
 
-void Simulator::addToChangedSlow( eElement* el )   
+void Simulator::addToReactiveList( eElement* el )
 { 
-    if( !m_changedSlow.contains(el) ) m_changedSlow.append(el); 
+    if( !m_reactiveList.contains(el) ) m_reactiveList.append(el);
 }
 
-void Simulator::remFromChangedSlow( eElement* el ) 
+void Simulator::remFromReactiveList( eElement* el )
 { 
-    m_changedSlow.removeOne(el); 
+    m_reactiveList.removeOne(el);
 }
 
 void Simulator::addToNoLinList( eElement* el )
@@ -403,10 +454,10 @@ void Simulator::remFromNoLinList( eElement* el )
     m_nonLinear.removeOne(el);
 }
 
-/*void Simulator::addToMcuList( eElement* el )
+void Simulator::addToMcuList( BaseProcessor* proc )
 {
-    if( !m_mcuStepList.contains(el) ) m_mcuStepList.append( el );
+    if( !m_mcuList.contains(proc) ) m_mcuList.append( proc );
 }
-void Simulator::remFromMcuList( eElement* el ) { m_mcuStepList.removeOne( el ); }*/
+void Simulator::remFromMcuList( BaseProcessor* proc ) { m_mcuList.removeOne( proc ); }
 
 #include "moc_simulator.cpp"

@@ -27,7 +27,7 @@ class Node : public Component
 {
     Q_OBJECT
     public:
-        QRectF boundingRect() const { return QRect( -8, -8, 16, 16 ); }
+        QRectF boundingRect() const { return QRect( -4, -4, 8, 8 ); }
 
         Node( QObject* parent, QString type, QString id );
         ~Node();

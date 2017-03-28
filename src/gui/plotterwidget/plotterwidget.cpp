@@ -29,6 +29,7 @@ PlotterWidget::PlotterWidget(  QWidget *parent  )
     this->setVisible( false );
 
     setMinimumSize(QSize(200, 200));
+    setMaximumSize(QSize(1000, 200));
 
     m_color[0] = QColor( 190, 190, 0 );
     m_color[1] = QColor( 240, 100, 10 );

@@ -49,7 +49,6 @@ class Capacitor : public Component, public eCapacitor
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
-        void remove();
 
     private:
 };

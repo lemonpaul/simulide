@@ -21,12 +21,35 @@
 
 #include "piccomponent.h"
 #include "piccomponentpin.h"
-#include "gpsimprocessor.h"
 #include "itemlibrary.h"
-
+#include "mainwindow.h"
+//#include "simulator.h"
 
 Component* PICComponent::construct( QObject* parent, QString type, QString id )
-{ return new PICComponent( parent, type,  id ); }
+{
+    if( m_canCreate ) 
+    {
+        PICComponent* pic = new PICComponent( parent, type,  id );
+        if( m_error > 0 )
+        {
+            Circuit::self()->compList()->removeOne( pic );
+            pic->deleteLater();
+            pic = 0l;
+            m_error = 0;
+            m_canCreate = true;
+        }
+        return pic;
+    }
+    QMessageBox* msgBox = new QMessageBox( MainWindow::self() );
+    msgBox->setAttribute( Qt::WA_DeleteOnClose ); //makes sure the msgbox is deleted automatically when closed
+    msgBox->setStandardButtons( QMessageBox::Ok );
+    msgBox->setWindowTitle( tr("Error") );
+    msgBox->setText( tr("Only 1 Mcu allowed\n to be in the Circuit.") );
+    msgBox->setModal( false ); 
+    msgBox->open();
+
+    return 0l;
+}
 
 LibraryItem* PICComponent::libraryItem()
 {
@@ -41,19 +64,29 @@ LibraryItem* PICComponent::libraryItem()
 PICComponent::PICComponent( QObject* parent, QString type, QString id )
     : McuComponent( parent, type, id )
 {
+    m_pSelf = this;
     m_dataFile = "data/pics.xml";
-    m_processor = GpsimProcessor::self();
+    m_processor = PicProcessor::self();
 
-    if( m_id.startsWith("PIC") ) m_id.replace( "PIC", "pic16f876" );
+    //if( m_id.startsWith("PIC") ) m_id.replace( "PIC", "pic16f876" );
 
     initPackage();
-    setFreq( 20 );
+    if( m_error == 0 )
+    {
+        setFreq( 20 );
+        
+        qDebug() <<"     ..."<<m_id<<"OK\n";
+    }
+    else
+    {
+        qDebug() <<"     ..."<<m_id<<"Error!!!\n";
+    }
 }
 PICComponent::~PICComponent() { }
 
 void PICComponent::attachPins()
 {
-    GpsimProcessor* ap = dynamic_cast<GpsimProcessor*>( m_processor );
+    PicProcessor* ap = dynamic_cast<PicProcessor*>( m_processor );
     pic_processor* cpu = ap->getCpu();
 
     for( int i=0; i < m_numpins; i++ )
@@ -61,6 +94,7 @@ void PICComponent::attachPins()
         PICComponentPin* pin = dynamic_cast<PICComponentPin*>( m_pinList[i] );
         pin->attach( cpu );
     }
+    m_attached = true;
 }
 
 void PICComponent::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )

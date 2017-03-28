@@ -1,8 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2003-2006 by David Saxton                               *
- *   david@bluehaze.org                                                    *
- *                                                                         *
- *   Copyright (C) 2010 by santiago González                               *
+ *   Copyright (C) 2012 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -16,17 +13,16 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #include "e-latch_d.h"
 
-eLatchD::eLatchD( string id, int channels )
+eLatchD::eLatchD( std::string id, int channels )
     : eLogicDevice( id )
 {
-    setNumChannels( channels );
+    //setNumChannels( channels );
 }
 eLatchD::~eLatchD()
 { 
@@ -56,23 +52,19 @@ void eLatchD::setVChanged()
 {
     if( m_outEnablePin )
     {
+        bool outEnPrev = m_outEnable;
         bool outEn = eLogicDevice::outputEnabled();
-
-        if( outEn ) eLogicDevice::setOutImp( m_outImp );
-        else        eLogicDevice::setOutImp( high_imp );
-
+        
+        if( outEnPrev != outEn ) eLogicDevice::setOutputEnabled( outEn );
+    }
+    if( m_inEnablePin )
+    {
+        if( !eLogicDevice::inputEnabled() ) return;
     }
     if( !m_clockPin || (eLogicDevice::getClockState()==Rising) )
     {
         for( int i=0; i<m_numOutputs; i++ )
-        {
-            double volt = m_input[i]->getVolt();
-
-            if     ( volt > m_inputHighV ) m_inputState[i] = true;
-            else if( volt < m_inputLowV )  m_inputState[i] = false;
-
-            eLogicDevice::setOut( i, m_inputState[i] );
-        }
+            eLogicDevice::setOut( i, getInputState( i ) );
     }
 }
 

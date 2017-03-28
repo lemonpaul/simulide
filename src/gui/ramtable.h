@@ -21,6 +21,7 @@
 #define RAMTABLE_H
 
 #include <QtWidgets>
+#include "baseprocessor.h"
 
 class BaseProcessor;
 
@@ -28,8 +29,12 @@ class RamTable : public QTableWidget
 {
     Q_OBJECT
     public:
-        RamTable( BaseProcessor *processor );
+        RamTable( BaseProcessor* processor );
         ~RamTable();
+        
+        void setItemValue( int col, QString value );
+        void setItemValue( int col, int value );
+        void setItemValue( int col, float value );
 
         //void setProcessor( BaseProcessor *processor );
 
@@ -42,11 +47,12 @@ class RamTable : public QTableWidget
         void addToWatch(QTableWidgetItem*);
 
     private:
-        BaseProcessor *m_processor;
+        BaseProcessor* m_processor;
 
         QHash<int, QString> watchList;
 
         int m_numRegs;
+        int m_currentRow;
         QTimer *m_ramTimer;
 };
 

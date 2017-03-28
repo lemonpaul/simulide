@@ -39,29 +39,24 @@ Resistor::Resistor( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eResistor( id.toStdString() )
 {
     QString pinId = m_id;
-    pinId.append(QString("lnod"));
+    pinId.append(QString("-lPin"));
     QPoint pinPos = QPoint(-8-8,0);
     m_ePin[0] = new Pin( 180, pinPos, pinId, 0, this);
 
     pinId = m_id;
-    pinId.append(QString("rnod"));
+    pinId.append(QString("-rPin"));
     pinPos = QPoint(8+8,0);
     m_ePin[1] = new Pin( 0, pinPos, pinId, 1, this);
 
     //m_idLabel->setText( QString("") );
     m_idLabel->setPos(-12,-24);
+    setLabelPos(-12,-24, 0);
     
     m_unit = "Ω";
     setResist( m_resist );
-    m_valLabel->setPos(-16, 6);
+    setValLabelPos(-16, 6, 0);
+    //m_valLabel->setPos(-16, 6);
     setShowVal( true );
-
-    /*const QFont sansFont("Helvetica [Cronyx]", 4);
-    m_labelcurr = Circuit::self()->addSimpleText( id.toLatin1().data(), sansFont );
-    m_labelcurr->setParentItem( this );
-    m_labelcurr->setPos(-9.2, -4.0 );
-    //m_labelcurr->rotate( 180-dir );
-    m_labelcurr->setText( QString("%1").arg(res()) );*/
 }
 Resistor::~Resistor(){}
 
@@ -70,13 +65,13 @@ double Resistor::resist() { return m_value; }
 void Resistor::setResist( double r )
 {
     Component::setValue( r );       // Takes care about units multiplier
-    eResistor::setRes( r*m_unitMult );
+    eResistor::setResSafe( m_value*m_unitMult );
 }
 
 void Resistor::setUnit( QString un ) 
 {
     Component::setUnit( un );
-    eResistor::setRes( m_value*m_unitMult );
+    eResistor::setResSafe( m_value*m_unitMult );
 }
 
 void Resistor::remove()

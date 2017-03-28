@@ -21,8 +21,10 @@
 // consists of a current source in parallel with a resistor.
 
 #include "e-capacitor.h"
+#include "simulator.h"
+#include "e-node.h"
 
-eCapacitor::eCapacitor( string id ) : eResistor( id )
+eCapacitor::eCapacitor( std::string id ) : eResistor( id )
 {
     m_cap = 0.00001; // Farads
     m_resist = m_tStep/m_cap;
@@ -35,8 +37,8 @@ eCapacitor::~eCapacitor()
 
 void eCapacitor::initialize()
 {
-    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToChangedSlow(this);
-    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToChangedSlow(this);
+    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToReactiveList(this);
+    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToReactiveList(this);
     
     m_tStep = (double)Simulator::self()->reaClock()/1e6;
     
@@ -48,16 +50,16 @@ void eCapacitor::setVChanged()
 {
     double volt = m_ePin[0]->getVolt() - m_ePin[1]->getVolt();
     
-    if( volt == 0 ) return;
+    //if( volt == 0 ) return;
     //if( abs(m_volt-volt) < 1e-9 ) return;
     //m_volt = volt;
 
-    m_curSource = -volt/m_resist;
+    m_curSource = volt/m_resist;
 
     //qDebug() << "eCapacitor::setVChanged voltdiff " <<volt<<" m_resist "<<m_resist<< " m_curSource "<<m_curSource;
 
-    m_ePin[0]->stampCurrent(-m_curSource );
-    m_ePin[1]->stampCurrent( m_curSource );
+    m_ePin[0]->stampCurrent( m_curSource );
+    m_ePin[1]->stampCurrent(-m_curSource );
 }
 
 double eCapacitor::cap()             
@@ -67,7 +69,7 @@ double eCapacitor::cap()
 void  eCapacitor::setCap( double c ) 
 { 
     m_cap = c; 
-    eResistor::setRes( m_tStep/m_cap ); 
+    eResistor::setResSafe( m_tStep/m_cap ); 
     
     //qDebug() << "eCapacitor::setCap  m_tStep" << m_tStep << c <<" m_cap "<<m_cap<<" m_resist "<<m_resist;
 }

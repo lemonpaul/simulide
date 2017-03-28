@@ -19,10 +19,14 @@
 
 #include "pin.h"
 #include "connector.h"
+#include "circuit.h"
 
 
 Pin::Pin( int angle, const QPoint &pos, QString id, int index, Component* parent )
-        : QObject(), QGraphicsItem( parent ), ePin( id.toStdString(), index )
+   : QObject()
+   , QGraphicsItem( parent )
+   , ePin( id.toStdString(), index )
+   , m_label( parent )
 {
     m_component  = parent;
     m_blocked    = false;
@@ -36,22 +40,17 @@ Pin::Pin( int angle, const QPoint &pos, QString id, int index, Component* parent
 
     setObjectName( id );
     setConnector( 0l );
-
     setPos( pos );
-
     setRotation( 180-angle );
-    const QFont sansFont( "Helvetica [Cronyx]", 6 );
-    m_label = Circuit::self()->addSimpleText( id.toLatin1().data(), sansFont );
-    m_label->setParentItem( parent /*this*/ );
-
-    m_label->setText("");
-    m_label->setBrush( QColor( 250, 250, 200 ) );
-
     setLength(8);
-
     setCursor(Qt::CrossCursor);
-    this->setFlag( QGraphicsItem::ItemStacksBehindParent, true );
-    this->setFlag( QGraphicsItem::ItemIsSelectable, true );
+    setFlag( QGraphicsItem::ItemStacksBehindParent, true );
+    setFlag( QGraphicsItem::ItemIsSelectable, true );
+
+    const QFont sansFont( "Helvetica [Cronyx]", 5 );
+    m_label.setFont( sansFont );
+    m_label.setText("");
+    m_label.setBrush( QColor( 250, 250, 200 ) );
 
     connect( parent, SIGNAL( moved() ), this, SLOT( isMoved() ) );
 }
@@ -86,10 +85,10 @@ void Pin::findNodePins()     // Called by connector closing or other pin
     m_blocked = false;
 }
 
-double Pin::getVolt()
+/*double Pin::getVolt()
 {
     return ePin::getVolt();
-}
+}*/
 
 void  Pin::setConnector( Connector* connector )
 {
@@ -122,50 +121,50 @@ void Pin::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 void Pin::setLabelText( QString label )
 {
-    m_label->setText( label );
+    m_label.setText( label );
     setLabelPos();
 }
 void Pin::setLabelPos()
 {
-    QFontMetrics fm( m_label->font() );
+    QFontMetrics fm( m_label.font() );
 
     int xlabelpos = pos().x();
     int ylabelpos = pos().y();
 
     if( m_angle == 0 )   // Right side
     {
-        xlabelpos -= fm.width(m_label->text())+m_length+1;
-        ylabelpos -= 6;
+        xlabelpos -= fm.width(m_label.text())+m_length+1;
+        ylabelpos -= 5;
     }
     if( m_angle == 90 )   // Top
     {
         xlabelpos += 5;
         ylabelpos += m_length+1;
-        m_label->setRotation(m_angle);
+        m_label.setRotation(m_angle);
     }
     if( m_angle == 180 )   // Left
     {
         xlabelpos += m_length+1;
-        ylabelpos -= 6;
+        ylabelpos -= 5;
     }
     if( m_angle == 270 )   //bottom
     {
-        m_label->setRotation(m_angle);
-        xlabelpos -= 6;
+        m_label.setRotation(m_angle);
+        xlabelpos -= 5;
         ylabelpos -= m_length+1;
         
     }
-    m_label->setPos(xlabelpos, ylabelpos );
+    m_label.setPos(xlabelpos, ylabelpos );
 }
 
 void Pin::setLabelColor( QColor color )
 {
-    m_label->setBrush( color );
+    m_label.setBrush( color );
 }
 
 void Pin::moveBy( int dx, int dy )
 {
-    m_label->moveBy( dx, dy );
+    m_label.moveBy( dx, dy );
     QGraphicsItem::moveBy( dx, dy );
 }
 
@@ -201,5 +200,17 @@ void Pin::paint( QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
 
     if( m_length < 1 ) m_length = 1;
     painter->drawLine( 0, 0, m_length-1, 0);
+    
+    if( m_inverted )
+    {
+        //Component::paint( p, option, widget );
+        painter->setBrush( Qt::white );
+        QPen pen = painter->pen();
+        pen.setWidth( 2 );
+        //if( isSelected() ) pen.setColor( Qt::darkGray);
+        painter->setPen(pen);
+        QRectF rect( 3,-2.5, 5, 5 ); 
+        painter->drawEllipse(rect);
+    }
 }
 #include "moc_pin.cpp"

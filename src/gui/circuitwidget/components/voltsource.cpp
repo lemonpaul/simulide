@@ -19,6 +19,7 @@
 
 #include "voltsource.h"
 #include "connector.h"
+#include "circuit.h"
 #include "itemlibrary.h"
 
 
@@ -44,11 +45,11 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
     
     m_changed = false;
 
-    m_voltw.setFixedSize( 48,72 );
+    m_voltw.setFixedSize( 46,70 );
     
     m_proxy = Circuit::self()->addWidget( &m_voltw );
     m_proxy->setParentItem( this );
-    m_proxy->setPos( QPoint(-40, -64) );
+    m_proxy->setPos( QPoint(-39, -63) );
     //m_proxy->setFlag(QGraphicsItem::ItemNegativeZStacksBehindParent, true );
 
     m_button = m_voltw.pushButton;
@@ -57,7 +58,7 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
     m_button->setText( QString("-- V") );
 
     QString nodid = id;
-    nodid.append(QString("outnod"));
+    nodid.append(QString("-outPin"));
     QPoint nodpos = QPoint(16,0);
     outpin = new Pin( 0, nodpos, nodid, 0, this );
 
@@ -66,8 +67,11 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
     
     m_unit = "V";
     setVolt(5.0);
-    m_valLabel->setPos(-26, 8);
+    voltChanged( 0 );
+    setValLabelPos(-26, 10 , 0 ); // x, y, rot 
     setShowVal( true );
+    
+    setTransformOriginPoint( boundingRect().center() );
     
     Simulator::self()->addToUpdateList( this );
 
@@ -80,15 +84,15 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
 
 VoltSource::~VoltSource() 
 { 
-    Simulator::self()->remFromUpdateList( this );
-    delete m_out; 
 }
 
 void VoltSource::updateStep()
 {
     if( m_changed ) 
     {
+        m_out->setVoltHigh( m_voltOut );
         m_out->stampOutput();
+        updateButton();
         m_changed = false;
     }
 }
@@ -116,12 +120,10 @@ void VoltSource::onbuttonclicked()
 void VoltSource::voltChanged( int volt )
 {
     m_voltOut = double( volt )/100;
-    m_out->setVoltHigh( m_voltOut );
-    updateButton();
     m_changed = true;
 }
 
-void VoltSource::setVolt( double v )
+void VoltSource::setVolt( double v )            // Sets the Maximum Volt
 {
     Component::setValue( v );       // Takes care about units multiplier
     m_voltHight = m_value*m_unitMult;
@@ -137,6 +139,10 @@ void VoltSource::setUnit( QString un )
 void VoltSource::remove()
 {
     if ( outpin->isConnected() ) outpin->connector()->remove();
+    
+    Simulator::self()->remFromUpdateList( this );
+    delete m_out;
+    
     Component::remove();
 }
 
@@ -144,11 +150,8 @@ void VoltSource::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWi
 {
     p->setBrush(Qt::white);
     p->drawRoundedRect( QRect( -42, -66, 52, 76 ), 1, 1 );
-    //p->setBrush(Qt::darkGray);
-    p->fillRect( QRect( -42, -64, 50, 74 ), Qt::darkGray );
 
-    
-    //p->drawRoundedRect( QRect( 8, -56, 8, 40 ), 1, 1 );
+    p->fillRect( QRect( -39, -63, 49, 73 ), Qt::darkGray );
 
     Component::paint( p, option, widget );
 }

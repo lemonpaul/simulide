@@ -37,6 +37,8 @@ class McuComponent : public Package
 
         McuComponent( QObject* parent, QString type, QString id );
         ~McuComponent();
+        
+ static McuComponent* self() { return m_pSelf; }
 
         QString program()   const      { return  m_symbolFile; }
         void setProgram( QString /*pro*/ ) {/* m_symbolFile = pro;*/ }
@@ -45,7 +47,7 @@ class McuComponent : public Package
         virtual void setFreq( int freq );
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
-    
+  
     public slots:
         virtual void terminate();
         virtual void remove();
@@ -55,9 +57,13 @@ class McuComponent : public Package
         void slotReload();
         void slotOpenTerm();
         void slotCloseTerm();
+        void slotOpenSerial();
+        void slotCloseSerial();
         
-
     protected:
+ static McuComponent* m_pSelf;
+ static bool m_canCreate;
+  
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
         virtual void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )=0;
@@ -66,12 +72,19 @@ class McuComponent : public Package
 
         BaseProcessor* m_processor;
 
-        int   m_freq;           // Clock Frequency Mhz
+        int m_freq;             // Clock Frequency Mhz
+        
+        //bool m_serialTerm;
+        bool m_attached;
 
         QString m_device;       // Name of device
         QString m_symbolFile;   // firmware file loaded
         QString m_lastFirmDir;  // Last firmware folder used
+        QString m_BackGround;   // BackGround Image
         
         QList<McuComponentPin*> m_pinList;
+        
+    private:
+
 };
 #endif

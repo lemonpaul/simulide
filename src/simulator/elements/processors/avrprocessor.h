@@ -36,23 +36,25 @@ class AvrProcessor : public BaseProcessor
         AvrProcessor( QObject* parent=0 );
         ~AvrProcessor();
 
- static AvrProcessor* self() { return m_pSelf; }
+ //static AvrProcessor* self() { return m_pSelf; }
 
         bool loadFirmware( QString file );
         void terminate();
 
-        void step();
-
         void reset();
+        void stepOne();
+        void step();
+        int pc();
 
-        int  getRamValue( QString name );
+        int getRamValue( QString name );
+        int getRamValue( int address );
         
         avr_t* getCpu() { return m_avrProcessor; }
         void setCpu( avr_t* avrProc ) { m_avrProcessor = avrProc; }
+
+        void uartIn( uint32_t value );
         
-        void uartOut( uint32_t value );
-        
-        static void uart_pty_in_hook( struct avr_irq_t* irq, uint32_t value, void* param )
+        static void uart_pty_out_hook( struct avr_irq_t* irq, uint32_t value, void* param )
         {
             Q_UNUSED(irq);
             // get the pointer out of param and asign it to AvrProcessor*
@@ -62,12 +64,16 @@ class AvrProcessor : public BaseProcessor
         }
 
     private:
- static AvrProcessor *m_pSelf;
+ //static AvrProcessor *m_pSelf;
  
-        QHash<QString, int> getRegsTable( QString lstFileName );
+        //QHash<QString, int> getRegsTable( QString lstFileName );
+        
+        //virtual void setRegisters();
+        virtual int  validate( int address );
 
         //From simavr
-        avr_t* m_avrProcessor;
+        avr_t*     m_avrProcessor;
+        avr_irq_t* m_uartInIrq;
 };
 
 

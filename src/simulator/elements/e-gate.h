@@ -1,7 +1,4 @@
 /***************************************************************************
- *   Copyright (C) 2003-2006 by David Saxton                               *
- *   david@bluehaze.org                                                    *
- *                                                                         *
  *   Copyright (C) 2010 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
@@ -16,9 +13,8 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #ifndef EGATE_H
@@ -30,19 +26,15 @@ class eGate : public eLogicDevice
 {
     public:
 
-        eGate( string id, int inputs );
+        eGate( std::string id, int inputs );
         ~eGate();
 
         virtual void initialize();
         virtual void setVChanged();
 
-        void setInverted( bool inverted );
-        bool inverted() { return m_inverted; }
-                             
     protected:           
         virtual bool calcOutput( int inputs );
-        bool m_inverted;
-        //int m_prevInputs;
+
 };
 
 

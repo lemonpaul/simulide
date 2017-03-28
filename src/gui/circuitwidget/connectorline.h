@@ -20,15 +20,15 @@
 #ifndef CONNECTORLINE_H
 #define CONNECTORLINE_H
 
+#include <QtWidgets>
+
 #include "connector.h"
-#include "circuitwidget.h"
 
 class Connector;
  
  class ConnectorLine : public QGraphicsObject
 {
     Q_OBJECT
-    //Q_INTERFACES(QGraphicsItem)
 
 public:
     ConnectorLine( int x1, int y1, int x2, int y2, Connector*  connector );
@@ -80,7 +80,6 @@ private:
     int m_p2Y;
 
     Connector* m_pConnector;
-    QGraphicsSimpleTextItem* label;
 };
 
 #endif

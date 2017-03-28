@@ -19,6 +19,7 @@
 
 #include "probe.h"
 #include "connector.h"
+#include "simulator.h"
 #include "itemlibrary.h"
 #include "oscopewidget.h"
 #include "plotterwidget.h"
@@ -42,45 +43,40 @@ Probe::Probe( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eElement( id.toStdString() )
 {
     m_haveOscope = false;
-    m_showVolt   = true;
-
-    setLabelPos(-32,-24, 45 ); // x, y, rot 
-
-    m_voltIn   = cero_doub;
     m_voltTrig = 2.5;
     m_plotterLine = -1;
     m_plotterColor = QColor( 255, 255, 255 );
 
-    // Create volts Label
-    m_dispvolt = new Label( this );
-    m_dispvolt->setPos( 16, -4 );
-    m_dispvolt->setRotation( 45 );
-    m_dispvolt->setPlainText( "0 V" );
-    m_dispvolt->setDefaultTextColor( Qt::darkRed );
-    //m_dispvolt->setEnabled( false );
-    //m_valLabel->setEnabled( false );
-    //m_valLabel->setVisible( false );
-
     // Create Input Pin
     m_ePin.resize(1);
     QString nodid = id;
-    nodid.append(QString("inpin"));
+    nodid.append(QString("-inpin"));
     QPoint nodpos = QPoint(-22,0);
     m_inputpin = new Pin( 180, nodpos, nodid, 0, this);
     m_inputpin->setLength( 20 );
     m_inputpin->setBoundingRect( QRect(-2, -2, 4, 4) );
     
     nodid.append( QString("-eSource") );
-    eSource* m_inSource = new eSource( nodid.toStdString(), m_inputpin );
+    m_inSource = new eSource( nodid.toStdString(), m_inputpin );
     m_inSource->setOut(false);
     m_inSource->setImp( 1e9 );
 
     setRotation( rotation() - 45 );
+    
+    m_unit = " ";
+    m_valLabel->setDefaultTextColor( Qt::darkRed );
+    m_valLabel->setPlainText( "0" );
+    setValLabelPos( 16, 0 , 45 ); // x, y, rot 
+    setVolt( 0 );
+    setShowVal( true );
+    
+    setLabelPos( 16, -16 , 45 );
 
     Simulator::self()->addToUpdateList( this );
 }
 Probe::~Probe()
 {
+    delete m_inSource;
 }
 
 void Probe::updateStep()
@@ -108,7 +104,7 @@ void Probe::updateStep()
 
     foreach( QGraphicsItem *it, list )
     {
-        if( it->type() == 65536 )                          // Component
+        if( it->type() == 65536 )                           // Component
         {
             ConnectorLine *line =  qgraphicsitem_cast<ConnectorLine *>( it );
 
@@ -136,11 +132,18 @@ void Probe::setVolt( double volt )
     if( m_voltIn == volt ) return;
 
     m_voltIn = volt;
-    int dispVolt = int(m_voltIn*100);
-    if( m_showVolt ) m_dispvolt->setPlainText( QString("%1 V").arg(double(dispVolt)/100));
-    else             m_dispvolt->setPlainText("");
 
-    if( m_plotterLine > -1 ) PlotterWidget::self()->setData(m_plotterLine, dispVolt );
+    if( fabs(volt) < 0.01 ) volt = 0;
+    int dispVolt = int( volt*100 );
+
+    //if( m_showVolt ) m_dispvolt->setPlainText( QString("%1 V").arg(double(dispVolt)/100));
+    //else             m_dispvolt->setPlainText("");
+    
+    m_valLabel->setPlainText( QString("%1 V").arg(double(dispVolt)/100) );
+    //Component::setUnit( "V" );
+    //Component::setValue( double(dispVolt)/100 );
+
+    if( m_plotterLine > -1 ) PlotterWidget::self()->setData(m_plotterLine, m_voltIn*100 );
 
     update();       // Repaint
 }
@@ -154,18 +157,20 @@ double Probe::getVolt()
 
 void Probe::remove()
 {
-    Simulator::self()->remFromUpdateList( this );
-    if( m_inputpin->isConnected() )
-    {
-        slotOscopRem();
-        m_inputpin->connector()->remove();
-    }
+    if( m_inputpin->isConnected() ) m_inputpin->connector()->remove();
+
+    slotOscopRem();
     slotPlotterRem();
+    
+    Simulator::self()->remFromUpdateList( this );
+    
     Component::remove();
 }
 
 void Probe::slotPlotterAdd()
 {
+    if( m_plotterLine != -1 ) return;            // Already have plotter
+    
     m_plotterLine = PlotterWidget::self()->addChannel();
     if( m_plotterLine < 0 ) return;
 
@@ -177,7 +182,7 @@ void Probe::slotPlotterAdd()
 void Probe::slotPlotterRem()
 {
     //qDebug() << m_plotterLine;
-    if( m_plotterLine < 0 ) return;
+    if( m_plotterLine < 0 ) return;              // No plotter to remove
 
     PlotterWidget::self()->remChannel( m_plotterLine );
     m_plotterLine = -1;
@@ -238,8 +243,8 @@ void Probe::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     menu->deleteLater();
 }
 
-bool Probe::Show_volt()                { return  m_showVolt; }
-void Probe::setShow_volt( bool show )  { m_showVolt = show; setVolt(m_voltIn); }
+//bool Probe::Show_volt()                { return  m_showVolt; }
+//void Probe::setShow_volt( bool show )  { m_showVolt = show; setVolt(m_voltIn); }
 
 void Probe::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {

@@ -32,6 +32,7 @@
 #define PCD8544_H
 
 #include "component.h"
+#include "itemlibrary.h"
 #include "e-element.h"
 #include "pin.h"
 
@@ -46,7 +47,7 @@ class Pcd8544 : public Component, public eElement
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
         
-        void initialize();
+        virtual void initialize();
         
         virtual void setVChanged();
         
@@ -73,14 +74,15 @@ class Pcd8544 : public Component, public eElement
         unsigned char m_aDispRam[6][84];                   //84x48 DDRAM
 
         //Controller state
-        int m_iX;
-        int m_iY;
         bool m_bPD;
         bool m_bV;
         bool m_bH;
         bool m_bD;
         bool m_bE;
-        int m_ibit;         //How many bits have we read since last byte
+        bool m_lastScl;
+        int m_addrX;                                    // X RAM address
+        int m_addrY;                                    // Y RAM address
+        int m_inBit;        //How many bits have we read since last byte
         unsigned char m_cinBuf;     //Buffer where we keep incoming bits
 
         //Inputs

@@ -22,26 +22,33 @@
 
 #include <bitset>
 
-#include <QObject>
-
 #include "e-logic_device.h"
-//#include "e-node.h"
-
 
 class eShiftReg : public eLogicDevice
 {
     public:
-        eShiftReg( string id );
+        eShiftReg( std::string id, int latchClk=0, int serOut=0 );
         ~eShiftReg();
 
         virtual void initEpins();
         virtual void initialize();
         virtual void setVChanged();
+        
+        virtual ePin* getEpin( QString pinName );
 
     protected:
-        //eSource* m_output[8];
+        void createLatchClockPin();
+        void createSerOutPin();
+        
         std::bitset<8> m_shiftReg;
-        bool m_clockPrev;
+        std::bitset<8> m_latch;
+        
+        bool m_latchClock;
+        bool m_changed;
+        bool m_reset;
+        
+        eSource* m_latchClockPin;
+        eSource* m_serOutPin;
 
 };
 #endif

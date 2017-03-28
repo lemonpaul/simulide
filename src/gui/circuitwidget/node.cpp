@@ -19,6 +19,7 @@
 
 #include "node.h"
 #include "connector.h"
+#include "circuit.h"
 
 
 Node::Node( QObject* parent, QString type, QString id )

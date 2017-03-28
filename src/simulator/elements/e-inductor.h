@@ -27,7 +27,7 @@ class LibraryItem;
 class eInductor : public eResistor
 {
     public:
-        eInductor( string id );
+        eInductor( std::string id );
         ~eInductor();
 
         void initialize();

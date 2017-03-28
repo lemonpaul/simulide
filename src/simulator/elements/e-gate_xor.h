@@ -30,7 +30,7 @@ class eXorGate : public eGate
 {
     public:
 
-        eXorGate( string id, int inputs );
+        eXorGate( std::string id, int inputs );
         ~eXorGate();
 
     protected:

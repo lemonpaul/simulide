@@ -56,8 +56,6 @@ void Switch::onbuttonclicked()
         //stampAdmit( high_imp );
     }
     m_changed = true;
-
-    update();
 }
 
 void Switch::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

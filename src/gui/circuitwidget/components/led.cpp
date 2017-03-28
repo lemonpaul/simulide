@@ -18,8 +18,7 @@
  ***************************************************************************/
 
 #include "led.h"
-#include "itemlibrary.h"
-
+#include "pin.h"
 
 Component* Led::construct( QObject* parent, QString type, QString id )
 { return new Led( parent, type, id ); }
@@ -38,14 +37,14 @@ Led::Led( QObject* parent, QString type, QString id )
     : LedBase( parent, type, id )
 {
     QString nodid = m_id;
-    nodid.append(QString("lnod"));
+    nodid.append(QString("-lPin"));
     QPoint nodpos = QPoint(-16, 0 );
     Pin* pin = new Pin( 180, nodpos, nodid, 0, this);
     pin->setPos(-8-8,0);
     m_ePin[0] = pin;
 
     nodid = m_id;
-    nodid.append(QString("rnod"));
+    nodid.append(QString("-rPin"));
     nodpos = QPoint( 16, 0 );
     pin = new Pin( 0, nodpos, nodid, 1, this);
     pin->setPos( 8+8,0);

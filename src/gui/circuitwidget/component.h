@@ -21,12 +21,11 @@
 #ifndef COMPONENTITEM_H
 #define COMPONENTITEM_H
 
+#include <QtWidgets>
 #include <QPointer>
-#include <QObject>
 
-#include "simulator.h"
-#include "circuit.h"
 #include "QPropertyEditorWidget.h"
+
 
 class Pin;
 class Label;
@@ -48,6 +47,8 @@ class Component : public QObject, public QGraphicsItem
     Q_PROPERTY( int      valLabelx READ valLabelx WRITE setValLabelX )
     Q_PROPERTY( int      valLabely READ valLabely WRITE setValLabelY )
     Q_PROPERTY( int      valLabRot READ valLabRot WRITE setValLabRot )
+    Q_PROPERTY( int      hflip     READ hflip     WRITE setHflip )
+    Q_PROPERTY( int      vflip     READ vflip     WRITE setVflip )
 
     public:
         QRectF boundingRect() const { return m_area; }
@@ -91,6 +92,13 @@ class Component : public QObject, public QGraphicsItem
         int valLabRot();
         void setValLabRot( int rot );
         
+        int hflip();
+        void setHflip( int hf );
+        
+        int vflip();
+        void setVflip( int vf );
+        
+        void setValLabelPos( int x, int y, int rot );
         void setValLabelPos();
         
         void updateLabel( Label* label, QString txt );
@@ -112,7 +120,11 @@ class Component : public QObject, public QGraphicsItem
         void rotateCW();
         void rotateCCW();
         void rotateHalf();
+        void H_flip();
+        void V_flip();
+        void V_flip2();
         void slotRemove();
+        void slotCopy();
 
         virtual void remove();
 
@@ -124,11 +136,8 @@ class Component : public QObject, public QGraphicsItem
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
         void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
 
-        //void setIdLabel();
-        //void setValLabel();
-        
-        //double value();
         void setValue( double val );
+        void setflip();
         
         double m_value;
 
@@ -136,6 +145,10 @@ class Component : public QObject, public QGraphicsItem
         QString m_unit;
         QString m_mult;
         double  m_unitMult;
+        
+        int m_Hflip;
+        int m_Vflip;
+ static int m_error;
 
         Label* m_idLabel;
         Label* m_valLabel;
@@ -146,9 +159,12 @@ class Component : public QObject, public QGraphicsItem
         QIcon   m_icon;
         QColor  m_color;
         QRectF  m_area;         // bounding rect
+        QPointF m_eventpoint;
 
         bool m_showId;
         bool m_showVal;
+        
+        std::vector<Pin*> m_pin;
 };
 
 typedef Component* (*createItemPtr)( QObject* parent, QString type, QString id );
@@ -171,6 +187,8 @@ class Label : public QGraphicsTextItem
         void rotateCW();
         void rotateCCW();
         void rotate180();
+        void H_flip( int hf );
+        void V_flip( int vf );
         void updateGeometry(int, int, int);
 
     protected:

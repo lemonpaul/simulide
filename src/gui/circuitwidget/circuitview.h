@@ -13,9 +13,8 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #ifndef CIRCUITVIEW_H
@@ -23,8 +22,8 @@
 
 #include <QtWidgets>
 
-class Circuit;
-class Component;
+#include "component.h"
+#include "circuit.h"
 
 class CircuitView : public QGraphicsView
 {
@@ -40,6 +39,8 @@ class CircuitView : public QGraphicsView
 
     public slots:
         void saveImage();
+        void slotPaste();
+        void importCirc();
         
     protected:
         void contextMenuEvent(QContextMenuEvent* event);
@@ -56,9 +57,11 @@ class CircuitView : public QGraphicsView
         void resizeEvent(QResizeEvent *event);
         void scaleView(qreal scaleFactor);
 
-        qreal      m_scalefactor;
-        Component *m_enterItem;
-        Circuit   *m_circuit;
+        qreal       m_scalefactor;
+        Component*  m_enterItem;
+        Circuit*     m_circuit;
+
+        QPointF m_eventpoint;
         //QString    m_file;
 };
 

@@ -20,34 +20,28 @@
 #ifndef SUBCIRCUIT_H
 #define SUBCIRCUIT_H
 
-#include <QtWidgets>
-
-#include "component.h"
 #include "package.h"
-#include "e-source.h"
-
-class LibraryItem;
+#include "itemlibrary.h"
 
 class SubCircuit : public Package
 {
-	Q_OBJECT
-    //Q_PROPERTY( int      Freq     READ freq    WRITE setFreq    DESIGNABLE true USER true )
+    Q_OBJECT
 
     public:
 
         SubCircuit( QObject* parent, QString type, QString id );
         ~SubCircuit();
-
+        
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem * libraryItem();
 
         virtual void initialize();
 
-	
+    
     public slots:
         virtual void remove();
 
-	protected:
+    protected:
         virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
         virtual void initPackage();

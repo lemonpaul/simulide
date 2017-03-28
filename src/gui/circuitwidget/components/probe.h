@@ -29,7 +29,7 @@ class LibraryItem;
 class Probe : public Component, public eElement
 {
     Q_OBJECT
-    Q_PROPERTY( bool Show_volt  READ Show_volt  WRITE setShow_volt DESIGNABLE true USER true )
+    Q_PROPERTY( bool     Show_volt READ showVal  WRITE setShowVal DESIGNABLE true USER true )
 
     public:
         QRectF boundingRect() const { return QRect( -10, -10, 20, 20 ); }
@@ -41,9 +41,6 @@ class Probe : public Component, public eElement
         static LibraryItem *libraryItem();
         
 static  bool  m_oscopeBusy;
-
-        bool Show_volt();
-        void setShow_volt( bool show );
 
         void setVolt( double volt );
         double getVolt();
@@ -72,10 +69,8 @@ static  bool  m_oscopeBusy;
         QColor m_plotterColor;
 
         bool  m_haveOscope;
-        bool  m_showVolt;
 
         Pin   *m_inputpin;
-        Label *m_dispvolt;
         
         eSource* m_inSource;
 };

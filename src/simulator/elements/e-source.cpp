@@ -17,10 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <sstream>
+
 #include "e-source.h"
 #include "simulator.h"
 
-eSource::eSource( string id, ePin* epin ) : eElement( id )
+eSource::eSource( std::string id, ePin* epin ) : eElement( id )
 {
     m_ePin.resize(1);
     m_ePin[0] = epin;
@@ -37,6 +39,7 @@ eSource::eSource( string id, ePin* epin ) : eElement( id )
 
     m_scrEnode = new eNode( nodId+"scr" );
     m_scrEnode->setNodeNumber(0);
+
     Simulator::self()->remFromEnodeList( m_scrEnode, /*delete=*/ false );
 }
 eSource::~eSource(){ delete m_scrEnode; }
@@ -46,9 +49,17 @@ eSource::~eSource(){ delete m_scrEnode; }
     m_ePin[0] = epin;
 }*/
 
+void eSource::createPin()
+{
+    std::stringstream sspin;
+    sspin << m_elmId << "-ePin0";
+    m_ePin[0] = new ePin( sspin.str(), 0 );
+}
+
 void eSource::initialize()
 {
     m_ePin[0]->setEnodeComp( m_scrEnode );
+    stamp();
 }
 
 void eSource::stamp()
@@ -56,6 +67,13 @@ void eSource::stamp()
     //qDebug() <<"eSource::stamp"<< m_out;
     m_ePin[0]->stampAdmitance( m_admit );
     stampOutput();
+}
+
+void eSource::stampOutput()                               // Stamp Output
+{
+    m_scrEnode->setVolt(m_voltOut);
+
+    m_ePin[0]->stampCurrent( m_voltOut/m_imp );
 }
 
 void eSource::setVoltHigh( double v )
@@ -70,22 +88,13 @@ void eSource::setVoltLow( double v )
     if( !m_out ) m_voltOut = v;
 }
 
-void eSource::stampOutput()                               // Stamp Output
-{
-    m_scrEnode->setVolt(m_voltOut);
-
-    m_ePin[0]->stampCurrent( m_voltOut/m_imp );
-}
-
 void eSource::setOut( bool out )           // Set Output to Hight or Low
 {
     if( m_inverted ) m_out = !out;
     else             m_out =  out;
 
-    double v = m_voltLow;
-    if( m_out ) v = m_voltHigh;
-
-    m_voltOut = v;
+    if( m_out ) m_voltOut = m_voltHigh;
+    else        m_voltOut = m_voltLow;
 }
 
 void eSource::setInverted( bool inverted )
@@ -93,6 +102,7 @@ void eSource::setInverted( bool inverted )
     if( inverted == m_inverted ) return;
 
     m_inverted = inverted;
+    m_ePin[0]->setInverted( inverted );
     setOut( m_out );
 }
 
@@ -100,11 +110,17 @@ void eSource::setImp( double imp )
 {
     m_imp = imp;
     m_admit = 1/m_imp;
-    m_ePin[0]->stampAdmitance( m_admit );
+    stamp();
 }
 
 ePin* eSource::getEpin()
 {
+    return m_ePin[0];
+}
+
+ePin* eSource::getEpin( QString pinName )
+{
+    pinName ="";
     return m_ePin[0];
 }
 

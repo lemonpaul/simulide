@@ -42,7 +42,7 @@ class LogicInput : public Component, public eElement
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
-        void updateStep();
+        virtual void updateStep();
 
         double volt() const      { return m_voltHight; }
         void setVolt( double v );
@@ -52,10 +52,10 @@ class LogicInput : public Component, public eElement
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
-        void onbuttonclicked();
+        virtual void onbuttonclicked();
         virtual void remove();
 
-    private:
+    protected:
         double m_voltHight;
         
         bool m_changed;

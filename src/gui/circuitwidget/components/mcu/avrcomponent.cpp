@@ -18,12 +18,10 @@
  ***************************************************************************/
 
 #include "avrcomponent.h"
-#include "avrcomponentpin.h"
 #include "avrprocessor.h"
 #include "itemlibrary.h"
+#include "mainwindow.h"
 
-Component* AVRComponent::construct( QObject* parent, QString type, QString id )
-{ return new AVRComponent( parent, type,  id ); }
 
 LibraryItem* AVRComponent::libraryItem()
 {
@@ -35,16 +33,57 @@ LibraryItem* AVRComponent::libraryItem()
         AVRComponent::construct );
 }
 
+Component* AVRComponent::construct( QObject* parent, QString type, QString id )
+{ 
+    if( m_canCreate ) 
+    {
+        AVRComponent* avr = new AVRComponent( parent, type,  id );
+        if( m_error > 0 )
+        {
+            Circuit::self()->compList()->removeOne( avr );
+            avr->deleteLater();
+            avr = 0l;
+            m_error = 0;
+            m_canCreate = true;
+            
+        }
+        return avr;
+    }
+    QMessageBox* msgBox = new QMessageBox( MainWindow::self() );
+    msgBox->setAttribute( Qt::WA_DeleteOnClose ); //makes sure the msgbox is deleted automatically when closed
+    msgBox->setStandardButtons( QMessageBox::Ok );
+    msgBox->setWindowTitle( tr("Error") );
+    msgBox->setText( tr("Only 1 Mcu allowed\n to be in the Circuit.") );
+    msgBox->setModal( false ); 
+    msgBox->open();
+
+    return 0l;
+}
+
 AVRComponent::AVRComponent( QObject* parent, QString type, QString id )
     : McuComponent( parent, type, id )
 {
+    m_pSelf = this;
     m_dataFile = "data/avrs.xml";
     m_processor = AvrProcessor::self();
+    //m_processor = new AvrProcessor();
+    
+    /*m_t.start();
+    AvrProcessor* ap = dynamic_cast<AvrProcessor*>( m_processor );
+    ap->moveToThread( &m_t );*/
 
-    if( m_id.startsWith("AVR") ) m_id.replace( "AVR", "atmega328" );
+    //if( m_id.startsWith("AVR") ) m_id.replace( "AVR", "atmega328" );
 
     initPackage();
-    setFreq( 16 );
+    if( m_error == 0 )
+    {
+        setFreq( 16 );
+        qDebug() <<"     ..."<<m_id<<"OK\n";
+    }
+    else
+    {
+        qDebug() <<"     ..."<<m_id<<"Error!!!\n";
+    }
 }
 AVRComponent::~AVRComponent() { }
 
@@ -60,11 +99,26 @@ void AVRComponent::attachPins()
     }
     cpu->vcc  = 5000;
     cpu->avcc = 5000;
+    
+    // Registra IRQ para recibir petiones de voltaje de pin ( usado en ADC )
+    avr_irq_t* adcIrq = avr_io_getirq( cpu, AVR_IOCTL_ADC_GETIRQ, ADC_IRQ_OUT_TRIGGER );
+    avr_irq_register_notify( adcIrq, adc_hook, this );
+    
+    m_attached = true;
 }
 
 void AVRComponent::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
 {
-    m_pinList.append( new AVRComponentPin( this, id, type, label, pos, xpos, ypos, angle ) );
+    AVRComponentPin*  newPin = new AVRComponentPin( this, id, type, label, pos, xpos, ypos, angle );
+    m_pinList.append( newPin );
+    
+    if( type.startsWith("adc") )m_ADCpinList[type.right(1).toInt()] = newPin;
+}
+
+void AVRComponent::adcread( int channel )
+{
+    AVRComponentPin* pin = m_ADCpinList.value(channel);
+    if( pin ) pin->adcread();
 }
 
 #include "moc_avrcomponent.cpp"

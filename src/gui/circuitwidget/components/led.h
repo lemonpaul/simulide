@@ -21,8 +21,7 @@
 #define LED_H
 
 #include "ledbase.h"
-
-class LibraryItem;
+#include "itemlibrary.h"
 
 class Led : public LedBase
 {

@@ -27,9 +27,9 @@
 //
 // Copyright: See COPYING file that comes with this distribution
 
-
 #include "itemlibrary.h"
 #include "connector.h"
+#include "simulator.h"
 #include "pcd8544.h"
 
 
@@ -72,14 +72,15 @@ Pcd8544::Pcd8544( QObject* parent, QString type, QString id )
     
     Simulator::self()->addToUpdateList( this );
     
+    setLabelPos( -32,-66, 0);
+    setShowId( true );
+    
     clearDDRAM();
     clearLcd();
 }
 
 Pcd8544::~Pcd8544()
 {
-    delete m_pdisplayImg;
-    Simulator::self()->remFromUpdateList( this );
 }
 
 void Pcd8544::initialize()
@@ -92,6 +93,8 @@ void Pcd8544::initialize()
     
     clearDDRAM();
     clearLcd();
+    reset() ;
+    updateStep();
 }
 
 void Pcd8544::setVChanged()               // Called when Scl Pin changes 
@@ -104,37 +107,37 @@ void Pcd8544::setVChanged()               // Called when Scl Pin changes
     if( m_pCs.getVolt()>1.6 )           // Cs Pin High: Lcd not selected
     {
         m_cinBuf = 0;                   // Initialize serial buffer
-        m_ibit   = 0;
+        m_inBit   = 0;
         return;
     }
-    if( m_pScl.getVolt()<1.6 ) return;    // This is an Scl Falling Edge
+    if( m_pScl.getVolt()<1.6 )            // This is an Scl Falling Edge
+    {
+        m_lastScl = false;
+        return;    
+    }
+    else if( m_lastScl ) return;                    // Not a rising edge
+    m_lastScl = true;
 
-    //SCL rising edge
     m_cinBuf &= ~1; //Clear bit 0
     
     if( m_pSi.getVolt()>1.6 ) m_cinBuf |= 1;
     
-    //qDebug() << m_id << "Rising";
-    
-    if( m_ibit == 7 ) 
+    if( m_inBit == 7 ) 
     {
         if( m_pDc.getVolt()>1.6 )                          // Write Data
         {
-            m_aDispRam[m_iY][m_iX] = m_cinBuf;
+            m_aDispRam[m_addrY][m_addrX] = m_cinBuf;
             incrementPointer();
         } 
         else                                            // Write Command
         {
             //if(m_cinBuf == 0) { //(NOP) } 
                 
-            if((m_cinBuf & 0xF8) == 0x20)          //(Function set)
+            if((m_cinBuf & 0xF8) == 0x20)                // Function set 
             {
-                m_bH  = ((m_cinBuf & 0x01) == 1);
-                //m_bV  = ((m_cinBuf & 0x02) == 0x02);
-                m_bPD = ((m_cinBuf & 0x04) == 0x04);
-                
-                //TODO: Addressing mode currently ignored,
-                //always using horizontal mode.
+                m_bH  = ((m_cinBuf & 1) == 1);
+                m_bV  = ((m_cinBuf & 2) == 2);
+                m_bPD = ((m_cinBuf & 4) == 4);
             }
             else
             {
@@ -145,64 +148,55 @@ void Pcd8544::setVChanged()               // Called when Scl Pin changes
                     //Visualization of e.g. contrast setting could be
                     //useful in some cases, meaningless in others.
                 } 
-                else //(Basic instruction set)
+                else                            // Basic instruction set 
                 {
-                    if((m_cinBuf & 0xFA) == 0x08)         // Display control
+                    if((m_cinBuf & 0xFA) == 0x08)     // Display control
                     {
                         m_bD = ((m_cinBuf & 0x04) == 0x04);
                         m_bE =  (m_cinBuf & 0x01);
                     } 
-                    else if((m_cinBuf & 0xF8) == 0x40)// Set Y address of RAM
+                    else if((m_cinBuf & 0xF8) == 0x40)// Set Y RAM address
                     {
                         int addrY = m_cinBuf & 0x07;
-                        if( addrY<6 ) m_iY = addrY;
+                        if( addrY<6 ) m_addrY = addrY;
                     } 
-                    else if((m_cinBuf & 0x80) == 0x80)// Set X address of RAM
+                    else if((m_cinBuf & 0x80) == 0x80)// Set X RAM address
                     {
                         int addrX = m_cinBuf & 0x7F;
-                        if( addrX<84 ) m_iX = addrX;
+                        if( addrX<84 ) m_addrX = addrX;
                     } 
                 }
             }
         }
-        m_ibit = 0;
+        m_inBit = 0;
     } 
     else 
     {
         m_cinBuf <<= 1;
-        m_ibit++;
+        m_inBit++;
     }
 }
 
 void Pcd8544::updateStep()
 {
-    if( m_bPD ) 
+    if     ( m_bPD )          m_pdisplayImg->fill(0); // Power-Down mode
+    else if( !m_bD && !m_bE ) m_pdisplayImg->fill(0);// Blank Display mode, blank the visuals
+    else if( !m_bD && m_bE )  m_pdisplayImg->fill(1);  //All segments on
+    else
     {
-        m_pdisplayImg->fill(0);//clearDDRAM();
-    }
-    if( !m_bD && !m_bE )                  //We are in blank display mode,
-    {                                                //blank the visuals
-        m_pdisplayImg->fill(0);
-        return;
-    }
-    if( !m_bD && m_bE )                                //All segments on
-    {
-        m_pdisplayImg->fill(1);
-        return;
-    }
-
-    for(int row=0;row<6;row++) 
-    {
-        for( int col=0;col<84;col++ ) 
+        for(int row=0;row<6;row++) 
         {
-            char abyte = m_aDispRam[row][col];
-            for( int bit=0;bit<8;bit++ ) 
+            for( int col=0;col<84;col++ ) 
             {
-                //This takes inverse video mode into account:
-                m_pdisplayImg->setPixel(col,row*8+bit,
-                    (abyte & 1)/*^ ((m_bD && m_bE) ? 1 : 0)*/);
+                char abyte = m_aDispRam[row][col];
+                for( int bit=0; bit<8; bit++ ) 
+                {
+                    //This takes inverse video mode into account:
+                    m_pdisplayImg->setPixel(col,row*8+bit,
+                        (abyte & 1) ^ ((m_bD && m_bE) ? 1 : 0) );
 
-                abyte >>= 1;
+                    abyte >>= 1;
+                }
             }
         }
     }
@@ -223,27 +217,45 @@ void Pcd8544::clearDDRAM()
 
 void Pcd8544::incrementPointer() 
 {
-    //TODO: Vertical addressing
-    m_iX++;
-    if( m_iX >= 84 ) 
+    if( m_bV )
     {
-        m_iX = 0;
-        m_iY++;
+        m_addrY++;
+        if( m_addrY >= 6 )
+        {
+            m_addrY = 0;
+            m_addrX++;
+        }
+        if( m_addrX >= 84 ) 
+        {
+            m_addrX = 0;
+        }
     }
-    if( m_iY >= 6 )
+    else
     {
-        m_iY = 0;
+        m_addrX++;
+        if( m_addrX >= 84 ) 
+        {
+            m_addrX = 0;
+            m_addrY++;
+        }
+        if( m_addrY >= 6 )
+        {
+            m_addrY = 0;
+        }
     }
 }
 
 void Pcd8544::reset() 
 {
     m_cinBuf = 0;
-    m_ibit   = 0;
+    m_inBit   = 0;
+    m_addrX  = 0;
+    m_addrY  = 0;
     m_bPD = true;
-    m_bV = m_bH = false;
-    m_bE = m_bD = false;
-    m_iX = m_iY = 0;
+    m_bV  = false;
+    m_bH  = false;
+    m_bE  = false;
+    m_bD  = false;
 }
 
 void Pcd8544::remove()
@@ -253,6 +265,10 @@ void Pcd8544::remove()
     if( m_pDc.isConnected() ) m_pDc.connector()->remove();
     if( m_pSi.isConnected() ) m_pSi.connector()->remove();
     if( m_pScl.isConnected() ) m_pScl.connector()->remove();
+    
+    delete m_pdisplayImg;
+    Simulator::self()->remFromUpdateList( this );
+    
     Component::remove();
 }
 

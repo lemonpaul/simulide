@@ -56,7 +56,7 @@ void Push::onbuttonPressed()
 }
 void Push::onbuttonReleased()
 {
-    m_resist = 1e50;                                        // Open Push
+    m_resist = 1e38;                                        // Open Push
     m_button->setChecked(false);
     m_changed = true;
     update();

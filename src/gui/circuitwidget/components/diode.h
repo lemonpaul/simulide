@@ -28,7 +28,9 @@ class LibraryItem;
 class Diode : public Component, public eDiode
 {
     Q_OBJECT
-    Q_PROPERTY( double threshold READ threshold WRITE setThreshold DESIGNABLE true USER true )
+    Q_PROPERTY( double threshold  READ threshold WRITE setThreshold DESIGNABLE true USER true )
+    Q_PROPERTY( double Zener_Volt READ zenerV    WRITE setZenerV    DESIGNABLE true USER true )
+    
 
     public:
 
@@ -40,13 +42,12 @@ class Diode : public Component, public eDiode
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
-        double threshold();
-        void  setThreshold( double threshold );
-
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
         void remove();
+        
+    private:
 
 };
 

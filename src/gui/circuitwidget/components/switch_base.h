@@ -31,17 +31,15 @@ class SwitchBase : public Component, public eResistor
 
         SwitchBase( QObject* parent, QString type, QString id );
         ~SwitchBase();
-        
+
         void updateStep();
 
-        void setRes( double resist );
+        //void setRes( double resist );
 
     public slots:
         void remove();
 
     protected:
-        void stampAdmit( double admit );
-        
         bool m_changed;
         
         QPushButton          *m_button;

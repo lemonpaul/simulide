@@ -25,11 +25,12 @@
 class eResistor : public eElement
 {
     public:
-        eResistor( string id );
+        eResistor( std::string id );
         ~eResistor();
 
-        double res();
-        void  setRes( double resist );
+        virtual double res();
+        virtual void setRes( double resist );
+        virtual void setResSafe( double resist );
 
         double current();
 

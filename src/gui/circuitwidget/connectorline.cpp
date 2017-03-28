@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "connectorline.h"
+#include "circuit.h"
 #include "node.h"
 #include "utils.h"
  
@@ -82,6 +83,17 @@ void ConnectorLine::setP2( QPoint point )
 
 void ConnectorLine::move( QPointF delta )
 {
+    if( Circuit::self()->pasting() )
+    {
+        prepareGeometryChange();
+        m_p1Y = m_p1Y + delta.y();
+        m_p2Y = m_p2Y + delta.y();
+        m_p1X = m_p1X + delta.x();
+        m_p2X = m_p2X + delta.x();
+        updatePos();
+
+        return;
+    }
    int myindex = m_pConnector->lineList()->indexOf( this );
    if( ( myindex == 0 ) || ( myindex == m_pConnector->lineList()->size()-1 ) )
        return;    //avoid moving first or last line
@@ -141,8 +153,9 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
            ConnectorLine* line;
 
-           if( ( (dy() == 0) && ( abs( point1.x()-m_p2X ) < 15 ) ) // point near the p2 corner
-             ||( (dx() == 0) && ( abs( point1.y()-m_p2Y ) < 15 ) ) )
+           if( ( ( (dy() == 0) && ( abs( point1.x()-m_p2X ) < 8 ) ) // point near the p2 corner
+             ||( (dx() == 0) && ( abs( point1.y()-m_p2Y ) < 8 ) ) )
+             && ( myindex != m_pConnector->lineList()->size()-1 ) )
            {
                if ( myindex == m_pConnector->lineList()->size()-1 )
                {
@@ -154,8 +167,9 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
                index = myindex+1;
                line = m_pConnector->lineList()->at( index );
            }
-           else if( ( (dy() == 0) && ( abs( point1.x()-m_p1X ) < 15 ) ) // point near the p1 corner
-                 || ( (dx() == 0) && ( abs( point1.y()-m_p1Y ) < 15 ) ) )
+           else if( ( ( (dy() == 0) && ( abs( point1.x()-m_p1X ) < 8 ) ) // point near the p1 corner
+                  ||( (dx() == 0) && ( abs( point1.y()-m_p1Y ) < 8 ) ) )
+                  &&( myindex != 0 ) )
            {
                if ( myindex == 0 )
                {

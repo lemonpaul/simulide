@@ -31,7 +31,7 @@ LibraryItem* OrGate::libraryItem()
 {
     return new LibraryItem(
         tr( "Or Gate" ),
-        tr( "Gates" ),
+        tr( "Logic" ),
         "orgate.png",
         "Or Gate",
         OrGate::construct );
@@ -72,8 +72,6 @@ void OrGate::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
     p->drawPath(path);
 
     // Draw curves
-    //Component::paint( p, option, widget );
-
     
     pen.setWidth(2);
     p->setPen(pen);
@@ -85,8 +83,6 @@ void OrGate::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
 
     // Input side arc
     p->drawArc( -24, y_orig, 9, height, -1440/*-16*90*/, 2880/*16*180*/ );
-    
-    Gate::paint( p, option, widget );            // draw inverted circle
 }
 
 #include "moc_gate_or.cpp"

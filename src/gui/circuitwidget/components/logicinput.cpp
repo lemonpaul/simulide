@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "connector.h"
+#include "circuit.h"
 #include "itemlibrary.h"
 #include "logicinput.h"
 
@@ -52,7 +53,7 @@ LogicInput::LogicInput( QObject* parent, QString type, QString id )
     
     m_unit = "V";
     setVolt(5.0);
-    m_valLabel->setPos(-16, 8);
+    setValLabelPos(-16, 8 , 0 ); // x, y, rot 
     setShowVal( true );
 
     m_button = new QPushButton( );
@@ -72,14 +73,14 @@ LogicInput::LogicInput( QObject* parent, QString type, QString id )
 
 LogicInput::~LogicInput() 
 {
-    Simulator::self()->remFromUpdateList( this );
-    delete m_out;
+    //delete m_out;
 }
 
 void LogicInput::onbuttonclicked()
 {
     m_out->setOut( m_button->isChecked() );
     m_changed = true;
+    //qDebug() << "LogicInput::onbuttonclicked" ;
 }
 
 void LogicInput::updateStep()
@@ -108,6 +109,10 @@ void LogicInput::setUnit( QString un )
 void LogicInput::remove()
 {
     if( m_outpin->isConnected() ) m_outpin->connector()->remove();
+    delete m_out;
+    
+    Simulator::self()->remFromUpdateList( this );
+    
     Component::remove();
 }
 

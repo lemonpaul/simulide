@@ -19,12 +19,16 @@
 
 #include "ledbase.h"
 #include "connector.h"
+#include "simulator.h"
+#include "pin.h"
 
 LedBase::LedBase( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eLed( id.toStdString() )
 {
-    m_ePin.resize(2);
-
+    m_grounded = false;
+    m_ground   = 0l;
+    m_scrEnode = 0l;
+    
     m_color = QColor( Qt::black );
     
     m_valLabel->setEnabled( false );
@@ -34,19 +38,71 @@ LedBase::LedBase( QObject* parent, QString type, QString id )
 }
 LedBase::~LedBase()
 { 
-    Simulator::self()->remFromUpdateList( this ); 
 }
 
 void LedBase::updateStep()
 {
-    //if( m_prevpVolt == m_pVolt && m_prevnVolt == m_nVolt ) return;
     update();
+}
+
+bool LedBase::grounded()
+{
+    return m_grounded;
+}
+
+void LedBase::setGrounded( bool grounded )
+{
+    if( grounded )
+    {
+        if( m_grounded ) return;
+        
+        Pin* pin1 = (static_cast<Pin*>(m_ePin[1]));
+        if( m_ePin[1]->isConnected() ) pin1->connector()->remove();
+        pin1->setEnabled( false );
+        pin1->setVisible( false );
+        
+        QString nodid = m_id;
+        nodid.append(QString("Gnod-eSource"));
+        
+        m_ground = new eSource( nodid.toStdString(), m_ePin[1] );
+        
+        m_scrEnode = new eNode( nodid+"scr" );
+        m_scrEnode->setNodeNumber(0);
+        Simulator::self()->remFromEnodeList( m_scrEnode, /*delete=*/ false );
+        
+        m_ePin[1]->setEnode( m_scrEnode );
+    }
+    else
+    {
+        if( !m_grounded ) return;
+        
+        Pin* pin1 = (static_cast<Pin*>(m_ePin[1]));
+        if( m_ePin[1]->isConnected() ) pin1->connector()->remove();
+        pin1->setEnabled( true );
+        pin1->setVisible( true );
+        
+        delete m_ground;
+        delete m_scrEnode;
+
+        m_ground = 0l;
+        m_scrEnode = 0l;
+        
+        m_ePin[1]->setEnode( 0l );
+    }
+    m_grounded = grounded;
 }
 
 void LedBase::remove()
 {
-    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
-    if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
+    if( m_ePin[0] && m_ePin[0]->isConnected() )
+        (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
+    if(( m_ePin[1] && m_ePin[1]->isConnected() )&( !m_grounded ))
+        (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
+
+    if( m_ground )   delete m_ground;
+    
+    Simulator::self()->remFromUpdateList( this ); 
+    
     Component::remove();
 }
 
@@ -58,27 +114,32 @@ void LedBase::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
     QPen pen(Qt::black, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
-    if( m_bright > 255+75 )  // Corriente sobrepasada
+    if( m_bright > 255+75 )                               // Max Current
     {
         m_bright = 0;
         p->setBrush( Qt::white );
         pen.setColor( QColor( Qt::white ));
     }
 
-    if( m_bright > 20 )
+    int overBight = 100;
+    if( m_bright > 40 )
     {
-        m_bright += 30;    // Set a minimun bright
-        if( m_bright > 255 ) m_bright = 255;
+        m_bright += 10;                          // Set a Minimun Bright
+        if( m_bright > 255 ) 
+        {
+            overBight += m_bright-255;
+            m_bright = 255;
+        }
     }
 
     p->setPen(pen);
 
     drawBackground( p );
 
-    pen.setColor( QColor( m_bright, m_bright, 50 ));
+    pen.setColor( QColor( m_bright, m_bright, overBight ));
     pen.setWidth(2.5);
     p->setPen(pen);
-    p->setBrush( QColor( m_bright, m_bright, 50) );
+    p->setBrush( QColor( m_bright, m_bright, overBight) );
 
     drawForeground( p );
 }

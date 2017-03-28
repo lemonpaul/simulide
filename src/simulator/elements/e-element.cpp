@@ -22,7 +22,7 @@
 
 #include <sstream>
 
-eElement::eElement( string id )
+eElement::eElement( std::string id )
 {
     m_elmId = id;
 
@@ -30,8 +30,12 @@ eElement::eElement( string id )
 }
 eElement::~eElement()
 {
-    //qDebug() << "deleting" << QString::fromStdString( m_elmId );
+    //qDebug() << "eElement::~eElement deleting" << QString::fromStdString( m_elmId );
     Simulator::self()->remFromElementList( this );
+    /*foreach (ePin* epin, m_ePin)
+    {
+        delete epin;
+    }*/
     m_ePin.clear();
 }
 

@@ -26,40 +26,40 @@
 // Constructor
 /////////////////////////////////////////////////////////////////////////////////////////////
 EnumProperty::EnumProperty(const QString &name /* = QString()*/, 
-						   QObject *propertyObject /* = 0*/, QObject *parent /* = 0*/)
+                           QObject *propertyObject /* = 0*/, QObject *parent /* = 0*/)
 : Property(name, propertyObject, parent)
 {
-	// get the meta property object
-	const QMetaObject* meta = propertyObject->metaObject();
-	QMetaProperty prop = meta->property(meta->indexOfProperty(qPrintable(name)));
+    // get the meta property object
+    const QMetaObject* meta = propertyObject->metaObject();
+    QMetaProperty prop = meta->property(meta->indexOfProperty(qPrintable(name)));
 
-	// if it is indeed an enum type, fill the QStringList member with the keys
-	if(prop.isEnumType()){
-		QMetaEnum qenum = prop.enumerator();
-		for(int i=0; i < qenum.keyCount(); i++){
-			m_enum << qenum.key(i);
-		}
-	}
+    // if it is indeed an enum type, fill the QStringList member with the keys
+    if(prop.isEnumType()){
+        QMetaEnum qenum = prop.enumerator();
+        for(int i=0; i < qenum.keyCount(); i++){
+            m_enum << qenum.key(i);
+        }
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // value
 /////////////////////////////////////////////////////////////////////////////////////////////
 QVariant EnumProperty::value(int role /* = Qt::UserRole */) const {
-	if(role == Qt::DisplayRole){
-		if (m_propertyObject){
-			// resolve the value to the corresponding enum key
-			int index = m_propertyObject->property(qPrintable(objectName())).toInt();
+    if(role == Qt::DisplayRole){
+        if (m_propertyObject){
+            // resolve the value to the corresponding enum key
+            int index = m_propertyObject->property(qPrintable(objectName())).toInt();
 
-			const QMetaObject* meta = m_propertyObject->metaObject();
-			QMetaProperty prop = meta->property(meta->indexOfProperty(qPrintable(objectName())));
-			return QVariant(prop.enumerator().valueToKey(index));
-		} else{
-			return QVariant();
-		}
-	} else {
-		return Property::value(role);
-	}
+            const QMetaObject* meta = m_propertyObject->metaObject();
+            QMetaProperty prop = meta->property(meta->indexOfProperty(qPrintable(objectName())));
+            return QVariant(prop.enumerator().valueToKey(index));
+        } else{
+            return QVariant();
+        }
+    } else {
+        return Property::value(role);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,12 +68,12 @@ QVariant EnumProperty::value(int role /* = Qt::UserRole */) const {
 QWidget* EnumProperty::createEditor(QWidget* parent, const QStyleOptionViewItem& option){
         Q_UNUSED(option);
     // create a QComboBox and fill it with the QStringList values
-	QComboBox* editor = new QComboBox(parent);
-	editor->addItems(m_enum);
-	
-	connect(editor, SIGNAL(currentIndexChanged(const QString)), 
-		this, SLOT(valueChanged(const QString)));
-	return editor;
+    QComboBox* editor = new QComboBox(parent);
+    editor->addItems(m_enum);
+    
+    connect(editor, SIGNAL(currentIndexChanged(const QString)), 
+        this, SLOT(valueChanged(const QString)));
+    return editor;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,22 +81,22 @@ QWidget* EnumProperty::createEditor(QWidget* parent, const QStyleOptionViewItem&
 /////////////////////////////////////////////////////////////////////////////////////////////
 bool EnumProperty::setEditorData(QWidget *editor, const QVariant &data)
 {
-	QComboBox* combo = 0;
+    QComboBox* combo = 0;
     if ( (combo = qobject_cast<QComboBox*>(editor)) ){
-		int value = data.toInt();
-		const QMetaObject* meta = m_propertyObject->metaObject();
-		QMetaProperty prop = meta->property(meta->indexOfProperty(qPrintable(objectName())));
-		
-		int index = combo->findText(prop.enumerator().valueToKey(value));
-		if(index == -1)
-			return false;
+        int value = data.toInt();
+        const QMetaObject* meta = m_propertyObject->metaObject();
+        QMetaProperty prop = meta->property(meta->indexOfProperty(qPrintable(objectName())));
+        
+        int index = combo->findText(prop.enumerator().valueToKey(value));
+        if(index == -1)
+            return false;
 
-		combo->setCurrentIndex(index);
-	} else {
-		return false;
-	}
+        combo->setCurrentIndex(index);
+    } else {
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,17 +104,17 @@ bool EnumProperty::setEditorData(QWidget *editor, const QVariant &data)
 /////////////////////////////////////////////////////////////////////////////////////////////
 QVariant EnumProperty::editorData(QWidget *editor)
 {
-	QComboBox* combo = 0;
+    QComboBox* combo = 0;
     if( (combo = qobject_cast<QComboBox*>(editor)) ){
-		return QVariant(combo->currentText());
-	} else {
-		return QVariant();
-	}
+        return QVariant(combo->currentText());
+    } else {
+        return QVariant();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // valueChanged
 /////////////////////////////////////////////////////////////////////////////////////////////
 void EnumProperty::valueChanged(const QString item){
-	setValue(QVariant(item));
+    setValue(QVariant(item));
 }

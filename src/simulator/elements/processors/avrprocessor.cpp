@@ -17,6 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "serialportwidget.h"
 #include "avrprocessor.h"
 #include "simulator.h"
 #include "utils.h"
@@ -27,7 +28,7 @@
 #include "sim_core.h"
 #include "avr_uart.h"
 
-AvrProcessor* AvrProcessor::m_pSelf = 0l;
+//AvrProcessor* AvrProcessor::m_pSelf = 0l;
 
 AvrProcessor::AvrProcessor( QObject* parent ) : BaseProcessor( parent )
 {
@@ -47,7 +48,7 @@ bool AvrProcessor::loadFirmware( QString fileN )
 {
     if ( fileN == "" ) return false;
 
-    if( m_avrProcessor ) terminate();
+    //if( m_avrProcessor ) terminate();
 
     fileN.replace( fileN.split(".").last(), "hex" );
 
@@ -72,28 +73,27 @@ bool AvrProcessor::loadFirmware( QString fileN )
 
     if( fileN.endsWith("hex") )
     {
-        //struct ihex_chunk_t chunk[4];
-        //int cnt = read_ihex_chunks(filename, chunk, 4);
+        //qDebug()<<"!";
 
         ihex_chunk_p chunk = NULL;
         int cnt = read_ihex_chunks(filename, &chunk);
 
-        if (cnt <= 0) 
+        if (cnt <= 0)
         {
             QMessageBox::warning(0,"Error:",
             tr(" Unable to load IHEX file %1\n").arg(fileN) );
             return false;
         }
-        for (int ci = 0; ci < cnt; ci++) 
+        for (int ci = 0; ci < cnt; ci++)
         {
             if (chunk[ci].baseaddr < (1*1024*1024))
             {
                 f.flash = chunk[ci].data;
                 f.flashsize = chunk[ci].size;
                 f.flashbase = chunk[ci].baseaddr;
-            } 
+            }
             else if (chunk[ci].baseaddr >= AVR_SEGMENT_OFFSET_EEPROM ||
-                    chunk[ci].baseaddr + loadBase >= AVR_SEGMENT_OFFSET_EEPROM) 
+                    chunk[ci].baseaddr + loadBase >= AVR_SEGMENT_OFFSET_EEPROM)
             {
                 f.eeprom = chunk[ci].data;
                 f.eesize = chunk[ci].size;
@@ -108,43 +108,66 @@ bool AvrProcessor::loadFirmware( QString fileN )
     }
 
     if( strlen(name) ) strcpy( f.mmcu, name );
-    m_avrProcessor = avr_make_mcu_by_name(f.mmcu);
-
     if( !m_avrProcessor )
     {
-        QMessageBox::warning(0,"Error:",
-        tr("The firmware is not for %1 \n").arg(f.mmcu) );
-        return false;
+        m_avrProcessor = avr_make_mcu_by_name(f.mmcu);
+
+        if( !m_avrProcessor )
+        {
+            QMessageBox::warning(0,"Error:",
+            tr("The firmware is not for %1 \n").arg(f.mmcu) );
+            return false;
+        }
+        int started = avr_init( m_avrProcessor );
+        qDebug() << "\nAvrProcessor::loadFirmware Avr Init: "<< name << (started==0);
     }
-    int started = avr_init( m_avrProcessor );
-    qDebug() << "\nAvrProcessor::loadFirmware Avr Init: "<< name << (started==0);
+
     avr_load_firmware( m_avrProcessor, &f );
 
     if( f.flashbase ) m_avrProcessor->pc = f.flashbase;
 
     m_avrProcessor->frequency = 16000000;
     m_symbolFile = fileN;
-    
-    // Usart interface
-    avr_irq_t* src = avr_io_getirq(m_avrProcessor, AVR_IOCTL_UART_GETIRQ('0'), UART_IRQ_OUTPUT);
-    avr_irq_register_notify(src, uart_pty_in_hook, this);
-    
-    initialized();
-    
-    return true;
-}
 
-void AvrProcessor::step()
-{ 
-    //avr_run( m_avrProcessor );
-    m_avrProcessor->run(m_avrProcessor);
+    // Usart interface
+    // Irq to send data to terminal panel
+    avr_irq_t* src = avr_io_getirq(m_avrProcessor, AVR_IOCTL_UART_GETIRQ('0'), UART_IRQ_OUTPUT);
+    avr_irq_register_notify(src, uart_pty_out_hook, this);
+
+    // Irq to send data to AVR:
+    m_uartInIrq = avr_io_getirq(m_avrProcessor, AVR_IOCTL_UART_GETIRQ('0'), UART_IRQ_INPUT);
+
+
+    initialized();
+
+    return true;
 }
 
 void AvrProcessor::reset()
 {
     if( !m_loadStatus ) return;
+    //avr_init( m_avrProcessor );
     avr_reset( m_avrProcessor );
-    BaseProcessor::reset();
+    //BaseProcessor::reset();
+    //m_avrProcessor->init( m_avrProcessor );
+    m_avrProcessor->pc = 0;
+}
+
+void AvrProcessor::step()
+{
+    if( !m_loadStatus ) return;
+    //avr_run( m_avrProcessor );
+    for( int k=0; k<m_mcuStepsPT; k++ )m_avrProcessor->run(m_avrProcessor);
+}
+
+void AvrProcessor::stepOne()
+{
+    m_avrProcessor->run(m_avrProcessor);
+}
+
+int AvrProcessor::pc()
+{
+    return m_avrProcessor->pc;
 }
 
 int AvrProcessor::getRamValue( QString name )
@@ -155,76 +178,29 @@ int AvrProcessor::getRamValue( QString name )
     int address = name.toInt( &isNumber );      // Try to convert to integer
 
     if( !isNumber ) {address = m_regsTable[name];  /* Is a register name*/}
-    
+
     int value = m_avrProcessor->data[address];//_avr_get_ram( m_avrProcessor, address ); //
 
     return value;
 }
 
-QHash<QString, int> AvrProcessor::getRegsTable( QString lstFileName )// get register addresses from lst file
+int AvrProcessor::getRamValue( int address )
 {
-    QHash<QString, int> regsTable;
-
-    QStringList lineList = fileToStringList( lstFileName, "AvrProcessor::setRegisters" );
-
-    if( !regsTable.isEmpty() ) regsTable.clear();
-
-    foreach( QString line, lineList )
-    {
-        line = line.toLower().replace("\t"," ").replace("="," ");
-        if( line.contains("equ ") || line.contains("def "))      // This line contains a definition
-        {
-            QString name    = "";
-            QString addrtxt = "";
-            int address   = 0;
-            bool isNumber = false;
-
-            line.remove("equ").remove(".def").remove(".");
-            QStringList wordList = line.split(QRegExp("\\s+")); // Split in words
-            while( name.isEmpty() ) name = wordList.takeFirst();
-
-            /*name.right(1).toInt( &isNumber, 10 );
-            if( isNumber ) continue;        // reject names ends in number (pin defs)
-            isNumber = false;*/
-
-            while( addrtxt.isEmpty() ) addrtxt = wordList.takeFirst();
-
-            int base = 10;
-
-            if( addrtxt.startsWith("H") )                  // IS hexadecimal??
-            {
-                addrtxt.remove("H").remove("'");           // Get the digits
-                base = 16;
-            }
-            else if( addrtxt.startsWith("0x") )            // IS hexadecimal??
-            {
-                addrtxt.remove(0, 2);                      // Get the digits
-                base = 16;
-            }
-            if( addrtxt.startsWith("r"))
-            {
-                addrtxt.remove("r");
-                address = addrtxt.toInt( &isNumber );
-            }
-            else
-            {
-                address = addrtxt.toInt( &isNumber, base );
-                if( isNumber && address < 64 ) address += 32;
-
-            }
-            if( isNumber ) regsTable.insert(name, address); // If found a valid address add to map
-            //qDebug() << name << address<<"\n";
-        }
-    }
-    return regsTable;
+    return m_avrProcessor->data[address];
 }
 
-void AvrProcessor::uartOut( uint32_t value )
+int AvrProcessor::validate( int address )
 {
-    if( !m_usartTerm ) return;
+    if( address < 64 ) address += 32;
+    return address;
+}
 
-    QString text;
-    OutPanelText::self()->appendText( text.append( value ) );
+void AvrProcessor::uartIn( uint32_t value ) // Receive one byte on Uart
+{
+    //qDebug() << "AvrProcessor::uartIn: " << value;
+    BaseProcessor::uartIn( value );
+
+    if( m_avrProcessor ) avr_raise_irq( m_uartInIrq, value );
 }
 
 #include "moc_avrprocessor.cpp"

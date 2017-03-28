@@ -41,31 +41,32 @@ Capacitor::Capacitor( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eCapacitor( id.toStdString() )
 {
     m_ePin.resize(2);
+    m_pin.resize(2);
     
     m_area = QRectF( -10, -10, 20, 20 );
 
     QString nodid = m_id;
-    nodid.append(QString("lnod"));
+    nodid.append(QString("-lPin"));
     QPoint nodpos = QPoint(-16-8,0);
-    Pin* pin = new Pin( 180, nodpos, nodid, 0, this);
-    pin->setLength(12);
-    pin->setPos(-16, 0 );
-    m_ePin[0] = pin;
+    m_pin[0] = new Pin( 180, nodpos, nodid, 0, this);
+    m_pin[0]->setLength(12);
+    m_pin[0]->setPos(-16, 0 );
+    m_ePin[0] = m_pin[0];
 
     nodid = m_id;
-    nodid.append( QString("rnod") );
+    nodid.append( QString("-rPin") );
     nodpos = QPoint(16+8,0);
-    pin = new Pin( 0, nodpos, nodid, 1, this );
-    pin->setLength(12);
-    pin->setPos( 16, 0 );
-    m_ePin[1] = pin;
+    m_pin[1] = new Pin( 0, nodpos, nodid, 1, this );
+    m_pin[1]->setLength(12);
+    m_pin[1]->setPos( 16, 0 );
+    m_ePin[1] = m_pin[1];
     
     m_unit = "F";
     setCapac( m_cap );
-    m_valLabel->setPos(-16, 8);
+    setValLabelPos(-16, 8, 0);
     setShowVal( true );
 
-    m_idLabel->setPos(-16,-24);
+    setLabelPos(-16,-24, 0);
 
     /*const QFont sansFont("Helvetica [Cronyx]", 7);
     m_labelcurr = Circuit::self()->addSimpleText( id.toLatin1().data(), sansFont );
@@ -88,13 +89,6 @@ void Capacitor::setUnit( QString un )
 {
     Component::setUnit( un );
     eCapacitor::setCap( m_value*m_unitMult );
-}
-
-void Capacitor::remove()
-{
-    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
-    if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-    Component::remove();
 }
 
 void Capacitor::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )

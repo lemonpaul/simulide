@@ -16,17 +16,20 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
  *                                                                         *
  ***************************************************************************/
+ 
+#include <iostream>
 
 #include "e-pin.h"
 #include "e-node.h"
 
-ePin::ePin( string id, int index )
+ePin::ePin( std::string id, int index )
 {
     m_id     = id;
     m_index = index;
     m_enode    = 0l;
     m_enodeCon = 0l;
     m_connected = false;
+    m_inverted   = false;
 }
 ePin::~ePin()
 {
@@ -58,6 +61,7 @@ void ePin::setEnode( eNode* enode )
 
 void ePin::setEnodeComp( eNode* enode )
 {
+    //std::cout << "\nePin::setEnodeComp "<< m_id << m_connected ;
     m_enodeCon = enode;
     int enodeConNum = 0;
     if( enode ) enodeConNum = enode->getNodeNumber();
@@ -66,19 +70,22 @@ void ePin::setEnodeComp( eNode* enode )
 
 void ePin::stampCurrent( double data )
 {
-    //qDebug() << "connected" << m_connected << data;
+    //qDebug() << "ePin::stampCurrent connected" << m_connected << data;
     if( m_connected ) m_enode->stampCurrent( this, data );
 }
 
 void ePin::stampAdmitance( double data )
 {
-    if( !m_connected )  return;
-    if( !m_enodeCon ) data = 1e-12;
-    m_enode->stampAdmitance( this, data );
+    if( m_connected )
+    {
+        if( !m_enodeCon ) data = 1e-12;
+        m_enode->stampAdmitance( this, data );
+    }
 }
 
 double ePin::getVolt()
 {
+    //std::cout << "\nePin::getVolt "<< m_id << m_connected ;
     if( m_connected )return m_enode->getVolt();
     if( m_enodeCon ) return m_enodeCon->getVolt();
     return 0;

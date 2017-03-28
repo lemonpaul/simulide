@@ -20,11 +20,8 @@
 #ifndef ENODE_H
 #define ENODE_H
 
-#include <QtGui>
-
 #include "e-pin.h"
-
-class eElement;
+#include "e-element.h"
 
 class eNode
 {
@@ -42,8 +39,8 @@ class eNode
         void addToChangedFast( eElement* el );
         void remFromChangedFast( eElement* el );
         
-        void addToChangedSlow( eElement* el );
-        void remFromChangedSlow( eElement* el );
+        void addToReactiveList( eElement* el );
+        void remFromReactiveList( eElement* el );
         
         void addToNoLinList( eElement* el );
         void remFromNoLinList( eElement* el );
@@ -58,18 +55,21 @@ class eNode
 
         double getVolt();
         void  setVolt( double volt );
+        
+        bool needFastUpdate() { return m_needFastUpdate; }
 
         void initialize();
         void stampMatrix();
+        void setSingle( bool single ){ m_single = single; }      // This eNode can calculate it's own Volt
 
         QList<ePin*> getEpins();
         QList<ePin*> getSubEpins();
 
     private:
         QList<ePin*>     m_ePinList;
-        QList<ePin*>     m_ePinSubList;
+        QList<ePin*>     m_ePinSubList;  // Used by Connector to find connected dpins
         QList<eElement*> m_changedFast;
-        QList<eElement*> m_changedSlow;
+        QList<eElement*> m_reactiveList;
         QList<eElement*> m_nonLinear;
 
         QHash<ePin*, double> m_admitList;
@@ -78,7 +78,7 @@ class eNode
         //std::Hash<ePin*, double> m_pru;
         
         QHash<int, double> admit;
-        double m_totalCurr;
+        //double m_totalCurr;
         double m_totalAdmit;
 
         double m_volt;
@@ -86,9 +86,12 @@ class eNode
         int   m_numCons;
 
         QString m_id;
+        
+        bool m_needFastUpdate;
         bool m_currChanged;
         bool m_admitChanged;
-        //bool m_changed;
+        bool m_changed;
+        bool m_single;
 };
 #endif
 

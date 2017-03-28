@@ -19,6 +19,7 @@
 
 #include "potentiometer.h"
 #include "connector.h"
+#include "circuit.h"
 #include "itemlibrary.h"
 
 
@@ -47,10 +48,10 @@ Potentiometer::Potentiometer( QObject* parent, QString type, QString id )
     , m_resA(  (id+"-resA").toStdString() )
     , m_resB(  (id+"-resB").toStdString() )
 {
-    m_area = QRectF( 0, 0, 48, 48 );
+    m_area = QRectF( -2, -2, 52, 52 );
     
     m_dialW.setupWidget();
-    m_dialW.setFixedSize( 44, 44 );
+    m_dialW.setFixedSize( 42, 42 );
     m_dialW.dial->setMinimum(0);
     m_dialW.dial->setMaximum(1000);
     m_dialW.dial->setValue(500);
@@ -58,7 +59,7 @@ Potentiometer::Potentiometer( QObject* parent, QString type, QString id )
     
     m_proxy = Circuit::self()->addWidget( &m_dialW );
     m_proxy->setParentItem( this );
-    m_proxy->setPos( QPoint( 2, 2) );
+    m_proxy->setPos( QPoint( 3, 3) );
     //m_proxy->setFlag(QGraphicsItem::ItemNegativeZStacksBehindParent, true );
 
     m_dial = m_dialW.dial;
@@ -71,9 +72,11 @@ Potentiometer::Potentiometer( QObject* parent, QString type, QString id )
 
     m_unit = "Ω";
     setRes(1000);
-    m_valLabel->setPos( 10, -20);
+    setValLabelPos( 10,-20, 0);
     setShowVal( true );
     resChanged( 500 );
+    
+    setTransformOriginPoint( boundingRect().center() );
     
     Simulator::self()->addToUpdateList( this );
 
@@ -82,8 +85,7 @@ Potentiometer::Potentiometer( QObject* parent, QString type, QString id )
 }
 
 Potentiometer::~Potentiometer() 
-{ 
-    Simulator::self()->remFromUpdateList( this );
+{
 }
 
 void Potentiometer::initialize()
@@ -118,9 +120,8 @@ void Potentiometer::resChanged( int res ) // Called when dial is rotated
 void Potentiometer::setRes( double res ) // Called when property resistance is changed
 {
     Component::setValue( res );       // Takes care about units multiplier
-    m_resist = res*m_unitMult;
+    m_resist = m_value*m_unitMult;
     m_dial->setMaximum( int(m_resist) );
-    //update();
     
     m_changed = true;
 }
@@ -128,7 +129,10 @@ void Potentiometer::setRes( double res ) // Called when property resistance is c
 void Potentiometer::setUnit( QString un ) 
 {
     Component::setUnit( un );
-    setRes( m_value );
+    m_resist = m_value*m_unitMult;
+    m_dial->setMaximum( int(m_resist) );
+
+    m_changed = true;
 }
 
 void Potentiometer::remove()
@@ -136,6 +140,9 @@ void Potentiometer::remove()
     if( m_pinA.isConnected() ) m_pinA.connector()->remove();
     if( m_pinM.isConnected() ) m_pinM.connector()->remove();
     if( m_pinB.isConnected() ) m_pinB.connector()->remove();
+    
+    Simulator::self()->remFromUpdateList( this );
+    
     Component::remove();
 }
 
@@ -144,7 +151,7 @@ void Potentiometer::paint( QPainter *p, const QStyleOptionGraphicsItem *option, 
     p->setBrush(Qt::white);
     p->drawRoundedRect( QRect( 0, 0, 48, 48 ), 1, 1 );
     //p->setBrush(Qt::darkGray);
-    p->fillRect( QRect( 2, 2, 46, 46 ), Qt::darkGray );
+    p->fillRect( QRect( 3, 3, 45, 45 ), Qt::darkGray );
 
     
     //p->drawRoundedRect( QRect( 8, -56, 8, 40 ), 1, 1 );

@@ -24,6 +24,7 @@
 #include <QDomDocument>
 
 #include "QPropertyEditorWidget.h"
+#include "editorwindow.h"
 #include "componentselector.h"
 #include "circuitwidget.h"
 
@@ -39,10 +40,15 @@ class MainWindow : public QMainWindow
         
         void setRate( int rate );
 
-        QTabWidget*  sidepanel;
-        QSplitter*   splitter5;
-        QSplitter*   splitter3;
-        QGridLayout* ramTabWidgetLayout;
+        QTabWidget*   m_sidepanel;
+        QSplitter*    m_Centralsplitter;
+        //QSplitter*   splitter3;
+        QWidget*      m_ramTabWidget;
+        QGridLayout*  m_ramTabWidgetLayout;
+        QToolBar*     m_circToolBar;
+        
+        QPropertyEditorWidget* m_itemprop;
+        EditorWindow* m_editorWindow;
 
     public slots:
         void powerCircOn();
@@ -74,7 +80,10 @@ class MainWindow : public QMainWindow
         void writeSettings();
 
         void applyStile();
-
+        
+        QSettings m_settings;
+        
+        QString m_version;
         QString m_styleSheet;
 
         QString     m_curCirc;
@@ -84,12 +93,9 @@ class MainWindow : public QMainWindow
         CircuitWidget* m_circuit;
         QLabel*        m_rateLabel; 
 
-        QPropertyEditorWidget* itemprop;
         ComponentSelector*     components;
 
         QLineEdit m_findLabel;
-
-        QToolBar* circToolBar;
 
         QAction* exitAct;
         QAction* aboutAct;

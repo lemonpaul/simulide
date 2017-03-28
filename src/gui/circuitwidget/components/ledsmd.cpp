@@ -25,11 +25,6 @@ LedSmd::LedSmd( QObject* parent, QString type, QString id, QRectF area )
     : LedBase( parent, type, id )
 {
     m_area = area;
-
-    /*QString pinId = id;
-    m_ePin[0] = new ePin( pinId.append("ePin-0").toStdString(), 0 );
-    pinId = id;
-    m_ePin[1] = new ePin( pinId.append("ePin-0").toStdString(), 1 );*/
 }
 LedSmd::~LedSmd(){}
 

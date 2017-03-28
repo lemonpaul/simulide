@@ -21,12 +21,12 @@
 #define CIRCMATRIX_H
 
 #include <vector>
-#include <iostream>
-#include <cmath>
+//#include <iostream>
+//#include <cmath>
+
+#include <QList>
 
 #include "e-node.h"
-
-class eElement;
 
 class CircMatrix
 {
@@ -37,19 +37,29 @@ class CircMatrix
  static CircMatrix* self() { return m_pSelf; }
 
         void printMatrix();
-        void createMatrix( int numEnodes );
+        void createMatrix( QList<eNode*> &eNodeList, QList<eElement*> &elementList  );
         void stampMatrix( int row, int col, double value );
         void stampCoef( int row, double value );
+        void simplify();
         bool solveMatrix();
+        
+        std::vector<std::vector<double> > getMatrix(){return m_circMatrix; }
+        std::vector<double>               getCoeffVect(){ return m_coefVect; }
 
     private:
  static CircMatrix* m_pSelf;
+ 
+        void swap( int x, int y );
+ 
+        int m_numEnodes;
+        QList<eNode*>* m_eNodeList;
+        QList<eNode*>  m_eNodeList2;
+        QList<eElement*> m_elementList;
 
         std::vector<std::vector<double> > m_circMatrix;
+        //std::vector<std::vector<double> > m_totalMatrix;
         std::vector<double> m_coefVect;
         std::vector<double> m_nodeVolt;
-        
-        int m_numEnodes;
         
         std::vector<std::vector<double> > a;
         std::vector<double> b;

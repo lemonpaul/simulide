@@ -25,17 +25,21 @@
 class eDiode : public eResistor
 {
     public:
-        eDiode(  string id );
+        eDiode(  std::string id );
         ~eDiode();
 
-        double threshold() { return m_threshold; }
-        void  setThreshold( double threshold );
+        virtual double threshold() { return m_threshold; }
+        virtual void  setThreshold( double threshold );
+        
+        virtual double zenerV(){ return m_zenerV; }
+        virtual void  setZenerV( double zenerV );
 
-        void initialize();
+        virtual void initialize();
 
         virtual void setVChanged();
 
-        void  setRes( double resist );
+        virtual void    setRes( double resist );
+        virtual double  res();
 
     protected:
         void updateVI();
@@ -44,6 +48,9 @@ class eDiode : public eResistor
         double m_deltaV;
         double m_threshold;
         double m_imped;
+        double m_zenerV;
+
+        bool m_converged;
 };
 #endif
 

@@ -22,12 +22,10 @@
 
 #include "e-resistor.h"
 
-class LibraryItem;
-
 class eCapacitor : public eResistor
 {
     public:
-        eCapacitor( string id );
+        eCapacitor( std::string id );
         ~eCapacitor();
 
         void initialize();

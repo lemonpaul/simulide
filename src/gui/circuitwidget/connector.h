@@ -24,7 +24,6 @@
 #include "component.h"
 #include "e-node.h"
 
-class Component;
 class ConnectorLine;
 
 class Connector : public Component
@@ -37,7 +36,7 @@ class Connector : public Component
 
     public:
 
-        QRectF boundingRect() const { return QRect( 0, 0, 0, 0 ); }
+        QRectF boundingRect() const { return QRect( 0, 0, 1, 1 ); }
 
         Connector( QObject* parent, QString type, QString id, Pin* startpin, Pin* endpin = 0l );
         ~Connector();
@@ -101,6 +100,8 @@ class Connector : public Component
 
     public slots:
         virtual void remove();
+        virtual void move( QPointF delta );
+        virtual void setSelected( bool selected );
 
     private:
         void updateCon();

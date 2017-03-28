@@ -21,18 +21,19 @@
 #define ELED_H
 
 #include "e-diode.h"
-#include "pin.h"
 
 class eLed : public eDiode
 {
     public:
-        eLed( string id );
+        eLed( std::string id );
         ~eLed();
 
-        double maxCurrent() const             { return m_maxCurrent; }
-        void  setMaxCurrent( double current ) { m_maxCurrent = current; }
+        virtual double maxCurrent() const             { return m_maxCurrent; }
+        virtual void  setMaxCurrent( double current ) { m_maxCurrent = current; }
 
         void setVChanged();
+
+        void initialize();
 
     protected:
         void updateBright();

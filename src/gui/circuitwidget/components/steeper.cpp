@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "steeper.h"
+#include "simulator.h"
 
 Component*  Steeper::construct( QObject* parent, QString type, QString id )
 {
@@ -78,11 +79,13 @@ Steeper::Steeper( QObject* parent, QString type, QString id )
     m_resB2.setEpin( 1, &m_ePinB2Co );
     
     Simulator::self()->addToUpdateList( this );
+    
+    setLabelPos(-32,-62, 0);
+    setShowId( true );
 }
 
 Steeper::~Steeper()
 {
-    Simulator::self()->remFromUpdateList( this );
 }
 
 void Steeper::setVChanged()
@@ -151,19 +154,19 @@ void Steeper::setRes( double res )
 {
     m_res = res;
     Component::setValue( res );       // Takes care about units multiplier
-    m_resA1.setRes( res*m_unitMult );
-    m_resA2.setRes( res*m_unitMult );
-    m_resB1.setRes( res*m_unitMult );
-    m_resB2.setRes( res*m_unitMult );
+    m_resA1.setResSafe( m_value*m_unitMult );
+    m_resA2.setResSafe( m_value*m_unitMult );
+    m_resB1.setResSafe( m_value*m_unitMult );
+    m_resB2.setResSafe( m_value*m_unitMult );
 }
 
 void Steeper::setUnit( QString un )
 {
     Component::setUnit( un );
-    m_resA1.setRes( m_value*m_unitMult );
-    m_resA2.setRes( m_value*m_unitMult );
-    m_resB1.setRes( m_value*m_unitMult );
-    m_resB2.setRes( m_value*m_unitMult );
+    m_resA1.setResSafe( m_value*m_unitMult );
+    m_resA2.setResSafe( m_value*m_unitMult );
+    m_resB1.setResSafe( m_value*m_unitMult );
+    m_resB2.setResSafe( m_value*m_unitMult );
 }
 
 void Steeper::initialize()
@@ -196,6 +199,19 @@ void Steeper::initialize()
 void Steeper::updateStep()
 {
     update();
+}
+
+void Steeper::remove()
+{
+    if( m_pinA1.isConnected() ) m_pinA1.connector()->remove();
+    if( m_pinA2.isConnected() ) m_pinA2.connector()->remove();
+    if( m_pinCo.isConnected() ) m_pinCo.connector()->remove();
+    if( m_pinB1.isConnected() ) m_pinB1.connector()->remove();
+    if( m_pinB2.isConnected() ) m_pinB2.connector()->remove();
+    
+    Simulator::self()->remFromUpdateList( this ); 
+    
+    Component::remove();
 }
 
 void Steeper::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

@@ -17,9 +17,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <math.h>   // fabs(x,y)
 #include "e-op_amp.h"
 
-eOpAmp::eOpAmp( string id )
+eOpAmp::eOpAmp( std::string id )
     : eElement( id )
 {
     m_ePin.resize(3);
@@ -38,31 +39,25 @@ void eOpAmp::initialize()
     m_k = 1e-6/m_gain;
     m_converged = true;
     
-    if( m_ePin[0]->isConnected() )
-    {
-        m_ePin[0]->getEnode()->addToNoLinList(this);
-    }
-    if( m_ePin[1]->isConnected() )
-    {
-        m_ePin[1]->getEnode()->addToNoLinList(this);
-    }
+    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToNoLinList(this);
+
+    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToNoLinList(this);
+
 }
 
 void eOpAmp::setVChanged() // Called when input pins nodes change volt
 {
-    double vP = m_ePin[0]->getVolt();
-    double vN = m_ePin[1]->getVolt();
-    double vd = vP-vN;
+    double vd = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
 
     //qDebug() << "lastIn " << m_lastIn << "vd " << vd ;
     
     double out = vd * m_gain;
-    if     ( out >= m_voltPos ) out = m_voltPos;
-    else if( out <= m_voltNeg ) out = m_voltNeg;
+    if     ( out > m_voltPos ) out = m_voltPos;
+    else if( out < m_voltNeg ) out = m_voltNeg;
     
     //qDebug() << "lastOut " << m_lastOut << "out " << out << abs(out-m_lastOut)<< "<1e-5 ??";
 
-    if( abs(out-m_lastOut)<1e-5 )
+    if( fabs(out-m_lastOut)<1e-5 )
     {
         m_converged = true;
         return;
@@ -71,22 +66,18 @@ void eOpAmp::setVChanged() // Called when input pins nodes change volt
     if( m_converged )                  // First step after a convergence
     {
         double dOut = -1e-6;
-        if( vd>0 ) dOut =  1e-6;
+        if( vd>0 ) dOut = 1e-6;
         
         out = m_lastOut + dOut;
         m_converged = false;
     }
     else
     {
-        if( m_lastIn != vd )
+        if( m_lastIn != vd ) // We problably are in a close loop configuration
         {
-            // We problably are in a close loop configuration
-            
-            // Input diff with last dOut
-            double dIn  = abs(m_lastIn-vd); 
+            double dIn  = fabs(m_lastIn-vd); // Input diff with last step
             
             // Guess next converging output:
-            //dOut = (vd-out/m_gain)/dIn*1e-4;
             out = (m_lastOut*dIn + vd*1e-6)/(dIn + m_k);
         }
         m_converged = true;
@@ -100,8 +91,8 @@ void eOpAmp::setVChanged() // Called when input pins nodes change volt
     m_lastIn = vd;
     m_lastOut = out;
     
-    m_output->setVoltHigh(out);
-    m_output->stampOutput();
-
+    //m_output->setVoltHigh(out);
+    //m_output->stampOutput();
+    m_ePin[2]->stampCurrent( out/cero_doub );
 }
 

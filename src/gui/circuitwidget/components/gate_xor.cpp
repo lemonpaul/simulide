@@ -31,7 +31,7 @@ LibraryItem* XorGate::libraryItem()
 {
     return new LibraryItem(
         tr( "Xor Gate" ),
-        tr( "Gates" ),
+        tr( "Logic" ),
         "xorgate.png",
         "Xor Gate",
         XorGate::construct );
@@ -71,8 +71,6 @@ void XorGate::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     p->drawPath(path);
 
     // Draw curves
-    //Component::paint( p, option, widget );
-    
     pen.setWidth(2);
     p->setPen(pen);
     
@@ -86,8 +84,6 @@ void XorGate::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 
     // Input side arc close to pins
     p->drawArc( -24, y_orig, 9, height, -1440/*-16*90*/, 2880/*16*180*/ );
-    
-    Gate::paint( p, option, widget );            // draw inverted circle
 }
 
 #include "moc_gate_xor.cpp"

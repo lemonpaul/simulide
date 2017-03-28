@@ -20,20 +20,19 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include <QtWidgets>
-
-#include <sys/time.h>
-#include <iostream>
+#include <qtconcurrentrun.h>
+#include <QElapsedTimer>
 
 #include "e-node.h"
+#include "e-element.h"
 #include "circmatrix.h"
-#include "avrprocessor.h"
+#include "baseprocessor.h"
 
 #ifndef NO_PIC
-#include "gpsimprocessor.h"
+//#include "gpsimprocessor.h"
 #endif
 
-class eElement;
+
 
 class Simulator : public QObject
 {
@@ -48,12 +47,15 @@ class Simulator : public QObject
         void pauseSim();
         void resumeSim();
         void stopSim();
+        void runExtraStep();
         //void reset();
-        //int simuRate();
+        int simuRate() { return m_simuRate; }
         int simuRateChanged( int rate );
 
         int  reaClock();
         void setReaClock( int value );
+        int  noLinClock();
+        void setNoLinClock( int value );
         void setMcuClock( int value );
         
         //int  stepsPT();
@@ -61,8 +63,13 @@ class Simulator : public QObject
         
         unsigned long long step();
 
+        QList<eNode*> geteNodes() { return m_eNodeList; }
+
         void addToEnodeList( eNode* nod );
         void remFromEnodeList( eNode* nod, bool del );
+        
+        void addToChangedNodeList( eNode* nod );
+        void remFromChangedNodeList( eNode* nod );
         
         void addToElementList( eElement* el );
         void remFromElementList( eElement* el );
@@ -76,16 +83,19 @@ class Simulator : public QObject
         void addToChangedFast( eElement* el );
         void remFromChangedFast( eElement* el );
         
-        void addToChangedSlow( eElement* el );
-        void remFromChangedSlow( eElement* el );
+        void addToReactiveList( eElement* el );
+        void remFromReactiveList( eElement* el );
         
-        //void addToRunList( eElement* el );
-        //void remFromRunList( eElement* el );
+        void addToSimuClockList( eElement* el );
+        void remFromSimuClockList( eElement* el );
         
         void addToNoLinList( eElement* el );
         void remFromNoLinList( eElement* el );
+        
+        void addToMcuList( BaseProcessor* proc );
+        void remFromMcuList( BaseProcessor* proc );
 
-        void setNodeVolt( int enode, double v );
+        //void setNodeVolt( int enode, double v );
         //void setChanged( bool changed );
 
         void timerEvent( QTimerEvent* e );
@@ -95,18 +105,24 @@ class Simulator : public QObject
         
         void runCircuit();
         
+        inline void solveMatrix();
+        
         QFuture<void> m_CircuitFuture;
 
         CircMatrix m_matrix;
 
-        std::vector<eNode*>    m_eNodeList;
-        std::vector<eElement*> m_elementList;
-        std::vector<eElement*> m_updateList;
+        QList<eNode*>    m_eNodeList;
+        QList<eNode*>    m_eChangedNodeList;
+        
+        QList<eElement*> m_elementList;
+        QList<eElement*> m_updateList;
         
         //QList<eElement*> m_reactiveList;
         QList<eElement*> m_changedFast;
-        QList<eElement*> m_changedSlow;
+        QList<eElement*> m_reactiveList;
         QList<eElement*> m_nonLinear;
+        QList<eElement*> m_simuClock;
+        QList<BaseProcessor*> m_mcuList;
 
         //bool m_changed;
         bool m_isrunning;
@@ -117,11 +133,13 @@ class Simulator : public QObject
         //int m_reaClock;
         //int m_reaStepsPT;
         int m_stepsPrea;
+        int m_stepsNolin;
         int m_timerTick;
         int m_mcuStepsPT;
         
         int m_circuitRate;
-        int m_slowCounter;
+        int m_noLinCounter;
+        int m_reacCounter;
 
         unsigned long long m_step;
         unsigned long long m_lastStep;
@@ -129,12 +147,14 @@ class Simulator : public QObject
         qint64        m_lastRefTime;
         QElapsedTimer m_RefTimer;
         
-        AvrProcessor avr;
-        avr_t*       m_avrCpu;
+        //QThread      m_mcuThread;
+        
+        //AvrProcessor m_avr;
+        //avr_t*       m_avrCpu;
         
     #ifndef NO_PIC
-        GpsimProcessor pic;
-        pic_processor* m_picCpu;
+        //GpsimProcessor m_pic;
+        //pic_processor* m_picCpu;
     #endif
 };
  #endif

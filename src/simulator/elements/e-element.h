@@ -20,14 +20,14 @@
 #ifndef EELEMENT_H
 #define EELEMENT_H
 
-#include "simulator.h"
-
-class ePin;
+#include <string>
+#include "e-pin.h"
+#include <QPointer>
 
 class eElement
 {
     public:
-        eElement(string id=0);
+    eElement( std::string id=0 );
         virtual ~eElement();
 
         virtual void initEpins();
@@ -38,7 +38,7 @@ class eElement
         
         virtual void setEpin( int num, ePin* pin );
 
-        string getId(){ return m_elmId; }
+        std::string getId(){ return m_elmId; }
 
         virtual void initialize(){;}
         virtual void stamp(){;}
@@ -58,7 +58,7 @@ class eElement
     protected:
         std::vector<ePin*> m_ePin;
 
-        string m_elmId;
+        std::string m_elmId;
         
         bool m_converged;
 };

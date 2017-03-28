@@ -20,16 +20,14 @@
 #ifndef EPIN_H
 #define EPIN_H
 
-#include <iostream>
 #include <string>
-using namespace std;
 
 class eNode;
 
 class ePin
 {
     public:
-        ePin( string id, int index );
+        ePin( std::string id, int index );
         ~ePin();
 
         bool isConnected();
@@ -41,24 +39,29 @@ class ePin
         eNode* getEnode();
         void   setEnode( eNode* enode );
 
-        //eNode* getEnodeComp();
+        eNode* getEnodeComp(){ return m_enodeCon; }
         void   setEnodeComp( eNode* enode ); // The enode at other side of component
+
+        bool inverted() { return m_inverted; }
+        void setInverted( bool inverted ){ m_inverted = inverted; }
 
         void stampAdmitance( double data );
         void stampCurrent( double data );
 
         void reset();
         
-        string getId() { return m_id; }
+        std::string getId()          { return m_id; }
+        void setId( std::string id ) { m_id = id; }
 
     protected:
         eNode* m_enode;
         eNode* m_enodeCon;
 
-        string m_id;
+        std::string m_id;
         int m_index;
 
         bool m_connected;
+        bool m_inverted;
 };
 
 #endif

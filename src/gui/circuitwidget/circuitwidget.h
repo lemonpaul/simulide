@@ -13,9 +13,8 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #ifndef CIRCUITWIDGET_H
@@ -26,7 +25,8 @@
 #include "circuitview.h"
 #include "oscopewidget.h"
 #include "plotterwidget.h"
-#include "outpaneltext.h"
+#include "terminalwidget.h"
+#include "serialportwidget.h"
 
 class CircuitWidget : public QWidget
 {
@@ -38,16 +38,16 @@ class CircuitWidget : public QWidget
 
         void clear();
 
-
     public slots:
 
     private:
-        QVBoxLayout   m_verticalLayout;
-        QHBoxLayout   m_horizontLayout;
-        CircuitView   m_circView;
-        OutPanelText  m_outPanel;
-        OscopeWidget  m_oscope;
-        PlotterWidget m_plotter;
+        QVBoxLayout    m_verticalLayout;
+        QHBoxLayout    m_horizontLayout;
+        CircuitView    m_circView;
+        TerminalWidget m_terminal;
+        OscopeWidget   m_oscope;
+        PlotterWidget  m_plotter;
+        SerialPortWidget m_serialPortWidget;
 };
 
 #endif

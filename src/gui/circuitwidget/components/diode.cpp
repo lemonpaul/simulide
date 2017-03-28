@@ -40,19 +40,16 @@ Diode::Diode( QObject* parent, QString type, QString id )
 {
     m_ePin.resize(2);
     QString nodid = m_id;
-    nodid.append(QString("lnod"));
+    nodid.append(QString("-lPin"));
     QPoint nodpos = QPoint(-16, 0 );
     m_ePin[0] = new Pin( 180, nodpos, nodid, 0, this ); // pPin
 
     nodid = m_id;
-    nodid.append(QString("rnod"));
+    nodid.append(QString("-rPin"));
     nodpos = QPoint( 16, 0 );
     m_ePin[1] = new Pin( 0, nodpos, nodid, 1, this ); // nPin
 }
 Diode::~Diode(){}
-
-double Diode::threshold()                   { return eDiode::threshold(); }
-void   Diode::setThreshold( double threshold ) { eDiode::setThreshold( threshold );}
 
 void Diode::remove()
 {
@@ -60,6 +57,7 @@ void Diode::remove()
     if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
     Component::remove();
 }
+
 
 void Diode::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
@@ -79,6 +77,12 @@ void Diode::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget 
    p->setPen(pen);
 
    p->drawLine( 7, -6, 7, 6 );
+   
+   if( m_zenerV>0 ) 
+   {
+       p->drawLine( 7,-6, 4,-6 );
+       p->drawLine( 7, 6, 10, 6 );
+   }
 }
 
 #include "moc_diode.cpp"

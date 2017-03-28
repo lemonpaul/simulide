@@ -44,7 +44,7 @@ class Hd44780 : public Component, public eElement
         int rows();
         void setRows( int rows );
         
-        void initialize();
+        virtual void initialize();
         
         virtual void setVChanged();
         
@@ -97,6 +97,8 @@ class Hd44780 : public Component, public eElement
         int m_input;
         
         int m_blinkStep;
+        
+        bool m_lastClock;
 
         //Inputs
         Pin* m_pinRS;

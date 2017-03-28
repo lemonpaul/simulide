@@ -22,11 +22,9 @@
 #define PICCOMPONENT_H
 
 #include "mcucomponent.h"
+#include "picprocessor.h"
+#include "itemlibrary.h"
 
-
-class LibraryItem;
-
-class pic_processor;
 
 class PICComponent : public McuComponent
 {
@@ -47,6 +45,8 @@ class PICComponent : public McuComponent
     private:
         void attachPins();
         void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
+        
+        PicProcessor m_pic;
 };
 #endif
 

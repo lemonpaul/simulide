@@ -31,7 +31,7 @@ LibraryItem* Buffer::libraryItem()
 {
     return new LibraryItem(
         tr( "Buffer" ),
-        tr( "Gates" ),
+        tr( "Logic" ),
         "buffer.png",
         "Buffer",
         Buffer::construct );
