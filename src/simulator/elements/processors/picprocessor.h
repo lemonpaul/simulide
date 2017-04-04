@@ -42,8 +42,7 @@ class PicProcessor : public BaseProcessor
         void stepOne();
         void step(); 
         int pc();
-        
-        int getRamValue( QString name );
+
         int getRamValue( int address );
 
         void uartIn( uint32_t value );
