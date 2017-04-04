@@ -53,7 +53,7 @@ class BaseProcessor : public QObject
         virtual void reset()=0;
         virtual int  pc()=0;
 
-        virtual int getRamValue( QString name )=0;
+        virtual int getRamValue( QString name );
         virtual int getRamValue( int address )=0;
         virtual int getRegAddress( QString name );
         virtual void addWatchVar( QString name, int address, QString type );

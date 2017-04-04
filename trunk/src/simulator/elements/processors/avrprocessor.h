@@ -46,7 +46,6 @@ class AvrProcessor : public BaseProcessor
         void step();
         int pc();
 
-        int getRamValue( QString name );
         int getRamValue( int address );
         
         avr_t* getCpu() { return m_avrProcessor; }

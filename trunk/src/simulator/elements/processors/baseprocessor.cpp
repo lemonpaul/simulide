@@ -149,6 +149,19 @@ void BaseProcessor::updateRamValue( QString name )
     if( !type.contains( "8" ) ) m_ramTable->setItemValue( 2, type  );
 }
 
+
+int BaseProcessor::getRamValue( QString name )
+{
+    if( m_regsTable.isEmpty() ) return -1;
+
+    bool isNumber = false;
+    int address = name.toInt( &isNumber );      // Try to convert to integer
+
+    if( !isNumber ) {address = m_regsTable[name.toLower()];  /* Is a register name*/}
+
+    return getRamValue( address );
+}
+
 void BaseProcessor::addWatchVar( QString name, int address, QString type )
 {
     if( !m_regsTable.contains(name) ) 
@@ -166,16 +179,16 @@ void BaseProcessor::setRegisters()// get register addresses from data file
 
     foreach( QString line, lineList )
     {
-        if( line.contains("equ ") )   // This line contains a definition
+        if( line.contains("EQU ") )   // This line contains a definition
         {
-            line = line.toLower().replace("\t"," ");
-            
+            line = line.replace("\t"," ");
+
             QString name    = "";
             QString addrtxt = "";
             int address   = 0;
             bool isNumber = false;
 
-            line.remove("equ");
+            line.remove("EQU");
             QStringList wordList = line.split(" "); // Split in words
             name    = wordList.takeFirst();
             while( addrtxt.isEmpty() ) addrtxt = wordList.takeFirst();

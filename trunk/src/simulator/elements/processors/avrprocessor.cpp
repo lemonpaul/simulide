@@ -170,19 +170,6 @@ int AvrProcessor::pc()
     return m_avrProcessor->pc;
 }
 
-int AvrProcessor::getRamValue( QString name )
-{
-    if( m_regsTable.isEmpty() ) return -1;
-
-    bool isNumber = false;
-    int address = name.toInt( &isNumber );      // Try to convert to integer
-
-    if( !isNumber ) {address = m_regsTable[name];  /* Is a register name*/}
-
-    int value = m_avrProcessor->data[address];//_avr_get_ram( m_avrProcessor, address ); //
-
-    return value;
-}
 
 int AvrProcessor::getRamValue( int address )
 {

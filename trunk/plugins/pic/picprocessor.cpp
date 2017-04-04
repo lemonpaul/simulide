@@ -167,20 +167,6 @@ void PicProcessor::reset()
     //BaseProcessor::reset();
 }
 
-int PicProcessor::getRamValue( QString name ) // Returns the value stored in Ram address
-{
-    if( m_regsTable.isEmpty() ) return -1;
-
-    bool isNumber = false;
-    int address = name.toInt( &isNumber );  // Try to convert to integer
-
-    if( !isNumber ) address = m_regsTable[name];   // Is a register name
-    
-    int value = m_pPicProcessor->rma[address].get_value();
-
-    return value;
-}
-
 int PicProcessor::getRamValue( int address )
 {
     return m_pPicProcessor->rma[address].get_value();
@@ -190,41 +176,6 @@ int PicProcessor::validate( int address )
 {
     return address;
 }
-/*QHash<QString, int>  PicProcessor::getRegsTable( QString lstFileName )// get register addresses from lst file
-{
-    QHash<QString, int> regsTable;
-
-    QStringList lineList = fileToStringList( lstFileName, "PicProcessor::setRegisters" );
-
-    if( !regsTable.isEmpty() ) regsTable.clear();
-
-    foreach( QString line, lineList )
-    {
-        line = line.toLower().replace("\t"," ").replace("="," ");
-        if( line.contains("equ ") )      // This line contains a definition
-        {
-            QString name    = "";
-            QString addrtxt = "";
-            int address   = 0;
-            bool isNumber = false;
-
-            line.remove("equ");
-            QStringList wordList = line.split(QRegExp("\\s+")); // Split in words
-            while( name.isEmpty() ) name = wordList.takeFirst();
-
-            while( addrtxt.isEmpty() ) addrtxt = wordList.takeFirst();
-
-            int base = 10;
-
-            address = addrtxt.toInt( &isNumber, base );
-
-            if( isNumber ) regsTable.insert(name, address); // If found a valid address add to map
-            //qDebug() << name << address<<"\n";
-        }
-    }
-    return regsTable;
-}*/
-
 
 void PicProcessor::uartIn( uint32_t value ) // Receive one byte on Uart
 {
