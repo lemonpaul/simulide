@@ -34,6 +34,7 @@ AvrProcessor::AvrProcessor( QObject* parent ) : BaseProcessor( parent )
 {
     m_pSelf = this;
     m_avrProcessor = 0l;
+    setSteps( 16 );
 }
 AvrProcessor::~AvrProcessor() {}
 
@@ -157,7 +158,14 @@ void AvrProcessor::step()
 {
     if( !m_loadStatus ) return;
     //avr_run( m_avrProcessor );
-    for( int k=0; k<m_mcuStepsPT; k++ )m_avrProcessor->run(m_avrProcessor);
+
+    while( m_avrProcessor->cycle < m_nextCycle )
+    {
+        m_avrProcessor->run(m_avrProcessor);
+    }
+    m_nextCycle += m_mcuStepsPT;
+    //for( int k=0; k<m_mcuStepsPT; k++ )m_avrProcessor->run(m_avrProcessor);
+    //qDebug() << m_avrProcessor->cycle;
 }
 
 void AvrProcessor::stepOne()
