@@ -194,12 +194,12 @@ void PicProcessor::readUsart()
 static int txreg;
 static int txreg0;
 
-    int txstaReg = getRamValue( "txsta" );
+    int txstaReg = BaseProcessor::getRamValue( "txsta" );
     if( !(txstaReg & 32) ) return;                           // TXEN bit
 
     bool trmtBit = txstaReg & 2;
     
-    txreg = getRamValue( "txreg" );
+    txreg = BaseProcessor::getRamValue( "txreg" );
 
     if( txreg != txreg0  )
     {
