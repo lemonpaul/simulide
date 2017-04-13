@@ -18,17 +18,19 @@ INCLUDEPATH +=  /usr/include/glib-2.0\
                         
 LIBS += /usr/lib/libgpsim.so 
 
-DESTDIR = PICplugin/PICplugin-$$_ARCH
+DESTDIR = PICplugin/PICplugin-$$_ARCH/data/plugins
 
 
 
 isEqual( _ARCH,"Lin32") {
 
-    INCLUDEPATH +=  /usr/lib/i386-linux-gnu/glib-2.0/include
+    INCLUDEPATH +=  /usr/lib/i386-linux-gnu/glib-2.0/include \
+                    /usr/local/include/gpsim    
 
 }
 isEqual( _ARCH,"Lin64") {
-    INCLUDEPATH +=  /usr/lib/x86_64-linux-gnu/glib-2.0/include
+    INCLUDEPATH +=  /usr/lib/x86_64-linux-gnu/glib-2.0/include \
+                    /usr/local/include/gpsim
 
 }
 isEqual( _ARCH,"Win32") {
@@ -45,11 +47,6 @@ isEqual( _ARCH,"Win32") {
         LIBS += /home/user/mxe/usr/i686-w64-mingw32.static/lib/libsrc.a 
 }
 isEqual( _ARCH,"Win64") {
-    Release:DESTDIR = ../release
-    
-    LIBS += ../include/simavr/lib/libsimavrW64.a
-    
-    INCLUDEPATH += ../include/simavr/sim
 }
 
 
