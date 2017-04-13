@@ -61,6 +61,7 @@ void BaseProcessor::initialized()
 
     setRegisters();
     m_loadStatus = true;
+    m_nextCycle = m_mcuStepsPT;
 
     if( m_ramTable == 0l )
     {

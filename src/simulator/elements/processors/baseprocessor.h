@@ -76,7 +76,8 @@ class BaseProcessor : public QObject
         QString m_dataFile;
         QString m_device;
         
-        int m_mcuStepsPT;
+        int  m_mcuStepsPT;
+        unsigned long m_nextCycle;
 
         RamTable* m_ramTable;
         QHash<QString, int> m_regsTable;     // int max 32 bits
