@@ -26,17 +26,17 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
 {
     m_area =  QRectF( -11, -9, 22, 11 );
     
-    m_changed = false;
+    m_changed = true;
     
-    QString nodid = m_id;
-    nodid.append(QString("-lnod"));
-    QPoint nodpos = QPoint(-8-8,0);
-    m_ePin[0] = new Pin( 180, nodpos, nodid, 0, this);
+    QString pinid = m_id;
+    pinid.append(QString("-lnod"));
+    QPoint pinpos = QPoint(-8-8,0);
+    m_ePin[0] = new Pin( 180, pinpos, pinid, 0, this);
 
-    nodid = m_id;
-    nodid.append(QString("-rnod"));
-    nodpos = QPoint(8+8,0);
-    m_ePin[1] = new Pin( 0, nodpos, nodid, 1, this);
+    pinid = m_id;
+    pinid.append(QString("-rnod"));
+    pinpos = QPoint(8+8,0);
+    m_ePin[1] = new Pin( 0, pinpos, pinid, 1, this);
 
     //m_idLabel->setText( QString("") );
     m_idLabel->setPos(-12,-24);
