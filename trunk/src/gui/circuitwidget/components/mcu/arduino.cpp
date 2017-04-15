@@ -245,6 +245,8 @@ void Arduino::attachPins()
     // Registra IRQ para recibir petiones de voltaje de pin ( usado en ADC )
     avr_irq_t* adcIrq = avr_io_getirq( cpu, AVR_IOCTL_ADC_GETIRQ, ADC_IRQ_OUT_TRIGGER );
     avr_irq_register_notify( adcIrq, adc_hook, this );
+
+    m_attached = true;
     
     //uart_pty_t m_uart_pty;
     /*uart_pty_init(cpu, &m_uart_pty);

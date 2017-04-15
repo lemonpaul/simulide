@@ -49,8 +49,6 @@ bool AvrProcessor::loadFirmware( QString fileN )
 {
     if ( fileN == "" ) return false;
 
-    //if( m_avrProcessor ) terminate();
-
     fileN.replace( fileN.split(".").last(), "hex" );
 
     if( !QFile::exists(fileN) )     // File not found
@@ -63,19 +61,15 @@ bool AvrProcessor::loadFirmware( QString fileN )
 
     uint32_t loadBase = AVR_SEGMENT_OFFSET_FLASH;
     char name[16] = "";
-    elf_firmware_t f = {{0}};
-
-    //f.frequency = 16000000;
-
     strcpy( name, m_device.toLatin1() );
 
     char filename[200]="";
     strcpy( filename, fileN.toLatin1() );
 
+    elf_firmware_t f = {{0}};
+
     if( fileN.endsWith("hex") )
     {
-        //qDebug()<<"!";
-
         ihex_chunk_p chunk = NULL;
         int cnt = read_ihex_chunks(filename, &chunk);
 
@@ -101,7 +95,6 @@ bool AvrProcessor::loadFirmware( QString fileN )
             }
         }
     }
-    //else if ( fileN.endsWith("axf") ) elf_read_firmware(filename, &f);
     else                                    // File extension not valid
     {
         QMessageBox::warning(0,"Error:", tr("%1 should be .hex \n").arg(fileN) );
@@ -120,6 +113,15 @@ bool AvrProcessor::loadFirmware( QString fileN )
             return false;
         }
         int started = avr_init( m_avrProcessor );
+
+        // Usart interface
+        // Irq to send data to terminal panel
+        avr_irq_t* src = avr_io_getirq(m_avrProcessor, AVR_IOCTL_UART_GETIRQ('0'), UART_IRQ_OUTPUT);
+        avr_irq_register_notify(src, uart_pty_out_hook, this);
+
+        // Irq to send data to AVR:
+        m_uartInIrq = avr_io_getirq(m_avrProcessor, AVR_IOCTL_UART_GETIRQ('0'), UART_IRQ_INPUT);
+
         qDebug() << "\nAvrProcessor::loadFirmware Avr Init: "<< name << (started==0);
     }
 
@@ -128,16 +130,8 @@ bool AvrProcessor::loadFirmware( QString fileN )
     if( f.flashbase ) m_avrProcessor->pc = f.flashbase;
 
     m_avrProcessor->frequency = 16000000;
+    m_avrProcessor->cycle = 0;
     m_symbolFile = fileN;
-
-    // Usart interface
-    // Irq to send data to terminal panel
-    avr_irq_t* src = avr_io_getirq(m_avrProcessor, AVR_IOCTL_UART_GETIRQ('0'), UART_IRQ_OUTPUT);
-    avr_irq_register_notify(src, uart_pty_out_hook, this);
-
-    // Irq to send data to AVR:
-    m_uartInIrq = avr_io_getirq(m_avrProcessor, AVR_IOCTL_UART_GETIRQ('0'), UART_IRQ_INPUT);
-
 
     initialized();
 
@@ -147,24 +141,21 @@ bool AvrProcessor::loadFirmware( QString fileN )
 void AvrProcessor::reset()
 {
     if( !m_loadStatus ) return;
-    //avr_init( m_avrProcessor );
+    //qDebug() << "AvrProcessor::reset";
+
     avr_reset( m_avrProcessor );
-    //BaseProcessor::reset();
-    //m_avrProcessor->init( m_avrProcessor );
     m_avrProcessor->pc = 0;
 }
 
 void AvrProcessor::step()
 {
     if( !m_loadStatus ) return;
-    //avr_run( m_avrProcessor );
-
     while( m_avrProcessor->cycle < m_nextCycle )
     {
         m_avrProcessor->run(m_avrProcessor);
     }
     m_nextCycle += m_mcuStepsPT;
-    //for( int k=0; k<m_mcuStepsPT; k++ )m_avrProcessor->run(m_avrProcessor);
+
     //qDebug() << m_avrProcessor->cycle;
 }
 
