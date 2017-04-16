@@ -76,8 +76,6 @@ Potentiometer::Potentiometer( QObject* parent, QString type, QString id )
     setShowVal( true );
     resChanged( 500 );
     
-    setTransformOriginPoint( boundingRect().center() );
-    
     Simulator::self()->addToUpdateList( this );
 
     connect( m_dial, SIGNAL(valueChanged(int)),

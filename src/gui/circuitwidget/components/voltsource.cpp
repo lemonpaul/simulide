@@ -71,8 +71,6 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
     setValLabelPos(-26, 10 , 0 ); // x, y, rot 
     setShowVal( true );
     
-    setTransformOriginPoint( boundingRect().center() );
-    
     Simulator::self()->addToUpdateList( this );
 
     connect( m_button, SIGNAL( clicked()),
