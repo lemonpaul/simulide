@@ -53,7 +53,7 @@ void eElement::setNumEpins( int n )
     for( int i=0; i<n; i++ )
     {
         std::stringstream ss;
-        ss << m_elmId << "ePin" << i;
+        ss << m_elmId << "-ePin" << i;
         m_ePin[i] = new ePin( ss.str(), i );
     }
 }
@@ -66,9 +66,11 @@ ePin* eElement::getEpin( int pin )
 ePin* eElement::getEpin( QString pinName )
 {
     //qDebug() << "eElement::getEpin" << pinName;
+    if     ( pinName == "lPin") pinName = "ePin0";
+    else if( pinName == "rPin") pinName = "ePin1";
     if( pinName.contains("ePin") )
     {
-        int pin = pinName.remove("ePin").toInt();
+        int pin = pinName.split("-").last().remove("ePin").toInt();
         return m_ePin[pin];
     }
     return 0l;
