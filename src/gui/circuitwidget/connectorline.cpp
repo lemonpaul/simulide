@@ -134,7 +134,7 @@ void ConnectorLine::remove() { m_pConnector->remove(); }
 
 void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-   if( event->button() == Qt::LeftButton && m_pConnector->endPin() ) // If havent endPin means try to connect myself
+   if( event->button() == Qt::LeftButton ) // If havent endPin means try to connect myself
    {
        if( event->modifiers() == Qt::ControlModifier )      // Move Line
        {
@@ -145,8 +145,18 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
            grabMouse();
        }
-       else                // Connecting a wire here: Add a graphic Node
+       else                              // Connecting a wire here: Add a graphic Node
        {
+           if( Circuit::self()->is_constarted() )       // Avoid connect to same eNode
+           {
+               eNode* eNode1 = Circuit::self()->getNewConnector()->enode();
+               eNode* eNode2 = m_pConnector->enode();
+               if( eNode1 == eNode2 )
+               {
+                   event->ignore();
+                   return;
+               }
+           }
            int index;
            int myindex = m_pConnector->lineList()->indexOf( this );
            QPoint point1 = togrid(event->scenePos()).toPoint();
