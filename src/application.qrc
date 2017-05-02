@@ -81,6 +81,7 @@
         <file alias="clock.png">../src/icons/components/clock.png</file>
         <file alias="resistordip.png">../src/icons/components/resistordip.png</file>
         <file alias="ledbar.png">../src/icons/components/ledbar.png</file>
+        <file alias="text.png">../src/icons/components/text.png</file>
         <file alias="font2.png">../src/icons/font/font2.png</file>
         
     </qresource>
