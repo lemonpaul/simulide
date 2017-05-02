@@ -469,7 +469,7 @@ void Label::focusOutEvent(QFocusEvent *event)
 void Label::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if( !isEnabled() ) return;
-    setTextInteractionFlags(Qt::TextEditorInteraction);
+    //setTextInteractionFlags(Qt::TextEditorInteraction);
 
     QGraphicsTextItem::mouseDoubleClickEvent(event);
 
