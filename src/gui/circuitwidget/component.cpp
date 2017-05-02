@@ -282,7 +282,7 @@ void Component::setValLabelPos()
 
 void Component::setValue( double val) 
 { 
-    if( val < 0 ) val = 1e-12;
+    if( val < 1e-12 ) val = 1e-12;
     val = val*m_unitMult;
     
     int index = 4;   // We are in bare units "TGMK munp"
