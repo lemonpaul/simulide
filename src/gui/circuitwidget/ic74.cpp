@@ -20,7 +20,17 @@
 #include "ic74.h"
 
 Component* Ic74::construct( QObject* parent, QString type, QString id )
-{ return new Ic74( parent, type,  id ); }
+{ 
+    Ic74* ic74 = new Ic74( parent, type,  id ); 
+    if( m_error > 0 )
+    {
+        Circuit::self()->compList()->removeOne( ic74 );
+        ic74->deleteLater();
+        ic74 = 0l;
+        m_error = 0;
+    }
+    return ic74;
+}
 
 LibraryItem* Ic74::libraryItem()
 {
