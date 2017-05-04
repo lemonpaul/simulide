@@ -28,6 +28,17 @@
 #include <QPointF>
 #include <cmath>
 
+inline void MessageBoxNB( const QString &title, const QString &message )
+{
+    QMessageBox* msgBox = new QMessageBox( 0l );
+    msgBox->setAttribute( Qt::WA_DeleteOnClose ); //makes sure the msgbox is deleted automatically when closed
+    msgBox->setStandardButtons( QMessageBox::Ok );
+    msgBox->setWindowTitle( title );
+    msgBox->setText( message );
+    msgBox->setModal( false ); 
+    msgBox->open();
+}
+
 inline QString strippedName(const QString &fullFileName)
 {
     return QFileInfo(fullFileName).fileName();
