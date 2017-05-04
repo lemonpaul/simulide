@@ -17,10 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QDomDocument>
+
+#include "utils.h"
+#include "connector.h"
 #include "package.h"
 #include "pin.h"
-#include "connector.h"
-#include <QDomDocument>
 
 Package::Package( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eElement( id.toStdString() )
@@ -36,8 +38,8 @@ void Package::initPackage()
     QFile file( QCoreApplication::applicationDirPath()+"/"+m_dataFile );
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
-          QMessageBox::warning(0, "Package::initPackage",
-          tr("Cannot read file:\n%1:\n%2.").arg(m_dataFile).arg(file.errorString()));
+        MessageBoxNB( "Package::initPackage",
+                  tr("Cannot read file:\n%1:\n%2.").arg(m_dataFile).arg(file.errorString()) );
           m_error = 1;
           return;
     }
@@ -45,10 +47,10 @@ void Package::initPackage()
     QDomDocument domDoc;
     if( !domDoc.setContent(&file) )
     {
-         QMessageBox::warning(0, "Package::initPackage",
-         tr("Cannot set file:\n%1\nto DomDocument") .arg(m_dataFile));
+         MessageBoxNB( "Package::initPackage",
+                   tr("Cannot set file:\n%1\nto DomDocument") .arg(m_dataFile));
          file.close();
-         m_error = 1;
+         m_error = 2;
          return;
     }
     file.close();
@@ -57,9 +59,9 @@ void Package::initPackage()
 
     if( root.tagName()!="package" )
     {
-        QMessageBox::warning(0, "Package::initPackage",
-         tr("Error reading Package file:\n%1\nNo valid Package") .arg(m_dataFile));
-        m_error = 1;
+        MessageBoxNB( "Package::initPackage",
+                  tr("Error reading Package file:\n%1\nNo valid Package") .arg(m_dataFile));
+        m_error = 3;
         return;
     }
 

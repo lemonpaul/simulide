@@ -44,7 +44,17 @@
 #include "ledsmd.h"
 
 Component* SubCircuit::construct( QObject* parent, QString type, QString id )
-{ return new SubCircuit( parent, type,  id ); }
+{ 
+    SubCircuit* subCircuit = new SubCircuit( parent, type,  id ); 
+    if( m_error > 0 )
+    {
+        Circuit::self()->compList()->removeOne( subCircuit );
+        subCircuit->deleteLater();
+        subCircuit = 0l;
+        m_error = 0;
+    }
+    return subCircuit;
+}
 
 LibraryItem* SubCircuit::libraryItem()
 {
@@ -71,7 +81,6 @@ SubCircuit::SubCircuit( QObject* parent, QString type, QString id )
     else
     {
         qDebug() <<"SubCircuit::SubCircuit"<<m_id<<"initPackage  Error!!!\n";
-        m_error = 0;
     }
     
 }
@@ -87,18 +96,18 @@ void SubCircuit::initPackage()
     QFile file( QCoreApplication::applicationDirPath()+"/data/"+m_dataFile );
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
-          QMessageBox::warning(0, "SubCircuit::initPackage",
-          tr("Cannot read file %1:\n%2.").arg(m_dataFile).arg(file.errorString()));
-          m_error = 1;
+          MessageBoxNB( "SubCircuit::initPackage",
+                    tr("Cannot read file %1:\n%2.").arg(m_dataFile).arg(file.errorString()));
+          m_error = 21;
           return;
     }
     QDomDocument domDoc;
     if( !domDoc.setContent(&file) )
     {
-         QMessageBox::warning(0, "SubCircuit::initPackage",
-         tr("Cannot set file %1\nto DomDocument") .arg(m_dataFile));
+         MessageBoxNB( "SubCircuit::initPackage",
+                   tr("Cannot set file %1\nto DomDocument") .arg(m_dataFile));
          file.close();
-         m_error = 2;
+         m_error = 22;
          return;
     }
     file.close();
@@ -118,6 +127,7 @@ void SubCircuit::initPackage()
             {
                 m_dataFile = "data/"+element.attribute( "package" );
                 Package::initPackage();
+                if( m_error != 0 ) return;
 
                 m_dataFile = "data/"+element.attribute( "subcircuit" );
                 break;
@@ -133,16 +143,18 @@ void SubCircuit::initSubcircuit()
     QFile file( QCoreApplication::applicationDirPath()+"/"+m_dataFile );
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
-          QMessageBox::warning(0, "SubCircuit::initSubcircuit",
-          tr("Cannot read file %1:\n%2.").arg(m_dataFile).arg(file.errorString()));
+          MessageBoxNB( "SubCircuit::initSubcircuit",
+                    tr("Cannot read file %1:\n%2.").arg(m_dataFile).arg(file.errorString()));
+          m_error = 23;
           return;
     }
     QDomDocument domDoc;
     if( !domDoc.setContent(&file) )
     {
-         QMessageBox::warning(0, "SubCircuit::initSubcircuit",
-         tr("Cannot set file %1\nto DomDocument") .arg(m_dataFile));
+         MessageBoxNB( "SubCircuit::initSubcircuit",
+                   tr("Cannot set file %1\nto DomDocument") .arg(m_dataFile));
          file.close();
+         m_error = 24;
          return;
     }
     file.close();
@@ -152,7 +164,9 @@ void SubCircuit::initSubcircuit()
 
     if( root.tagName()!="subcircuit" )
     {
-        qDebug() << " SubCircuit::initSubcircuit Error reading Subcircuit file: " << m_dataFile;
+        MessageBoxNB( "SubCircuit::initSubcircuit",
+                  tr("Error reading Subcircuit file: %1\n") .arg(m_dataFile));
+        m_error = 25;
         return;
     }
     if( root.hasAttribute("enodes") )                    // Create eNodes & add to enodList
