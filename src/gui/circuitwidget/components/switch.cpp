@@ -47,7 +47,7 @@ void Switch::onbuttonclicked()
 {
     if( m_resist == cero_doub )                      // switch is Closed
     {
-        m_resist = high_imp;                              // Open Switch
+        m_resist = 1e38;                              // Open Switch
         //stampAdmit( 0 );
     }
     else                                            // Switch is Oppened
