@@ -65,12 +65,13 @@ void SwitchBase::updateStep()
 {
     if( m_changed ) 
     {
-        if( m_resist >= high_imp )
+        /*if( m_resist >= high_imp )
         {
             m_ePin[0]->stampAdmitance( 0 );
             m_ePin[1]->stampAdmitance( 0 );
         }
-        else  eResistor::stamp();
+        else */
+        eResistor::stamp();
         m_changed = false;
     }
 }
