@@ -1,0 +1,78 @@
+<circuit type="simulide_0.1">
+ 
+Fixed Volt.-12: 
+<item x="-428" vflip="1" id="Fixed Volt.-12" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-212" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-12" valLabely="8" rotation="0"/>
+ 
+Fixed Volt.-11: 
+<item x="-428" vflip="1" id="Fixed Volt.-11" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-156" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-11" valLabely="8" rotation="0"/>
+ 
+Fixed Volt.-10: 
+<item x="-428" vflip="1" id="Fixed Volt.-10" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-84" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-10" valLabely="8" rotation="0"/>
+ 
+And Gate-9: 
+<item x="-316" Input_High_V="2.5" vflip="1" Out_High_V="5" id="And Gate-9" hflip="1" labelrot="0" valLabRot="0" Out_Low_V="0" Out_Imped="40" valLabelx="0" Show_id="false" y="-204" labely="-24" Input_Low_V="2.5" Input_Imped="100000000000000" itemtype="And Gate" Inverted="false" Num_Inputs="2" labelx="-16" objectName="And Gate-9" valLabely="0" rotation="0"/>
+ 
+And Gate-8: 
+<item x="-316" Input_High_V="2.5" vflip="1" Out_High_V="5" id="And Gate-8" hflip="1" labelrot="0" valLabRot="0" Out_Low_V="0" Out_Imped="40" valLabelx="0" Show_id="false" y="-92" labely="-24" Input_Low_V="2.5" Input_Imped="100000000000000" itemtype="And Gate" Inverted="false" Num_Inputs="2" labelx="-16" objectName="And Gate-8" valLabely="0" rotation="0"/>
+ 
+Or Gate-7: 
+<item x="-196" Input_High_V="2.5" vflip="1" Out_High_V="5" id="Or Gate-7" hflip="1" labelrot="0" valLabRot="0" Out_Low_V="0" Out_Imped="40" valLabelx="0" Show_id="false" y="-196" labely="-24" Input_Low_V="2.5" Input_Imped="100000000000000" itemtype="Or Gate" Inverted="true" Num_Inputs="2" labelx="-16" objectName="Or Gate-7" valLabely="0" rotation="0"/>
+ 
+Or Gate-6: 
+<item x="-196" Input_High_V="2.5" vflip="1" Out_High_V="5" id="Or Gate-6" hflip="1" labelrot="0" valLabRot="0" Out_Low_V="0" Out_Imped="40" valLabelx="0" Show_id="false" y="-100" labely="-24" Input_Low_V="2.5" Input_Imped="100000000000000" itemtype="Or Gate" Inverted="true" Num_Inputs="2" labelx="-16" objectName="Or Gate-6" valLabely="0" rotation="0"/>
+ 
+Probe-5: 
+<item itemtype="Probe" labelx="16" Show_volt="true" id="Probe-5" rotation="-45" hflip="1" Show_id="false" labely="-16" valLabRot="45" vflip="1" y="-212" valLabely="0" valLabelx="16" objectName="Probe-5" x="-84" labelrot="45"/>
+ 
+Probe-4: 
+<item itemtype="Probe" labelx="16" Show_volt="true" id="Probe-4" rotation="-45" hflip="1" Show_id="false" labely="-16" valLabRot="45" vflip="1" y="-116" valLabely="0" valLabelx="16" objectName="Probe-4" x="-84" labelrot="45"/>
+ 
+Node-3: 
+<item itemtype="Node" labelx="-16" id="Node-3" rotation="0" hflip="1" Show_id="false" labely="-24" valLabRot="0" vflip="1" y="-156" valLabely="0" valLabelx="0" objectName="Node-3" x="-372" labelrot="0"/>
+ 
+Node-2: 
+<item itemtype="Node" labelx="-16" id="Node-2" rotation="0" hflip="1" Show_id="false" labely="-24" valLabRot="0" vflip="1" y="-100" valLabely="0" valLabelx="0" objectName="Node-2" x="-156" labelrot="0"/>
+ 
+Node-1: 
+<item itemtype="Node" labelx="-16" id="Node-1" rotation="0" hflip="1" Show_id="false" labely="-24" valLabRot="0" vflip="1" y="-196" valLabely="0" valLabelx="0" objectName="Node-1" x="-140" labelrot="0"/>
+ 
+Connector-13: 
+<item endpinid="And Gate-9-in0" x="-412" vflip="1" id="Connector-13" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-14" Show_id="false" startpinid="Fixed Volt.-12-outnod" pointList="-412,-212,-332,-212" y="-212" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-13" valLabely="0" rotation="0"/>
+ 
+Connector-15: 
+<item endpinid="And Gate-8-in1" x="-412" vflip="1" id="Connector-15" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-16" Show_id="false" startpinid="Fixed Volt.-10-outnod" pointList="-412,-84,-340,-84" y="-84" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-15" valLabely="0" rotation="0"/>
+ 
+Connector-17: 
+<item endpinid="Or Gate-6-in1" x="-292" vflip="1" id="Connector-17" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-18" Show_id="false" startpinid="And Gate-8-out" pointList="-292,-92,-220,-92" y="-92" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-17" valLabely="0" rotation="0"/>
+ 
+Connector-19: 
+<item endpinid="Node-3-0" x="-340" vflip="1" id="Connector-19" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-20" Show_id="false" startpinid="And Gate-9-in1" pointList="-340,-196,-372,-196,-372,-156" y="-196" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-19" valLabely="0" rotation="0"/>
+ 
+Connector-21: 
+<item endpinid="Node-3-1" x="-412" vflip="1" id="Connector-21" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-20" Show_id="false" startpinid="Fixed Volt.-11-outnod" pointList="-412,-156,-372,-156" y="-156" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-21" valLabely="0" rotation="0"/>
+ 
+Connector-22: 
+<item endpinid="And Gate-8-in0" x="-372" vflip="1" id="Connector-22" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-20" Show_id="false" startpinid="Node-3-2" pointList="-372,-156,-372,-100,-340,-100" y="-156" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-22" valLabely="0" rotation="0"/>
+ 
+Connector-23: 
+<item endpinid="Or Gate-7-in0" x="-292" vflip="1" id="Connector-23" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-24" Show_id="false" startpinid="And Gate-9-out" pointList="-292,-204,-220,-204" y="-204" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-23" valLabely="0" rotation="0"/>
+ 
+Connector-25: 
+<item endpinid="Node-1-0" x="-172" vflip="1" id="Connector-25" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-26" Show_id="false" startpinid="Or Gate-7-out" pointList="-172,-196,-140,-196" y="-196" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-25" valLabely="0" rotation="0"/>
+ 
+Connector-27: 
+<item endpinid="Node-2-0" x="-172" vflip="1" id="Connector-27" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-28" Show_id="false" startpinid="Or Gate-6-out" pointList="-172,-100,-156,-100" y="-100" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-27" valLabely="0" rotation="0"/>
+ 
+Connector-29: 
+<item endpinid="Node-2-1" x="-220" vflip="1" id="Connector-29" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-28" Show_id="false" startpinid="Or Gate-7-in1" pointList="-220,-188,-236,-188,-236,-156,-156,-156,-156,-100" y="-188" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-29" valLabely="0" rotation="0"/>
+ 
+Connector-30: 
+<item endpinid="Probe-4-inpin" x="-156" vflip="1" id="Connector-30" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-28" Show_id="false" startpinid="Node-2-2" pointList="-156,-100,-100,-100" y="-100" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-30" valLabely="0" rotation="0"/>
+ 
+Connector-31: 
+<item endpinid="Node-1-1" x="-220" vflip="1" id="Connector-31" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-26" Show_id="false" startpinid="Or Gate-6-in0" pointList="-220,-108,-236,-108,-236,-140,-140,-140,-140,-196" y="-108" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-31" valLabely="0" rotation="0"/>
+ 
+Connector-32: 
+<item endpinid="Probe-5-inpin" x="-140" vflip="1" id="Connector-32" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-26" Show_id="false" startpinid="Node-1-2" pointList="-140,-196,-100,-196" y="-196" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-32" valLabely="0" rotation="0"/>
+ 
+</circuit>

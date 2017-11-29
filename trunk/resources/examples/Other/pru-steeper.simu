@@ -1,0 +1,36 @@
+<circuit type="simulide_0.1">
+ 
+Fixed Volt.-6: 
+<item x="-260" vflip="1" id="Fixed Volt.-6" hflip="1" labelrot="0" valLabRot="0" valLabelx="-57" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-60" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-6" valLabely="-9" rotation="0"/>
+ 
+Fixed Volt.-5: 
+<item x="-260" vflip="1" id="Fixed Volt.-5" hflip="1" labelrot="0" valLabRot="0" valLabelx="-57" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-76" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-5" valLabely="-10" rotation="0"/>
+ 
+Fixed Volt.-4: 
+<item x="-260" vflip="1" id="Fixed Volt.-4" hflip="1" labelrot="0" valLabRot="0" valLabelx="-58" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-108" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-4" valLabely="-10" rotation="0"/>
+ 
+Fixed Volt.-3: 
+<item x="-260" vflip="1" id="Fixed Volt.-3" hflip="1" labelrot="0" valLabRot="0" valLabelx="-57" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-124" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-3" valLabely="-9" rotation="0"/>
+ 
+Stepper-2: 
+<item x="-148" vflip="1" id="Stepper-2" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" Resistance="100" Show_id="false" Unit=" kΩ" Steps="32" y="-92" labely="-24" itemtype="Stepper" labelx="-16" objectName="Stepper-2" valLabely="0" rotation="0"/>
+ 
+Ground (0 V)-1: 
+<item itemtype="Ground" labelx="-16" id="Ground (0 V)-1" rotation="0" hflip="1" Show_id="false" labely="-24" valLabRot="0" vflip="1" y="-12" valLabely="0" valLabelx="0" objectName="Ground (0 V)-1" x="-228" labelrot="0"/>
+ 
+Connector-7: 
+<item endpinid="Stepper-2-PinA1" x="-244" vflip="1" id="Connector-7" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-8" Show_id="false" startpinid="Fixed Volt.-3-outnod" pointList="-244,-124,-220,-124" y="-124" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-7" valLabely="0" rotation="0"/>
+ 
+Connector-9: 
+<item endpinid="Stepper-2-PinB1" x="-244" vflip="1" id="Connector-9" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-10" Show_id="false" startpinid="Fixed Volt.-4-outnod" pointList="-244,-108,-220,-108" y="-108" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-9" valLabely="0" rotation="0"/>
+ 
+Connector-11: 
+<item endpinid="Stepper-2-PinA2" x="-244" vflip="1" id="Connector-11" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-12" Show_id="false" startpinid="Fixed Volt.-5-outnod" pointList="-244,-76,-220,-76" y="-76" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-11" valLabely="0" rotation="0"/>
+ 
+Connector-13: 
+<item endpinid="Stepper-2-PinB2" x="-244" vflip="1" id="Connector-13" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-14" Show_id="false" startpinid="Fixed Volt.-6-outnod" pointList="-244,-60,-220,-60" y="-60" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-13" valLabely="0" rotation="0"/>
+ 
+Connector-15: 
+<item endpinid="Stepper-2-PinCo" x="-228" vflip="1" id="Connector-15" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-16" Show_id="false" startpinid="Ground (0 V)-1-Gnd" pointList="-228,-28,-228,-92,-220,-92" y="-28" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-15" valLabely="0" rotation="0"/>
+ 
+</circuit>
