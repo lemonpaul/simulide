@@ -1,0 +1,65 @@
+<!DOCTYPE SimulIDE>
+
+<subcircuit enodes="0">
+
+    <item itemtype="eAndGate"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        inverted = "false"
+        numInputs = "2"
+        connections="
+        input0-packagePin1
+        input1-packagePin2
+        output0-packagePin3" >
+    </item>
+
+    <item itemtype="eAndGate"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        inverted = "false"
+        numInputs = "2"
+        connections="
+        input0-packagePin4
+        input1-packagePin5
+        output0-packagePin6" >
+    </item>
+
+    <item itemtype="eAndGate"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        inverted = "false"
+        numInputs = "2"
+        connections="
+        output0-packagePin11
+        input0-packagePin13
+        input1-packagePin12" >
+    </item>
+
+    <item itemtype="eAndGate"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        inverted = "false"
+        numInputs = "2"
+        connections="
+        input0-packagePin10
+        input1-packagePin9
+        output0-packagePin8" >
+    </item>
+
+</subcircuit>

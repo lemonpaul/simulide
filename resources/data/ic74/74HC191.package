@@ -1,0 +1,22 @@
+<!DOCTYPE SimulIDE>
+<package name="74HC191" pins="16" width="6" height="9">
+
+    <pin side="left" pos="1"  type="" id="B"  label="B" /><!-- packagePin1 -->
+    <pin side="left" pos="2"  type="" id="QB"  label="QB" /><!-- packagePin2 -->
+    <pin side="left" pos="3"  type="" id="QA"  label="QA" /><!-- packagePin3 -->
+    <pin side="left" pos="4"  type="" id="!CTEN"  label="!CTEN" /><!-- packagePin4 -->
+    <pin side="left" pos="5"  type="" id="D/!U"  label="D/!U" /><!-- packagePin5 -->
+    <pin side="left" pos="6"  type="" id="QC"  label="QC" /><!-- packagePin6 -->
+	<pin side="left" pos="7"  type="" id="QD"  label="QD" /><!-- packagePin7 -->
+    <pin side="left" pos="8"  type="" id="GND" label="GND"/><!-- packagePin8 -->
+
+	<pin side="right" pos="8" type="" id="D"  label="D" /><!-- packagePin9 -->
+    <pin side="right" pos="7" type="" id="C"  label="C" /><!-- packagePin10 -->
+    <pin side="right" pos="6" type="" id="!LOAD"  label="!LOAD" /><!-- packagePin11 -->
+    <pin side="right" pos="5" type="" id="MAX/MIN"  label="MAX/MIN" /><!-- packagePin12 -->
+    <pin side="right" pos="4" type="" id="!RCO"  label="!RCO" /><!-- packagePin13 -->
+    <pin side="right" pos="3" type="" id="CLK"  label="CLK" /><!-- packagePin14 -->
+    <pin side="right" pos="2" type="" id="A"  label="A" /><!-- packagePin15 -->
+    <pin side="right" pos="1" type="" id="Vcc" label="Vcc"/><!-- packagePin16 -->
+
+</package>

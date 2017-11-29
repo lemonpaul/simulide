@@ -1,0 +1,36 @@
+<circuit type="simulide_0.1">
+ 
+Stepper-3: 
+<item x="-212" vflip="1" id="Stepper" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" Resistance="186.59104522249845" Show_id="true" Unit=" Ω" Steps="64" y="-260" labely="-72" itemtype="Stepper" labelx="-28" objectName="Stepper-3" valLabely="0" rotation="0"/>
+ 
+Arduino Uno-2: 
+<item itemtype="Arduino" labelx="51" id="Arduino Uno" rotation="0" hflip="1" Show_id="true" labely="-20" valLabRot="0" vflip="1" y="-180" valLabely="0" valLabelx="0" Mhz="16" program="stepper_speedControl.cpp.hex" objectName="Arduino Uno-2" x="-308" labelrot="0"/>
+ 
+Potentiometer-1: 
+<item x="-84" vflip="1" id="Speed" hflip="1" labelrot="0" valLabRot="0" valLabelx="26" Value_Ohm="1000" Resistance="5" Show_id="true" Unit=" kΩ" y="-244" labely="-41" itemtype="Potentiometer" labelx="-16" objectName="Potentiometer-1" valLabely="-5" rotation="0" Show_res="true"/>
+ 
+Connector-4: 
+<item endpinid="Arduino Uno-2-PB0" x="-284" vflip="1" id="Connector-4" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-5" Show_id="false" startpinid="Stepper-3-PinA1" pointList="-284,-292,-420,-292,-420,-92,-300,-92" y="-292" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-4" valLabely="0" rotation="0"/>
+ 
+Connector-6: 
+<item endpinid="Arduino Uno-2-PB1" x="-284" vflip="1" id="Connector-6" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-7" Show_id="false" startpinid="Stepper-3-PinB1" pointList="-284,-276,-404,-276,-404,-84,-300,-84" y="-276" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-6" valLabely="0" rotation="0"/>
+ 
+Connector-8: 
+<item endpinid="Arduino Uno-2-PB2" x="-284" vflip="1" id="Connector-8" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-9" Show_id="false" startpinid="Stepper-3-PinA2" pointList="-284,-244,-388,-244,-388,-76,-300,-76" y="-244" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-8" valLabely="0" rotation="0"/>
+ 
+Connector-10: 
+<item endpinid="Arduino Uno-2-PB3" x="-284" vflip="1" id="Connector-10" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-11" Show_id="false" startpinid="Stepper-3-PinB2" pointList="-284,-228,-372,-228,-372,-68,-300,-68" y="-228" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-10" valLabely="0" rotation="0"/>
+ 
+Connector-12: 
+<item endpinid="Arduino Uno-2-GND0" x="-284" vflip="1" id="Connector-12" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-13" Show_id="false" startpinid="Stepper-3-PinCo" pointList="-284,-260,-356,-260,-356,-36,-300,-36" y="-260" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-12" valLabely="0" rotation="0"/>
+ 
+Connector-14: 
+<item endpinid="Arduino Uno-2-GND1" x="-100" vflip="1" id="Connector-14" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-15" Show_id="false" startpinid="Potentiometer-1-PinA" pointList="-100,-244,-100,-100,-156,-100" y="-244" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-14" valLabely="0" rotation="0"/>
+ 
+Connector-16: 
+<item endpinid="Arduino Uno-2-V5V" x="-68" vflip="1" id="Connector-16" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-17" Show_id="false" startpinid="Potentiometer-1-PinB" pointList="-68,-244,-68,-84,-156,-84" y="-244" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-16" valLabely="0" rotation="0"/>
+ 
+Connector-18: 
+<item endpinid="Potentiometer-1-PinM" x="-156" vflip="1" id="Connector-18" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-19" Show_id="false" startpinid="Arduino Uno-2-PC0" pointList="-156,-124,-84,-124,-84,-228" y="-124" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-18" valLabely="0" rotation="0"/>
+ 
+</circuit>

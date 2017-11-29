@@ -1,0 +1,81 @@
+<circuit type="simulide_0.1">
+ 
+74HC08-14: 
+<item itemtype="Subcircuit" labelx="-12" id="74HC08-14" rotation="0" hflip="1" Show_id="true" labely="-20" valLabRot="0" vflip="1" y="-148" valLabely="0" valLabelx="0" objectName="74HC08-14" x="-324" labelrot="0"/>
+ 
+Fixed Volt.-13: 
+<item x="-420" vflip="1" id="Fixed Volt.-13" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-164" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-13" valLabely="8" rotation="0"/>
+ 
+Fixed Volt.-12: 
+<item x="-420" vflip="1" id="Fixed Volt.-12" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-132" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-12" valLabely="8" rotation="0"/>
+ 
+Probe-11: 
+<item itemtype="Probe" labelx="16" Show_volt="true" id="Probe-11" rotation="-45" hflip="1" Show_id="false" labely="-16" valLabRot="45" vflip="1" y="-156" valLabely="0" valLabelx="16" objectName="Probe-11" x="-380" labelrot="45"/>
+ 
+Probe-10: 
+<item itemtype="Probe" labelx="16" Show_volt="true" id="Probe-10" rotation="-45" hflip="1" Show_id="false" labely="-16" valLabRot="45" vflip="1" y="-100" valLabely="0" valLabelx="16" objectName="Probe-10" x="-380" labelrot="45"/>
+ 
+Fixed Volt.-9: 
+<item x="-420" vflip="1" id="Fixed Volt.-9" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-100" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-9" valLabely="8" rotation="0"/>
+ 
+Fixed Volt.-8: 
+<item x="-420" vflip="1" id="Fixed Volt.-8" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-68" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-8" valLabely="8" rotation="0"/>
+ 
+Probe-7: 
+<item itemtype="Probe" labelx="16" Show_volt="true" id="Probe-7" rotation="-45" hflip="1" Show_id="false" labely="-16" valLabRot="45" vflip="1" y="-156" valLabely="0" valLabelx="16" objectName="Probe-7" x="-228" labelrot="45"/>
+ 
+Probe-6: 
+<item itemtype="Probe" labelx="16" Show_volt="true" id="Probe-6" rotation="-45" hflip="1" Show_id="false" labely="-16" valLabRot="45" vflip="1" y="-100" valLabely="0" valLabelx="16" objectName="Probe-6" x="-228" labelrot="45"/>
+ 
+Fixed Volt.-5: 
+<item x="-172" vflip="1" id="Fixed Volt.-5" hflip="-1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-164" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-5" valLabely="8" rotation="0"/>
+ 
+Fixed Volt.-4: 
+<item x="-172" vflip="1" id="Fixed Volt.-4" hflip="-1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-132" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-4" valLabely="8" rotation="0"/>
+ 
+Fixed Volt.-3: 
+<item x="-172" vflip="1" id="Fixed Volt.-3" hflip="-1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-100" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-3" valLabely="8" rotation="0"/>
+ 
+Fixed Volt.-2: 
+<item x="-172" vflip="1" id="Fixed Volt.-2" hflip="-1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-68" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-2" valLabely="8" rotation="0"/>
+ 
+Text-1: 
+<item text="74HC08 QUADRUPLE 2-INPUT POSITIVE-AND GATES" Margin="5" x="-452" vflip="1" id="Text-1" hflip="1" labelrot="0" valLabRot="0" Fixed_Width="true" valLabelx="0" Show_id="false" y="-228" labely="-24" Border="1" itemtype="TextComponent" labelx="-16" objectName="Text-1" valLabely="0" rotation="0"/>
+ 
+Connector-15: 
+<item endpinid="74HC08-14-A1" x="-404" vflip="1" id="Connector-15" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-16" Show_id="false" startpinid="Fixed Volt.-13-outnod" pointList="-404,-164,-348,-164,-348,-140,-332,-140" y="-164" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-15" valLabely="0" rotation="0"/>
+ 
+Connector-17: 
+<item endpinid="74HC08-14-B1" x="-404" vflip="1" id="Connector-17" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-18" Show_id="false" startpinid="Fixed Volt.-12-outnod" pointList="-404,-132,-332,-132" y="-132" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-17" valLabely="0" rotation="0"/>
+ 
+Connector-19: 
+<item endpinid="74HC08-14-Y1" x="-396" vflip="1" id="Connector-19" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-20" Show_id="false" startpinid="Probe-11-inpin" pointList="-396,-140,-396,-124,-332,-124" y="-140" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-19" valLabely="0" rotation="0"/>
+ 
+Connector-21: 
+<item endpinid="74HC08-14-Y2" x="-396" vflip="1" id="Connector-21" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-22" Show_id="false" startpinid="Probe-10-inpin" pointList="-396,-84,-396,-76,-348,-76,-348,-100,-332,-100" y="-84" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-21" valLabely="0" rotation="0"/>
+ 
+Connector-23: 
+<item endpinid="74HC08-14-A2" x="-404" vflip="1" id="Connector-23" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-24" Show_id="false" startpinid="Fixed Volt.-9-outnod" pointList="-404,-100,-404,-116,-332,-116" y="-100" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-23" valLabely="0" rotation="0"/>
+ 
+Connector-25: 
+<item endpinid="74HC08-14-B2" x="-404" vflip="1" id="Connector-25" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-26" Show_id="false" startpinid="Fixed Volt.-8-outnod" pointList="-404,-68,-356,-68,-356,-108,-332,-108" y="-68" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-25" valLabely="0" rotation="0"/>
+ 
+Connector-27: 
+<item endpinid="Fixed Volt.-5-outnod" x="-284" vflip="1" id="Connector-27" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-28" Show_id="false" startpinid="74HC08-14-B4" pointList="-284,-132,-260,-132,-260,-164,-188,-164" y="-132" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-27" valLabely="0" rotation="0"/>
+ 
+Connector-29: 
+<item endpinid="Fixed Volt.-4-outnod" x="-284" vflip="1" id="Connector-29" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-30" Show_id="false" startpinid="74HC08-14-A4" pointList="-284,-124,-188,-124,-188,-132" y="-124" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-29" valLabely="0" rotation="0"/>
+ 
+Connector-31: 
+<item endpinid="Probe-7-inpin" x="-284" vflip="1" id="Connector-31" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-32" Show_id="false" startpinid="74HC08-14-Y4" pointList="-284,-116,-244,-116,-244,-140" y="-116" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-31" valLabely="0" rotation="0"/>
+ 
+Connector-33: 
+<item endpinid="Fixed Volt.-3-outnod" x="-284" vflip="1" id="Connector-33" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-34" Show_id="false" startpinid="74HC08-14-B3" pointList="-284,-108,-188,-108,-188,-100" y="-108" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-33" valLabely="0" rotation="0"/>
+ 
+Connector-35: 
+<item endpinid="Fixed Volt.-2-outnod" x="-284" vflip="1" id="Connector-35" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-36" Show_id="false" startpinid="74HC08-14-A3" pointList="-284,-100,-260,-100,-260,-68,-188,-68" y="-100" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-35" valLabely="0" rotation="0"/>
+ 
+Connector-37: 
+<item endpinid="Probe-6-inpin" x="-284" vflip="1" id="Connector-37" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-38" Show_id="false" startpinid="74HC08-14-Y3" pointList="-284,-92,-244,-92,-244,-84" y="-92" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-37" valLabely="0" rotation="0"/>
+ 
+</circuit>

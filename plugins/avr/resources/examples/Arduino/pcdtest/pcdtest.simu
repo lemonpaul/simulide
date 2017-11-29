@@ -1,0 +1,24 @@
+<circuit type="simulide_0.1">
+ 
+Pcd8544-2: 
+<item itemtype="Pcd8544" labelx="-16" id="Pcd8544-2" rotation="0" hflip="1" Show_id="false" labely="-24" valLabRot="0" vflip="1" y="-300" valLabely="0" valLabelx="0" objectName="Pcd8544-2" x="-372" labelrot="0"/>
+ 
+Arduino Uno-1: 
+<item itemtype="Arduino" labelx="54" id="Arduino Uno" rotation="0" hflip="1" Show_id="true" labely="-24" valLabRot="0" vflip="1" y="-244" valLabely="0" valLabelx="0" Mhz="16" program="pcdtest.cpp.hex" objectName="Arduino Uno-1" x="-284" labelrot="0"/>
+ 
+Connector-3: 
+<item endpinid="Arduino Uno-1-PD3" x="-404" vflip="1" id="Connector-3" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-4" Show_id="false" startpinid="Pcd8544-2-PinRst" pointList="-404,-260,-404,-204,-276,-204" y="-260" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-3" valLabely="0" rotation="0"/>
+ 
+Connector-5: 
+<item endpinid="Arduino Uno-1-PD4" x="-388" vflip="1" id="Connector-5" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-6" Show_id="false" startpinid="Pcd8544-2-PinCs" pointList="-388,-260,-388,-196,-276,-196" y="-260" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-5" valLabely="0" rotation="0"/>
+ 
+Connector-7: 
+<item endpinid="Arduino Uno-1-PD5" x="-372" vflip="1" id="Connector-7" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-8" Show_id="false" startpinid="Pcd8544-2-PinDc" pointList="-372,-260,-372,-188,-276,-188" y="-260" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-7" valLabely="0" rotation="0"/>
+ 
+Connector-9: 
+<item endpinid="Arduino Uno-1-PD6" x="-356" vflip="1" id="Connector-9" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-10" Show_id="false" startpinid="Pcd8544-2-PinSi" pointList="-356,-260,-356,-180,-276,-180" y="-260" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-9" valLabely="0" rotation="0"/>
+ 
+Connector-11: 
+<item endpinid="Arduino Uno-1-PD7" x="-340" vflip="1" id="Connector-11" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-12" Show_id="false" startpinid="Pcd8544-2-PinScl" pointList="-340,-260,-340,-172,-276,-172" y="-260" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-11" valLabely="0" rotation="0"/>
+ 
+</circuit>

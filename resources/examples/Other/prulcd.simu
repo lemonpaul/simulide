@@ -1,0 +1,42 @@
+<circuit type="simulide_0.1">
+ 
+Fixed Volt.-7: 
+<item x="-460" vflip="1" id="Fixed Volt.-7" hflip="1" labelrot="0" valLabRot="0" valLabelx="-60" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-124" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-7" valLabely="-12" rotation="0"/>
+ 
+Fixed Volt.-6: 
+<item x="-460" vflip="1" id="Fixed Volt.-6" hflip="1" labelrot="0" valLabRot="0" valLabelx="-58" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-188" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-6" valLabely="-9" rotation="0"/>
+ 
+Fixed Volt.-5: 
+<item x="-460" vflip="1" id="Fixed Volt.-5" hflip="1" labelrot="0" valLabRot="0" valLabelx="-59" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-204" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-5" valLabely="-9" rotation="0"/>
+ 
+Hd44780-4: 
+<item itemtype="Hd44780" labelx="-16" id="Hd44780-4" rotation="0" hflip="1" Show_id="false" labely="-24" valLabRot="0" vflip="1" Cols="16" y="-228" valLabely="0" valLabelx="0" objectName="Hd44780-4" x="-428" labelrot="0" Rows="2"/>
+ 
+Fixed Volt.-3: 
+<item x="-460" vflip="1" id="Fixed Volt.-3" hflip="1" labelrot="0" valLabRot="0" valLabelx="-61" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-76" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-3" valLabely="-8" rotation="0"/>
+ 
+Fixed Volt.-2: 
+<item x="-460" vflip="1" id="Fixed Volt.-2" hflip="1" labelrot="0" valLabRot="0" valLabelx="-59" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-100" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-2" valLabely="-11" rotation="0"/>
+ 
+Fixed Volt.-1: 
+<item x="-460" vflip="1" id="Fixed Volt.-1" hflip="1" labelrot="0" valLabRot="0" valLabelx="-60" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-148" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-1" valLabely="-11" rotation="0"/>
+ 
+Connector-8: 
+<item endpinid="Hd44780-4-PinEn" x="-444" vflip="1" id="Connector-8" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-9" Show_id="false" startpinid="Fixed Volt.-6-outnod" pointList="-444,-188,-396,-188,-396,-220" y="-188" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-8" valLabely="0" rotation="0"/>
+ 
+Connector-10: 
+<item endpinid="Hd44780-4-dataPin7" x="-444" vflip="1" id="Connector-10" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-11" Show_id="false" startpinid="Fixed Volt.-3-outnod" pointList="-444,-76,-332,-76,-332,-220" y="-76" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-10" valLabely="0" rotation="0"/>
+ 
+Connector-12: 
+<item endpinid="Hd44780-4-dataPin6" x="-444" vflip="1" id="Connector-12" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-13" Show_id="false" startpinid="Fixed Volt.-2-outnod" pointList="-444,-100,-340,-100,-340,-220" y="-100" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-12" valLabely="0" rotation="0"/>
+ 
+Connector-14: 
+<item endpinid="Hd44780-4-dataPin5" x="-444" vflip="1" id="Connector-14" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-15" Show_id="false" startpinid="Fixed Volt.-7-outnod" pointList="-444,-124,-348,-124,-348,-220" y="-124" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-14" valLabely="0" rotation="0"/>
+ 
+Connector-16: 
+<item endpinid="Hd44780-4-dataPin4" x="-444" vflip="1" id="Connector-16" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-17" Show_id="false" startpinid="Fixed Volt.-1-outnod" pointList="-444,-148,-356,-148,-356,-220" y="-148" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-16" valLabely="0" rotation="0"/>
+ 
+Connector-18: 
+<item endpinid="Hd44780-4-PinRS" x="-444" vflip="1" id="Connector-18" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-19" Show_id="false" startpinid="Fixed Volt.-5-outnod" pointList="-444,-204,-412,-204,-412,-220" y="-204" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-18" valLabely="0" rotation="0"/>
+ 
+</circuit>

@@ -1,0 +1,29 @@
+<!DOCTYPE SimulIDE>
+
+<itemlib>
+    
+    <itemset category="Logic/IC 74" type="Subcircuit">
+
+    <item name="74HC04"  package="ic74/74HC04.package"  subcircuit="ic74/74HC04.subcircuit"  icon="ic2.png" ></item>
+    <item name="74HC08"  package="ic74/74HC08.package"  subcircuit="ic74/74HC08.subcircuit"  icon="ic2.png" ></item>
+    <item name="74HC32"  package="ic74/74HC32.package"  subcircuit="ic74/74HC32.subcircuit"  icon="ic2.png" ></item>
+    <item name="74HC42"  package="ic74/74HC42.package"  subcircuit="ic74/74HC42.subcircuit"  icon="ic2.png" ></item>
+    <item name="74HC74"  package="ic74/74HC74.package"  subcircuit="ic74/74HC74.subcircuit"  icon="ic2.png" ></item>
+    <item name="74HC86"  package="ic74/74HC86.package"  subcircuit="ic74/74HC86.subcircuit"  icon="ic2.png" ></item>
+    <item name="74XX90"  package="ic74/74XX90.package"  subcircuit="ic74/74XX90.subcircuit"  icon="ic2.png" ></item>
+    <item name="74XX92"  package="ic74/74XX92.package"  subcircuit="ic74/74XX92.subcircuit"  icon="ic2.png" ></item>
+    <item name="74XX93"  package="ic74/74XX93.package"  subcircuit="ic74/74XX93.subcircuit"  icon="ic2.png" ></item>
+    <item name="74HC138" package="ic74/74HC138.package" subcircuit="ic74/74HC138.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC151" package="ic74/74XX151.package" subcircuit="ic74/74XX151.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC164" package="ic74/74XX164.package" subcircuit="ic74/74XX164.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC165" package="ic74/74HC165.package" subcircuit="ic74/74HC165.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC191" package="ic74/74HC191.package" subcircuit="ic74/74HC191.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC273" package="ic74/74HC273.package" subcircuit="ic74/74HC273.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC573" package="ic74/74XX573.package" subcircuit="ic74/74XX573.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC574" package="ic74/74XX574.package" subcircuit="ic74/74XX574.subcircuit" icon="ic2.png" ></item>
+    <item name="74HC595" package="ic74/74XX595.package" subcircuit="ic74/74XX595.subcircuit" icon="ic2.png" ></item>
+    
+    </itemset>
+
+</itemlib>
+
