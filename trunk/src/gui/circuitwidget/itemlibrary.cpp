@@ -32,6 +32,7 @@
 #include "dectobcd.h"
 #include "demux.h"
 #include "diode.h"
+#include "flipflopd.h"
 #include "flipflopjk.h"
 #include "fulladder.h"
 #include "gate_and.h"
@@ -128,6 +129,7 @@ void ItemLibrary::loadItems()
     addItem( AndGate::libraryItem() );
     addItem( OrGate::libraryItem() );
     addItem( XorGate::libraryItem() );
+    addItem( FlipFlopD::libraryItem() );
     addItem( FlipFlopJK::libraryItem() );
     addItem( BinCounter::libraryItem() );
     addItem( FullAdder::libraryItem() );
