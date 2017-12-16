@@ -34,6 +34,7 @@
 #include "e-gate_or.h"
 #include "e-gate_xor.h"
 #include "e-gate_xor.h"
+#include "e-flipflopd.h"
 #include "e-flipflopjk.h"
 #include "e-demux.h"
 #include "e-mux.h"
@@ -249,6 +250,12 @@ void SubCircuit::initSubcircuit()
                 eFullAdder* efulladder = new eFullAdder( id.toStdString() );
                 efulladder->createPins();
                 ecomponent = efulladder;
+            }
+            else if( type == "eFlipFlopD" )
+            {
+                eFlipFlopD* eFFD = new eFlipFlopD( id.toStdString() );
+                eFFD->createPins();
+                ecomponent = eFFD;
             }
             else if( type == "eFlipFlopJK" )
             {

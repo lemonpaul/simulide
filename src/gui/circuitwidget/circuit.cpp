@@ -389,7 +389,11 @@ void Circuit::loadDomDoc( QDomDocument* doc )
                     {
                         QString itemType = item->itemType();
 
-                        if( itemType == "FlipFlopJK" )
+                        if( itemType == "FlipFlopD" )
+                        {
+                            item->setProperty( "S_R_Inverted", true );
+                        }
+                        else if( itemType == "FlipFlopJK" )
                         {
                             item->setProperty( "S_R_Inverted", true );
                         }

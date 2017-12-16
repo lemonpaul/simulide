@@ -65,6 +65,7 @@
         <file alias="andgate.png">../src/icons/components/andgate.png</file>
         <file alias="orgate.png">../src/icons/components/orgate.png</file>
         <file alias="xorgate.png">../src/icons/components/xorgate.png</file>
+        <file alias="flipflopd.png">../src/icons/components/flipflopd.png</file>
         <file alias="flipflopjk.png">../src/icons/components/flipflopjk.png</file>
         <file alias="potentiometer.png">../src/icons/components/potentiometer.png</file>
         <file alias="push.png">../src/icons/components/push.png</file>
