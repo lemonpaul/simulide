@@ -66,7 +66,7 @@ int PicAsmDebugger::step() // returns source line
 
     int pc = BaseProcessor::self()->pc();
     int line = m_flashToAsm[ pc ];
-    //qDebug() <<"PicAsmDebugger::step"<<pc << line;
+    qDebug() <<"PicAsmDebugger::step"<<pc << line;
     return line ;
 }
 
@@ -117,21 +117,23 @@ void PicAsmDebugger::mapLstToAsm()
             if( asmLine.startsWith("#")) continue;
             if( asmLine.startsWith(".")) continue;
 
-            line = line.remove(" ");
-            if( line.contains(asmLine) ) break;
+            QString lstline = line;
+            if( lstline.remove(" ").contains(asmLine) ) break;
         }
         if( asmLineNumber >= lastAsmLine )
         {
             asmLineNumber = 0;
             continue; // End of asm file
         }
-        QString numberText = line.left( 4 );
+        QStringList words = line.split(' ');
+        QString numberText = words.at(0);
+        //QString numberText = line.left( 4 );
         bool ok = false;
         int address = numberText.toInt( &ok, 16 );  // original adress*2: instruc = 2 bytes
         if( ok )
         {
             m_flashToAsm[address] = asmLineNumber;
-            //qDebug() <<"asmLineNumber"<<asmLineNumber<<"address"<<address;
+            qDebug() <<"asmLineNumber"<<asmLineNumber<<"address"<<address;
         }
     }
     QHashIterator<int, int> i(m_flashToAsm);
