@@ -66,7 +66,7 @@ int PicAsmDebugger::step() // returns source line
 
     int pc = BaseProcessor::self()->pc();
     int line = m_flashToAsm[ pc ];
-    qDebug() <<"PicAsmDebugger::step"<<pc << line;
+    //qDebug() <<"PicAsmDebugger::step"<<pc << line;
     return line ;
 }
 
@@ -133,7 +133,7 @@ void PicAsmDebugger::mapLstToAsm()
         if( ok )
         {
             m_flashToAsm[address] = asmLineNumber;
-            qDebug() <<"asmLineNumber"<<asmLineNumber<<"address"<<address;
+            //qDebug() <<"asmLineNumber"<<asmLineNumber<<"address"<<address;
         }
     }
     QHashIterator<int, int> i(m_flashToAsm);
