@@ -257,6 +257,7 @@ int GcbDebugger::compile()
     m_outPane->writeText( "\n\n" );
 
     QProcess compGcb( 0l );
+    compGcb.setWorkingDirectory( m_fileDir );
     compGcb.start( command );
     compGcb.waitForFinished(-1);
     QString p_stdout = compGcb.readAllStandardOutput();
