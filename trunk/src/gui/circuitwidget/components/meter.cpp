@@ -66,7 +66,7 @@ void Meter::updateStep()
     if( m_dispValue > 1e-12 )
     {
         setValue( m_dispValue );
-        dispVal = int( m_value*10 );
+        dispVal = int( m_value*10+0.5 );
     }
      m_valLabel->setHtml( "<div align='center'><pre>"+decToBase( dispVal/10, 10, 3 )
                           +"."+decToBase( dispVal%10, 10, 1 )
