@@ -44,8 +44,8 @@ Meter::Meter( QObject* parent, QString type, QString id )
 
     const QFont f( "Helvetica [Cronyx]", 10, QFont::Bold );
     m_valLabel->setFont(f);
-    m_valLabel->setEnabled( false );
     m_valLabel->setAcceptedMouseButtons(0);
+    m_valLabel->setEnabled( false );
     m_valLabel->setDefaultTextColor( Qt::yellow );
     //m_valLabel->document()->setDefaultTextOption( QTextOption(Qt::AlignHCenter) );
 
@@ -81,6 +81,20 @@ void Meter::remove()
     Simulator::self()->remFromUpdateList( this );
 
     Component::remove();
+}
+
+void Meter::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+    if( event->button() == Qt::RightButton ) 
+    {
+        event->accept();
+        QMenu* menu = new QMenu();
+        m_eventpoint = mapToScene( togrid(event->pos()) );
+
+        runContextMenu( event->screenPos(), menu );
+        menu->deleteLater();
+    }
+    else Component::mousePressEvent( event );
 }
 
 void Meter::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
