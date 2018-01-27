@@ -135,6 +135,7 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
         void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
+        void runContextMenu( QPoint screenPos, QMenu* menu );
 
         void setValue( double val );
         void setflip();
