@@ -41,6 +41,7 @@ class MAINMODULE_EXPORT Meter : public Component, public eResistor
         void remove();
 
     protected:
+        virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
         double m_dispValue;
 };
 
