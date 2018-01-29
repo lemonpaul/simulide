@@ -48,7 +48,7 @@ class MAINMODULE_EXPORT Clock : public LogicInput
 
     public slots:
         virtual void onbuttonclicked();
-        virtual void setVChanged();
+        virtual void simuClockStep();
         virtual void remove();
 
     private:

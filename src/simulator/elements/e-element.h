@@ -52,15 +52,16 @@ class MAINMODULE_EXPORT eElement
         virtual void resetState(){;}
         virtual void stamp(){;}
 
+        virtual void simuClockStep(){;}
         virtual void updateStep(){;}
         virtual void setVChanged(){;}
         
         virtual bool converged() { return m_converged; }
 
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double cero_doub = 1e-14;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double high_imp  = 1e14;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_high = 5.0;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_low  = 0.0;
+        static GNU_CONST_STATIC_FLOAT_DECLARATION double cero_doub         = 1e-14;
+        static GNU_CONST_STATIC_FLOAT_DECLARATION double high_imp          = 1e14;
+        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_high      = 5.0;
+        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_low       = 0.0;
         static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_threshold = 2.5;
 
     protected:
