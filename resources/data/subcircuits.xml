@@ -4,6 +4,8 @@
     
     <itemset category="Logic/IC 74" type="Subcircuit">
 
+    <item name="74HC00"  package="ic74/74HC00.package"  subcircuit="ic74/74HC00.subcircuit"  icon="ic2.png" ></item>
+    <item name="74HC02"  package="ic74/74HC02.package"  subcircuit="ic74/74HC02.subcircuit"  icon="ic2.png" ></item>
     <item name="74HC04"  package="ic74/74HC04.package"  subcircuit="ic74/74HC04.subcircuit"  icon="ic2.png" ></item>
     <item name="74HC08"  package="ic74/74HC08.package"  subcircuit="ic74/74HC08.subcircuit"  icon="ic2.png" ></item>
     <item name="74HC32"  package="ic74/74HC32.package"  subcircuit="ic74/74HC32.subcircuit"  icon="ic2.png" ></item>
