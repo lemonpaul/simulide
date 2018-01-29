@@ -70,6 +70,7 @@
 #include "switch.h"
 #include "textcomponent.h"
 #include "voltimeter.h"
+#include "volt_reg.h"
 #include "voltsource.h"
 //END Item includes
 
@@ -109,8 +110,9 @@ void ItemLibrary::loadItems()
     addItem( ResistorDip::libraryItem() );
     addItem( Capacitor::libraryItem() );
     addItem( Inductor::libraryItem() );
-    addItem( Diode::libraryItem() );
     // Active
+    addItem( Diode::libraryItem() );
+    addItem( VoltReg::libraryItem() );
     addItem( OpAmp::libraryItem() );
     addItem( Mosfet::libraryItem() );
     // Outputs

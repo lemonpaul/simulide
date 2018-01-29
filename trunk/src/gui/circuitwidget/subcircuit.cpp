@@ -348,6 +348,14 @@ void SubCircuit::initSubcircuit()
                 }
                 ecomponent = emosfet;
             }
+            else if( type == "eVoltReg" )
+            {
+                double volts = 1.2;
+                if( element.hasAttribute("Volts") ) volts = element.attribute( "Volts" ).toDouble();
+                eVoltReg* evoltreg = new eVoltReg( id.toStdString() );
+                evoltreg->setVRef( volts );
+                ecomponent = evoltreg;
+            }
             else if( type == "LedSmd" )
             {
                 int width = 8;
