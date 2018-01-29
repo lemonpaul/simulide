@@ -83,6 +83,7 @@
         <file alias="amperimeter.png">../src/icons/components/amperimeter.png</file>
         <file alias="servo.png">../src/icons/components/servo.png</file>
         <file alias="relay-spst.png">../src/icons/components/relay-spst.png</file>
+        <file alias="voltreg.png">../src/icons/components/voltreg.png</file>
         <file alias="blanc.png">../src/icons/components/blanc.png</file>
         <file alias="font2.png">../src/icons/font/font2.png</file>
         
