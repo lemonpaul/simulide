@@ -28,10 +28,6 @@
 #include "circmatrix.h"
 #include "baseprocessor.h"
 
-#ifndef NO_PIC
-//#include "gpsimprocessor.h"
-#endif
-
 class MAINMODULE_EXPORT Simulator : public QObject
 {
     Q_OBJECT
@@ -39,17 +35,7 @@ class MAINMODULE_EXPORT Simulator : public QObject
         Simulator( QObject* parent=0 );
         ~Simulator();
 
-    enum CircuitRunStage {
-            RunStage_none = 0,
-            RunStage_reactive,
-            RunStage_clock,
-            RunStage_fast,
-            RunStage_nonLinear
-        };
-
  static Simulator* self() { return m_pSelf; }
-
-        CircuitRunStage stage() const { return m_stage; }
 
         void runContinuous();
         void stopTimer();
@@ -57,7 +43,7 @@ class MAINMODULE_EXPORT Simulator : public QObject
         void resumeSim();
         void stopSim();
         void runExtraStep();
-        //void reset();
+        
         int simuRate() { return m_simuRate; }
         int simuRateChanged( int rate );
 
@@ -67,7 +53,6 @@ class MAINMODULE_EXPORT Simulator : public QObject
         void setNoLinClock( int value );
         void setMcuClock( int value );
         
-        //int  stepsPT();
         bool isRunning();
         
         unsigned long long step();
@@ -86,9 +71,6 @@ class MAINMODULE_EXPORT Simulator : public QObject
         void addToUpdateList( eElement* el );
         void remFromUpdateList( eElement* el );
         
-        //void addToReactive( eElement* el );
-        //void remFromReactive( eElement* el );
-        
         void addToChangedFast( eElement* el );
         void remFromChangedFast( eElement* el );
         
@@ -104,9 +86,6 @@ class MAINMODULE_EXPORT Simulator : public QObject
         void addToMcuList( BaseProcessor* proc );
         void remFromMcuList( BaseProcessor* proc );
 
-        //void setNodeVolt( int enode, double v );
-        //void setChanged( bool changed );
-
         void timerEvent( QTimerEvent* e );
 
     private:
@@ -115,8 +94,6 @@ class MAINMODULE_EXPORT Simulator : public QObject
         void runCircuit();
         
         inline void solveMatrix();
-        
-        CircuitRunStage m_stage;
 
         QFuture<void> m_CircuitFuture;
 
@@ -128,22 +105,18 @@ class MAINMODULE_EXPORT Simulator : public QObject
         QList<eElement*> m_elementList;
         QList<eElement*> m_updateList;
         
-        //QList<eElement*> m_reactiveList;
         QList<eElement*> m_changedFast;
         QList<eElement*> m_reactiveList;
         QList<eElement*> m_nonLinear;
         QList<eElement*> m_simuClock;
         QList<BaseProcessor*> m_mcuList;
 
-        //bool m_changed;
         bool m_isrunning;
         bool m_paused;
         int  m_timerId;
 
         int m_numEnodes;
         int m_simuRate;
-        //int m_reaClock;
-        //int m_reaStepsPT;
         int m_stepsPrea;
         int m_stepsNolin;
         int m_timerTick;
@@ -158,15 +131,5 @@ class MAINMODULE_EXPORT Simulator : public QObject
         
         qint64        m_lastRefTime;
         QElapsedTimer m_RefTimer;
-        
-        //QThread      m_mcuThread;
-        
-        //AvrProcessor m_avr;
-        //avr_t*       m_avrCpu;
-        
-    #ifndef NO_PIC
-        //GpsimProcessor m_pic;
-        //pic_processor* m_picCpu;
-    #endif
 };
  #endif

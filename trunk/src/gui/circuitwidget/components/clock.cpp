@@ -84,7 +84,7 @@ void Clock::onbuttonclicked()
     //qDebug() << m_stepsPC << m_isRunning ;
 }
 
-void Clock::setVChanged()
+void Clock::simuClockStep()
 {
     m_step++;
 

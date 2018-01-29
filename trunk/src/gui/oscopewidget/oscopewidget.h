@@ -22,10 +22,11 @@
 
 #include <QtWidgets>
 
+#include "e-element.h"
 #include "renderoscope.h"
 #include "probe.h"
 
-class MAINMODULE_EXPORT OscopeWidget : public QWidget
+class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
 {
     Q_OBJECT
 
@@ -41,6 +42,7 @@ class MAINMODULE_EXPORT OscopeWidget : public QWidget
         void setData();
         void setTicksPs( int tps );
         void setOscopeTick( int tickUs );
+        virtual void simuClockStep();
         
     public slots:
         void speedChanged( int speed );

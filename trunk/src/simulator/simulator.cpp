@@ -37,7 +37,6 @@ Simulator::Simulator( QObject* parent ) : QObject(parent)
 
     m_isrunning = false;
     m_paused    = false;
-    //m_changed   = false;
 
     m_step       = 0;
     m_numEnodes  = 0;
@@ -51,25 +50,12 @@ Simulator::Simulator( QObject* parent ) : QObject(parent)
     
     //QThread      matrixThread;
     //m_matrix.moveToThread( &m_mcuThread );
-    
-    //m_avr.moveToThread( &m_mcuThread );
-    //m_avrCpu = 0l;
-    
-#ifndef NO_PIC
-    //m_pic.moveToThread( &m_mcuThread );
-    //m_picCpu = 0l;
-#endif
-    //m_mcuThread.start();
     //matrixThread.start();
     m_RefTimer.start();
 }
 Simulator::~Simulator() 
 { 
     m_CircuitFuture.waitForFinished();
-    //m_mcuThread.quit();
-    //Sm_mcuThread.wait();
-    //m_mcuThread.deletelater();
-    //m_RefTimer.invalidate();
 }
 
 inline void Simulator::solveMatrix()
@@ -122,7 +108,6 @@ void Simulator::runCircuit()
         m_step ++;
         
         // Run Reactive Elements
-        m_stage = RunStage_reactive;
         if( ++m_reacCounter == m_stepsPrea )
         {
             m_reacCounter = 0;
@@ -131,26 +116,17 @@ void Simulator::runCircuit()
             m_reactiveList.clear();
         }
         // Run Sinchronized to Simulation Clock elements
-        m_stage = RunStage_clock;
-        foreach( eElement* el, m_simuClock ) el->setVChanged();
-        OscopeWidget::self()->setData();
+        foreach( eElement* el, m_simuClock ) el->simuClockStep();
         
         // Run Fast elements
-        m_stage = RunStage_fast;
         foreach( eElement* el, m_changedFast ) el->setVChanged();
         m_changedFast.clear();
         
         if( !m_eChangedNodeList.isEmpty() ) { solveMatrix(); }
         if( !m_isrunning ) return;
         // Run Mcus
-        //foreach( BaseProcessor* proc, m_mcuList ) proc->step();
         if( BaseProcessor::self() ) BaseProcessor::self()->step();
-        //if( m_avrCpu ) m_avr.step(); //m_avrCpu->run(m_avrCpu);//avr_run( m_avrCpu ); //avr.step();
-    #ifndef NO_PIC
-        //if( m_picCpu ) m_pic.step();
-    #endif
 
-        m_stage = RunStage_nonLinear;
         // Run Non-Linear elements
         if( ++m_noLinCounter == m_stepsNolin )
         {
@@ -312,27 +288,6 @@ int Simulator::simuRateChanged( int rate )
     return m_simuRate;
 }
 
-/*int  Simulator::simuRate()   
-{ 
-    return m_simuRate; 
-}*/
-
-/*void Simulator::setChanged( bool changed ) 
-{ 
-    m_changed = changed; 
-}*/
-
-/*void Simulator::setNodeVolt( int enode, double v ) 
-{ 
-    if( isnan(v) )
-    {
-        //qDebug() << "Simulator::setNodeVolt NaN";
-        MainWindow::self()->setRate( -1 );
-        return;
-    }
-    m_eNodeList.at(enode)->setVolt( v ); 
-}*/
-
 bool Simulator::isRunning()  
 { 
     return m_isrunning; 
@@ -379,8 +334,6 @@ void Simulator::setMcuClock( int value )
     BaseProcessor::self()->setSteps( value );
     //m_pic.setSteps( value );
 }
-
-//int  Simulator::stepsPT()    { return m_reaStepsPT; }
 
 unsigned long long Simulator::step() 
 { 

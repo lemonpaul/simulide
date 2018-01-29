@@ -18,11 +18,13 @@
  ***************************************************************************/
 
 #include "oscopewidget.h"
+#include "simulator.h"
 
 OscopeWidget* OscopeWidget::m_pSelf = 0l;
 
 OscopeWidget::OscopeWidget(  QWidget *parent  )
-    : QWidget( parent )
+    : QWidget( parent ),
+      eElement( "oscope" )
 {
     m_pSelf = this;
 
@@ -45,14 +47,14 @@ OscopeWidget::OscopeWidget(  QWidget *parent  )
     m_counter = 0;
     m_tick    = 0;
     m_probe   = 0l;
-    
-
 }
 OscopeWidget::~OscopeWidget(){ }
 
 void OscopeWidget::setProbe( Probe* probe )
 {
     m_probe = probe;
+    if( probe == 0l ) Simulator::self()->remFromSimuClockList( this );
+    else              Simulator::self()->addToSimuClockList( this );
 }
 
 void OscopeWidget::clear()
@@ -77,7 +79,7 @@ void OscopeWidget::step()
     m_counter = 0;
 }
 
-void OscopeWidget::setData()
+void OscopeWidget::simuClockStep()
 {
     if( !m_probe ) return;
     if( m_counter == 140 ) return;
