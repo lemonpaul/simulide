@@ -37,8 +37,6 @@ class MAINMODULE_EXPORT eVoltReg : public eResistor
         virtual void setVRef( double vref ){m_vRef = vref;}
         
     protected:
-        //eSource* m_output;
-        
         double m_vRef;
         double m_voltPos;
         double m_voltNeg;

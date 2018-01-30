@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "dectobcd.h"
-#include "pin.h"
 
 
 Component* DecToBcd::construct( QObject* parent, QString type, QString id )

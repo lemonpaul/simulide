@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2010 by santiago González                               *
+ *   Copyright (C) 2017 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,7 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "connector.h"
 #include "dac.h"
 
 Component* DAC::construct( QObject* parent, QString type, QString id )

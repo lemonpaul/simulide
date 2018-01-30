@@ -97,6 +97,7 @@ void LogicInput::setVolt( double v )
     Component::setValue( v );       // Takes care about units multiplier
     m_voltHight = m_value*m_unitMult;
     m_out->setVoltHigh( m_voltHight );
+    m_out->stampOutput();
     //update();
 }
 
