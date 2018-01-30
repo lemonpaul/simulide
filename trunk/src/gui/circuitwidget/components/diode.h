@@ -21,9 +21,9 @@
 #define DIODE_H
 
 #include "e-diode.h"
-#include "pin.h"
+#include "itemlibrary.h"
 
-class LibraryItem;
+#include <QObject>
 
 class MAINMODULE_EXPORT Diode : public Component, public eDiode
 {
@@ -43,12 +43,6 @@ class MAINMODULE_EXPORT Diode : public Component, public eDiode
         static LibraryItem *libraryItem();
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-
-    public slots:
-        void remove();
-        
-    private:
-
 };
 
 #endif

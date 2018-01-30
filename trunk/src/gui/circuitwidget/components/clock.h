@@ -21,9 +21,8 @@
 #define CLOCK_H
 
 #include "logicinput.h"
-
-
-class LibraryItem;
+#include "itemlibrary.h"
+#include <QObject>
 
 class MAINMODULE_EXPORT Clock : public LogicInput
 {

@@ -1,5 +1,4 @@
 /***************************************************************************
- *                                                                         *
  *   Copyright (C) 2018 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
@@ -14,13 +13,11 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
 
 #include "volt_reg.h"
-
 #include "connector.h"
 #include "pin.h"
 
@@ -72,16 +69,9 @@ VoltReg::VoltReg( QObject* parent, QString type, QString id )
     m_pin[2]->setLabelText( "R" );
     m_pin[2]->setLabelColor( QColor( 0, 0, 0 ) );
     m_ePin[2] = m_pin[2];
-
-    
-    //newId.append("-eSource");
-    //m_output = new eSource( newId.toStdString(), m_ePin[2] );
-    //m_output->setImp( 40 );
-    //m_output->setOut( true );
 }
 VoltReg::~VoltReg()
 {
-    //delete m_output;
 }
 
 void VoltReg::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

@@ -44,24 +44,24 @@ void eVoltReg::initialize()
 
 void eVoltReg::setVChanged() 
 {
-    m_voltPos = m_ePin[0]->getVolt();
+    double inVolt = m_ePin[0]->getVolt();
+    
+    m_voltPos = inVolt;
     if( m_voltPos > 0.7 ) m_voltPos -= 0.7;
     else                  m_voltPos = 0;
     
-    double vRefPin = m_ePin[2]->getVolt();
+    double outVolt = m_ePin[2]->getVolt()+m_vRef;
     
-    double out = vRefPin+m_vRef;
-    
-    if     ( out > m_voltPos ) out = m_voltPos;
-    else if( out < m_voltNeg ) out = m_voltNeg;
-    //qDebug()<< out <<m_lastOut;
+    if     ( outVolt > m_voltPos ) outVolt = m_voltPos;
+    else if( outVolt < m_voltNeg ) outVolt = m_voltNeg;
+    //qDebug()<< outVolt <<m_lastOut;
 
-    if( fabs(out-m_lastOut)<1e-5 ) return;
+    if( fabs(outVolt-m_lastOut)<1e-5 ) return;
     
-    m_lastOut = out;
+    m_lastOut = outVolt;
     
-    double current = (m_ePin[0]->getVolt()-out)/m_resist;
+    double current = (inVolt-outVolt)/m_resist;
     m_ePin[0]->stampCurrent( current );
-    m_ePin[1]->stampCurrent( -current );
+    m_ePin[1]->stampCurrent(-current );
 }
 

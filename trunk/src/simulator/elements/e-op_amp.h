@@ -45,7 +45,6 @@ class MAINMODULE_EXPORT eOpAmp : public eElement
         double m_k;
         double m_voltPos;
         double m_voltNeg;
-        //double m_lastDOut;
         double m_lastOut;
         double m_lastIn;
 };

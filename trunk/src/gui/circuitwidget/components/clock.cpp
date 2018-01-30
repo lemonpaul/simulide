@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "clock.h"
-#include "itemlibrary.h"
+#include "pin.h"
 #include "simulator.h"
 
 Component* Clock::construct( QObject* parent, QString type, QString id )
