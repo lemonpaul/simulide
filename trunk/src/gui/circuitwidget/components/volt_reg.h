@@ -42,8 +42,6 @@ class MAINMODULE_EXPORT VoltReg : public Component, public eVoltReg
         static LibraryItem *libraryItem();
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-        
-    public slots:
 };
 
 

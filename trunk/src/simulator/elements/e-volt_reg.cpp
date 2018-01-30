@@ -23,7 +23,7 @@
 #include "e-volt_reg.h"
 
 eVoltReg::eVoltReg( std::string id )
-    : eElement( id )
+    : eResistor( id )
 {
     m_ePin.resize(3);
 }
@@ -33,10 +33,13 @@ eVoltReg::~eVoltReg()
 
 void eVoltReg::initialize()
 {
+    eResistor::setRes( 1e-6 );
     m_lastOut = 0;
     if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToNoLinList(this);
     if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToNoLinList(this);
     if( m_ePin[2]->isConnected() ) m_ePin[2]->getEnode()->addToNoLinList(this);
+    
+    eResistor::initialize();
 }
 
 void eVoltReg::setVChanged() 
@@ -45,7 +48,7 @@ void eVoltReg::setVChanged()
     if( m_voltPos > 0.7 ) m_voltPos -= 0.7;
     else                  m_voltPos = 0;
     
-    double vRefPin = m_ePin[1]->getVolt();
+    double vRefPin = m_ePin[2]->getVolt();
     
     double out = vRefPin+m_vRef;
     
@@ -56,7 +59,9 @@ void eVoltReg::setVChanged()
     if( fabs(out-m_lastOut)<1e-5 ) return;
     
     m_lastOut = out;
-
-    m_ePin[2]->stampCurrent( out/cero_doub );
+    
+    double current = (m_ePin[0]->getVolt()-out)/m_resist;
+    m_ePin[0]->stampCurrent( current );
+    m_ePin[1]->stampCurrent( -current );
 }
 

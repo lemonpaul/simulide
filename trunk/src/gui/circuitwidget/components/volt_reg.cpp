@@ -60,26 +60,28 @@ VoltReg::VoltReg( QObject* parent, QString type, QString id )
     m_ePin[0] = m_pin[0];
     
     newId = id;
-    newId.append(QString("-ref"));
-    m_pin[1] = new Pin( 270, QPoint( 0, 16 ), newId, 1, this );
-    m_pin[1]->setLabelText( "R" );
+    newId.append(QString("-output"));
+    m_pin[1] = new Pin( 0, QPoint( 16, 0 ), newId, 1, this );
+    m_pin[1]->setLabelText( "O" );
     m_pin[1]->setLabelColor( QColor( 0, 0, 0 ) );
     m_ePin[1] = m_pin[1];
-
+    
     newId = id;
-    newId.append(QString("-output"));
-    m_pin[2] = new Pin( 0, QPoint( 16, 0 ), newId, 2, this );
-    m_pin[2]->setLabelText( "O" );
+    newId.append(QString("-ref"));
+    m_pin[2] = new Pin( 270, QPoint( 0, 16 ), newId, 2, this );
+    m_pin[2]->setLabelText( "R" );
     m_pin[2]->setLabelColor( QColor( 0, 0, 0 ) );
     m_ePin[2] = m_pin[2];
-    newId.append("-eSource");
-    m_output = new eSource( newId.toStdString(), m_ePin[2] );
+
+    
+    //newId.append("-eSource");
+    //m_output = new eSource( newId.toStdString(), m_ePin[2] );
     //m_output->setImp( 40 );
-    m_output->setOut( true );
+    //m_output->setOut( true );
 }
 VoltReg::~VoltReg()
 {
-    delete m_output;
+    //delete m_output;
 }
 
 void VoltReg::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
