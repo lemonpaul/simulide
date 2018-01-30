@@ -134,7 +134,7 @@ void Probe::setVolt( double volt )
     m_voltIn = volt;
 
     if( fabs(volt) < 0.01 ) volt = 0;
-    int dispVolt = int( volt*100 );
+    int dispVolt = int( volt*100+0.5 );
 
     //if( m_showVolt ) m_dispvolt->setPlainText( QString("%1 V").arg(double(dispVolt)/100));
     //else             m_dispvolt->setPlainText("");
