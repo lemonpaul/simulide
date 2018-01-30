@@ -354,6 +354,7 @@ void SubCircuit::initSubcircuit()
                 double volts = 1.2;
                 if( element.hasAttribute("Volts") ) volts = element.attribute( "Volts" ).toDouble();
                 eVoltReg* evoltreg = new eVoltReg( id.toStdString() );
+                evoltreg->setNumEpins(3);
                 evoltreg->setVRef( volts );
                 ecomponent = evoltreg;
             }

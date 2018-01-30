@@ -20,10 +20,10 @@
 #ifndef EVOLTREG_H
 #define EVOLTREG_H
 
-#include "e-element.h"
+#include "e-resistor.h"
 #include "e-source.h"
 
-class MAINMODULE_EXPORT eVoltReg : public eElement
+class MAINMODULE_EXPORT eVoltReg : public eResistor
 {
     public:
 
@@ -37,7 +37,7 @@ class MAINMODULE_EXPORT eVoltReg : public eElement
         virtual void setVRef( double vref ){m_vRef = vref;}
         
     protected:
-        eSource* m_output;
+        //eSource* m_output;
         
         double m_vRef;
         double m_voltPos;
