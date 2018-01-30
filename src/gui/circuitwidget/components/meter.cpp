@@ -67,10 +67,17 @@ void Meter::updateStep()
     {
         setValue( m_dispValue );
         dispVal = int( m_value*10+0.5 );
+        
+        if( dispVal > 999 ) 
+        {
+            setValue( dispVal/10 );
+            dispVal = int( m_value*10 );
+        }
+        //qDebug() <<"Meter::updateStep"<<m_dispValue<< m_value<<dispVal<<m_unitMult;
     }
-     m_valLabel->setHtml( "<div align='center'><pre>"+decToBase( dispVal/10, 10, 3 )
-                          +"."+decToBase( dispVal%10, 10, 1 )
-                          +"<br/>"+m_mult+m_unit+"</pre></div>" );
+    m_valLabel->setHtml( "<div align='center'><pre>"+decToBase( dispVal/10, 10, 3 )
+                        +"."+decToBase( dispVal%10, 10, 1 )
+                        +"<br/>"+m_mult+m_unit+"</pre></div>" );
 }
 
 void Meter::remove()
