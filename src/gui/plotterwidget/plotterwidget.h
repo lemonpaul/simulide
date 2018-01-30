@@ -42,19 +42,25 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
         void step();
         void setData( int channel, int data );
         void setTicksPs( int tps );
-        //void setButtonText( QString text );
         void setPlotterTick( int tickUs );
 
+    public slots:
+        void maxChanged( double value );
+        void minChanged( double value );
+        
     private:
  static PlotterWidget* m_pSelf;
 
         void setupWidget();
+        void setScale();
+        void setRenderData( int channel, int data );
 
         QHBoxLayout* m_horizontalLayout;
         QVBoxLayout* m_verticalLayout;
         QLineEdit*   m_chanLabel[4];
+        QDoubleSpinBox* m_maxValue;
+        QDoubleSpinBox* m_minValue;
 
-        //RenderArea  m_value;
         RenderArea*  m_rArea;
 
         QColor m_color[4];
@@ -64,6 +70,10 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
         int  m_numchan;
         int  m_counter;
         int  m_ticksPs;
+        
+        int m_maxVolt;
+        int m_minVolt;
+        int m_offset;
 };
 
 #endif
