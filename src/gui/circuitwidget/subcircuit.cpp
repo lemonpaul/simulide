@@ -43,6 +43,7 @@
 #include "e-mosfet.h"
 #include "e-logic_device.h"
 #include "e-source.h"
+#include "e-volt_reg.h"
 #include "ledsmd.h"
 #include "simuapi_apppath.h"
 
