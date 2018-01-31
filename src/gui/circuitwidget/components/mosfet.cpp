@@ -20,7 +20,8 @@
 #include "mosfet.h"
 #include "connector.h"
 #include "itemlibrary.h"
-
+#include "e-source.h"
+#include "pin.h"
 
 Component* Mosfet::construct( QObject* parent, QString type, QString id )
 { return new Mosfet( parent, type, id ); }
@@ -79,9 +80,8 @@ void Mosfet::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
 {
     Component::paint( p, option, widget );
     
-    if( m_resist < 1e6 )  p->setBrush( Qt::yellow );
-    else
-    p->setBrush( Qt::white );
+    if( m_DScurrent > 1e-3 )  p->setBrush( Qt::yellow );
+    else                      p->setBrush( Qt::white );
 
     p->drawEllipse( m_area );
     
