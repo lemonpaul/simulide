@@ -20,9 +20,9 @@
 #ifndef MOSFET_H
 #define MOSFET_H
 
-#include "pin.h"
+
 #include "e-mosfet.h"
-#include "e-source.h"
+#include "component.h"
 
 class LibraryItem;
 
@@ -39,9 +39,6 @@ class MAINMODULE_EXPORT Mosfet : public Component, public eMosfet
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
-        
-        double RDSon()                { return m_RDSon; }
-        void  setRDSon( double rdson ){ m_RDSon = rdson; }
         
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
         
