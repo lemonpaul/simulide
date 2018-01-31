@@ -40,16 +40,20 @@ Voltimeter::Voltimeter( QObject* parent, QString type, QString id )
 {
     m_unit = "V";
     setRes( high_imp );
-    updateStep();
+    Meter::updateStep();
 }
 Voltimeter::~Voltimeter(){}
 
 void Voltimeter::updateStep()
 {
-    setUnit("V");
-    m_dispValue = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
-
-    Meter::updateStep();
+    double volt = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
+    
+    if( volt != m_dispValue )
+    {
+        setUnit("V");
+        m_dispValue = volt;
+        Meter::updateStep();
+    }
 }
 
 #include "moc_voltimeter.cpp"

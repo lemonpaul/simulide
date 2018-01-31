@@ -40,16 +40,20 @@ Amperimeter::Amperimeter( QObject* parent, QString type, QString id )
 {
     m_unit = "A";
     setRes( 1e-6 );
-    updateStep();
+    Meter::updateStep();
 }
 Amperimeter::~Amperimeter(){}
 
 void Amperimeter::updateStep()
 {
-    setUnit("A");
-    m_dispValue = current();
-
-    Meter::updateStep();
+    double curr = current();
+    
+    if( curr != m_dispValue )
+    { 
+        setUnit("A");
+        m_dispValue = curr;
+        Meter::updateStep();
+    }
 }
 
 #include "moc_amperimeter.cpp"
