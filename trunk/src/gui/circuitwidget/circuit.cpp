@@ -39,6 +39,8 @@ Circuit::Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  p
     m_con_started = false;
     new_connector = 0l;
     m_seqNumber   = 0;
+    
+    m_nlAcc = 5; // Non-Linear accuracy
 }
 
 Circuit::~Circuit()
@@ -53,6 +55,14 @@ Circuit::~Circuit()
     }
 }
 
+int Circuit::nlAcc()              { return m_nlAcc; }
+void  Circuit::setNlAcc( int ac ) 
+{ 
+    if     ( ac < 3 )  ac = 3;
+    else if( ac > 12 ) ac = 12;
+    m_nlAcc = ac; 
+}
+        
 int Circuit::reactStep()
 {
     return Simulator::self()->reaClock();

@@ -49,7 +49,7 @@ Diode::Diode( QObject* parent, QString type, QString id )
     nodid.append(QString("-rPin"));
     nodpos = QPoint( 16, 0 );
     m_pin[1] = new Pin( 0, nodpos, nodid, 1, this ); // nPin
-    m_ePin[0] = m_pin[0];
+    m_ePin[1] = m_pin[1];
 }
 Diode::~Diode(){}
 

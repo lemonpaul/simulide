@@ -80,8 +80,8 @@ void Mosfet::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
 {
     Component::paint( p, option, widget );
     
-    if( m_DScurrent > 1e-3 )  p->setBrush( Qt::yellow );
-    else                      p->setBrush( Qt::white );
+    if( m_gateV > 0 )  p->setBrush( Qt::yellow );
+    else               p->setBrush( Qt::white );
 
     p->drawEllipse( m_area );
     

@@ -41,6 +41,7 @@ class MAINMODULE_EXPORT eOpAmp : public eElement
         
         bool m_connected;
         
+        double m_accuracy;
         double m_gain;
         double m_k;
         double m_voltPos;
