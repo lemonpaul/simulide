@@ -21,6 +21,7 @@
 #include <QDebug>
 
 #include "e-volt_reg.h"
+#include "circuit.h"
 
 eVoltReg::eVoltReg( std::string id )
     : eResistor( id )
@@ -34,6 +35,10 @@ eVoltReg::~eVoltReg()
 void eVoltReg::initialize()
 {
     eResistor::setRes( 1e-6 );
+    
+    int exp = Circuit::self()->nlAcc();
+    m_accuracy = 1/pow(10,exp);
+    
     m_lastOut = 0;
     if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToNoLinList(this);
     if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToNoLinList(this);
@@ -56,7 +61,7 @@ void eVoltReg::setVChanged()
     else if( outVolt < m_voltNeg ) outVolt = m_voltNeg;
     //qDebug()<< outVolt <<m_lastOut;
 
-    if( fabs(outVolt-m_lastOut)<1e-5 ) return;
+    if( fabs(outVolt-m_lastOut)<m_accuracy ) return;
     
     m_lastOut = outVolt;
     
