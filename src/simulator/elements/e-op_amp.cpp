@@ -19,6 +19,7 @@
 
 #include <math.h>   // fabs(x,y)
 #include "e-op_amp.h"
+#include "circuit.h"
 
 eOpAmp::eOpAmp( std::string id )
     : eElement( id )
@@ -34,6 +35,9 @@ eOpAmp::~eOpAmp()
 
 void eOpAmp::initialize()
 {
+    int exp = Circuit::self()->nlAcc();
+    m_accuracy = 1/pow(10,exp);
+    
     m_lastOut = 0;
     m_lastIn  = 0;
     m_k = 1e-6/m_gain;
@@ -57,7 +61,7 @@ void eOpAmp::setVChanged() // Called when input pins nodes change volt
     
     //qDebug() << "lastOut " << m_lastOut << "out " << out << abs(out-m_lastOut)<< "<1e-5 ??";
 
-    if( fabs(out-m_lastOut)<1e-5 )
+    if( fabs(out-m_lastOut) < m_accuracy )
     {
         m_converged = true;
         return;

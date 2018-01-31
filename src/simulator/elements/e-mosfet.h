@@ -49,11 +49,12 @@ class MAINMODULE_EXPORT eMosfet : public eResistor
         }
         
     protected:
+        double m_accuracy;
         double m_lastCurrent;
-        double m_DScurrent;
         double m_threshold;
         double m_kRDSon;
         double m_RDSon;
+        double m_gateV;
         double m_Gth;
 
         bool m_Pchannel;

@@ -31,9 +31,11 @@
 class MAINMODULE_EXPORT Circuit : public QGraphicsScene
 {
     Q_OBJECT
+    
+    Q_PROPERTY( int Speed     READ circSpeed WRITE setCircSpeed DESIGNABLE true USER true )
     Q_PROPERTY( int ReactStep READ reactStep WRITE setReactStep DESIGNABLE true USER true )
     Q_PROPERTY( int NoLinStep READ noLinStep WRITE setNoLinStep DESIGNABLE true USER true )
-    Q_PROPERTY( int Speed     READ circSpeed WRITE setCircSpeed DESIGNABLE true USER true )
+    Q_PROPERTY( int NoLinAcc  READ nlAcc     WRITE setNlAcc     DESIGNABLE true USER true )
 
     public:
         Circuit(qreal x, qreal y, qreal width, qreal height, QGraphicsView*  parent);
@@ -49,6 +51,9 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         
         int  circSpeed();
         void setCircSpeed( int rate );
+        
+        int  nlAcc();
+        void setNlAcc( int ac );
         
         void remove();
         void saveState();
@@ -108,6 +113,8 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         QString getCompId( QString name );
 
  static Circuit*  m_pSelf;
+ 
+        int m_nlAcc;
 
         QDomDocument m_domDoc;
         QDomDocument m_copyDoc;
