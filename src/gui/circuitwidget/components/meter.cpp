@@ -23,6 +23,7 @@
 #include "utils.h"
 #include "pin.h"
 
+#include <math.h>   // fabs(x,y)
 
 Meter::Meter( QObject* parent, QString type, QString id )
     : Component( parent, type, id ),
@@ -62,10 +63,16 @@ Meter::~Meter(){}
 void Meter::updateStep()
 {
     int dispVal = 0;
-
-    if( m_dispValue > 1e-12 )
+    
+    QString sign = "";
+    
+    double dispValue = fabs(m_dispValue);
+    
+    if( dispValue > 1e-12 )
     {
-        setValue( m_dispValue );
+        if( m_dispValue < 0 ) sign = "-";
+        
+        setValue( dispValue );
         dispVal = int( m_value*10+0.5 );
         
         if( dispVal > 999 ) 
@@ -75,7 +82,7 @@ void Meter::updateStep()
         }
         //qDebug() <<"Meter::updateStep"<<m_dispValue<< m_value<<dispVal<<m_unitMult;
     }
-    m_valLabel->setHtml( "<div align='center'><pre>"+decToBase( dispVal/10, 10, 3 )
+    m_valLabel->setHtml( "<div align='center'><pre>"+sign+decToBase( dispVal/10, 10, 3 )
                         +"."+decToBase( dispVal%10, 10, 1 )
                         +"<br/>"+m_mult+m_unit+"</pre></div>" );
 }
