@@ -43,6 +43,8 @@ eBJT::eBJT( std::string id )
 }
 eBJT::~eBJT()
 { 
+    delete m_BEdiode;
+    delete m_BCdiode;
 }
 
 void eBJT::initialize()
