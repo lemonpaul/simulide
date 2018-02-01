@@ -25,6 +25,7 @@
 #include "adc.h"
 #include "bcdtodec.h"
 #include "bincounter.h"
+#include "bjt.h"
 #include "buffer.h"
 #include "capacitor.h"
 #include "clock.h"
@@ -115,6 +116,7 @@ void ItemLibrary::loadItems()
     addItem( VoltReg::libraryItem() );
     addItem( OpAmp::libraryItem() );
     addItem( Mosfet::libraryItem() );
+    addItem( BJT::libraryItem() );
     // Outputs
     addItem( Led::libraryItem() );
     addItem( LedBar::libraryItem() );
