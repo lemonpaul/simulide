@@ -100,7 +100,7 @@ static int offset;
         if( data > max ) max = data;
         if( data < min ) min = data;
         //qDebug() << "OscopeWidget::setData"<< lastData << data << max << min << up << down;
-
+        m_ampli = (max-min)/2;
         if( (data-lastData)>0.2 )
         {
             if( up & down )
