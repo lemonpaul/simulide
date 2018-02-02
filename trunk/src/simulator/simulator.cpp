@@ -75,9 +75,9 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 m
 {
     e->accept();
     if( !m_isrunning ) return;
-    
+    if( !m_CircuitFuture.isFinished() ) return;
     // Run Circuit in a parallel thread
-    m_CircuitFuture.waitForFinished();
+    //m_CircuitFuture.waitForFinished();
     foreach( eElement* el, m_updateList ) el->updateStep();
     m_CircuitFuture = QtConcurrent::run( this, &Simulator::runCircuit );
     //runCircuit();
@@ -98,7 +98,6 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 m
     OscopeWidget::self()->step();
     TerminalWidget::self()->step();
 }
-
 
 void Simulator::runCircuit()
 {
@@ -140,7 +139,7 @@ void Simulator::runCircuit()
                 if( !m_eChangedNodeList.isEmpty() ) { solveMatrix(); }
                 if( !m_isrunning ) return;
 
-                if( ++counter > 20 ) break; // Limit the number of loops
+                if( ++counter > 50 ) break; // Limit the number of loops
             }
             //if( counter > 0 ) qDebug() << "\nSimulator::runCircuit  Non-Linear Solved in steps:"<<counter;
         }
@@ -165,7 +164,6 @@ void Simulator::runContinuous()
 
     foreach( eElement* el, m_elementList )    // Initialize all Elements
     {
-        
         if( !m_paused ) 
         {
             //std::cout << "el->resetState()"
@@ -304,7 +302,7 @@ void Simulator::setReaClock( int value )
     if( running ) stopSim();
     
     if     ( value < 3  ) value = 3;
-    else if( value > 50 ) value = 50;
+    else if( value > 100 ) value = 100;
     
     m_stepsPrea = value;
     
@@ -322,7 +320,7 @@ void Simulator::setNoLinClock( int value )
     if( running ) stopSim();
 
     if     ( value < 1  ) value = 1;
-    else if( value > 50 ) value = 50;
+    else if( value > 100 ) value = 100;
 
     m_stepsNolin = value;
 
