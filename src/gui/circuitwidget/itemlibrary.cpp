@@ -73,6 +73,7 @@
 #include "voltimeter.h"
 #include "volt_reg.h"
 #include "voltsource.h"
+#include "wavegen.h"
 //END Item includes
 
 #include "simuapi_apppath.h"
@@ -98,6 +99,7 @@ void ItemLibrary::loadItems()
     // Sources
     addItem( LogicInput::libraryItem() );
     addItem( Clock::libraryItem() );
+    addItem( WaveGen::libraryItem() );
     addItem( VoltSource::libraryItem() );
     addItem( Rail::libraryItem() );
     addItem( Ground::libraryItem() );

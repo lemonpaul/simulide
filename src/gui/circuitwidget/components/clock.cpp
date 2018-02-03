@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2010 by santiago González                               *
+ *   Copyright (C) 2017 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -37,58 +37,16 @@ LibraryItem* Clock::libraryItem()
 }
 
 Clock::Clock( QObject* parent, QString type, QString id )
-    : LogicInput( parent, type, id )
+    : ClockBase( parent, type, id )
 {
-    m_isRunning = false;
-
-    m_stepsPC = 0;
-    m_step = 0;
-    setFreq( 1000 );
-
-    Simulator::self()->addToUpdateList( this );
 }
 Clock::~Clock(){}
-
-void Clock::updateStep()
-{
-    if( m_changed )
-    {
-        if( m_isRunning )
-            Simulator::self()->addToSimuClockList( this );
-        else
-        {
-            m_out->setOut( false );
-            m_out->stampOutput();
-            Simulator::self()->remFromSimuClockList( this );
-        }
-        m_changed = false;
-    }
-}
-
-void Clock::setFreq( int freq )
-{
-    //m_freq = freq;
-    m_stepsPC = 1e6/freq/2;
-    
-    if (m_stepsPC < 1) m_stepsPC = 1;
-    
-    m_freq = 1e6/m_stepsPC/2;
-}
-
-void Clock::onbuttonclicked()
-{
-    m_isRunning = !m_isRunning;
-    m_step = 0;
-
-    m_changed = true;
-    //qDebug() << m_stepsPC << m_isRunning ;
-}
 
 void Clock::simuClockStep()
 {
     m_step++;
 
-    if ( m_step >= m_stepsPC )
+    if ( m_step >= m_stepsPC/2 )
     {
         m_out->setOut( !m_out->out() );
         m_out->stampOutput();
@@ -96,12 +54,14 @@ void Clock::simuClockStep()
     }
 }
 
-void Clock::remove()
+void Clock::setFreq( int freq )
 {
-
-    Simulator::self()->remFromSimuClockList( this );
-
-    LogicInput::remove();
+    //m_freq = freq;
+    m_stepsPC = (int)1e6/freq;
+    
+    if (m_stepsPC < 1) m_stepsPC = 1;
+    
+    m_freq = 1e6/(int)m_stepsPC;
 }
 
 void Clock::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

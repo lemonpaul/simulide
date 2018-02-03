@@ -231,8 +231,6 @@ void Simulator::pauseSim()
 
 void Simulator::stopTimer()
 {
-    //m_CircuitFuture.waitForFinished();
-    
     if( m_timerId != 0 )
     {
         this->killTimer( m_timerId );
@@ -240,6 +238,8 @@ void Simulator::stopTimer()
     }
     m_isrunning = false;
     std::cout << "\n    Simulation Stopped \n" << std::endl;
+    
+    m_CircuitFuture.waitForFinished();
 }
 
 void Simulator::resumeSim()
@@ -304,7 +304,7 @@ void Simulator::setReaClock( int value )
     bool running = m_isrunning;
     if( running ) stopSim();
     
-    if     ( value < 3  ) value = 3;
+    if     ( value < 1  )  value = 1;
     else if( value > 100 ) value = 100;
     
     m_stepsPrea = value;
