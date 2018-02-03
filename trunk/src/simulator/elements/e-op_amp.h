@@ -39,7 +39,8 @@ class MAINMODULE_EXPORT eOpAmp : public eElement
     protected:
         eSource* m_output;
         
-        bool m_connected;
+        //bool m_connected;
+        bool m_converged;
         
         double m_accuracy;
         double m_gain;

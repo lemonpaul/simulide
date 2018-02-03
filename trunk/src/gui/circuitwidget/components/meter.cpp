@@ -68,7 +68,7 @@ void Meter::updateStep()
     
     double dispValue = fabs(m_dispValue);
     
-    if( dispValue > 1e-12 )
+    if( dispValue > 1e-6 )
     {
         if( m_dispValue < 0 ) sign = "-";
         

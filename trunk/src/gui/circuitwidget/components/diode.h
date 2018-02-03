@@ -23,8 +23,6 @@
 #include "e-diode.h"
 #include "itemlibrary.h"
 
-#include <QObject>
-
 class MAINMODULE_EXPORT Diode : public Component, public eDiode
 {
     Q_OBJECT

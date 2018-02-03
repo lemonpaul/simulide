@@ -18,11 +18,11 @@
  ***************************************************************************/
 
 #include <math.h>   // fabs(x,y)
+#include <QDebug>
 
 #include "e-mosfet.h"
-#include "circuit.h"
+#include "simulator.h"
 #include "e-node.h"
-#include <QDebug>
 
 
 eMosfet::eMosfet( std::string id )
@@ -34,7 +34,6 @@ eMosfet::eMosfet( std::string id )
     m_resist    = 1;
     m_RDSon     = 1;
     m_threshold = 3;
-    m_accuracy  = 1e-6;
 
     m_ePin.resize(3);
 }
@@ -44,10 +43,11 @@ void eMosfet::initialize()
 {
     eResistor::setRes( 1 );
     
-    int exp = Circuit::self()->nlAcc();
-    m_accuracy = 1/pow(10,exp);
+    m_accuracy = Simulator::self()->NLaccuracy();
 
     m_lastCurrent = 0;
+    m_Vs = 0;
+    m_Sfollow = false;
     
     m_kRDSon = m_RDSon*(10-m_threshold);
     m_Gth = m_threshold-m_threshold/4;
@@ -70,6 +70,12 @@ void eMosfet::setVChanged()
     double Vd = m_ePin[0]->getVolt();
     double Vs = m_ePin[1]->getVolt();
     double Vg = m_ePin[2]->getVolt();
+    
+    if(( m_Sfollow == false)&( fabs(Vs) > 1e-3 ))
+    {
+        if(( fabs(m_Vs) > 1e-3 )&( m_Vs != Vs )) m_Sfollow = true;
+        m_Vs = Vs;
+    }
 
     if( m_Pchannel )
     {
@@ -91,8 +97,7 @@ void eMosfet::setVChanged()
     if( Vds > m_gateV ) Vds = m_gateV;
     
     double DScurrent = (m_gateV*Vds-pow(Vds,2)/2)*satK/m_kRDSon;
-    
-    //qDebug() << "     DScurrent"<<DScurrent<<"maxCurrDS"<<maxCurrDS;
+    //if( m_Sfollow ) DScurrent /= 2;
     if( DScurrent > maxCurrDS ) DScurrent = maxCurrDS;
     
     double current = maxCurrDS-DScurrent;

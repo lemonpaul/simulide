@@ -21,7 +21,7 @@
 #include <QDebug>
 
 #include "e-volt_reg.h"
-#include "circuit.h"
+#include "simulator.h"
 
 eVoltReg::eVoltReg( std::string id )
     : eResistor( id )
@@ -36,8 +36,7 @@ void eVoltReg::initialize()
 {
     eResistor::setRes( 1e-6 );
     
-    int exp = Circuit::self()->nlAcc();
-    m_accuracy = 1/pow(10,exp);
+    m_accuracy = Simulator::self()->NLaccuracy();
     
     m_lastOut = 0;
     if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToNoLinList(this);

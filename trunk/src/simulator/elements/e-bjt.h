@@ -40,16 +40,18 @@ class MAINMODULE_EXPORT eBJT : public eResistor
         virtual void setPnp( double pnp ) {m_PNP = pnp;}
         
     protected:
-        double m_voltPos;
-        double m_voltNeg;
+        double m_accuracy;
         double m_lastOut;
+        double m_baseCurr;
+        double m_voltE;
+        bool m_Efollow;
         
         int m_gain;
         
         bool m_PNP;
         
         eDiode* m_BEdiode;
-        eDiode* m_BCdiode;
+        //eDiode* m_BCdiode;
 };
 
 
