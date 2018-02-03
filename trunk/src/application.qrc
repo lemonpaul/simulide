@@ -85,6 +85,7 @@
         <file alias="relay-spst.png">../src/icons/components/relay-spst.png</file>
         <file alias="voltreg.png">../src/icons/components/voltreg.png</file>
         <file alias="bjt.png">../src/icons/components/bjt.png</file>
+        <file alias="wavegen.png">../src/icons/components/wavegen.png</file>
         <file alias="blanc.png">../src/icons/components/blanc.png</file>
         <file alias="font2.png">../src/icons/font/font2.png</file>
         

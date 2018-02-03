@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2010 by santiago González                               *
+ *   Copyright (C) 2017 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,17 +20,15 @@
 #ifndef CLOCK_H
 #define CLOCK_H
 
-#include "logicinput.h"
+#include "clock-base.h"
 #include "itemlibrary.h"
 #include <QObject>
 
-class MAINMODULE_EXPORT Clock : public LogicInput
+class MAINMODULE_EXPORT Clock : public ClockBase
 {
     Q_OBJECT
-    Q_PROPERTY( int Freq  READ freq   WRITE setFreq   DESIGNABLE true USER true )
-
+    
     public:
-        QRectF boundingRect() const { return QRect( -14, -8, 22, 16 ); }
 
         Clock( QObject* parent, QString type, QString id );
         ~Clock();
@@ -38,25 +36,11 @@ class MAINMODULE_EXPORT Clock : public LogicInput
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
-        void updateStep();
-        
-        int freq() { return m_freq; }
-        void setFreq( int freq );
-
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-
-    public slots:
-        virtual void onbuttonclicked();
-        virtual void simuClockStep();
-        virtual void remove();
-
-    private:
-        bool m_isRunning;
-        bool m_changed;
         
-        int m_step;
-        int m_stepsPC;
-        int m_freq;
+        virtual void simuClockStep();
+        
+        virtual void setFreq( int freq );
 };
 
 #endif
