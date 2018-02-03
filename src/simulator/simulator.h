@@ -52,6 +52,9 @@ class MAINMODULE_EXPORT Simulator : public QObject
         int  noLinClock();
         void setNoLinClock( int value );
         void setMcuClock( int value );
+        int  nlAcc();
+        void setNlAcc( int ac );
+        double NLaccuracy();
         
         bool isRunning();
         
@@ -114,6 +117,8 @@ class MAINMODULE_EXPORT Simulator : public QObject
         bool m_isrunning;
         bool m_paused;
         int  m_timerId;
+        
+        int m_nlAcc;
 
         int m_numEnodes;
         int m_simuRate;

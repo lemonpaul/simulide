@@ -47,6 +47,7 @@ Simulator::Simulator( QObject* parent ) : QObject(parent)
     m_stepsNolin = 10;
     m_mcuStepsPT = 16;
     m_simuRate   = 1000000;
+    m_nlAcc = 5; // Non-Linear accuracy
     
     //QThread      matrixThread;
     //m_matrix.moveToThread( &m_mcuThread );
@@ -141,7 +142,7 @@ void Simulator::runCircuit()
                 if( !m_eChangedNodeList.isEmpty() ) { solveMatrix(); }
                 if( !m_isrunning ) return;
 
-                if( ++counter > 50 ) break; // Limit the number of loops
+                if( ++counter > 1000 ) break; // Limit the number of loops
             }
             //if( counter > 0 ) qDebug() << "\nSimulator::runCircuit  Non-Linear Solved in steps:"<<counter;
         }
@@ -230,7 +231,7 @@ void Simulator::pauseSim()
 
 void Simulator::stopTimer()
 {
-    m_CircuitFuture.waitForFinished();
+    //m_CircuitFuture.waitForFinished();
     
     if( m_timerId != 0 )
     {
@@ -333,6 +334,22 @@ void Simulator::setMcuClock( int value )
     m_mcuStepsPT = value;
     BaseProcessor::self()->setSteps( value );
     //m_pic.setSteps( value );
+}
+int Simulator::nlAcc(){ return m_nlAcc; }
+void  Simulator::setNlAcc( int ac ) 
+{ 
+    bool running = m_isrunning;
+    if( running ) stopSim();
+    
+    if     ( ac < 3 )  ac = 3;
+    else if( ac > 14 ) ac = 14;
+    m_nlAcc = ac; 
+    
+    if( running ) runContinuous();
+}
+double Simulator::NLaccuracy()
+{
+    return 1/pow(10,m_nlAcc)/2;
 }
 
 unsigned long long Simulator::step() 

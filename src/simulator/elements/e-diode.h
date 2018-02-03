@@ -38,8 +38,7 @@ class MAINMODULE_EXPORT eDiode : public eResistor
 
         virtual void setVChanged();
 
-        virtual void    setRes( double resist );
-        virtual double  res();
+        virtual void   setRes( double resist );
 
     protected:
         void updateVI();
@@ -47,10 +46,8 @@ class MAINMODULE_EXPORT eDiode : public eResistor
         double m_voltPN;
         double m_deltaV;
         double m_threshold;
-        double m_imped;
         double m_zenerV;
-
-        bool m_converged;
+        double m_accuracy;
 };
 #endif
 

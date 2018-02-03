@@ -23,6 +23,7 @@
 
 #include "e-bjt.h"
 #include "e-node.h"
+#include "simulator.h"
 
 eBJT::eBJT( std::string id )
     : eResistor( id )
@@ -36,29 +37,35 @@ eBJT::eBJT( std::string id )
     m_BEdiode = new eDiode( ssa.str() );
     m_BEdiode->initEpins();
     
-    std::stringstream ssb;
+    /*std::stringstream ssb;
     ssb << m_elmId << "-BCdiode";
     m_BCdiode = new eDiode( ssb.str() );
-    m_BCdiode->initEpins();
+    m_BCdiode->initEpins();*/
 }
 eBJT::~eBJT()
 { 
     delete m_BEdiode;
-    delete m_BCdiode;
+    //delete m_BCdiode;
 }
 
 void eBJT::initialize()
 {
-    eResistor::setRes( 1 );
+    eResistor::setRes( 2 );
+    
+    m_accuracy = Simulator::self()->NLaccuracy();
+    //m_stage = 0;
     m_lastOut = 0;
+    m_baseCurr = 0;
+    m_voltE = 0;
+    m_Efollow = false;
     
     if( m_ePin[0]->isConnected() ) // C
     {
         eNode* enod0 = m_ePin[0]->getEnode();
         enod0->addToNoLinList(this);
         
-        if( m_PNP ) m_BCdiode->getEpin( 0 )->setEnode( enod0 );
-        else        m_BCdiode->getEpin( 1 )->setEnode( enod0 );
+        //if( m_PNP ) m_BCdiode->getEpin( 0 )->setEnode( enod0 );
+        //else        m_BCdiode->getEpin( 1 )->setEnode( enod0 );
     }
     if( m_ePin[1]->isConnected() ) // E
     {
@@ -77,12 +84,12 @@ void eBJT::initialize()
         if( m_PNP ) 
         {
             m_BEdiode->getEpin( 1 )->setEnode( enod2 );
-            m_BCdiode->getEpin( 1 )->setEnode( enod2 );
+            //m_BCdiode->getEpin( 1 )->setEnode( enod2 );
         }
         else
         {
             m_BEdiode->getEpin( 0 )->setEnode( enod2 );
-            m_BCdiode->getEpin( 0 )->setEnode( enod2 );
+            //m_BCdiode->getEpin( 0 )->setEnode( enod2 );
         }
     }
     eResistor::initialize();
@@ -90,31 +97,50 @@ void eBJT::initialize()
 
 void eBJT::setVChanged() 
 {
+    double voltCE;
+    double voltBE;
     double voltC = m_ePin[0]->getVolt();
     double voltE = m_ePin[1]->getVolt();
     double voltB = m_ePin[2]->getVolt();
     
-    double voltCE = fabs(voltC-voltE);
-    double voltBE = fabs(voltB-voltE);
+    if(( m_Efollow == false)&( fabs(voltE) > 1e-3 ))
+    {
+        if(( fabs(m_voltE) > 1e-3 )&( m_voltE != voltE )){qDebug()<<"m_baseCurr"; m_Efollow = true;}
+        m_voltE = voltE;
+    }
     
+    if( m_PNP )
+    {
+        voltCE = voltE-voltC;
+        voltBE = voltE-voltB;
+    }
+    else
+    {
+        voltCE = voltC-voltE;
+        voltBE = voltB-voltE;
+    }
+    if( voltCE < cero_doub ) voltCE = cero_doub;
+
     double satK = 0;
     if( voltBE > 0 ) satK = voltCE/voltBE;
     
     if( satK > 1 ) satK = 1;
     else           satK = pow(satK,0.15);
 
-    double baseCurr = m_BEdiode->current();
+    m_baseCurr = m_BEdiode->current();
     
+    double currentCE = m_baseCurr*m_gain*(1+voltCE/75)*satK;
+    if( m_Efollow ) currentCE /= 2;
+
     double maxCurrCE = voltCE/m_resist;
-    double currentCE = baseCurr*m_gain*(1+voltCE/75)*satK;
-    
+    //qDebug()<<"m_baseCurr"<<m_baseCurr<<"    currentCE"<<currentCE<<"     maxCurrCE"<<maxCurrCE<<"     voltBE"<<voltBE;
     if( currentCE > maxCurrCE ) currentCE = maxCurrCE;
 
     double current = maxCurrCE-currentCE;
+    
     if( m_PNP ) current = -current;
-    //qDebug()<<"satK"<<satK<<pow(satK,0.15);
-    //qDebug()<<current<<maxCurrCE<< currentCE <<m_lastOut;
-    if( fabs(current-m_lastOut)<1e-5 ) return;
+
+    if( fabs(current-m_lastOut)<m_accuracy ) return;
     
     m_lastOut = current;
     m_ePin[0]->stampCurrent( current );

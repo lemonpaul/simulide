@@ -19,7 +19,7 @@
 
 #include <math.h>   // fabs(x,y)
 #include "e-op_amp.h"
-#include "circuit.h"
+#include "simulator.h"
 
 eOpAmp::eOpAmp( std::string id )
     : eElement( id )
@@ -27,7 +27,7 @@ eOpAmp::eOpAmp( std::string id )
     m_ePin.resize(3);
     m_gain = 1000;
     
-    m_connected = false;
+    //m_connected = false;
 }
 eOpAmp::~eOpAmp()
 { 
@@ -35,8 +35,7 @@ eOpAmp::~eOpAmp()
 
 void eOpAmp::initialize()
 {
-    int exp = Circuit::self()->nlAcc();
-    m_accuracy = 1/pow(10,exp);
+    m_accuracy = Simulator::self()->NLaccuracy();
     
     m_lastOut = 0;
     m_lastIn  = 0;

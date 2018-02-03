@@ -56,8 +56,10 @@ class MAINMODULE_EXPORT eMosfet : public eResistor
         double m_RDSon;
         double m_gateV;
         double m_Gth;
+        double m_Vs;
 
         bool m_Pchannel;
+        bool m_Sfollow;
         
         eSource* m_gate;
 };

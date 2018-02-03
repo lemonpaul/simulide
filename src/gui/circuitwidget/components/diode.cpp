@@ -21,7 +21,6 @@
 #include "connector.h"
 #include "pin.h"
 
-
 Component* Diode::construct( QObject* parent, QString type, QString id )
 { return new Diode( parent, type, id ); }
 

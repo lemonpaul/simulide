@@ -49,7 +49,7 @@ void Amperimeter::updateStep()
     double curr = current();
     
     if( curr != m_dispValue )
-    { 
+    {
         setUnit("A");
         m_dispValue = curr;
         Meter::updateStep();

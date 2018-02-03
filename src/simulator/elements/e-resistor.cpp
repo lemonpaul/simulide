@@ -74,9 +74,9 @@ void eResistor::updateVI()
     if( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() )
     {
         double volt = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
-        //if( volt < 0 ) volt = -volt;
+
         m_current = volt/m_resist;
-        //qDebug() << " current " <<m_current<<volt<<m_deltaV;
+        //qDebug() << " current " <<m_current<<volt;
     }
     else m_current = 0;
 }

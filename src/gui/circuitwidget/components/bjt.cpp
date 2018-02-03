@@ -45,8 +45,8 @@ BJT::BJT( QObject* parent, QString type, QString id )
     
     m_PNP = false;
     
-    m_voltPos = 0;
-    m_voltNeg = 0;
+    //m_voltPos = 0;
+    //m_voltNeg = 0;
     
     m_pin.resize( 3 );
     
@@ -77,11 +77,10 @@ BJT::~BJT()
 
 void BJT::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
-        Component::paint( p, option, widget );
+    Component::paint( p, option, widget );
     
-    //if( m_DScurrent > 1e-3 )  p->setBrush( Qt::yellow );
-    //else
-    p->setBrush( Qt::white );
+    if( m_baseCurr > 1e-4 )  p->setBrush( Qt::yellow );
+    else                  p->setBrush( Qt::white );
 
     p->drawEllipse( m_area );
     

@@ -114,8 +114,6 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
 
  static Circuit*  m_pSelf;
  
-        int m_nlAcc;
-
         QDomDocument m_domDoc;
         QDomDocument m_copyDoc;
         QString      m_fileName;
