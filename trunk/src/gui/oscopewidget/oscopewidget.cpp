@@ -61,6 +61,11 @@ void OscopeWidget::clear()
 {
     for( int i=0; i<140; i++ ) m_data[i] = 160;
     m_rArea->setData( m_data );
+    
+    m_freqLabel->setText( "Freq: 000 Hz" );
+    m_ampLabel->setText( "Amp: 000 V" );
+    m_freq = 0;
+    m_ampli = 0;
 }
 
 void OscopeWidget::step()
@@ -71,12 +76,15 @@ void OscopeWidget::step()
         //m_rArea->update();
         return;
     }
-    
+    m_maxStep = 0;
+    m_minStep = 0;
     m_rArea->setTick( m_speed );
     m_rArea->setData( m_data );
     newReading = true;
     m_newReadCount = 0;
     m_counter = 0;
+    m_freqLabel->setText( "Freq: "+QString::number(m_freq)+" Hz" );
+    m_ampLabel->setText( "Amp: "+QString::number(m_ampli*2)+" V" );
 }
 
 void OscopeWidget::simuClockStep()
@@ -99,38 +107,54 @@ static int offset;
         
         if( data > max ) max = data;
         if( data < min ) min = data;
+
         //qDebug() << "OscopeWidget::setData"<< lastData << data << max << min << up << down;
-        m_ampli = (max-min)/2;
+        
         if( (data-lastData)>0.2 )
         {
-            if( up & down )
+            if((m_maxStep > 0) & (m_minStep > 0))
             {
-                //mid = (max-min)/2;
+                m_ampli = (max-min)/2;
+                
                 if( (data>=m_ampli) /*& ((data-m_ampli)<0.2)*/ )// Rising edge
                 {
                     //qDebug() << "..."  << data << max << m_ampli << min;
+                    int per = m_maxStep - m_minStep;
+                    m_freq = 1e6/abs( per )/2;
+                    //qDebug()<<"OscopeWidget::simuClockStep" <<m_maxStep << m_minStep<<per << m_freq;
                     m_tick = 0;
                     m_counter = 0;
                     up   = false;
                     down = false;
                     offset = 0;
-                    max = 0;
-                    min = 0;
+                    max = -1e12;
+                    min = 1e12;
+                    m_maxStep = 0;
+                    m_minStep = 0;
                     //mid = 0;
                     newReading = false;
                 }
                 lastData = data;
                 return;
             }
+            if( down & !up ) // we are just afther a min
+            {
+                m_minStep = Simulator::self()->step();
+                down = false;
+            }
             up = true;
             lastData = data;
         }
         else if( (data-lastData) < -0.2 )
         {
+            if( up & !down ) // we are just afther a max
+            {
+                m_maxStep = Simulator::self()->step();
+                up = false;
+            }
             down = true;
             lastData = data;
         }
-
         if( ++m_newReadCount == 100000 )  // No reading: Clear Screen
         {
            m_newReadCount = 0;
@@ -218,6 +242,12 @@ void OscopeWidget::setupWidget()
     m_verticalLayout = new QVBoxLayout();
     m_verticalLayout->setObjectName( "verticalLayout" );
     
+    m_freqLabel = new QLabel( "Freq: 000 Hz", this );
+    m_verticalLayout->addWidget(m_freqLabel);
+    
+    m_ampLabel  = new QLabel( "Amp: 000 V", this );
+    m_verticalLayout->addWidget(m_ampLabel);
+    
     QFrame* line = new QFrame(this);
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
@@ -236,7 +266,7 @@ void OscopeWidget::setupWidget()
     QLabel *speedLabel = new QLabel( "Tick", this );
     speedLabel->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
     QFont font = speedLabel->font();
-    font.setPointSize(9);
+    font.setPointSize(8);
     font.setBold(true);
     speedLabel->setFont(font);
     m_verticalLayout->addWidget( speedLabel );

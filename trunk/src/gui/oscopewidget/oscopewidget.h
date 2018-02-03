@@ -70,11 +70,17 @@ class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
         int m_offset;
         int m_prevSpeed;
         int m_prevOffset;
+        int m_freq;
         double m_ampli;
+        
+        unsigned long long m_maxStep;
+        unsigned long long m_minStep;
         
         
         Probe* m_probe;
         
+        QLabel* m_freqLabel;
+        QLabel* m_ampLabel;
         QDial* m_speedDial;
         //QDial* m_ampliDial;
         QDial* m_centeDial;

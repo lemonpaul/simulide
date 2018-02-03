@@ -75,6 +75,9 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 m
 {
     e->accept();
     if( !m_isrunning ) return;
+    
+    OscopeWidget::self()->step();
+    
     if( !m_CircuitFuture.isFinished() ) return;
     // Run Circuit in a parallel thread
     //m_CircuitFuture.waitForFinished();
@@ -95,7 +98,6 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 m
     }
     // Run Graphic Elements
     PlotterWidget::self()->step();
-    OscopeWidget::self()->step();
     TerminalWidget::self()->step();
 }
 
