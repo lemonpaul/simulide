@@ -39,6 +39,7 @@ LibraryItem* WaveGen::libraryItem()
 WaveGen::WaveGen( QObject* parent, QString type, QString id )
     : ClockBase( parent, type, id )
 {
+    m_voltBase = 0;
 }
 WaveGen::~WaveGen(){}
 
@@ -50,7 +51,7 @@ void WaveGen::simuClockStep()
     if( m_type == Triangle ) genTriangle();
     if( m_type == Square )   genSquare();
 
-    m_out->setVoltHigh( m_voltHight*m_vOut );
+    m_out->setVoltHigh( m_voltHight*m_vOut+m_voltBase );
     m_out->stampOutput();
 }
 

@@ -27,7 +27,8 @@
 class MAINMODULE_EXPORT WaveGen : public ClockBase
 {
     Q_OBJECT
-    Q_PROPERTY( wave_type Wave_Type  READ waveType      WRITE setWaveType      DESIGNABLE true USER true )
+    Q_PROPERTY( double    Volt_Base  READ voltBase    WRITE setVoltBase    DESIGNABLE true USER true )
+    Q_PROPERTY( wave_type Wave_Type  READ waveType    WRITE setWaveType      DESIGNABLE true USER true )
     Q_ENUMS( wave_type )
     
     public:
@@ -45,6 +46,9 @@ class MAINMODULE_EXPORT WaveGen : public ClockBase
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
+        double voltBase()            { return m_voltBase; }
+        void setVoltBase( double v ) { m_voltBase = v; }
+        
         wave_type waveType()              { return m_type; }
         void setWaveType( wave_type typ ) { m_type = typ; }
         
@@ -61,6 +65,7 @@ class MAINMODULE_EXPORT WaveGen : public ClockBase
         
         wave_type m_type;
         double m_vOut;
+        double m_voltBase;
 };
 
 #endif
