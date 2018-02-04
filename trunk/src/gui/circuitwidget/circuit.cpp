@@ -28,6 +28,7 @@ Circuit*  Circuit::m_pSelf = 0l;
 Circuit::Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  parent)
     : QGraphicsScene(x, y, width, height, parent)
 {
+    setObjectName( "Circuit" );
     setParent( parent );
     m_widget = parent;
     m_scenerect.setRect( x, y, width, height );

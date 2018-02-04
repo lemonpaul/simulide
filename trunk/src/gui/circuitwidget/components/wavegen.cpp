@@ -40,6 +40,7 @@ WaveGen::WaveGen( QObject* parent, QString type, QString id )
     : ClockBase( parent, type, id )
 {
     m_voltBase = 0;
+    m_type = Sine;
 }
 WaveGen::~WaveGen(){}
 
