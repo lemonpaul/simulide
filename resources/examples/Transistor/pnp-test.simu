@@ -1,0 +1,51 @@
+<circuit type="simulide_0.1">
+ 
+Amperimeter-24: 
+<item Show_id="false" labelx="-12" objectName="Amperimeter-24" id="Amperimeter-24" labely="-24" vflip="1" valLabelx="-20" x="-340" labelrot="0" rotation="0" y="-220" valLabely="-22" itemtype="Amperimeter" valLabRot="0" hflip="1"/>
+ 
+Ground (0 V)-22: 
+<item Show_id="false" labelx="-16" objectName="Ground (0 V)-22" id="Ground (0 V)-22" labely="-24" vflip="1" valLabelx="0" x="-172" labelrot="0" rotation="0" y="-44" valLabely="0" itemtype="Ground" valLabRot="0" hflip="1"/>
+ 
+Resistor-20: 
+<item Show_id="false" rotation="90" valLabelx="-16" valLabRot="0" itemtype="Resistor" labely="-24" Resistance="100" labelrot="0" hflip="1" objectName="Resistor-20" x="-172" Unit=" Ω" valLabely="6" Show_res="true" labelx="-12" vflip="1" y="-116" id="Resistor-20"/>
+ 
+Rail.-18: 
+<item Show_id="false" rotation="0" Voltage="5" valLabelx="-16" valLabRot="0" itemtype="Rail" labely="-24" labelrot="0" hflip="1" objectName="Rail.-18" x="-332" Unit=" V" valLabely="8" labelx="-64" vflip="1" Show_Volt="true" y="-332" id="Rail.-18"/>
+ 
+BJT-6: 
+<item Show_id="false" labelx="-16" objectName="BJT-6" id="BJT-6" labely="-24" vflip="-1" valLabelx="0" x="-244" labelrot="0" rotation="0" PNP="true" y="-196" valLabely="0" itemtype="BJT" valLabRot="0" hflip="1" Gain="100"/>
+ 
+Amperimeter-4: 
+<item Show_id="false" labelx="-12" objectName="Amperimeter-4" id="Amperimeter-4" labely="-24" vflip="1" valLabelx="-20" x="-180" labelrot="0" rotation="0" y="-188" valLabely="-22" itemtype="Amperimeter" valLabRot="0" hflip="1"/>
+ 
+Volt. Source-3: 
+<item Show_id="false" rotation="0" Voltage="5" valLabelx="-26" valLabRot="0" itemtype="Voltage Source" labely="-24" labelrot="0" hflip="1" objectName="Volt. Source-3" x="-420" Unit=" V" valLabely="10" labelx="-16" vflip="1" Show_Volt="true" y="-196" id="Volt. Source-3"/>
+ 
+Resistor-2: 
+<item Show_id="false" rotation="0" valLabelx="-11" valLabRot="0" itemtype="Resistor" labely="-24" Resistance="1" labelrot="0" hflip="1" objectName="Resistor-2" x="-380" Unit=" kΩ" valLabely="10" Show_res="true" labelx="-12" vflip="1" y="-196" id="Resistor-2"/>
+ 
+Probe-1: 
+<item Show_id="false" labelx="16" objectName="Probe-1" id="Probe-1" labely="-16" vflip="1" valLabelx="16" Show_volt="true" x="-292" labelrot="45" rotation="-45" y="-212" valLabely="0" itemtype="Probe" valLabRot="45" hflip="1"/>
+ 
+Connector-10: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-236,-180,-236,-156,-188,-156,-188,-172" valLabRot="0" itemtype="Connector" endpinid="Amperimeter-4-lPin" labely="-24" labelrot="0" hflip="1" objectName="Connector-10" enodeid="Circ_eNode-11" x="-236" valLabely="0" labelx="-16" vflip="1" y="-180" id="Connector-10" startpinid="BJT-6-collector"/>
+ 
+Connector-12: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-404,-196,-396,-196" valLabRot="0" itemtype="Connector" endpinid="Resistor-2-lPin" labely="-24" labelrot="0" hflip="1" objectName="Connector-12" enodeid="Circ_eNode-13" x="-404" valLabely="0" labelx="-16" vflip="1" y="-196" id="Connector-12" startpinid="Volt. Source-3-outPin"/>
+ 
+Connector-19: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-316,-332,-236,-332,-236,-212" valLabRot="0" itemtype="Connector" endpinid="BJT-6-emiter" labely="-24" labelrot="0" hflip="1" objectName="Connector-19" enodeid="enode-19" x="-316" valLabely="0" labelx="-16" vflip="1" y="-332" id="Connector-19" startpinid="Rail.-18-outnod"/>
+ 
+Connector-21: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-172,-172,-172,-132" valLabRot="0" itemtype="Connector" endpinid="Resistor-20-lPin" labely="-24" labelrot="0" hflip="1" objectName="Connector-21" enodeid="enode-21" x="-172" valLabely="0" labelx="-16" vflip="1" y="-172" id="Connector-21" startpinid="Amperimeter-4-rPin"/>
+ 
+Connector-23: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-172,-60,-172,-100" valLabRot="0" itemtype="Connector" endpinid="Resistor-20-rPin" labely="-24" labelrot="0" hflip="1" objectName="Connector-23" enodeid="enode-23" x="-172" valLabely="0" labelx="-16" vflip="1" y="-60" id="Connector-23" startpinid="Ground (0 V)-22-Gnd"/>
+ 
+Connector-25: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-364,-196,-348,-196,-348,-204" valLabRot="0" itemtype="Connector" endpinid="Amperimeter-24-lPin" labely="-24" labelrot="0" hflip="1" objectName="Connector-25" enodeid="enode-25" x="-364" valLabely="0" labelx="-16" vflip="1" y="-196" id="Connector-25" startpinid="Resistor-2-rPin"/>
+ 
+Connector-26: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-332,-204,-332,-196,-260,-196" valLabRot="0" itemtype="Connector" endpinid="BJT-6-base" labely="-24" labelrot="0" hflip="1" objectName="Connector-26" enodeid="enode-26" x="-332" valLabely="0" labelx="-16" vflip="1" y="-204" id="Connector-26" startpinid="Amperimeter-24-rPin"/>
+ 
+</circuit>
