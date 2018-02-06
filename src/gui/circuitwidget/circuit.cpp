@@ -30,7 +30,7 @@ Circuit::Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  p
 {
     setObjectName( "Circuit" );
     setParent( parent );
-    m_widget = parent;
+    m_graphicView = parent;
     m_scenerect.setRect( x, y, width, height );
     setSceneRect( QRectF(x, y, width, height) );
 
@@ -53,6 +53,9 @@ Circuit::~Circuit()
         QPropertyEditorWidget::self()->removeObject( comp );
     }
 }
+
+QList<Component*>* Circuit::compList() { return &m_compList; }
+QList<Component*>* Circuit::conList()  { return &m_conList; }
 
 int Circuit::nlAcc()             
 { 
@@ -442,7 +445,7 @@ void Circuit::loadDomDoc( QDomDocument* doc )
     // Take care about unconnected Joints
     foreach( Node* joint, jointList ) joint->remove(); // Only removed if some missing connector
 
-    m_widget->ensureVisible( itemsBoundingRect() );
+    m_graphicView->ensureVisible( itemsBoundingRect() );
 }
 
 bool Circuit::saveCircuit( QString &fileName )
@@ -671,6 +674,9 @@ void Circuit::paste( QPointF eventpoint )
     m_pasting = false;
 }
 
+bool  Circuit::pasting() { return m_pasting; }
+QPointF Circuit::deltaMove(){ return m_deltaMove; }
+
 void Circuit::createSubcircuit()
 {
     QHash<QString, QString> compList;        // Get Components properties
@@ -864,6 +870,9 @@ void Circuit::closeconnector( Pin* endpin )
     new_connector->closeCon( endpin );
 }
 
+void Circuit::constarted( bool started) { m_con_started = started; }
+bool Circuit::is_constarted() { return m_con_started ; }
+
 void Circuit::mousePressEvent( QGraphicsSceneMouseEvent* event )
 {
     if( event->button() == Qt::LeftButton )
@@ -918,15 +927,20 @@ void Circuit::keyPressEvent( QKeyEvent* event )
 {
     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
     {
-        ;//copy( QPointF(0,0));
+        QPoint p = CircuitWidget::self()->mapFromGlobal(QCursor::pos());
+        
+        copy( m_graphicView->mapToScene( p ) );
+        clearSelection();
     }
     else if (event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier))
     {
-        ;//paste( QPointF(50,50) );
+        QPoint p = CircuitWidget::self()->mapFromGlobal(QCursor::pos());
+        
+        paste( m_graphicView->mapToScene( p ) );
     }
     else if (event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
     {
-        ;//paste( QPointF(50,50) );
+        MainWindow::self()->saveCirc();
     }
     else QGraphicsScene::keyPressEvent(event);
 }
@@ -936,6 +950,8 @@ void Circuit::removeItems()                     // Remove Selected items
     bool pauseSim = Simulator::self()->isRunning();
     if( pauseSim ) Simulator::self()->pauseSim();
 
+    saveState();
+    
     foreach( Component* comp, m_compList )
         if( comp->isSelected() ) comp->remove();
         

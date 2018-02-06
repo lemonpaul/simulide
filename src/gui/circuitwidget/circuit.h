@@ -73,19 +73,16 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         void closeconnector( Pin* endpin );
         Connector* getNewConnector() { return new_connector; }
 
-        QList<Component*>* compList() { return &m_compList; }
-        QList<Component*>* conList()  { return &m_conList; }
+        QList<Component*>* compList();
+        QList<Component*>* conList();
 
-        /** a conector is been created*/
-        void constarted( bool started) { m_con_started = started; }
-        bool is_constarted() { return m_con_started ; }
+        void constarted( bool started);
+        bool is_constarted();
 
         void removeItems();
 
-        bool  pasting() { return m_pasting; }
-        QPointF deltaMove(){ return m_deltaMove; }
-
-        QGraphicsView* widget(){ return m_widget; }
+        bool  pasting();
+        QPointF deltaMove();
 
         const QString getFileName() const { return m_fileName; }
 
@@ -119,7 +116,7 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         QString      m_fileName;
 
         QRect          m_scenerect;
-        QGraphicsView* m_widget;
+        QGraphicsView* m_graphicView;
         Connector*     new_connector;
 
         int  m_seqNumber;
