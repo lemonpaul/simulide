@@ -17,42 +17,70 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef EBJT_H
-#define EBJT_H
+#include <QDebug>
+#include <math.h>   // fabs(x,y)
 
 #include "e-pn.h"
+#include "simulator.h"
 
-
-class MAINMODULE_EXPORT eBJT : public eResistor
+ePN::ePN( std::string id ) : eResistor(id )
 {
-    public:
+    m_threshold = 0.7;
+    m_resist = 0.6;
+}
+ePN::~ePN()
+{ 
+}
 
-        eBJT( std::string id );
-        virtual ~eBJT();
+void ePN::initialize()
+{
+    m_accuracy = Simulator::self()->NLaccuracy();
+    m_voltPN  = 0;
+    m_deltaV  = 0;
+    m_current = 0;
 
-        virtual void initialize();
-        virtual void setVChanged();
-        
-        virtual double gain()              {return m_gain;}
-        virtual void setGain( double gain ){m_gain = gain;}
-        
-        virtual double pnp()              {return m_PNP;}
-        virtual void setPnp( double pnp ) {m_PNP = pnp;}
-        
-    protected:
-        double m_accuracy;
-        double m_lastOut;
-        double m_baseCurr;
-        double m_voltE;
-        bool m_Efollow;
-        
-        int m_gain;
-        
-        bool m_PNP;
-        
-        ePN* m_BEdiode;
-        //eDiode* m_BCdiode;
-};
+    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToNoLinList(this);
+    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToNoLinList(this);
+    eResistor::initialize();
+}
 
+void ePN::setVChanged()
+{
+    m_voltPN = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
 
-#endif
+    double deltaV = m_threshold;
+
+    if( m_voltPN < m_threshold ) deltaV = m_voltPN;
+
+    //qDebug() <<"ePN::setVChanged,  deltaR: "<< deltaR << "  deltaV" << deltaV << "m_voltPN" << m_voltPN ;
+
+    if( fabs(deltaV-m_deltaV) < m_accuracy ) return;
+
+    m_deltaV = deltaV;
+
+    double current = deltaV/m_resist;
+
+    m_ePin[0]->stampCurrent( current );
+    m_ePin[1]->stampCurrent(-current );
+}
+
+void ePN::setThreshold( double threshold )
+{
+    m_threshold = threshold;
+}
+
+void ePN::updateVI()
+{
+    m_current = 0;
+
+    if( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() )
+    {
+        double volt = m_voltPN - m_deltaV;
+        if( volt>0 )
+        {
+            m_current = volt/m_resist;
+            //qDebug() << " current " <<m_current<<volt<<m_deltaV;
+        }
+    }
+}
+

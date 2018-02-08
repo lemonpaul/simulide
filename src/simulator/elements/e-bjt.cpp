@@ -34,7 +34,7 @@ eBJT::eBJT( std::string id )
     
     std::stringstream ssa;
     ssa << m_elmId << "-BEdiode";
-    m_BEdiode = new eDiode( ssa.str() );
+    m_BEdiode = new ePN( ssa.str() );
     m_BEdiode->initEpins();
     
     /*std::stringstream ssb;
