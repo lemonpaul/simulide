@@ -17,42 +17,30 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef EBJT_H
-#define EBJT_H
+#ifndef EPN_H
+#define EPN_H
 
-#include "e-pn.h"
+#include "e-resistor.h"
 
-
-class MAINMODULE_EXPORT eBJT : public eResistor
+class MAINMODULE_EXPORT ePN : public eResistor
 {
     public:
+        ePN(  std::string id );
+        ~ePN();
 
-        eBJT( std::string id );
-        virtual ~eBJT();
+        virtual double threshold() { return m_threshold; }
+        virtual void  setThreshold( double threshold );
 
         virtual void initialize();
+
         virtual void setVChanged();
-        
-        virtual double gain()              {return m_gain;}
-        virtual void setGain( double gain ){m_gain = gain;}
-        
-        virtual double pnp()              {return m_PNP;}
-        virtual void setPnp( double pnp ) {m_PNP = pnp;}
-        
+
     protected:
+        virtual void updateVI();
+
+        double m_voltPN;
+        double m_deltaV;
+        double m_threshold;
         double m_accuracy;
-        double m_lastOut;
-        double m_baseCurr;
-        double m_voltE;
-        bool m_Efollow;
-        
-        int m_gain;
-        
-        bool m_PNP;
-        
-        ePN* m_BEdiode;
-        //eDiode* m_BCdiode;
 };
-
-
 #endif
