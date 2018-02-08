@@ -70,9 +70,10 @@ static  bool  m_oscopeBusy;
 
         bool  m_haveOscope;
 
-        Pin   *m_inputpin;
-        
-        eSource* m_inSource;
+        Pin*       m_inputpin;
+        Pin*       m_readPin;
+        Connector* m_readConn;
+        eSource*   m_inSource;
 };
 
 

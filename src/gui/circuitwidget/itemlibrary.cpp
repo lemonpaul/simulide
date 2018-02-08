@@ -53,6 +53,7 @@
 #include "mosfet.h"
 #include "mux.h"
 #include "op_amp.h"
+#include "oscope.h"
 #include "outbus.h"
 #include "pcd8544.h"
 #include "probe.h"
@@ -96,6 +97,7 @@ void ItemLibrary::loadItems()
     addItem( Probe::libraryItem() );
     addItem( Voltimeter::libraryItem() );
     addItem( Amperimeter::libraryItem() );
+    addItem( Oscope::libraryItem() );
     // Sources
     addItem( LogicInput::libraryItem() );
     addItem( Clock::libraryItem() );

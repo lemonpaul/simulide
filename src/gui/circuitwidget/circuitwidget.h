@@ -36,6 +36,8 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         ~CircuitWidget();
 
  static CircuitWidget* self() { return m_pSelf; }
+ 
+        OscopeWidget* oscope();
 
         void clear();
 

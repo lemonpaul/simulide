@@ -35,6 +35,8 @@ CircuitWidget::CircuitWidget( QWidget *parent, QToolBar* toolbar  )
     m_pSelf = this;
 
     m_serialPortWidget = 0l;
+    
+    m_oscope.setupWidget( 180 );
 
     m_verticalLayout.setObjectName(tr("verticalLayout"));
     m_verticalLayout.setContentsMargins(0, 0, 0, 0);
@@ -50,9 +52,12 @@ CircuitWidget::CircuitWidget( QWidget *parent, QToolBar* toolbar  )
 }
 CircuitWidget::~CircuitWidget() { }
 
+OscopeWidget* CircuitWidget::oscope() { return &m_oscope; }
+
 void CircuitWidget::clear()
 {
     m_circView.clear();
+    Simulator::self()->addToElementList( &m_oscope );
 }
 
 void CircuitWidget::setSerialPortWidget( QWidget* serialPortWidget )

@@ -37,7 +37,7 @@ void Package::initPackage()
 {
 
     QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
-    qDebug() << "Package::initPackage datafile: " << dfPath;
+    //qDebug() << "Package::initPackage datafile: " << dfPath;
     QFile file(dfPath);
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
