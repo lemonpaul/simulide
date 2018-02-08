@@ -41,7 +41,7 @@ eMosfet::~eMosfet(){}
 
 void eMosfet::initialize()
 {
-    eResistor::setRes( 1 );
+    eResistor::setRes( m_RDSon );
     
     m_accuracy = Simulator::self()->NLaccuracy();
 
@@ -91,7 +91,7 @@ void eMosfet::setVChanged()
     
     if( m_gateV < 0 ) m_gateV = 0;
 
-    double satK = 1+Vds/100;
+    double satK = 1+Vds/150;
     double maxCurrDS = Vds/m_resist;
     
     if( Vds > m_gateV ) Vds = m_gateV;
