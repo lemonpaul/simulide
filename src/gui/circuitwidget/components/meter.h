@@ -23,6 +23,8 @@
 #include "e-resistor.h"
 #include "component.h"
 
+class eSource;
+class Pin;
 
 class MAINMODULE_EXPORT Meter : public Component, public eResistor
 {
@@ -43,6 +45,9 @@ class MAINMODULE_EXPORT Meter : public Component, public eResistor
     protected:
         virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
         double m_dispValue;
+        
+        Pin*     m_outpin;
+        eSource* m_out;
 };
 
 #endif
