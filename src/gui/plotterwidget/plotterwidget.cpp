@@ -141,21 +141,11 @@ void PlotterWidget::setPlotterTick( int tickUs )
 void PlotterWidget::maxChanged( double value )
 {
     m_maxVolt = value*100;
-    if( m_maxVolt <= m_minVolt ) 
-    {
-        m_maxVolt = m_minVolt+1;
-        m_maxValue->setValue( m_maxVolt/100 );
-    }
     setScale();
 }
 void PlotterWidget::minChanged( double value )
 {
     m_minVolt = value*100;
-    if( m_maxVolt <= m_minVolt ) 
-    {
-        m_minVolt = m_maxVolt-1;
-        m_minValue->setValue( m_minVolt/100 );
-    }
     setScale();
 }
 

@@ -50,7 +50,7 @@ eBJT::~eBJT()
 
 void eBJT::initialize()
 {
-    eResistor::setRes( 1 );
+    eResistor::setRes( m_gain/25 );
     
     m_accuracy = Simulator::self()->NLaccuracy();
     //m_stage = 0;
@@ -118,7 +118,7 @@ void eBJT::setVChanged()
     double maxCurrCE = voltCE/m_resist;
     double current = maxCurrCE;
     
-    if( voltBE > 0.7 ) 
+    if( voltBE > 0.6 ) 
     {
         if(( m_Efollow == false)&( fabs(voltE) > 1e-3 ))
         {
