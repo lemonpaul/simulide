@@ -98,7 +98,7 @@ void WaveGen::genSquare()
 }
 void WaveGen::updateStep()
 {
-    if(( !m_out->out() )&( m_isRunning ))
+    if(( !m_out-> out() )&( m_isRunning ))
     {
         m_out->setOut( true );
     }

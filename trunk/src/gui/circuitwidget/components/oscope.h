@@ -22,15 +22,16 @@
 
 #include "component.h"
 #include "e-element.h"
+#include "oscopewidget.h"
 #include "topwidget.h"
 #include "pin.h"
 
 class LibraryItem;
-class OscopeWidget;
 
 class MAINMODULE_EXPORT Oscope : public Component, public eElement
 {
     Q_OBJECT
+    Q_PROPERTY( double Filter READ filter  WRITE setFilter DESIGNABLE true USER true )
 
     public:
 
@@ -43,6 +44,9 @@ class MAINMODULE_EXPORT Oscope : public Component, public eElement
         void initialize();
         
         double getVolt();
+        
+        double filter()                 { return m_oscopeW->filter(); }
+        void setFilter( double filter ) { m_oscopeW->setFilter( filter ); }
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
@@ -50,8 +54,6 @@ class MAINMODULE_EXPORT Oscope : public Component, public eElement
         void remove();
 
     private:
-        //bool m_changed;
-        
         Pin m_pinP;
         Pin m_pinN;
         

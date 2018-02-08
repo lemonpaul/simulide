@@ -19,6 +19,7 @@
 
 #include "oscopewidget.h"
 #include "simulator.h"
+#include "oscope.h"
 
 #include <math.h>   // fabs(x,y)
 
@@ -42,6 +43,7 @@ OscopeWidget::OscopeWidget(  QWidget *parent  )
     m_Vpos     = 0;
     
     m_ampli = 0;
+    m_filter = 0.3;
 
     newReading = true;
     m_auto = true;
@@ -115,7 +117,7 @@ void OscopeWidget::simuClockStep()
     if( data > max ) max = data;
     if( data < min ) min = data;
     
-    if( (data-lastData)>0.2 )                      // Filter noise > 0.2
+    if( (data-lastData)>m_filter )                      // Filter noise > 0.2
     {
         if( newReading )
         {

@@ -24,8 +24,9 @@
 
 #include "e-element.h"
 #include "renderoscope.h"
-#include "oscope.h"
 #include "probe.h"
+
+class Oscope;
 
 class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
 {
@@ -39,6 +40,8 @@ class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
         void setProbe( Probe* probe );
         void clear();
         void setupWidget( int size );
+        double filter()                 { return m_filter; }
+        void setFilter( double filter ) { m_filter = filter; }
         
         virtual void simuClockStep();
         virtual void initialize();
@@ -88,9 +91,8 @@ class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
         double m_prevVscale;
         double m_Vpos;
         double m_prevVpos;
-        
-        
         double m_ampli;
+        double m_filter;
         
         
         int Hpos;
