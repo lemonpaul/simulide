@@ -17,26 +17,23 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QVariant>
+#ifndef TOPWIDGET_H
+#define TOPWIDGET_H
 
-#include "dialwidget.h"
+#include <QtWidgets>
 
-DialWidget::DialWidget()
+
+class TopWidget : public QWidget
 {
-}
-DialWidget::~DialWidget() {}
+    Q_OBJECT
+    
+    public:
+        TopWidget();
+        ~TopWidget();
 
-void DialWidget::setupWidget()
-{
-    dial = new QDial(this);
-    dial->setObjectName(QString::fromUtf8("dial"));
-    dial->setNotchesVisible(true);
+        void setupWidget( QWidget* intWidget );
 
-    verticalLayout = new QVBoxLayout(this);
-    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-    verticalLayout->setContentsMargins(0, 0, 0, 0);
-    verticalLayout->setSpacing(0);
-    verticalLayout->addWidget(dial);
-}
+        QVBoxLayout* verticalLayout;
+};
+#endif
 
-#include "moc_dialwidget.cpp"

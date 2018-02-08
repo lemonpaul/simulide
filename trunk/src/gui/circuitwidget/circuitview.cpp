@@ -38,14 +38,11 @@ CircuitView::CircuitView( QWidget *parent )
     setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
     setCacheMode( CacheBackground );
     //setRenderHint( QPainter::Antialiasing );
-    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    setRenderHints( QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
     //setRenderHint( QPainter::SmoothPixmapTransform );
     setTransformationAnchor( AnchorUnderMouse );
     setResizeAnchor( AnchorUnderMouse );
     setDragMode( QGraphicsView::RubberBandDrag );
-
-    //m_file = "";
-    //setWindowTitle(m_file + "[*]");
 
     setAcceptDrops(true);
 }

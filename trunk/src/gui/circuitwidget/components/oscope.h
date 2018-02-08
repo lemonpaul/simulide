@@ -17,26 +17,48 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QVariant>
+#ifndef OSCOPE_H
+#define OSCOPE_H
 
-#include "dialwidget.h"
+#include "component.h"
+#include "e-element.h"
+#include "topwidget.h"
+#include "pin.h"
 
-DialWidget::DialWidget()
+class LibraryItem;
+class OscopeWidget;
+
+class MAINMODULE_EXPORT Oscope : public Component, public eElement
 {
-}
-DialWidget::~DialWidget() {}
+    Q_OBJECT
 
-void DialWidget::setupWidget()
-{
-    dial = new QDial(this);
-    dial->setObjectName(QString::fromUtf8("dial"));
-    dial->setNotchesVisible(true);
+    public:
 
-    verticalLayout = new QVBoxLayout(this);
-    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-    verticalLayout->setContentsMargins(0, 0, 0, 0);
-    verticalLayout->setSpacing(0);
-    verticalLayout->addWidget(dial);
-}
+        Oscope( QObject* parent, QString type, QString id );
+        ~Oscope();
 
-#include "moc_dialwidget.cpp"
+        static Component* construct( QObject* parent, QString type, QString id );
+        static LibraryItem* libraryItem();
+
+        void initialize();
+        
+        double getVolt();
+
+        virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
+
+    public slots:
+        void remove();
+
+    private:
+        //bool m_changed;
+        
+        Pin m_pinP;
+        Pin m_pinN;
+        
+        OscopeWidget* m_oscopeW;
+        TopWidget    m_topW;
+        QGraphicsProxyWidget* m_proxy;
+};
+
+#endif
+
