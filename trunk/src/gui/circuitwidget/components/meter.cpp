@@ -19,9 +19,10 @@
 
 #include "meter.h"
 #include "simulator.h"
-#include "connector.h"
-#include "utils.h"
+#include "e-source.h"
 #include "pin.h"
+#include "utils.h"
+
 
 #include <math.h>   // fabs(x,y)
 
@@ -30,6 +31,7 @@ Meter::Meter( QObject* parent, QString type, QString id )
       eResistor( id.toStdString() )
 {
     m_area = QRectF( -24, -24, 48, 32 );
+    
     QString pinId = m_id;
     pinId.append(QString("-lPin"));
     QPoint pinPos = QPoint(-8, 16);
@@ -39,6 +41,16 @@ Meter::Meter( QObject* parent, QString type, QString id )
     pinId.append(QString("-rPin"));
     pinPos = QPoint(8, 16);
     m_ePin[1] = new Pin( 270, pinPos, pinId, 1, this);
+    
+    pinId = id;
+    pinId.append(QString("-outnod"));
+    pinPos = QPoint(32,-8);
+    m_outpin = new Pin( 0, pinPos, pinId, 0, this);
+
+    pinId.append(QString("-eSource"));
+    m_out = new eSource( pinId.toStdString(), m_outpin );
+    m_out->setOut( true );
+    m_out->setVoltHigh( 0 );
 
     m_idLabel->setPos(-12,-24);
     setLabelPos(-12,-24, 0);
@@ -85,6 +97,9 @@ void Meter::updateStep()
     m_valLabel->setHtml( "<div align='center'><pre>"+sign+decToBase( dispVal/10, 10, 3 )
                         +"."+decToBase( dispVal%10, 10, 1 )
                         +"<br/>"+m_mult+m_unit+"</pre></div>" );
+
+    m_out->setVoltHigh( m_dispValue );
+    m_out->stampOutput();
 }
 
 void Meter::remove()
@@ -93,6 +108,8 @@ void Meter::remove()
     if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
 
     Simulator::self()->remFromUpdateList( this );
+    
+    delete m_out;
 
     Component::remove();
 }
@@ -117,6 +134,13 @@ void Meter::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget 
     p->setBrush( Qt::black);
 
     p->drawRect( m_area );
+
+    QPointF points[3] = {
+    QPointF( 27,-12 ),
+    QPointF( 32, -8 ),
+    QPointF( 27, -4 )     };
+    p->drawPolygon(points, 3);
+
 }
 
 #include "moc_meter.cpp"
