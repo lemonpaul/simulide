@@ -35,7 +35,7 @@ class MAINMODULE_EXPORT ClockBase : public LogicInput
         ~ClockBase();
 
         virtual void updateStep();
-        
+
         int freq() { return m_freq; }
         virtual void setFreq( int freq );
 

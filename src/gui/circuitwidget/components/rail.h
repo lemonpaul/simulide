@@ -56,8 +56,8 @@ class MAINMODULE_EXPORT Rail : public Component, public eElement
         
         bool m_changed;
 
-        Pin     *m_outpin;
-        eSource *m_out;
+        Pin*     m_outpin;
+        eSource* m_out;
 };
 
 

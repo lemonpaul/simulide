@@ -85,7 +85,7 @@ void LogicInput::onbuttonclicked()
 
 void LogicInput::updateStep()
 {
-    if( m_changed ) 
+    if( m_changed )
     {
         m_out->stampOutput();
         m_changed = false;

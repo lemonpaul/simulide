@@ -50,7 +50,7 @@ eBJT::~eBJT()
 
 void eBJT::initialize()
 {
-    eResistor::setRes( 2 );
+    eResistor::setRes( 1 );
     
     m_accuracy = Simulator::self()->NLaccuracy();
     //m_stage = 0;
@@ -118,32 +118,34 @@ void eBJT::setVChanged()
     double maxCurrCE = voltCE/m_resist;
     double current = maxCurrCE;
     
-    if(( m_Efollow == false)&( fabs(voltE) > 1e-3 ))
+    if( voltBE > 0.7 ) 
     {
-        if(( fabs(m_voltE) > 1e-3 )&( m_voltE != voltE )){m_Efollow = true;}
-        m_voltE = voltE;
-    }
-    double satK = 0;
-
-    if( voltCE < voltBE )          
-    {
-        satK = voltCE/voltBE-1;
-        satK = pow( satK, 2 );
-    }
-    m_baseCurr = m_BEdiode->current();
-
-    double currentCE = m_baseCurr*m_gain*(1+voltCE/75);
-    currentCE -= currentCE*satK;
-    if( m_Efollow ) currentCE /= 2;
+        if(( m_Efollow == false)&( fabs(voltE) > 1e-3 ))
+        {
+            if(( fabs(m_voltE) > 1e-3 )&( m_voltE != voltE )){m_Efollow = true;}
+            m_voltE = voltE;
+        }
+        double satK = 0;
     
-    //qDebug()<<"m_baseCurr"<<m_baseCurr<<"    currentCE"<<currentCE<<"     maxCurrCE"<<maxCurrCE<<"     voltBE"<<voltBE;
-    if( currentCE > maxCurrCE ) 
-    {
-        m_resist = voltCE/currentCE;
-        eResistor::stamp();
+        if( voltCE < voltBE )          
+        {
+            satK = voltCE/voltBE-1;
+            satK = pow( satK, 2 );
+        }
+        m_baseCurr = m_BEdiode->current();
+    
+        double currentCE = m_baseCurr*m_gain*(1+voltCE/75);
+        currentCE -= currentCE*satK;
+        if( m_Efollow ) currentCE /= 2;
+        
+        //qDebug()<<"m_baseCurr"<<m_baseCurr<<"    currentCE"<<currentCE<<"     maxCurrCE"<<maxCurrCE<<"     voltBE"<<voltBE;
+        if( currentCE > maxCurrCE ) 
+        {
+            m_resist = voltCE/currentCE;
+            eResistor::stamp();
+        }
+        current = maxCurrCE-currentCE;
     }
-    current = maxCurrCE-currentCE;
-
     if( m_PNP ) current = -current;
 
     if( fabs(current-m_lastOut)<m_accuracy ) return;
