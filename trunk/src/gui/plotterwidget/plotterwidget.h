@@ -71,8 +71,8 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
         int  m_counter;
         int  m_ticksPs;
         
-        int m_maxVolt;
-        int m_minVolt;
+        double m_maxVolt;
+        double m_minVolt;
         int m_offset;
 };
 
