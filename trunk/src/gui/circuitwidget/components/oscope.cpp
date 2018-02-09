@@ -42,27 +42,29 @@ LibraryItem* Oscope::libraryItem()
 Oscope::Oscope( QObject* parent, QString type, QString id )
     : Component( parent, type, id )
     , eElement( (id+"-eElement").toStdString() )
-    , m_pinP( 180, QPoint(-120,0 ), id+"-PinP", 0, this )
-    , m_pinN( 180, QPoint(-120,16), id+"-PinN", 0, this )
     , m_topW( )
 {
     m_area = QRectF( -115, -65, 230, 130 );
     
+    m_pin.resize(2);
     m_ePin.resize(2);
-    m_ePin[0] = &m_pinP;
-    m_ePin[1] = &m_pinP;
-    
-    m_pinP.setLabelText( "+" );
-    m_pinN.setLabelText( "_" );
-    m_pinP.setLabelColor( QColor( 0, 0, 0 ) );
-    m_pinN.setLabelColor( QColor( 0, 0, 0 ) );
-    m_pinP.setLength( 5 );
-    m_pinN.setLength( 5 );
+    m_pin[0] = new Pin( 180, QPoint(-120,0 ), id+"-PinP", 0, this );
+    m_pin[1] = new Pin( 180, QPoint(-120,16), id+"-PinN", 0, this );
+    m_ePin[0] = m_pin[0];
+    m_ePin[1] = m_pin[1];
+
+    m_pin[0]->setLabelText( "+" );
+    m_pin[1]->setLabelText( "_" );
+    m_pin[0]->setLabelColor( QColor( 0, 0, 0 ) );
+    m_pin[1]->setLabelColor( QColor( 0, 0, 0 ) );
+    m_pin[0]->setLength( 5 );
+    m_pin[1]->setLength( 5 );
     
     m_oscopeW = new OscopeWidget( &m_topW );
     m_oscopeW->setupWidget( 116 );
     m_oscopeW->setFixedSize( 220, 120 );
     m_oscopeW->setVisible( true );
+    m_oscopeW->setOscope( this );
     m_topW.setupWidget( m_oscopeW );
     
     m_proxy = Circuit::self()->addWidget( &m_topW);
@@ -77,15 +79,15 @@ Oscope::~Oscope()
 
 void Oscope::initialize()
 {
-    m_oscopeW->setOscope( this );
+    //m_oscopeW->setOscope( this );
     //m_changed = true;
     //updateStep();
 }
 
 double Oscope::getVolt()
 {
-    //qDebug() <<m_pinP.getVolt() - m_pinN.getVolt();
-    return m_pinP.getVolt() - m_pinN.getVolt();
+    //qDebug() <<m_pin[0]->getVolt() - m_pin[1]->getVolt();
+    return m_pin[0]->getVolt() - m_pin[1]->getVolt();
 }
 
 void Oscope::remove()

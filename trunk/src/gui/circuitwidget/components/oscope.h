@@ -54,8 +54,6 @@ class MAINMODULE_EXPORT Oscope : public Component, public eElement
         void remove();
 
     private:
-        Pin m_pinP;
-        Pin m_pinN;
         
         OscopeWidget* m_oscopeW;
         TopWidget    m_topW;
