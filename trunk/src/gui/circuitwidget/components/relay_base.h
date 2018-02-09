@@ -41,6 +41,7 @@ class MAINMODULE_EXPORT RelayBase : public Component, public eInductor
         void setITrig(double current) { if (current > 0.0f) m_trigCurrent = current; }
 
         void setVChanged();
+        virtual void initialize();
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
@@ -57,6 +58,7 @@ class MAINMODULE_EXPORT RelayBase : public Component, public eInductor
 
         eNode* m_internalEnode;
         double m_trigCurrent;
+        bool m_state;
 };
 
 #endif
