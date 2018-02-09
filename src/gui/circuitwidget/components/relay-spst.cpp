@@ -64,8 +64,8 @@ RelaySPST::~RelaySPST(){}
 
 void RelaySPST::setSwitch( bool on )
 {
-    if( on ) m_switches[0]->setRes( cero_doub );
-    else     m_switches[0]->setRes( 1e38 );
+    if( on ) m_switches[0]->setRes( 1e-6 );
+    else     m_switches[0]->setRes( 1e18 );
     update();
 }
 

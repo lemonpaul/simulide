@@ -50,13 +50,13 @@ Push::~Push()
 
 void Push::onbuttonPressed()
 {
-    m_resist = cero_doub;                                  // Close Push
+    m_closed = true;
     m_changed = true;
     update();
 }
 void Push::onbuttonReleased()
 {
-    m_resist = 1e38;                                        // Open Push
+    m_closed = false;
     m_button->setChecked(false);
     m_changed = true;
     update();
@@ -70,10 +70,8 @@ void Push::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *
     pen.setWidth(3);
     p->setPen(pen);
 
-    if( m_resist == cero_doub )             // Pushch is closed
-        p->drawLine(-9, -2, 9, -2 );
-    else                                    // Push is oppened
-        p->drawLine(-9, -8, 9, -8 );
+    if( m_closed ) p->drawLine(-9, -2, 9, -2 );
+    else           p->drawLine(-9, -8, 9, -8 );
 }
 
 #include "moc_push.cpp"

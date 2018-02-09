@@ -86,7 +86,7 @@ void RelayBase::setVChanged()
     eInductor::setVChanged();
 
     if( fabs(m_curSource) > m_trigCurrent ) setSwitch( true );
-    else                      setSwitch( false );
+    else                                    setSwitch( false );
 }
 
 void RelayBase::remove()

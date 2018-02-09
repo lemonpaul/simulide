@@ -45,16 +45,7 @@ Switch::~Switch(){}
 
 void Switch::onbuttonclicked()
 {
-    if( m_resist == cero_doub )                      // switch is Closed
-    {
-        m_resist = 1e38;                              // Open Switch
-        //stampAdmit( 0 );
-    }
-    else                                            // Switch is Oppened
-    {
-        m_resist = cero_doub;                            // Close Switch
-        //stampAdmit( high_imp );
-    }
+    m_closed = !m_closed;
     m_changed = true;
 }
 
@@ -66,10 +57,8 @@ void Switch::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
     pen.setWidth(3);
     p->setPen(pen);
 
-    if( m_resist == cero_doub )             // switch is closed
-        p->drawLine(-10, 0, 10, -2 );
-    else                                    // Switch is oppened
-        p->drawLine(-10.5, 0, 8, -8 );
+    if( m_closed ) p->drawLine(-10, 0, 10, -2 );
+    else           p->drawLine(-10.5, 0, 8, -8 );
 }
 
 #include "moc_switch.cpp"
