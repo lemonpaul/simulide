@@ -92,6 +92,11 @@ void LogicInput::updateStep()
     }
 }
 
+double LogicInput::volt()  
+{ 
+    return m_value; 
+}
+
 void LogicInput::setVolt( double v )
 {
     Component::setValue( v );       // Takes care about units multiplier
@@ -104,7 +109,9 @@ void LogicInput::setVolt( double v )
 void LogicInput::setUnit( QString un ) 
 {
     Component::setUnit( un );
-    setVolt( m_value*m_unitMult );
+    m_voltHight = m_value*m_unitMult;
+    m_out->setVoltHigh( m_voltHight );
+    m_changed = true;
 }
 
 void LogicInput::remove()
