@@ -55,6 +55,8 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         int  nlAcc();
         void setNlAcc( int ac );
         
+        void removeItems();
+        void removeComp( Component* comp );
         void remove();
         void saveState();
 
@@ -78,8 +80,6 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
 
         void constarted( bool started);
         bool is_constarted();
-
-        void removeItems();
 
         bool  pasting();
         QPointF deltaMove();
