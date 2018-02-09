@@ -18,8 +18,7 @@
  ***************************************************************************/
 
 #include "relay-spst.h"
-#include "connector.h"
-
+#include "pin.h"
 
 Component* RelaySPST::construct( QObject* parent, QString type, QString id )
 { return new RelaySPST( parent, type, id ); }

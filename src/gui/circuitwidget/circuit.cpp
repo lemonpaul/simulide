@@ -953,7 +953,16 @@ void Circuit::removeItems()                     // Remove Selected items
     saveState();
     
     foreach( Component* comp, m_compList )
-        if( comp->isSelected() ) comp->remove();
+    {
+        if( comp->isSelected() )
+        {
+            comp->remove();
+            QPropertyEditorWidget::self()->removeObject( comp );
+            compList()->removeOne( comp );
+            removeItem( comp );
+            delete comp;
+        }
+    }
         
     if( pauseSim ) Simulator::self()->runContinuous();
 }

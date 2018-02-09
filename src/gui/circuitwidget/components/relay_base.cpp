@@ -20,6 +20,7 @@
 #include "relay_base.h"
 #include "connector.h"
 #include "simulator.h"
+#include "pin.h"
 
 RelayBase::RelayBase( QObject* parent, QString type, QString id )
          : Component( parent, type, id )
@@ -29,22 +30,23 @@ RelayBase::RelayBase( QObject* parent, QString type, QString id )
     // We need to create the resistor, internal eNode and do the connections.
 
     m_ePin.resize(4);
+    m_pin.resize(2);
 
     QString nodid = m_id;            // External Left pin to inductor
     nodid.append(QString("-lPin"));
     QPoint nodpos = QPoint(-16-8,0);
-    Pin* pin = new Pin( 180, nodpos, nodid, 0, this);
-    pin->setLength(4.5);
-    pin->setPos(-16, 0 );
-    m_ePin[0] = pin;
+    m_pin[0] = new Pin( 180, nodpos, nodid, 0, this);
+    m_pin[0]->setLength(4.5);
+    m_pin[0]->setPos(-16, 0 );
+    m_ePin[0] = m_pin[0];
 
     nodid = m_id;                    // External Right pin to resistor
     nodid.append(QString("-rPin"));
     nodpos = QPoint(16+8,0);
-    pin = new Pin( 0, nodpos, nodid, 1, this);
-    pin->setLength(4.5);
-    pin->setPos( 16, 0 );
-    m_ePin[3] = pin;
+    m_pin[1] = new Pin( 0, nodpos, nodid, 1, this);
+    m_pin[1]->setLength(4.5);
+    m_pin[1]->setPos( 16, 0 );
+    m_ePin[3] = m_pin[1];
 
     QString reid = m_id;
     reid.append(QString("-resistor"));
@@ -91,10 +93,6 @@ void RelayBase::setVChanged()
 
 void RelayBase::remove()
 {
-    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
-    // Bug? if( m_ePin[3]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-    if( m_ePin[3]->isConnected() ) (static_cast<Pin*>(m_ePin[3]))->connector()->remove();
-
     Simulator::self()->remFromEnodeList( m_internalEnode, true );
 
     delete m_resistor;

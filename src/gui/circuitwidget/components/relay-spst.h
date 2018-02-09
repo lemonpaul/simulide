@@ -39,7 +39,7 @@ class MAINMODULE_EXPORT RelaySPST : public RelayBase
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
-        void remove();
+        virtual void remove();
 
     protected:
         virtual void setSwitch( bool on );
