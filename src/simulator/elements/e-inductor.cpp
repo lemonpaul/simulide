@@ -45,15 +45,13 @@ void eInductor::initialize()
     
     eResistor::setRes( m_ind/m_tStep );
     eResistor::initialize();
+
+    m_curSource = 0;
 }
 
 void eInductor::setVChanged()
 {
     double volt = m_ePin[0]->getVolt() - m_ePin[1]->getVolt();
-    
-    //if( volt == 0 ) return;
-    //if( abs(m_volt-volt) < 1e-9 ) return;
-    //m_volt = volt;
 
     m_curSource += volt/m_resist;
 

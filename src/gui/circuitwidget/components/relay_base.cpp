@@ -83,12 +83,19 @@ RelayBase::~RelayBase()
 {
 }
 
+void RelayBase::initialize()
+{
+    eInductor::initialize();
+    setSwitch( false );
+}
+
 void RelayBase::setVChanged()
 {
     eInductor::setVChanged();
 
-    if( fabs(m_curSource) > m_trigCurrent ) setSwitch( true );
-    else                                    setSwitch( false );
+    bool newState = ( fabs(m_curSource) > m_trigCurrent );
+
+    if( newState != m_state ) setSwitch( newState );
 }
 
 void RelayBase::remove()

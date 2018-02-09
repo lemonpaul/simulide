@@ -61,10 +61,11 @@ RelaySPST::RelaySPST( QObject* parent, QString type, QString id )
 }
 RelaySPST::~RelaySPST(){}
 
-void RelaySPST::setSwitch( bool on )
+void RelaySPST::setSwitch( bool state )
 {
-    if( on ) m_switches[0]->setRes( 1e-6 );
-    else     m_switches[0]->setRes( 1e18 );
+    m_state = state;
+    if( state ) m_switches[0]->setRes( 1e-6 );
+    else        m_switches[0]->setRes( 1e18 );
     update();
 }
 
@@ -77,8 +78,6 @@ void RelaySPST::remove()
 
     RelayBase::remove();
 }
-
-
 
 void RelaySPST::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {

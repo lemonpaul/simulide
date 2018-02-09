@@ -42,7 +42,7 @@ class MAINMODULE_EXPORT RelaySPST : public RelayBase
         virtual void remove();
 
     protected:
-        virtual void setSwitch( bool on );
+        virtual void setSwitch(bool state );
 
 };
 
