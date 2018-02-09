@@ -104,7 +104,7 @@ void CircuitView::dragLeaveEvent(QDragLeaveEvent *event)
     event->accept();
     if ( m_enterItem )
     {
-        m_enterItem->remove();
+        m_circuit->removeComp( m_enterItem );
         m_enterItem = 0l;
     }
 }

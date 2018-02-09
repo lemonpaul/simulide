@@ -96,6 +96,30 @@ void Circuit::setCircSpeed( int rate )
     Simulator::self()->simuRateChanged( rate );
 }
 
+void Circuit::removeItems()                     // Remove Selected items
+{
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->pauseSim();
+
+    saveState();
+
+    foreach( Component* comp, m_compList )
+    {
+        if( comp->isSelected() ) removeComp( comp );
+    }
+
+    if( pauseSim ) Simulator::self()->runContinuous();
+}
+
+void Circuit::removeComp( Component* comp )
+{
+    comp->remove();
+    QPropertyEditorWidget::self()->removeObject( comp );
+    compList()->removeOne( comp );
+    removeItem( comp );
+    delete comp;
+}
+
 void Circuit::remove() // Remove everything
 {
     //qDebug() << m_compList.size();
@@ -109,7 +133,7 @@ void Circuit::remove() // Remove everything
         // Don't remove Graphical Nodes
         bool isNode = comp->objectName ().contains( "Node" );
         
-        if( isNumber && !isNode )  comp->remove();
+        if( isNumber && !isNode )  removeItem( comp );
     }
         
 }
@@ -943,28 +967,6 @@ void Circuit::keyPressEvent( QKeyEvent* event )
         MainWindow::self()->saveCirc();
     }
     else QGraphicsScene::keyPressEvent(event);
-}
-
-void Circuit::removeItems()                     // Remove Selected items
-{
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
-
-    saveState();
-    
-    foreach( Component* comp, m_compList )
-    {
-        if( comp->isSelected() )
-        {
-            comp->remove();
-            QPropertyEditorWidget::self()->removeObject( comp );
-            compList()->removeOne( comp );
-            removeItem( comp );
-            delete comp;
-        }
-    }
-        
-    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void Circuit::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
