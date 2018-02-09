@@ -20,10 +20,10 @@
 #ifndef SWITCH_BASE_H
 #define SWITCH_BASE_H
 
-#include "e-resistor.h"
+#include "e-element.h"
 #include "pin.h"
 
-class MAINMODULE_EXPORT SwitchBase : public Component, public eResistor
+class MAINMODULE_EXPORT SwitchBase : public Component, public eElement
 {
     Q_OBJECT
 
@@ -34,13 +34,14 @@ class MAINMODULE_EXPORT SwitchBase : public Component, public eResistor
 
         void updateStep();
 
-        //void setRes( double resist );
+        virtual void initialize();
 
     public slots:
         void remove();
 
     protected:
         bool m_changed;
+        bool m_closed;
         
         QPushButton          *m_button;
         QGraphicsProxyWidget *m_proxy;

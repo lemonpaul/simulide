@@ -22,11 +22,15 @@
 #include "circuit.h"
 
 SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eResistor( id.toStdString() )
+    : Component( parent, type, id )
+    , eElement( id.toStdString() )
 {
     m_area =  QRectF( -11, -9, 22, 11 );
     
+    m_ePin.resize(2);
+    
     m_changed = true;
+    m_closed = false;
     
     QString pinid = m_id;
     pinid.append(QString("-lnod"));
@@ -38,12 +42,7 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
     pinpos = QPoint(8+8,0);
     m_ePin[1] = new Pin( 0, pinpos, pinid, 1, this);
 
-    //m_idLabel->setText( QString("") );
     m_idLabel->setPos(-12,-24);
-    
-    m_resist = 1e38;
-    //stampAdmit( 0 );
-    eResistor::stamp();
     
     m_button = new QPushButton( );
     m_button->setMaximumSize( 16,16 );
@@ -55,23 +54,32 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
     m_proxy->setPos( QPoint(-8, 4) );
     
     Simulator::self()->addToUpdateList( this );
-
 }
 SwitchBase::~SwitchBase()
 {
+}
+
+void SwitchBase::initialize()
+{
+    m_ePin[0]->setEnodeComp( m_ePin[1]->getEnode() );
+    m_ePin[1]->setEnodeComp( m_ePin[0]->getEnode() );
+    m_ePin[0]->stampAdmitance( 1 );
+    m_ePin[1]->stampAdmitance( 1 );
+    m_changed = true;
+    updateStep();
 }
 
 void SwitchBase::updateStep()
 {
     if( m_changed ) 
     {
-        /*if( m_resist >= high_imp )
-        {
-            m_ePin[0]->stampAdmitance( 0 );
-            m_ePin[1]->stampAdmitance( 0 );
-        }
-        else */
-        eResistor::stamp();
+        double admitance = cero_doub;
+        
+        if( m_closed ) admitance = 1e6;
+
+        m_ePin[0]->stampAdmitance( admitance );
+        m_ePin[1]->stampAdmitance( admitance );
+
         m_changed = false;
     }
 }
