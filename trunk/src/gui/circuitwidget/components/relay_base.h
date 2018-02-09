@@ -21,7 +21,8 @@
 #define RELAY_BASE_H
 
 #include "e-inductor.h"
-#include "pin.h"
+#include "component.h"
+
 
 class MAINMODULE_EXPORT RelayBase : public Component, public eInductor
 {
@@ -44,7 +45,7 @@ class MAINMODULE_EXPORT RelayBase : public Component, public eInductor
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
-        void remove();
+        virtual void remove();
 
     protected:
         virtual void setSwitch( bool on )=0;

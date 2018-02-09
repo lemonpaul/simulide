@@ -204,10 +204,10 @@ void Component::remove()
     for( uint i=0; i<m_pin.size(); i++ )               // Remove connectors attached
         if( m_pin[i]->isConnected() ) m_pin[i]->connector()->remove();
         
-    QPropertyEditorWidget::self()->removeObject( this );
-    Circuit::self()->compList()->removeOne( this );
-    Circuit::self()->removeItem( this );
-    this->deleteLater();
+    //QPropertyEditorWidget::self()->removeObject( this );
+    //Circuit::self()->compList()->removeOne( this );
+    //Circuit::self()->removeItem( this );
+    //this->deleteLater();
 }
 
 void Component::slotProperties()
