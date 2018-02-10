@@ -153,11 +153,6 @@ void Component::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu 
 {
     m_eventpoint = mapToScene( togrid(event->pos()) );
 
-    runContextMenu( event->screenPos(), menu );
-}
-
-void Component::runContextMenu( QPoint screenPos, QMenu* menu )
-{
     QAction* copyAction = menu->addAction(QIcon(":/copy.png"),"Copy");
     connect( copyAction, SIGNAL( triggered()), this, SLOT(slotCopy()) );
 
@@ -183,7 +178,7 @@ void Component::runContextMenu( QPoint screenPos, QMenu* menu )
     QAction* V_flipAction = menu->addAction(QIcon(":/vflip.png"),"Vertical Flip");
     connect( V_flipAction, SIGNAL( triggered()), this, SLOT(V_flip()) );
 
-    menu->exec( screenPos );
+    menu->exec(event->screenPos());
 }
 
 void Component::slotCopy()
