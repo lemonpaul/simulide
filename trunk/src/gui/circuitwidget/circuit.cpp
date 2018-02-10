@@ -45,9 +45,9 @@ Circuit::Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  p
 Circuit::~Circuit()
 {
     // Avoid PropertyEditor problem: comps not unregistered
-    
+
     QPropertyEditorWidget::self()->removeObject( this );
-    
+
     foreach( Component* comp, m_compList )
     {
         QPropertyEditorWidget::self()->removeObject( comp );
@@ -57,16 +57,16 @@ Circuit::~Circuit()
 QList<Component*>* Circuit::compList() { return &m_compList; }
 QList<Component*>* Circuit::conList()  { return &m_conList; }
 
-int Circuit::nlAcc()             
-{ 
-    return Simulator::self()->nlAcc(); 
+int Circuit::nlAcc()
+{
+    return Simulator::self()->nlAcc();
 }
 
-void  Circuit::setNlAcc( int ac ) 
-{ 
+void  Circuit::setNlAcc( int ac )
+{
     Simulator::self()->setNlAcc( ac );
 }
-        
+
 int Circuit::reactStep()
 {
     return Simulator::self()->reaClock();
@@ -105,7 +105,8 @@ void Circuit::removeItems()                     // Remove Selected items
 
     foreach( Component* comp, m_compList )
     {
-        if( comp->isSelected() ) removeComp( comp );
+        bool isNode = comp->objectName().contains( "Node" ); // Don't remove Graphical Nodes
+        if( comp->isSelected() && !isNode )  removeComp( comp );
     }
 
     if( pauseSim ) Simulator::self()->runContinuous();
@@ -116,8 +117,8 @@ void Circuit::removeComp( Component* comp )
     comp->remove();
     QPropertyEditorWidget::self()->removeObject( comp );
     compList()->removeOne( comp );
-    removeItem( comp );
-    //delete comp;
+    //removeItem( comp );
+    delete comp;
 }
 
 void Circuit::remove() // Remove everything
@@ -126,16 +127,16 @@ void Circuit::remove() // Remove everything
     foreach( Component* comp, m_compList )
     {
         //qDebug() << "Circuit::remove" << comp->itemID();
-        
+
         // Don't remove internal items
         bool isNumber = false;
         comp->objectName().split("-").last().toInt( &isNumber ); // TODO: Find a proper way !!!!!!!!!!!
         // Don't remove Graphical Nodes
-        bool isNode = comp->objectName ().contains( "Node" );
-        
+        bool isNode = comp->objectName().contains( "Node" );
+
         if( isNumber && !isNode )  removeComp( comp );
     }
-        
+
 }
 
 void Circuit::saveState()
@@ -160,7 +161,7 @@ void Circuit::drawBackground ( QPainter*  painter, const QRectF & rect )
     Q_UNUSED( rect );
     /*painter->setBrush(QColor( 255, 255, 255 ) );
     painter->drawRect( m_scenerect );*/
-    
+
     painter->setBrush(QColor( 240, 240, 210 ) );
     painter->drawRect( m_scenerect );
     painter->setPen( QColor( 210, 210, 210 ) );
@@ -237,10 +238,10 @@ QString Circuit::getCompId( QString name )
 {
     QStringList nameSplit = name.split("-");
     if( nameSplit.isEmpty() ) return "";
-    
+
     QString compId  = nameSplit.takeFirst();
     if( nameSplit.isEmpty() ) return "";
-    
+
     QString compNum = nameSplit.takeFirst();
 
     int num = 0;
@@ -509,7 +510,7 @@ void Circuit::listToDom( QDomDocument* doc, QList<Component*>* complist )
         // Don't save internal items
         bool isNumber = false;
         item->objectName().split("-").last().toInt( &isNumber );
-        
+
         if ( item && isNumber)
         {
             QDomElement pin = m_domDoc.createElement("item");
@@ -623,25 +624,25 @@ void Circuit::loadProperties( QDomElement element, Component* Item )
             QStringList list= value.toString().split(",");
             Item->setProperty( name, list );
         }
-        else if ( metaproperty.type() == QVariant::Int    ) 
+        else if ( metaproperty.type() == QVariant::Int    )
                   Item->setProperty( name, value.toInt() );
-                  
+
         //else if ( metaproperty.type() == QMetaType::Float ) Item->setProperty( name, value.toFloat() );
-        
-        else if ( metaproperty.type() == QVariant::Double ) 
+
+        else if ( metaproperty.type() == QVariant::Double )
                   Item->setProperty( name, value.toDouble() );
-            
-        else if ( metaproperty.type() == QVariant::PointF ) 
+
+        else if ( metaproperty.type() == QVariant::PointF )
                   Item->setProperty( name, value.toPointF() );
-            
-        else if ( metaproperty.type() == QVariant::Bool   ) 
+
+        else if ( metaproperty.type() == QVariant::Bool   )
                   Item->setProperty( name, value.toBool() );
-                  
+
         else qDebug() << "    ERROR!!! Circuit::LoadProperties\n  unknown type:  "<<"name "<<name<<"   value "<<value ;
     }
     Item->setLabelPos();
     Item->setValLabelPos();
-    
+
     addItem(Item);
 
     int number = Item->objectName().split("-").last().toInt();
@@ -704,7 +705,7 @@ QPointF Circuit::deltaMove(){ return m_deltaMove; }
 void Circuit::createSubcircuit()
 {
     QHash<QString, QString> compList;        // Get Components properties
-    
+
     //qDebug() << compIdTip<<"--------------------------";
     foreach( Component* component, m_compList)
     {
@@ -742,7 +743,7 @@ void Circuit::createSubcircuit()
 
     QList<eNode*> eNodeList = simulator.geteNodes();
     QList<QStringList> connectionList;
-    
+
     int nodes = 0;
     foreach( eNode* node,  eNodeList  ) // Get all the connections in each eNode
     {
@@ -771,7 +772,7 @@ void Circuit::createSubcircuit()
             }
         }
         QString conType = "Node";
-        if( pinConList.length() == 4 ) conType = "Connection"; 
+        if( pinConList.length() == 4 ) conType = "Connection";
 
         if( conType == "Connection" )               // PackagePin to pin
         {
@@ -952,14 +953,14 @@ void Circuit::keyPressEvent( QKeyEvent* event )
     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
     {
         QPoint p = CircuitWidget::self()->mapFromGlobal(QCursor::pos());
-        
+
         copy( m_graphicView->mapToScene( p ) );
         clearSelection();
     }
     else if (event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier))
     {
         QPoint p = CircuitWidget::self()->mapFromGlobal(QCursor::pos());
-        
+
         paste( m_graphicView->mapToScene( p ) );
     }
     else if (event->key() == Qt::Key_Z && (event->modifiers() & Qt::ControlModifier))
