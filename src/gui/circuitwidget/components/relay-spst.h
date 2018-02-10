@@ -36,14 +36,6 @@ class MAINMODULE_EXPORT RelaySPST : public RelayBase
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
-        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-
-    public slots:
-        virtual void remove();
-
-    protected:
-        virtual void setSwitch(bool state );
-
 };
 
 #endif
