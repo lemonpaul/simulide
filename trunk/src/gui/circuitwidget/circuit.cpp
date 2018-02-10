@@ -117,7 +117,7 @@ void Circuit::removeComp( Component* comp )
     QPropertyEditorWidget::self()->removeObject( comp );
     compList()->removeOne( comp );
     removeItem( comp );
-    delete comp;
+    //delete comp;
 }
 
 void Circuit::remove() // Remove everything
@@ -133,7 +133,7 @@ void Circuit::remove() // Remove everything
         // Don't remove Graphical Nodes
         bool isNode = comp->objectName ().contains( "Node" );
         
-        if( isNumber && !isNode )  removeItem( comp );
+        if( isNumber && !isNode )  removeComp( comp );
     }
         
 }
@@ -976,7 +976,7 @@ void Circuit::keyPressEvent( QKeyEvent* event )
     }
     else if (event->key() == Qt::Key_Delete)
     {
-		removeItems();
+        removeItems();
     }
     else QGraphicsScene::keyPressEvent(event);
 }
