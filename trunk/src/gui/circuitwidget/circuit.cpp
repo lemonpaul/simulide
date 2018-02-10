@@ -962,9 +962,21 @@ void Circuit::keyPressEvent( QKeyEvent* event )
         
         paste( m_graphicView->mapToScene( p ) );
     }
+    else if (event->key() == Qt::Key_Z && (event->modifiers() & Qt::ControlModifier))
+    {
+        undo();
+    }
+    else if (event->key() == Qt::Key_Y && (event->modifiers() & Qt::ControlModifier))
+    {
+        redo();
+    }
     else if (event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
     {
         MainWindow::self()->saveCirc();
+    }
+    else if (event->key() == Qt::Key_Delete)
+    {
+		removeItems();
     }
     else QGraphicsScene::keyPressEvent(event);
 }
