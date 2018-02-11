@@ -565,6 +565,9 @@ LineNumberArea::~LineNumberArea(){}
 void LineNumberArea::contextMenuEvent( QContextMenuEvent *event)
 {
     event->accept();
+    
+    if( !m_codeEditor->debugStarted() ) return;
+    
     QMenu menu;
 
     QAction *addm_brkAction = menu.addAction( QIcon(":/remove.png"),"Add BreakPoint" );
