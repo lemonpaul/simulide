@@ -93,7 +93,7 @@ Arduino::~Arduino()
 
 void Arduino::remove()
 {
-    if( Simulator::self()->isRunning() ) MainWindow::self()->powerCircOff();
+    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
     m_pb5Pin->setEnode( 0l );
     
     Circuit::self()->compList()->removeOne( m_boardLed );
