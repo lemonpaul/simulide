@@ -121,15 +121,15 @@ void RelayBase::setSwitch( bool state )
     {
         int switchN = i*m_numthrows;
 
-        if( state ) m_switches[ switchN ]->setRes( 1e-6 );
-        else        m_switches[ switchN ]->setRes( 1e14 );
+        if( state ) m_switches[ switchN ]->setRes( 1e-3 );
+        else        m_switches[ switchN ]->setRes( 1e6 );
 
         if( m_numthrows == 2 )
         {
             switchN++;
 
-            if( !state ) m_switches[ switchN ]->setRes( 1e-6 );
-            else         m_switches[ switchN ]->setRes( 1e14 );
+            if( !state ) m_switches[ switchN ]->setRes( 1e-3 );
+            else         m_switches[ switchN ]->setRes( 1e6 );
         }
 
     }
