@@ -93,7 +93,7 @@ void MainWindow::newCircuit()
     m_circuit->clear();
     m_curCirc = "";
     
-    this->setWindowTitle(m_version+"  -  New Circuit");
+    this->setWindowTitle(m_version+"  -  New Circuit*");
 }
 
 void MainWindow::openCirc()
