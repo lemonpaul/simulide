@@ -26,12 +26,12 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
     , eElement( id.toStdString() )
 {
     m_area =  QRectF( -11, -9, 22, 11 );
-    
+
     m_ePin.resize(2);
-    
+
     m_changed = true;
     m_closed = false;
-    
+
     QString pinid = m_id;
     pinid.append(QString("-lnod"));
     QPoint pinpos = QPoint(-8-8,0);
@@ -43,7 +43,7 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
     m_ePin[1] = new Pin( 0, pinpos, pinid, 1, this);
 
     m_idLabel->setPos(-12,-24);
-    
+
     m_button = new QPushButton( );
     m_button->setMaximumSize( 16,16 );
     m_button->setGeometry(-20,-16,16,16);
@@ -52,7 +52,7 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
     m_proxy = Circuit::self()->addWidget( m_button );
     m_proxy->setParentItem( this );
     m_proxy->setPos( QPoint(-8, 4) );
-    
+
     Simulator::self()->addToUpdateList( this );
 }
 SwitchBase::~SwitchBase()
@@ -63,7 +63,7 @@ void SwitchBase::initialize()
 {
     m_ePin[0]->setEnodeComp( m_ePin[1]->getEnode() );
     m_ePin[1]->setEnodeComp( m_ePin[0]->getEnode() );
-    m_ePin[0]->stampAdmitance( 1 );
+    m_ePin[0]->stampAdmitance( 1 ); // Restart circuit afther switch closed issue
     m_ePin[1]->stampAdmitance( 1 );
     m_changed = true;
     updateStep();
@@ -71,14 +71,14 @@ void SwitchBase::initialize()
 
 void SwitchBase::updateStep()
 {
-    if( m_changed ) 
+    if( m_changed )
     {
-        double admitance = cero_doub;
-        
-        if( m_closed ) admitance = 1e6;
+        double admit = 1e-6;
 
-        m_ePin[0]->stampAdmitance( admitance );
-        m_ePin[1]->stampAdmitance( admitance );
+        if( m_closed ) admit = 1e3;
+
+        m_ePin[0]->stampAdmitance( admit );
+        m_ePin[1]->stampAdmitance( admit );
 
         m_changed = false;
     }
@@ -88,9 +88,9 @@ void SwitchBase::remove()
 {
     if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
     if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-    
+
     Simulator::self()->remFromUpdateList( this );
-    
+
     Component::remove();
 }
 
