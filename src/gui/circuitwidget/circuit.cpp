@@ -986,10 +986,6 @@ void Circuit::keyPressEvent( QKeyEvent* event )
     {
         redo();
     }
-    else if (event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
-    {
-        MainWindow::self()->saveCirc();
-    }
     else if (event->key() == Qt::Key_Delete)
     {
         removeItems();
