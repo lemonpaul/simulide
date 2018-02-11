@@ -52,6 +52,8 @@ void EditorWindow::newFile()
     connect(baseWidget->m_codeEditor->document(), SIGNAL(contentsChanged()),
             this,                                 SLOT(documentWasModified()));
     m_fileList << "New";
+    enableFileActs( true ); 
+    enableDebugActs( true );
 }
 
 void EditorWindow::open()
