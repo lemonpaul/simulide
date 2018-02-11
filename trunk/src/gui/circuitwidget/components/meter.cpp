@@ -33,20 +33,25 @@ Meter::Meter( QObject* parent, QString type, QString id )
 {
     m_area = QRectF( -24, -24, 48, 32 );
 
+    m_pin.resize( 3 );
+
     QString pinId = m_id;
     pinId.append(QString("-lPin"));
     QPoint pinPos = QPoint(-8, 16);
-    m_ePin[0] = new Pin( 270, pinPos, pinId, 0, this);
+    m_pin[0] = new Pin( 270, pinPos, pinId, 0, this);
+    m_ePin[0] = m_pin[0];
 
     pinId = m_id;
     pinId.append(QString("-rPin"));
     pinPos = QPoint(8, 16);
-    m_ePin[1] = new Pin( 270, pinPos, pinId, 1, this);
+    m_pin[1] = new Pin( 270, pinPos, pinId, 1, this);
+    m_ePin[1] = m_pin[1];
 
     pinId = id;
     pinId.append(QString("-outnod"));
     pinPos = QPoint(32,-8);
-    m_outpin = new Pin( 0, pinPos, pinId, 0, this);
+    m_pin[2] = new Pin( 0, pinPos, pinId, 0, this);
+    m_outpin = m_pin[2];
 
     pinId.append(QString("-eSource"));
     m_out = new eSource( pinId.toStdString(), m_outpin );

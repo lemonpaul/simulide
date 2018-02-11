@@ -138,7 +138,12 @@ void eNode::stampMatrix()
         double totalCurr  = 0;
         foreach( double current, m_currList ) totalCurr  += current;
 
-        if( m_single ) setVolt( totalCurr/m_totalAdmit ); // single element in matrix
+        if( m_single )                   // single element in matrix
+        {
+            double volt = 0;
+            if( m_totalAdmit  > 0 )volt = totalCurr/m_totalAdmit;
+            setVolt( volt );
+        }
         else CircMatrix::self()->stampCoef( m_nodeNum, totalCurr );
         //m_currList.clear();
         m_currChanged  = false;

@@ -177,20 +177,20 @@ void Simulator::runContinuous()
     }
     // Initialize Matrix
     m_matrix.createMatrix( m_eNodeList, m_elementList );
+    m_matrix.printMatrix();
     m_matrix.simplify();
 
     // Try to solve matrix, if fail stop simulation
+    m_matrix.printMatrix();
     if( !m_matrix.solveMatrix() )
     {
         std::cout << "Simulator::runContinuous, Failed to solve Matrix"
                   <<  std::endl;
         MainWindow::self()->powerCircOff();
         MainWindow::self()->setRate( -1 );
-        //pauseSim();
         return;
     }
-    //m_matrix.printMatrix();
-
+    
     m_reacCounter  = 0;
     m_noLinCounter = 0;
 

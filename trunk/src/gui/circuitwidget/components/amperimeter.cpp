@@ -19,7 +19,6 @@
 
 #include "amperimeter.h"
 #include "simulator.h"
-#include "connector.h"
 
 
 Component* Amperimeter::construct( QObject* parent, QString type, QString id )
@@ -39,6 +38,7 @@ Amperimeter::Amperimeter( QObject* parent, QString type, QString id )
     : Meter( parent, type, id )
 {
     m_unit = "A";
+    m_dispValue = 0;
     setRes( 1e-6 );
     Meter::updateStep();
 }
