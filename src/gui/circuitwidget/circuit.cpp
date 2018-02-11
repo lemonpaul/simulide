@@ -543,6 +543,9 @@ void Circuit::listToDom( QDomDocument* doc, QList<Component*>* complist )
             root.appendChild(pin);
         }
     }
+    QString title = MainWindow::self()->windowTitle();
+    if (!title.endsWith('*'))
+        MainWindow::self()->setWindowTitle(title+'*');
 }
 
 void Circuit::circuitToDom()
