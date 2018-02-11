@@ -100,7 +100,6 @@ void OscopeWidget::clear()
 
 void OscopeWidget::simuClockStep()
 {
-    //qDebug() << "OscopeWidget::setData" << m_Hscale << m_tick << m_counter << lastData << newReading;
     if( ++m_newReadCount == 1000500 )
     {
         m_ampli = 0;
@@ -112,12 +111,12 @@ void OscopeWidget::simuClockStep()
     if     ( m_probe != 0l )  data = m_probe->getVolt();
     else if( m_oscope != 0l ) data = m_oscope->getVolt();
 
-    //qDebug() << "OscopeWidget::setData"<< lastData << data << max << min << up << down;
+//qDebug() << "OscopeWidget::setData"<< lastData << data << max << min << up << down;
     
     if( data > max ) max = data;
     if( data < min ) min = data;
     
-    if( (data-lastData)>m_filter )                      // Filter noise > 0.2
+    if( (data-lastData)>m_filter )                       // Filter noise 
     {
         if( newReading )
         {
@@ -140,8 +139,8 @@ void OscopeWidget::simuClockStep()
                         if( m_Hscale > 10000 ) m_Hscale = 10000;
                         if( m_Hscale < 1 )    m_Hscale = 1;
                     }
-                    //qDebug()<<"OscopeWidget::simuClockStep"<<max<<min <<m_ampli << m_Vscale;
-                    //qDebug()<<"OscopeWidget::simuClockStep" <<m_sampleR <<per << m_freq;
+//qDebug()<<"OscopeWidget::simuClockStep"<<max<<min <<m_ampli << m_Vscale;
+//qDebug()<<"OscopeWidget::simuClockStep" <<m_sampleR <<per << m_freq;
                     
                     Hpos = 0;
                     m_tick = 0;
@@ -162,7 +161,7 @@ void OscopeWidget::simuClockStep()
         up = true;
         lastData = data;
     }
-    else if( (data-lastData) < -0.2 )
+    else if( (data-lastData) < -m_filter )
     {
         if( up & !down )                                    // Max Found
         {
@@ -176,7 +175,7 @@ void OscopeWidget::simuClockStep()
         lastData = data;
     }
 
-    if( ++m_stepCount == 50000 )                       // 5 ms Update
+    if( ++m_stepCount == 50000 )                          // 5 ms Update
     {
         m_stepCount = 0;
         
@@ -222,13 +221,15 @@ void OscopeWidget::simuClockStep()
         {
             if( ++m_tick == m_Hscale )
             {
-                m_data[m_counter] = ((data-m_Vpos)*m_Vscale+2.5)*28;// V-Center data
-                
+                m_data[m_counter] = ((data-m_Vpos)*m_Vscale+2.5)*28;
+                //qDebug() << "data"<<data;
                 m_counter++;
-                    
-                //qDebug() << "m_tick == m_Hscale" << m_counter << data;
-
                 m_tick = 0;
+                if( m_counter == 140 )
+                {
+                    down = false;
+                    up = false;
+                }
             }
         }
     }
@@ -296,7 +297,6 @@ void OscopeWidget::VposChanged( int Vpos )
     if( vpos < m_prevVpos ) 
     {
         m_Vpos += 0.005*m_Vscale;
-        
         if( m_Vpos > maxVpos ) m_Vpos = maxVpos;
     }
     else
