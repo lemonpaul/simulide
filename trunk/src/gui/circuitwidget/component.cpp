@@ -153,10 +153,10 @@ void Component::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu 
 {
     m_eventpoint = mapToScene( togrid(event->pos()) );
 
-    QAction* copyAction = menu->addAction(QIcon(":/copy.png"),"Copy");
+    QAction* copyAction = menu->addAction(QIcon(":/copy.png"),"Copy\tCtrl+C");
     connect( copyAction, SIGNAL( triggered()), this, SLOT(slotCopy()) );
 
-    QAction* removeAction = menu->addAction( QIcon( ":/remove.png"),"Remove" );
+    QAction* removeAction = menu->addAction( QIcon( ":/remove.png"),"Remove\tDel" );
     connect( removeAction, SIGNAL( triggered()), this, SLOT(slotRemove()) );
     
     QAction* propertiesAction = menu->addAction( QIcon( ":/properties.png"),"Properties" );

@@ -70,19 +70,19 @@ void CircuitWidget::clear()
 
 void CircuitWidget::createActions()
 {
-    newCircAct = new QAction(QIcon(":/newcirc.png"), tr("New C&ircuit"), this);
+    newCircAct = new QAction(QIcon(":/newcirc.png"), tr("New C&ircuit\tCtrl+N"), this);
     newCircAct->setStatusTip(tr("Create a new Circuit"));
     connect( newCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(newCircuit()));
 
-    openCircAct = new QAction(QIcon(":/opencirc.png"), tr("&Open Circuit"), this);
+    openCircAct = new QAction(QIcon(":/opencirc.png"), tr("&Open Circuit\tCtrl+O"), this);
     openCircAct->setStatusTip(tr("Open an existing Circuit"));
     connect(openCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(openCirc()));
 
-    saveCircAct = new QAction(QIcon(":/savecirc.png"), tr("&Save Circuit"), this);
+    saveCircAct = new QAction(QIcon(":/savecirc.png"), tr("&Save Circuit\tCtrl+S"), this);
     saveCircAct->setStatusTip(tr("Save the Circuit to disk"));
     connect(saveCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(saveCirc()));
 
-    saveCircAsAct = new QAction(QIcon(":/savecircas.png"),tr("Save Circuit &As..."), this);
+    saveCircAsAct = new QAction(QIcon(":/savecircas.png"),tr("Save Circuit &As...\tCtrl+Shift+S"), this);
     saveCircAsAct->setStatusTip(tr("Save the Circuit under a new name"));
     connect(saveCircAsAct, SIGNAL(triggered()), MainWindow::self(), SLOT(saveCircAs()));
 
