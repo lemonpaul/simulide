@@ -66,14 +66,13 @@ void WaveGen::genSine()
 }
 void WaveGen::genSaw()
 {
-    int halfW = m_stepsPC/2;
-    if( m_step >= halfW )
+    if( m_step >= m_stepsPC )
     {
         m_vOut = 0;
         m_step = 0;
         return;
     }
-    m_vOut = (double)m_step/halfW;
+    m_vOut = (double)m_step/m_stepsPC;
     
 }
 void WaveGen::genTriangle()
