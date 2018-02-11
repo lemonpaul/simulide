@@ -71,6 +71,7 @@ class EditorWindow : public QWidget
         void writeSettings();
         void enableFileActs( bool enable );
         void enableDebugActs( bool enable );
+        void keyPressEvent(QKeyEvent *event);
 
         bool maybeSave();
         void loadFile(const QString &fileName);
