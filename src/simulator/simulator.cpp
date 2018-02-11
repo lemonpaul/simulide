@@ -67,8 +67,8 @@ inline void Simulator::solveMatrix()
     if( !m_matrix.solveMatrix() )            // Try to solve matrix,
     {                                     // if fail stop simulation
         std::cout << "Simulator::runStep, Failed to solve Matrix" << std::endl;
-        MainWindow::self()->powerCircOff();//stopSim();
-        MainWindow::self()->setRate( -1 );
+        CircuitWidget::self()->powerCircOff();//stopSim();
+        CircuitWidget::self()->setRate( -1 );
     }                                // m_matrix sets the eNode voltages
 }
 
@@ -95,7 +95,7 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 m
     if( deltaRefTime >= 1e9 )          // We want steps per Sec = 1e9 ns
     {
         qint64 stepsPerSec = (m_step-m_lastStep)*1e9/deltaRefTime;
-        MainWindow::self()->setRate( (stepsPerSec*100)/m_simuRate );
+        CircuitWidget::self()->setRate( (stepsPerSec*100)/m_simuRate );
         m_lastStep    = m_step;
         m_lastRefTime = refTime;
     }
@@ -186,8 +186,8 @@ void Simulator::runContinuous()
     {
         std::cout << "Simulator::runContinuous, Failed to solve Matrix"
                   <<  std::endl;
-        MainWindow::self()->powerCircOff();
-        MainWindow::self()->setRate( -1 );
+        CircuitWidget::self()->powerCircOff();
+        CircuitWidget::self()->setRate( -1 );
         return;
     }
     
@@ -217,7 +217,7 @@ void Simulator::stopSim()
 
     if( McuComponent::self() ) McuComponent::self()->reset();
 
-    MainWindow::self()->setRate( 0 );
+    CircuitWidget::self()->setRate( 0 );
 }
 
 void Simulator::pauseSim()
