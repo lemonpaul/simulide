@@ -569,6 +569,9 @@ void Circuit::undo()
 {
     if( m_undoStack.isEmpty() ) return;
 
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->stopSim();
+
     circuitToDom();
     m_redoStack.prepend( new QDomDocument() );
     m_redoStack.first()->setContent( m_domDoc.toString() );
@@ -579,11 +582,16 @@ void Circuit::undo()
 
     m_seqNumber = 0;
     loadDomDoc( &m_domDoc );
+
+    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void Circuit::redo()
 {
     if( m_redoStack.isEmpty() ) return;
+
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->stopSim();
 
     circuitToDom();
     m_undoStack.append( new QDomDocument() );
@@ -595,6 +603,8 @@ void Circuit::redo()
 
     m_seqNumber = 0;
     loadDomDoc( &m_domDoc );
+
+    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 Component* Circuit::createItem( QString type, QString id )
@@ -688,6 +698,9 @@ void Circuit::copy( QPointF eventpoint )
 
 void Circuit::paste( QPointF eventpoint )
 {
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->stopSim();
+
     saveState();
 
     m_pasting = true;
@@ -697,6 +710,8 @@ void Circuit::paste( QPointF eventpoint )
     loadDomDoc( &m_copyDoc );
 
     m_pasting = false;
+
+    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 bool  Circuit::pasting() { return m_pasting; }
