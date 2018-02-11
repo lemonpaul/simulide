@@ -117,7 +117,7 @@ bool EditorWindow::saveFile(const QString &fileName)
     QApplication::setOverrideCursor(Qt::WaitCursor);
     CodeEditor* ce = getCodeEditor();
     out << ce->toPlainText();
-    //ce->setFile( fileName );
+    ce->setFile( fileName );
     QApplication::restoreOverrideCursor();
     
     ce->document()->setModified(false);
