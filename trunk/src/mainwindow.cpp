@@ -36,9 +36,7 @@ MainWindow::MainWindow()
     m_version = "SimulIDE-"+QString(APP_VERSION);
     
 
-    createActions();
     createWidgets();
-    createToolBars();
     readSettings();
     
     loadPlugins();
@@ -90,7 +88,7 @@ void MainWindow::writeSettings()
 
 void MainWindow::newCircuit()
 {
-    powerCircOff();
+    m_circuit->powerCircOff();
     
     m_circuit->clear();
     m_curCirc = "";
@@ -151,36 +149,6 @@ void MainWindow::openInfo()
     QDesktopServices::openUrl(QUrl("http://simulide.blogspot.com"));
 }
 
-void MainWindow::powerCirc()
-{
-    if( powerCircAct->iconText() == "Off" ) powerCircOn();
-    else                                    powerCircOff();
-}
-
-void MainWindow::powerCircOn()
-{
-    powerCircAct->setIcon(QIcon(":/poweron.png"));
-    powerCircAct->setIconText("On");
-    Simulator::self()->runContinuous();
-}
-void MainWindow::powerCircOff()
-{
-    //if( Simulator::self()->isRunning() )
-    {
-        powerCircAct->setIcon(QIcon(":/poweroff.png"));
-        powerCircAct->setIconText("Off");
-        Simulator::self()->stopSim();
-    }
-}
-
-void MainWindow::setRate( int rate )
-{
-    if( rate < 0 )
-        m_rateLabel->setText( "Circuit ERROR!!!" );
-    else 
-        m_rateLabel->setText( "Real Speed: "+QString::number(rate) +" %" );
-}
-
 void MainWindow::about()
 {
    QMessageBox::about(this, tr("About Application"),
@@ -224,16 +192,11 @@ void MainWindow::createWidgets()
     m_itemprop->setObjectName(QString::fromUtf8("properties"));
     m_sidepanel->addTab( m_itemprop, QString::fromUtf8("Properties") );
 
-    m_circToolBar = new QToolBar( this );
-    m_circuit = new CircuitWidget( this, m_circToolBar );
+    m_circuit = new CircuitWidget( this );
     m_circuit->setObjectName(QString::fromUtf8("circuit"));
     m_Centralsplitter->addWidget( m_circuit );
-
     //m_editorWindow = new EditorWindow( this );
     //m_Centralsplitter->addWidget( m_editorWindow );
-    
-    m_rateLabel = new QLabel( this );
-    m_rateLabel->setText( "Real Speed: 0 %" );
 
     baseWidgetLayout->addWidget( m_Centralsplitter, 0, 0 );
 
@@ -248,57 +211,6 @@ void MainWindow::createWidgets()
     this->showMaximized();
 }
 
-void MainWindow::createActions()
-{
-    newCircAct = new QAction(QIcon(":/newcirc.png"), tr("New C&ircuit"), this);
-    newCircAct->setShortcut(tr("Ctrl+I"));
-    newCircAct->setStatusTip(tr("Create a new Circuit"));
-    connect( newCircAct, SIGNAL(triggered()), this, SLOT(newCircuit()));
-
-    openCircAct = new QAction(QIcon(":/opencirc.png"), tr("&Open Circuit"), this);
-    openCircAct->setShortcut(tr("Ctrl+O"));
-    openCircAct->setStatusTip(tr("Open an existing Circuit"));
-    connect(openCircAct, SIGNAL(triggered()), this, SLOT(openCirc()));
-
-    saveCircAct = new QAction(QIcon(":/savecirc.png"), tr("&Save Circuit"), this);
-    saveCircAct->setShortcut(tr("Ctrl+S"));
-    saveCircAct->setStatusTip(tr("Save the Circuit to disk"));
-    connect(saveCircAct, SIGNAL(triggered()), this, SLOT(saveCirc()));
-
-    saveCircAsAct = new QAction(QIcon(":/savecircas.png"),tr("Save Circuit &As..."), this);
-    saveCircAsAct->setStatusTip(tr("Save the Circuit under a new name"));
-    connect(saveCircAsAct, SIGNAL(triggered()), this, SLOT(saveCircAs()));
-
-    powerCircAct = new QAction(QIcon(":/poweroff.png"),tr("Power Circuit"), this);
-    powerCircAct->setStatusTip(tr("Power the Circuit"));
-    powerCircAct->setIconText("Off");
-    connect(powerCircAct, SIGNAL(triggered()), this, SLOT(powerCirc()));
-    
-    infoAct = new QAction(QIcon(":/help.png"),tr("Online Help"), this);
-    infoAct->setStatusTip(tr("Online Help"));
-    infoAct->setIconText("Off");
-    connect(infoAct, SIGNAL(triggered()), this, SLOT(openInfo()));
-}
-
-void MainWindow::createToolBars()
-{
-    m_circToolBar->setObjectName("m_circToolBar");
-    m_circToolBar->addAction(newCircAct);
-    m_circToolBar->addAction(openCircAct);
-    m_circToolBar->addAction(saveCircAct);
-    m_circToolBar->addAction(saveCircAsAct);
-    m_circToolBar->addSeparator();//..........................
-    m_circToolBar->addAction(powerCircAct);
-    m_circToolBar->addSeparator();//..........................
-    m_circToolBar->addWidget( m_rateLabel );
-
-    QWidget *spacerWidget = new QWidget(this);
-    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    spacerWidget->setVisible(true);
-    m_circToolBar->addWidget(spacerWidget);
-    m_circToolBar->addAction(infoAct);
-    m_circToolBar->addSeparator();//..........................
-}
 
 #define STRING(s) #s
 #define STRING_MACRO(arg) STRING(arg)
