@@ -990,6 +990,21 @@ void Circuit::keyPressEvent( QKeyEvent* event )
     {
         removeItems();
     }
+    if (event->key() == Qt::Key_N && (event->modifiers() & Qt::ControlModifier))
+    {
+        MainWindow::self()->newCircuit();
+    }
+    else if (event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
+    {
+        if (event->modifiers() & Qt::ShiftModifier)
+            MainWindow::self()->saveCircAs();
+        else
+            MainWindow::self()->saveCirc();
+    }
+    else if (event->key() == Qt::Key_O && (event->modifiers() & Qt::ControlModifier))
+    {
+        MainWindow::self()->openCirc();
+    }
     else QGraphicsScene::keyPressEvent(event);
 }
 
