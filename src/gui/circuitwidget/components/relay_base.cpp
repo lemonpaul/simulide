@@ -150,7 +150,7 @@ void RelayBase::SetupSwitches( int poles, int throws )
 {
     for( uint i=0; i<m_switches.size(); i++ )
         delete m_switches[i];
-    //qDebug() << "RelayBase::SetupSwitches ePins:"<<poles<<throws<<m_numPoles<<m_numthrows;
+    //qDebug() << "RelayBase::SetupSwitches Pins:"<<poles<<throws<<m_numPoles<<m_numthrows;
     for( int i=0; i<m_numPoles; i++ )
     {
         int epinN = 4+i*m_numthrows*2;
@@ -164,7 +164,6 @@ void RelayBase::SetupSwitches( int poles, int throws )
     {
         Pin* pin = m_pin[i];
         if( pin->isConnected() ) pin->connector()->remove();
-        Circuit::self()->removeItem( pin );
         pin->reset();
         delete pin;
     }
