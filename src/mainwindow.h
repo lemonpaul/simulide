@@ -37,6 +37,8 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         ~MainWindow();
 
  static MainWindow* self() { return m_pSelf; }
+        
+        void setRate( int rate );
 
         QSettings* settings() { return &m_settings; }
 
@@ -49,11 +51,15 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         QSplitter*    m_Centralsplitter;
         QWidget*      m_ramTabWidget;
         QGridLayout*  m_ramTabWidgetLayout;
+        QToolBar*     m_circToolBar;
         
         QPropertyEditorWidget* m_itemprop;
         //EditorWindow* m_editorWindow;
 
     public slots:
+        void powerCircOn();
+        void powerCircOff();
+
         void openCirc();
         void newCircuit();
         void saveCirc();
@@ -64,6 +70,7 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
 
     private slots:
         void about();
+        void powerCirc();
         void openInfo();
 
     private:
@@ -73,6 +80,7 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         bool m_blocked;
 
         void createWidgets();
+        void createActions();
         void createMenus();
         void createToolBars();
         void writeSettings();
@@ -89,10 +97,15 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         QStringList m_docList;
         //QStringList m_plugins;
         QHash<QString, QPluginLoader*>  m_plugins;
+
         CircuitWidget* m_circuit;
+        QLabel*        m_rateLabel; 
+
         ComponentSelector* components;
 
         QLineEdit m_findLabel;
+
+
 
         QAction* exitAct;
         QAction* aboutAct;
@@ -103,6 +116,13 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         QAction* pauseAct;
         QAction* resetAct;
         QAction* stopAct;
+
+        QAction* newCircAct;
+        QAction* openCircAct;
+        QAction* saveCircAct;
+        QAction* saveCircAsAct;
+        QAction* powerCircAct;
+        QAction* infoAct;
 };
 
 #endif

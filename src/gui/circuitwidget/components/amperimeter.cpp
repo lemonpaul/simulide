@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2017 by santiago González                               *
+ *   Copyright (C) 2012 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,6 +19,7 @@
 
 #include "amperimeter.h"
 #include "simulator.h"
+#include "connector.h"
 
 
 Component* Amperimeter::construct( QObject* parent, QString type, QString id )
@@ -38,22 +39,17 @@ Amperimeter::Amperimeter( QObject* parent, QString type, QString id )
     : Meter( parent, type, id )
 {
     m_unit = "A";
-    m_dispValue = 0;
     setRes( 1e-6 );
-    Meter::updateStep();
+    updateStep();
 }
 Amperimeter::~Amperimeter(){}
 
 void Amperimeter::updateStep()
 {
-    double curr = current();
-    
-    if( curr != m_dispValue )
-    {
-        setUnit("A");
-        m_dispValue = curr;
-        Meter::updateStep();
-    }
+    setUnit("A");
+    m_dispValue = current();
+
+    Meter::updateStep();
 }
 
 #include "moc_amperimeter.cpp"

@@ -44,7 +44,7 @@ class MAINMODULE_EXPORT LogicInput : public Component, public eElement
         
         virtual void updateStep();
 
-        double volt();
+        double volt() const      { return m_voltHight; }
         void setVolt( double v );
         
         void setUnit( QString un );

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2017 by santiago González                               *
+ *   Copyright (C) 2010 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "clock.h"
-#include "pin.h"
+#include "itemlibrary.h"
 #include "simulator.h"
 
 Component* Clock::construct( QObject* parent, QString type, QString id )
@@ -37,16 +37,58 @@ LibraryItem* Clock::libraryItem()
 }
 
 Clock::Clock( QObject* parent, QString type, QString id )
-    : ClockBase( parent, type, id )
+    : LogicInput( parent, type, id )
 {
+    m_isRunning = false;
+
+    m_stepsPC = 0;
+    m_step = 0;
+    setFreq( 1000 );
+
+    Simulator::self()->addToUpdateList( this );
 }
 Clock::~Clock(){}
 
-void Clock::simuClockStep()
+void Clock::updateStep()
+{
+    if( m_changed )
+    {
+        if( m_isRunning )
+            Simulator::self()->addToSimuClockList( this );
+        else
+        {
+            m_out->setOut( false );
+            m_out->stampOutput();
+            Simulator::self()->remFromSimuClockList( this );
+        }
+        m_changed = false;
+    }
+}
+
+void Clock::setFreq( int freq )
+{
+    //m_freq = freq;
+    m_stepsPC = 1e6/freq/2;
+    
+    if (m_stepsPC < 1) m_stepsPC = 1;
+    
+    m_freq = 1e6/m_stepsPC/2;
+}
+
+void Clock::onbuttonclicked()
+{
+    m_isRunning = !m_isRunning;
+    m_step = 0;
+
+    m_changed = true;
+    //qDebug() << m_stepsPC << m_isRunning ;
+}
+
+void Clock::setVChanged()
 {
     m_step++;
 
-    if ( m_step >= m_stepsPC/2 )
+    if ( m_step >= m_stepsPC )
     {
         m_out->setOut( !m_out->out() );
         m_out->stampOutput();
@@ -54,14 +96,12 @@ void Clock::simuClockStep()
     }
 }
 
-void Clock::setFreq( int freq )
+void Clock::remove()
 {
-    //m_freq = freq;
-    m_stepsPC = (int)1e6/freq;
-    
-    if (m_stepsPC < 1) m_stepsPC = 1;
-    
-    m_freq = 1e6/(int)m_stepsPC;
+
+    Simulator::self()->remFromSimuClockList( this );
+
+    LogicInput::remove();
 }
 
 void Clock::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

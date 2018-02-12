@@ -20,7 +20,8 @@
 #include <cmath>
 
 #include "capacitor.h"
-#include "pin.h"
+#include "connector.h"
+#include "itemlibrary.h"
 
 
 Component* Capacitor::construct( QObject* parent, QString type, QString id )
@@ -66,6 +67,13 @@ Capacitor::Capacitor( QObject* parent, QString type, QString id )
     setShowVal( true );
 
     setLabelPos(-16,-24, 0);
+
+    /*const QFont sansFont("Helvetica [Cronyx]", 7);
+    m_labelcurr = Circuit::self()->addSimpleText( id.toLatin1().data(), sansFont );
+    m_labelcurr->setParentItem( this );
+    m_labelcurr->setPos(-13, -5.5 );
+    //m_labelcurr->rotate( 180-dir );
+    m_labelcurr->setText( QString("%1").arg(m_resist) );*/
 }
 Capacitor::~Capacitor(){}
 

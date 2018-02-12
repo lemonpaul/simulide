@@ -19,56 +19,41 @@
 
 #include "meter.h"
 #include "simulator.h"
-#include "e-source.h"
-#include "pin.h"
+#include "connector.h"
 #include "utils.h"
+#include "pin.h"
 
-
-#include <math.h>   // fabs(x,y)
 
 Meter::Meter( QObject* parent, QString type, QString id )
-    : Component( parent, type, id )
-    ,  eResistor( id.toStdString() )
-    , m_display( this )
+    : Component( parent, type, id ),
+      eResistor( id.toStdString() )
 {
     m_area = QRectF( -24, -24, 48, 32 );
-
-    m_pin.resize( 3 );
-
     QString pinId = m_id;
     pinId.append(QString("-lPin"));
     QPoint pinPos = QPoint(-8, 16);
-    m_pin[0] = new Pin( 270, pinPos, pinId, 0, this);
-    m_ePin[0] = m_pin[0];
+    m_ePin[0] = new Pin( 270, pinPos, pinId, 0, this);
 
     pinId = m_id;
     pinId.append(QString("-rPin"));
     pinPos = QPoint(8, 16);
-    m_pin[1] = new Pin( 270, pinPos, pinId, 1, this);
-    m_ePin[1] = m_pin[1];
-
-    pinId = id;
-    pinId.append(QString("-outnod"));
-    pinPos = QPoint(32,-8);
-    m_pin[2] = new Pin( 0, pinPos, pinId, 0, this);
-    m_outpin = m_pin[2];
-
-    pinId.append(QString("-eSource"));
-    m_out = new eSource( pinId.toStdString(), m_outpin );
-    m_out->setOut( true );
-    m_out->setVoltHigh( 0 );
+    m_ePin[1] = new Pin( 270, pinPos, pinId, 1, this);
 
     m_idLabel->setPos(-12,-24);
     setLabelPos(-12,-24, 0);
 
     const QFont f( "Helvetica [Cronyx]", 10, QFont::Bold );
-    m_display.setFont(f);
-    m_display.setText( "Freq: 0 Hz" );
-    m_display.setBrush(  Qt::yellow );
-    m_display.setPos( -22, -22 );
-    m_display.setVisible( true );
+    m_valLabel->setFont(f);
+    m_valLabel->setEnabled( false );
+    m_valLabel->setAcceptedMouseButtons(0);
+    m_valLabel->setDefaultTextColor( Qt::yellow );
+    //m_valLabel->document()->setDefaultTextOption( QTextOption(Qt::AlignHCenter) );
 
-    setShowVal( false );
+    setValLabelX( -20 );
+    setValLabelY( -22 );
+    setValLabRot( 0 );
+    setValLabelPos();
+    setShowVal( true );
 
     Simulator::self()->addToUpdateList( this );
 }
@@ -78,37 +63,22 @@ void Meter::updateStep()
 {
     int dispVal = 0;
 
-    QString sign = " ";
-
-    double dispValue = fabs(m_dispValue);
-
-    if( dispValue > 1e-6 )
+    if( m_dispValue > 1e-12 )
     {
-        if( m_dispValue < 0 ) sign = "-";
-
-        setValue( dispValue );
-        dispVal = int( m_value*10+0.5 );
-
-        if( dispVal > 999 )
-        {
-            setValue( dispVal/10 );
-            dispVal = int( m_value*10 );
-        }
-        //qDebug() <<"Meter::updateStep"<<m_dispValue<< m_value<<dispVal<<m_unitMult;
+        setValue( m_dispValue );
+        dispVal = int( m_value*10 );
     }
-    m_display.setText( sign+decToBase( dispVal/10, 10, 3 )
-                       +"."+decToBase( dispVal%10, 10, 1 )
-                       +"\n"+m_mult+m_unit );
-
-    m_out->setVoltHigh( m_dispValue );
-    m_out->stampOutput();
+     m_valLabel->setHtml( "<div align='center'><pre>"+decToBase( dispVal/10, 10, 3 )
+                          +"."+decToBase( dispVal%10, 10, 1 )
+                          +"<br/>"+m_mult+m_unit+"</pre></div>" );
 }
 
 void Meter::remove()
 {
-    Simulator::self()->remFromUpdateList( this );
+    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
+    if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
 
-    delete m_out;
+    Simulator::self()->remFromUpdateList( this );
 
     Component::remove();
 }
@@ -119,12 +89,6 @@ void Meter::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget 
     p->setBrush( Qt::black);
 
     p->drawRect( m_area );
-
-    QPointF points[3] = {
-    QPointF( 27,-12 ),
-    QPointF( 32, -8 ),
-    QPointF( 27, -4 )     };
-    p->drawPolygon(points, 3);
 }
 
 #include "moc_meter.cpp"

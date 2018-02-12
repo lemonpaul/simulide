@@ -92,8 +92,6 @@ CodeEditor::~CodeEditor()
 
 void CodeEditor::setFile( const QString& filePath )
 {
-    if( m_debugger ) return;
-    
     m_outPane->appendText( "-------------------------------------------------------\n" );
     m_outPane->appendText( " File: " );
     m_outPane->appendText( filePath );
@@ -565,9 +563,6 @@ LineNumberArea::~LineNumberArea(){}
 void LineNumberArea::contextMenuEvent( QContextMenuEvent *event)
 {
     event->accept();
-    
-    if( !m_codeEditor->debugStarted() ) return;
-    
     QMenu menu;
 
     QAction *addm_brkAction = menu.addAction( QIcon(":/remove.png"),"Add BreakPoint" );

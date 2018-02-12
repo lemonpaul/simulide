@@ -1,16 +1,18 @@
 TEMPLATE = lib
 
-CONFIG += plugin
-CONFIG += qt
+CONFIG  += plugin
+CONFIG  += qt
+#CONFIG -= debug_and_release debug_and_release_target
+#CONFIG += release
 CONFIG *= c++11
 
 QT += xml
 QT += widgets
+#QT += gui
 QT += concurrent
 
-include( ../version )
 
-MAKEFILE = build_$$_ARCH$$_BITS/Makefile
+include( ../version )
 
 isEmpty(TARGET_PREFIX) {
     error("Please run qmake first on the main executeable project in one of build_XXX folders")
@@ -24,30 +26,23 @@ isEqual( _ARCH,"Lin") {
 isEqual( _ARCH,"Win") {
 
     DEFINES += MAINMODULE_EXPORT=__declspec\\\(dllimport\\\)
-
-    LIBS += ../../../dependencies/build-$$_ARCH$$_BITS/lib/libsimulide.a
-    
-    CONFIG -= debug_and_release debug_and_release_target
+#Q_DECL_IMPORT
+    QMAKE_LIBS += -lsimulide
     CONFIG -= console
     CONFIG += windows
     CONFIG += dll
-
-    copy2dest.commands += $(COPY_DIR) $$PLGN_DIR_BIN $$TARGET_PREFIX & 
 }
 
 CONFIG(release, debug|release) {
-        _OBJECTS_DIR  = $$OUT_PWD/release
-        QMAKE_PRE_LINK +=$(DEL_DIR) ../release && 
+        _OBJECTS_DIR  = $$OUT_PWD/build/release
 }
 CONFIG(debug, debug|release) {
-        _OBJECTS_DIR  = $$OUT_PWD/debug
-        QMAKE_PRE_LINK += $(DEL_DIR) ../debug &&
+        _OBJECTS_DIR  = $$OUT_PWD/build/debug
 }
-
-OBJECTS_DIR *= $$OUT_PWD/release
-MOC_DIR     *= $$OBJECTS_DIR
+OBJECTS_DIR *= $$_OBJECTS_DIR
+MOC_DIR     *= $$_OBJECTS_DIR
 INCLUDEPATH += $$OBJECTS_DIR
-#mkpath( build_$$_ARCH$$_BITS/release )
+mkpath($$OBJECTS_DIR)
 
 INCLUDEPATH +=  ../../src \
                 ../../src/gui \
@@ -64,14 +59,20 @@ INCLUDEPATH +=  ../../src \
                 ../../src/simulator/elements/processors \
                 ../../src/misc \
                 $${TARGET_PREFIX}/include
+#                ../../include/simavr/sim \
                 
 DESTDIR = $$TARGET_PREFIX/lib/simulide/plugins
 
-QMAKE_LFLAGS += "-L../../dependencies/build-$$_ARCH$$_BITS/lib"
+QMAKE_LFLAGS += "-L$${TARGET_PREFIX}/lib"
+
+
+
+
+#DEFINES += MYSHAREDLIB_LIBRARY
 
 QMAKE_CFLAGS_SHLIB += -fpic
+
 QMAKE_CFLAGS_DEBUG += -O0
-QMAKE_CFLAGS += -std=c11 
 QMAKE_CXXFLAGS_DEBUG += -O0
 QMAKE_CXXFLAGS_RELEASE -= -O
 QMAKE_CXXFLAGS_RELEASE -= -O1
@@ -95,19 +96,17 @@ defineReplace(copyToDestdir) {
             copyList += $(COPY_DIR) \"$$shell_path($$folder)\" \"$$shell_path($$dest_path)\" &
         }
     }
+
     return($$copyList)
 }
 
-#PLGN_DIR_DATA = $$PWD/resources/data
-#PLGN_DIR_EXAMPLES = $$PWD/resources/examples
-
+#copy2dest.commands = $(MKDIR) \"$$shell_path($$TARGET_PREFIX/share/simulide/data)\" & \
+#    $(MKDIR) \"$$shell_path($$TARGET_PREFIX/share/simulide/examples)\" &
 copy2dest.commands += $$copyToDestdir($$PLGN_DIR_DATA $$PLGN_DIR_EXAMPLES)
 
 QMAKE_EXTRA_TARGETS += copy2dest
 POST_TARGETDEPS += copy2dest
 
-QMAKE_PRE_LINK += $(DEL_FILE) ../*.rc
-
-message( "------  COMMON PLUGIN  -------" )
+message( "-----------------------------" )
 message( "       " $$VERSION $$_ARCH $$_BITS )
 message( "-----------------------------" )

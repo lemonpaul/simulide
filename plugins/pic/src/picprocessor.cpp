@@ -26,7 +26,7 @@
 // GpSim includes
 #include "gpsim/pic-processor.h"
 
-//void simulation_cleanup();
+void simulation_cleanup();
 
 PicProcessor::PicProcessor( QObject* parent ) : BaseProcessor( parent )
 {
@@ -61,8 +61,8 @@ bool PicProcessor::loadFirmware( QString fileN )
         int init = initialize_gpsim_core();
         initialization_is_complete();
         m_DoneGpsimInit = (init==0);
-
-        if( m_DoneGpsimInit )
+        
+        if( m_DoneGpsimInit ) 
             qDebug() << "    ...GpSim Initialization is complete\n\n";
         else
             qDebug() << "    ...Error!!! GpSim Initialization Failed!!!\n\n";
@@ -72,7 +72,7 @@ bool PicProcessor::loadFirmware( QString fileN )
     
     QByteArray symbolFile = m_symbolFile.toLocal8Bit();
     QByteArray device = m_device.toLocal8Bit();
-
+        
     if( !m_pPicProcessor )
     {
         ProcessorConstructor *pc = ProcessorConstructorList::GetList()->findByType(device.constData());
@@ -86,7 +86,6 @@ bool PicProcessor::loadFirmware( QString fileN )
             return false;
         }
     }
-
     FILE* pFile  = fopen( symbolFile.constData(), "r" );
     m_loadStatus = m_pPicProcessor->LoadProgramFile( symbolFile.constData(), pFile, device.constData() );
 
@@ -96,6 +95,7 @@ bool PicProcessor::loadFirmware( QString fileN )
         return false;
     }
     qDebug() << "PicProcessor::loadFirmware      Device: " << m_pPicProcessor->name().c_str();
+    qDebug() << m_pPicProcessor->description().c_str();
 
     m_lastTrmtBit = 0; // for usart
     

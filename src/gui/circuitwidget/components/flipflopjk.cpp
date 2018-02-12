@@ -71,8 +71,7 @@ FlipFlopJK::FlipFlopJK( QObject* parent, QString type, QString id )
 
     eLogicDevice::createOutput( m_outPin[1] );               // Output Q'
 
-    setSrInv( true );                         // Invert Set & Reset pins
-    setClockInv( false );                       //Don't Invert Clock pin
+    //setSrInv( true );                          // Inver Set & Reset pins
 
 }
 FlipFlopJK::~FlipFlopJK(){}

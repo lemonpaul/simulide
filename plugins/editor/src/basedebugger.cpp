@@ -92,7 +92,6 @@ int BaseDebugger::stepOver(){return 0;}
 
 int BaseDebugger::getValidLine( int line )
 {
-    Q_UNUSED( line );
     return 0;
 }
 

@@ -25,7 +25,6 @@
 #include "adc.h"
 #include "bcdtodec.h"
 #include "bincounter.h"
-#include "bjt.h"
 #include "buffer.h"
 #include "capacitor.h"
 #include "clock.h"
@@ -33,7 +32,6 @@
 #include "dectobcd.h"
 #include "demux.h"
 #include "diode.h"
-#include "flipflopd.h"
 #include "flipflopjk.h"
 #include "fulladder.h"
 #include "gate_and.h"
@@ -53,7 +51,6 @@
 #include "mosfet.h"
 #include "mux.h"
 #include "op_amp.h"
-#include "oscope.h"
 #include "outbus.h"
 #include "pcd8544.h"
 #include "probe.h"
@@ -72,9 +69,7 @@
 #include "switch.h"
 #include "textcomponent.h"
 #include "voltimeter.h"
-#include "volt_reg.h"
 #include "voltsource.h"
-#include "wavegen.h"
 //END Item includes
 
 #include "simuapi_apppath.h"
@@ -97,11 +92,9 @@ void ItemLibrary::loadItems()
     addItem( Probe::libraryItem() );
     addItem( Voltimeter::libraryItem() );
     addItem( Amperimeter::libraryItem() );
-    addItem( Oscope::libraryItem() );
     // Sources
     addItem( LogicInput::libraryItem() );
     addItem( Clock::libraryItem() );
-    addItem( WaveGen::libraryItem() );
     addItem( VoltSource::libraryItem() );
     addItem( Rail::libraryItem() );
     addItem( Ground::libraryItem() );
@@ -115,12 +108,10 @@ void ItemLibrary::loadItems()
     addItem( ResistorDip::libraryItem() );
     addItem( Capacitor::libraryItem() );
     addItem( Inductor::libraryItem() );
-    // Active
     addItem( Diode::libraryItem() );
-    addItem( VoltReg::libraryItem() );
+    // Active
     addItem( OpAmp::libraryItem() );
     addItem( Mosfet::libraryItem() );
-    addItem( BJT::libraryItem() );
     // Outputs
     addItem( Led::libraryItem() );
     addItem( LedBar::libraryItem() );
@@ -137,7 +128,6 @@ void ItemLibrary::loadItems()
     addItem( AndGate::libraryItem() );
     addItem( OrGate::libraryItem() );
     addItem( XorGate::libraryItem() );
-    addItem( FlipFlopD::libraryItem() );
     addItem( FlipFlopJK::libraryItem() );
     addItem( BinCounter::libraryItem() );
     addItem( FullAdder::libraryItem() );

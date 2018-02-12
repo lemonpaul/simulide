@@ -20,6 +20,8 @@
 #ifndef RENDEROSCOPE_H
 #define RENDEROSCOPE_H
 
+#include <QBrush>
+#include <QPen>
 #include <QPixmap>
 #include <QtWidgets>
 
@@ -34,26 +36,23 @@ class RenderOscope : public QWidget
         QSize sizeHint() const;
 
         void setData( int data[] );
-        void setMaxMin( double max, double min );
+
+        void setTick( int tickUs );
+        
+        void drawBackground();
 
     protected:
         void paintEvent( QPaintEvent *event );
 
     private:
+        
+        QPixmap m_pixmap;
+
         int m_width;
         int m_height;
-        int* m_data;
-        
-        double m_hCenter;
-        double m_vCenter;
-        double m_vMax;
-        double m_vMin;
-        double m_margin;
-        double m_scale;
-        
-        QPointF lastPoint;
-        
         int m_sec;
+
+        QString m_tick;
 };
 
 #endif

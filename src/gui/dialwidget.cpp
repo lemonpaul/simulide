@@ -35,7 +35,6 @@ void DialWidget::setupWidget()
     verticalLayout = new QVBoxLayout(this);
     verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
     verticalLayout->setContentsMargins(0, 0, 0, 0);
-    verticalLayout->setSpacing(0);
     verticalLayout->addWidget(dial);
 }
 

@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "demux.h"
+#include "pin.h"
 
 
 Component* Demux::construct( QObject* parent, QString type, QString id )

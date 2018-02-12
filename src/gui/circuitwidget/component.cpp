@@ -153,10 +153,10 @@ void Component::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu 
 {
     m_eventpoint = mapToScene( togrid(event->pos()) );
 
-    QAction* copyAction = menu->addAction(QIcon(":/copy.png"),"Copy\tCtrl+C");
+    QAction* copyAction = menu->addAction(QIcon(":/copy.png"),"Copy");
     connect( copyAction, SIGNAL( triggered()), this, SLOT(slotCopy()) );
 
-    QAction* removeAction = menu->addAction( QIcon( ":/remove.png"),"Remove\tDel" );
+    QAction* removeAction = menu->addAction( QIcon( ":/remove.png"),"Remove" );
     connect( removeAction, SIGNAL( triggered()), this, SLOT(slotRemove()) );
     
     QAction* propertiesAction = menu->addAction( QIcon( ":/properties.png"),"Properties" );
@@ -198,6 +198,11 @@ void Component::remove()
 {
     for( uint i=0; i<m_pin.size(); i++ )               // Remove connectors attached
         if( m_pin[i]->isConnected() ) m_pin[i]->connector()->remove();
+        
+    QPropertyEditorWidget::self()->removeObject( this );
+    Circuit::self()->compList()->removeOne( this );
+    Circuit::self()->removeItem( this );
+    this->deleteLater();
 }
 
 void Component::slotProperties()
@@ -508,7 +513,7 @@ void Label::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 }
 
 void Label::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
-{qDebug() << "Label::contextMenuEvent";
+{
     event->accept();
     QMenu menu;
 

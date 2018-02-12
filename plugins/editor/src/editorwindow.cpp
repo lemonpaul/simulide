@@ -44,25 +44,6 @@ void EditorWindow::closeEvent(QCloseEvent* event)
     writeSettings();
 }
 
-void EditorWindow::keyPressEvent( QKeyEvent* event )
-{
-    if (event->key() == Qt::Key_N && (event->modifiers() & Qt::ControlModifier))
-    {
-        newFile();
-    }
-    else if (event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
-    {
-        if (event->modifiers() & Qt::ShiftModifier)
-            saveAs();
-        else
-            save();
-    }
-    else if (event->key() == Qt::Key_O && (event->modifiers() & Qt::ControlModifier))
-    {
-        open();
-    }
-}
-
 void EditorWindow::newFile()
 {
     CodeEditorWidget* baseWidget = new CodeEditorWidget( this );
@@ -71,8 +52,6 @@ void EditorWindow::newFile()
     connect(baseWidget->m_codeEditor->document(), SIGNAL(contentsChanged()),
             this,                                 SLOT(documentWasModified()));
     m_fileList << "New";
-    enableFileActs( true ); 
-    enableDebugActs( true );
 }
 
 void EditorWindow::open()
@@ -136,7 +115,7 @@ bool EditorWindow::saveFile(const QString &fileName)
     QApplication::setOverrideCursor(Qt::WaitCursor);
     CodeEditor* ce = getCodeEditor();
     out << ce->toPlainText();
-    ce->setFile( fileName );
+    //ce->setFile( fileName );
     QApplication::restoreOverrideCursor();
     
     ce->document()->setModified(false);
@@ -256,49 +235,57 @@ void EditorWindow::createWidgets()
 
 void EditorWindow::createActions()
 {
-    newAct = new QAction(QIcon(":/new.png"), tr("&New\tCtrl+N"), this);
+    newAct = new QAction(QIcon(":/new.png"), tr("&New"), this);
+    newAct->setShortcut( QKeySequence(Qt::CTRL + Qt::Key_N) );
     newAct->setStatusTip(tr("Create a new file"));
     connect( newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
-    openAct = new QAction(QIcon(":/open.png"), tr("&Open...\tCtrl+O"), this);
+    openAct = new QAction(QIcon(":/open.png"), tr("&Open..."), this);
+    openAct->setShortcut( QKeySequence(Qt::CTRL + Qt::Key_O) );
     openAct->setStatusTip(tr("Open an existing file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
 
-    saveAct = new QAction(QIcon(":/save.png"), tr("&Save\tCtrl+S"), this);
+    saveAct = new QAction(QIcon(":/save.png"), tr("&Save"), this);
+    saveAct->setShortcut( QKeySequence(Qt::CTRL + Qt::Key_S) );
+    //saveAct->setShortcutContext( Qt::WidgetShortcut );
     saveAct->setStatusTip(tr("Save the document to disk"));
     saveAct->setEnabled(false);
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
 
-    saveAsAct = new QAction(QIcon(":/saveas.png"),tr("Save &As...\tCtrl+Shift+S"), this);
+    saveAsAct = new QAction(QIcon(":/saveas.png"),tr("Save &As..."), this);
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
     saveAsAct->setEnabled(false);
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
     exitAct = new QAction(QIcon(":/exit.png"),tr("E&xit"), this);
+    exitAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
     exitAct->setStatusTip(tr("Exit the application"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-    cutAct = new QAction(QIcon(":/cut.png"), tr("Cu&t\tCtrl+X"), this);
+    cutAct = new QAction(QIcon(":/cut.png"), tr("Cu&t"), this);
+    cutAct->setShortcut( QKeySequence(Qt::CTRL + Qt::Key_X) );
     cutAct->setStatusTip(tr("Cut the current selection's contents to the clipboard"));
     cutAct->setEnabled(false);
     connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()));
 
-    copyAct = new QAction(QIcon(":/copy.png"), tr("&Copy\tCtrl+C"), this);
+    copyAct = new QAction(QIcon(":/copy.png"), tr("&Copy"), this);
+    copyAct->setShortcut( QKeySequence(Qt::CTRL + Qt::Key_C) );
     copyAct->setStatusTip(tr("Copy the current selection's contents to the clipboard"));
     copyAct->setEnabled(false);
     connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
 
-    pasteAct = new QAction(QIcon(":/paste.png"), tr("&Paste\tCtrl+V"), this);
+    pasteAct = new QAction(QIcon(":/paste.png"), tr("&Paste"), this);
+    pasteAct->setShortcut( QKeySequence(Qt::CTRL + Qt::Key_V) );
     pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current selection"));
     pasteAct->setEnabled(false);
     connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
 
-    undoAct = new QAction(QIcon(":/undo.png"), tr("Undo\tCtrl+Z"), this);
+    undoAct = new QAction(QIcon(":/undo.png"), tr("Undo"), this);
     undoAct->setStatusTip(tr("Undo the last action"));
     undoAct->setEnabled(false);
     connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
 
-    redoAct = new QAction(QIcon(":/redo.png"), tr("Redo\tCtrl+Shift+Z"), this);
+    redoAct = new QAction(QIcon(":/redo.png"), tr("Redo"), this);
     redoAct->setStatusTip(tr("Redo the last action"));
     redoAct->setEnabled(false);
     connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));

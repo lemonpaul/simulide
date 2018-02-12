@@ -32,31 +32,18 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
     Q_OBJECT
 
     public:
-        CircuitWidget( QWidget *parent );
+        CircuitWidget( QWidget *parent, QToolBar* toolbar );
         ~CircuitWidget();
 
  static CircuitWidget* self() { return m_pSelf; }
- 
-        OscopeWidget* oscope();
 
         void clear();
-        
-        void createActions();
-        
-        void createToolBars();
-        
-        void setRate( int rate );
 
         void setSerialPortWidget( QWidget* serialPortWidget );
 
         void showSerialPortWidget( bool showIt );
         
         void writeSerialPortWidget( const QByteArray &data );
-        
-    public slots:
-        void powerCircOn();
-        void powerCircOff();
-        void powerCirc();
 
     signals:
         void dataAvailable( const QByteArray &data );
@@ -72,16 +59,6 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         OscopeWidget   m_oscope;
         PlotterWidget  m_plotter;
         QWidget*       m_serialPortWidget;
-        QToolBar       m_circToolBar;
-        QLabel*        m_rateLabel;
-        
-        QAction* newCircAct;
-        QAction* openCircAct;
-        QAction* saveCircAct;
-        QAction* saveCircAsAct;
-        QAction* powerCircAct;
-        QAction* infoAct;
-        
 };
 
 #endif

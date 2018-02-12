@@ -19,7 +19,6 @@
 
 #include <math.h>   // fabs(x,y)
 #include "e-op_amp.h"
-#include "simulator.h"
 
 eOpAmp::eOpAmp( std::string id )
     : eElement( id )
@@ -27,7 +26,7 @@ eOpAmp::eOpAmp( std::string id )
     m_ePin.resize(3);
     m_gain = 1000;
     
-    //m_connected = false;
+    m_connected = false;
 }
 eOpAmp::~eOpAmp()
 { 
@@ -35,8 +34,6 @@ eOpAmp::~eOpAmp()
 
 void eOpAmp::initialize()
 {
-    m_accuracy = Simulator::self()->NLaccuracy();
-    
     m_lastOut = 0;
     m_lastIn  = 0;
     m_k = 1e-6/m_gain;
@@ -60,7 +57,7 @@ void eOpAmp::setVChanged() // Called when input pins nodes change volt
     
     //qDebug() << "lastOut " << m_lastOut << "out " << out << abs(out-m_lastOut)<< "<1e-5 ??";
 
-    if( fabs(out-m_lastOut) < m_accuracy )
+    if( fabs(out-m_lastOut)<1e-5 )
     {
         m_converged = true;
         return;

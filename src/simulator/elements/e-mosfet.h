@@ -21,8 +21,7 @@
 #define EMOSFET_H
 
 #include "e-resistor.h"
-
-class eSource;
+#include "e-source.h"
 
 class MAINMODULE_EXPORT eMosfet : public eResistor
 {
@@ -49,17 +48,20 @@ class MAINMODULE_EXPORT eMosfet : public eResistor
         }
         
     protected:
-        double m_accuracy;
-        double m_lastCurrent;
+        double m_lastVs;
+        double m_lastGateV;
+        double m_DScurrent;
         double m_threshold;
+        double m_lastAdmit;
+        double m_dAdmit;
+        double m_cAdmit;
         double m_kRDSon;
         double m_RDSon;
-        double m_gateV;
         double m_Gth;
-        double m_Vs;
+        double m_convTh;
 
+        bool m_converged;
         bool m_Pchannel;
-        bool m_Sfollow;
         
         eSource* m_gate;
 };

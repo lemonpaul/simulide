@@ -34,7 +34,6 @@
 #include "e-gate_or.h"
 #include "e-gate_xor.h"
 #include "e-gate_xor.h"
-#include "e-flipflopd.h"
 #include "e-flipflopjk.h"
 #include "e-demux.h"
 #include "e-mux.h"
@@ -43,7 +42,6 @@
 #include "e-mosfet.h"
 #include "e-logic_device.h"
 #include "e-source.h"
-#include "e-volt_reg.h"
 #include "ledsmd.h"
 #include "simuapi_apppath.h"
 
@@ -252,12 +250,6 @@ void SubCircuit::initSubcircuit()
                 efulladder->createPins();
                 ecomponent = efulladder;
             }
-            else if( type == "eFlipFlopD" )
-            {
-                eFlipFlopD* eFFD = new eFlipFlopD( id.toStdString() );
-                eFFD->createPins();
-                ecomponent = eFFD;
-            }
             else if( type == "eFlipFlopJK" )
             {
                 eFlipFlopJK* eFFJK = new eFlipFlopJK( id.toStdString() );
@@ -348,15 +340,6 @@ void SubCircuit::initSubcircuit()
                     if( element.attribute( "pChannel" ) == "true" ) emosfet->setPchannel( true );
                 }
                 ecomponent = emosfet;
-            }
-            else if( type == "eVoltReg" )
-            {
-                double volts = 1.2;
-                if( element.hasAttribute("Volts") ) volts = element.attribute( "Volts" ).toDouble();
-                eVoltReg* evoltreg = new eVoltReg( id.toStdString() );
-                evoltreg->setNumEpins(3);
-                evoltreg->setVRef( volts );
-                ecomponent = evoltreg;
             }
             else if( type == "LedSmd" )
             {

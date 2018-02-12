@@ -53,3 +53,4 @@ class MAINMODULE_EXPORT eDiode : public eResistor
         bool m_converged;
 };
 #endif
+

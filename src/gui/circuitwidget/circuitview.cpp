@@ -38,11 +38,14 @@ CircuitView::CircuitView( QWidget *parent )
     setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
     setCacheMode( CacheBackground );
     //setRenderHint( QPainter::Antialiasing );
-    setRenderHints( QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     //setRenderHint( QPainter::SmoothPixmapTransform );
     setTransformationAnchor( AnchorUnderMouse );
     setResizeAnchor( AnchorUnderMouse );
     setDragMode( QGraphicsView::RubberBandDrag );
+
+    //m_file = "";
+    //setWindowTitle(m_file + "[*]");
 
     setAcceptDrops(true);
 }
@@ -104,7 +107,7 @@ void CircuitView::dragLeaveEvent(QDragLeaveEvent *event)
     event->accept();
     if ( m_enterItem )
     {
-        m_circuit->removeComp( m_enterItem );
+        m_enterItem->remove();
         m_enterItem = 0l;
     }
 }
@@ -146,26 +149,26 @@ void CircuitView::contextMenuEvent(QContextMenuEvent* event)
 
         QMenu menu;
 
-        QAction* pasteAction = menu.addAction(QIcon(":/paste.png"),"Paste\tCtrl+V");
+        QAction* pasteAction = menu.addAction(QIcon(":/paste.png"),"Paste");
         connect( pasteAction, SIGNAL( triggered()), this, SLOT(slotPaste()) );
 
-        QAction* undoAction = menu.addAction(QIcon(":/undo.png"),"Undo\tCtrl+Z");
+        QAction* undoAction = menu.addAction(QIcon(":/undo.png"),"Undo");
         connect( undoAction, SIGNAL( triggered()), Circuit::self(), SLOT(undo()) );
 
-        QAction* redoAction = menu.addAction(QIcon(":/redo.png"),"Redo\tCtrl+Y");
+        QAction* redoAction = menu.addAction(QIcon(":/redo.png"),"Redo");
         connect( redoAction, SIGNAL( triggered()), Circuit::self(), SLOT(redo()) );
         menu.addSeparator();
 
-        QAction* openCircAct = menu.addAction(QIcon(":/opencirc.png"), tr("Open Circuit\tCtrl+O") );
+        QAction* openCircAct = menu.addAction(QIcon(":/opencirc.png"), tr("Open Circuit") );
         connect(openCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(openCirc()));
 
-        QAction* newCircAct = menu.addAction( QIcon(":/newcirc.png"), tr("New Circuit\tCtrl+N") );
+        QAction* newCircAct = menu.addAction( QIcon(":/newcirc.png"), tr("New Circuit") );
         connect( newCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(newCircuit()));
 
-        QAction* saveCircAct = menu.addAction(QIcon(":/savecirc.png"), tr("Save Circuit\tCtrl+S") );
+        QAction* saveCircAct = menu.addAction(QIcon(":/savecirc.png"), tr("Save Circuit") );
         connect(saveCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(saveCirc()));
 
-        QAction* saveCircAsAct = menu.addAction(QIcon(":/savecircas.png"),tr("Save Circuit As...\tCtrl+Shift+S") );
+        QAction* saveCircAsAct = menu.addAction(QIcon(":/savecircas.png"),tr("Save Circuit As...") );
         connect(saveCircAsAct, SIGNAL(triggered()), MainWindow::self(), SLOT(saveCircAs()));
         menu.addSeparator();
 

@@ -1,4 +1,3 @@
-PLGN_DIR_BIN = $$PWD/resources/bin
 PLGN_DIR_DATA = $$PWD/resources/data
 #PLGN_DIR_EXAMPLES = $$PWD/resources/examples
 
@@ -18,4 +17,9 @@ HEADERS =   editorplugin.h \
 INCLUDEPATH +=  ./ \
                 src \
                 src/findreplacedialog
+                
+#FORMS += src/findreplacedialog/findreplacedialog.ui 
+#FORMS += src/findreplacedialog/findreplaceform.ui 
+
+#DESTDIR = ../../release/SimulIDE_$$VERSION-$$_ARCH$$_BITS/plugins/EDITORplugin/data/plugins
 

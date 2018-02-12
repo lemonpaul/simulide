@@ -19,7 +19,8 @@
 
 #include "diode.h"
 #include "connector.h"
-#include "pin.h"
+#include "itemlibrary.h"
+
 
 Component* Diode::construct( QObject* parent, QString type, QString id )
 { return new Diode( parent, type, id ); }
@@ -37,20 +38,26 @@ LibraryItem* Diode::libraryItem()
 Diode::Diode( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eDiode( id.toStdString() )
 {
-    m_pin.resize(2);
+    m_ePin.resize(2);
     QString nodid = m_id;
     nodid.append(QString("-lPin"));
     QPoint nodpos = QPoint(-16, 0 );
-    m_pin[0] = new Pin( 180, nodpos, nodid, 0, this ); // pPin
-    m_ePin[0] = m_pin[0];
+    m_ePin[0] = new Pin( 180, nodpos, nodid, 0, this ); // pPin
 
     nodid = m_id;
     nodid.append(QString("-rPin"));
     nodpos = QPoint( 16, 0 );
-    m_pin[1] = new Pin( 0, nodpos, nodid, 1, this ); // nPin
-    m_ePin[1] = m_pin[1];
+    m_ePin[1] = new Pin( 0, nodpos, nodid, 1, this ); // nPin
 }
 Diode::~Diode(){}
+
+void Diode::remove()
+{
+    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
+    if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
+    Component::remove();
+}
+
 
 void Diode::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {

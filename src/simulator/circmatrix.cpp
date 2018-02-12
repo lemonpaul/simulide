@@ -111,6 +111,21 @@ bool CircMatrix::solveMatrix()
 
     int n = m_numEnodes;
 
+    for( int i=0; i<n; i++)
+    {
+        if( m_admitChanged )
+        {
+            for( int j=0; j<n; j++)
+            {
+                a[i][j] = m_circMatrix[i][j];
+               // std::cout << matriz[i][j] << "\t";
+            }
+        }
+        b[i] = m_coefVect[i];
+        //m_coefVect[i] = 0;
+        //std::cout << "\t"<< coef[i] << std::endl;
+    }
+    
     if( m_admitChanged )      // Only factor admitance matrix if changed
     {
     // factors a matrix into upper and lower triangular matrices by
@@ -118,12 +133,11 @@ bool CircMatrix::solveMatrix()
     // matrix to be factored.  ipvt[] returns an integer vector of pivot
     // indices, used in the lu_solve() routine.
 
-        a = m_circMatrix;                                 // Copy matrix
-        
         double scaleFactors[n];
         int i,j,k;
 
-        // divide each row by its largest element, keeping track of the scaling factors
+        // divide each row by its largest element, keeping track of the
+        // scaling factors
         for( i=0; i<n; i++ )
         {
             double largest = 0;
@@ -166,7 +180,8 @@ bool CircMatrix::solveMatrix()
                 }
             }
 
-            if( j != largestRow ) // pivoting
+            // pivoting
+            if( j != largestRow )
             {
                 double x;
                 for( k=0; k<n; k++ )
@@ -178,9 +193,11 @@ bool CircMatrix::solveMatrix()
                 scaleFactors[largestRow] = scaleFactors[j];
             }
 
-            ipvt[j] = largestRow;      // keep track of row interchanges
+            // keep track of row interchanges
+            ipvt[j] = largestRow;
 
-            if( a[j][j] == 0.0 ) a[j][j]=1e-18;           // avoid zeros
+            // avoid zeros
+            if( a[j][j] == 0.0 ) a[j][j]=1e-18;
 
             if( j != n-1 )
             {
@@ -208,10 +225,9 @@ bool CircMatrix::solveMatrix()
 // previously performed by solveMatrix.  On input, b[0..n-1] is the right
 // hand side of the equations, and on output, contains the solution.
 
-    b = m_coefVect;                                       // Copy vector
-    
     int i;
-    for( i=0; i<n; i++ )                 // find first nonzero b element
+    // find first nonzero b element
+    for( i=0; i<n; i++ )
     {
         int row = ipvt[i];
 
@@ -248,8 +264,9 @@ bool CircMatrix::solveMatrix()
     
     for( i=0; i<m_numEnodes; i++ )  
     {
+        //Simulator::self()->setNodeVolt( i, b[i] );
         double volt = b[i];
-        if( std::isnan( volt ) ) return false;  
+        if( std::isnan( volt ) ) return false;
 
         m_eNodeList->at(i)->setVolt( volt ); 
     }
@@ -261,7 +278,6 @@ void CircMatrix::simplify()
 {
     //printMatrix();
     QList<int> singleEls;
-    
     for( int y=0; y<m_numEnodes; y++ )       // Find Single Element Rows
     {
         int nonCero = 0;
@@ -270,12 +286,10 @@ void CircMatrix::simplify()
             if( m_circMatrix[x][y] == 0 )continue;
             nonCero++;
         }
-        if( nonCero < 2 ) singleEls.append( y );
+        if( nonCero == 1 ) singleEls.append( y );
     }
-    
     m_eNodeList2.clear();
     int newY = 0;
-    
     for( int y=0; y<m_numEnodes; y++ )
     {
         if( singleEls.contains( y ) ) 

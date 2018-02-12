@@ -21,8 +21,10 @@
 #define CAPACITOR_H
 
 #include "e-capacitor.h"
-#include "itemlibrary.h"
-#include <QObject>
+
+#include "pin.h"
+
+class LibraryItem;
 
 class MAINMODULE_EXPORT Capacitor : public Component, public eCapacitor
 {
@@ -45,6 +47,10 @@ class MAINMODULE_EXPORT Capacitor : public Component, public eCapacitor
         void setUnit( QString un );
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
+
+    public slots:
+
+    private:
 };
 
 #endif

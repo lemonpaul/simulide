@@ -117,17 +117,15 @@ void PicAsmDebugger::mapLstToAsm()
             if( asmLine.startsWith("#")) continue;
             if( asmLine.startsWith(".")) continue;
 
-            QString lstline = line;
-            if( lstline.remove(" ").contains(asmLine) ) break;
+            line = line.remove(" ");
+            if( line.contains(asmLine) ) break;
         }
         if( asmLineNumber >= lastAsmLine )
         {
             asmLineNumber = 0;
             continue; // End of asm file
         }
-        QStringList words = line.split(' ');
-        QString numberText = words.at(0);
-        //QString numberText = line.left( 4 );
+        QString numberText = line.left( 4 );
         bool ok = false;
         int address = numberText.toInt( &ok, 16 );  // original adress*2: instruc = 2 bytes
         if( ok )

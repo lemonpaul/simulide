@@ -31,11 +31,9 @@
 class MAINMODULE_EXPORT Circuit : public QGraphicsScene
 {
     Q_OBJECT
-    
-    Q_PROPERTY( int Speed     READ circSpeed WRITE setCircSpeed DESIGNABLE true USER true )
     Q_PROPERTY( int ReactStep READ reactStep WRITE setReactStep DESIGNABLE true USER true )
     Q_PROPERTY( int NoLinStep READ noLinStep WRITE setNoLinStep DESIGNABLE true USER true )
-    Q_PROPERTY( int NoLinAcc  READ nlAcc     WRITE setNlAcc     DESIGNABLE true USER true )
+    Q_PROPERTY( int Speed     READ circSpeed WRITE setCircSpeed DESIGNABLE true USER true )
 
     public:
         Circuit(qreal x, qreal y, qreal width, qreal height, QGraphicsView*  parent);
@@ -52,11 +50,6 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         int  circSpeed();
         void setCircSpeed( int rate );
         
-        int  nlAcc();
-        void setNlAcc( int ac );
-        
-        void removeItems();
-        void removeComp( Component* comp );
         void remove();
         void saveState();
 
@@ -75,14 +68,19 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         void closeconnector( Pin* endpin );
         Connector* getNewConnector() { return new_connector; }
 
-        QList<Component*>* compList();
-        QList<Component*>* conList();
+        QList<Component*>* compList() { return &m_compList; }
+        QList<Component*>* conList()  { return &m_conList; }
 
-        void constarted( bool started);
-        bool is_constarted();
+        /** a conector is been created*/
+        void constarted( bool started) { m_con_started = started; }
+        bool is_constarted() { return m_con_started ; }
 
-        bool  pasting();
-        QPointF deltaMove();
+        void removeItems();
+
+        bool  pasting() { return m_pasting; }
+        QPointF deltaMove(){ return m_deltaMove; }
+
+        QGraphicsView* widget(){ return m_widget; }
 
         const QString getFileName() const { return m_fileName; }
 
@@ -110,13 +108,13 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         QString getCompId( QString name );
 
  static Circuit*  m_pSelf;
- 
+
         QDomDocument m_domDoc;
         QDomDocument m_copyDoc;
         QString      m_fileName;
 
         QRect          m_scenerect;
-        QGraphicsView* m_graphicView;
+        QGraphicsView* m_widget;
         Connector*     new_connector;
 
         int  m_seqNumber;
