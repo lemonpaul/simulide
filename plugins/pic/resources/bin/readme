@@ -1,5 +1,0 @@
-https://sourceforge.net/projects/gpsim/files/gpsim-win32/0.29.0/
-
-Extract this libraries from installer and place in this folder :
-gpsim/bin/libgpsim.dll
-gpsim/bin/pthreadGC2.dll

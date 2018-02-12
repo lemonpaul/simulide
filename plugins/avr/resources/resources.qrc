@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file alias="arduinoUno.png">../resources/data/images/arduinoUno.png</file>
-        <file alias="arduinoNano.png">../resources/data/images/arduinoNano.png</file>
-        <file alias="duemilanove.png">../resources/data/images/duemilanove.png</file>
-        <file alias="leonardo.png">../resources/data/images/leonardo.png</file>
-    </qresource>
-</RCC>

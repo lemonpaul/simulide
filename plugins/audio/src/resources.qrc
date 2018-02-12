@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file alias="audio_out.png">images/audio_out.png</file>
-    </qresource>
-</RCC>
-
