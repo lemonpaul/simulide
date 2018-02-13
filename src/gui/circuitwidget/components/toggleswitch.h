@@ -17,47 +17,42 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "switch.h"
-#include "itemlibrary.h"
+#ifndef TOGGLESWITCH_H
+#define TOGGLESWITCH_H
 
+#include "e-element.h"
+#include "pin.h"
 
-Component* Switch::construct( QObject* parent, QString type, QString id )
-{ return new Switch( parent, type, id ); }
+class LibraryItem;
 
-LibraryItem* Switch::libraryItem()
+class MAINMODULE_EXPORT ToggleSwitch : public Component, public eElement
 {
-    return new LibraryItem(
-            tr( "Switch" ),
-            tr( "Switches" ),
-            "switch.png",
-            "Switch",
-            Switch::construct);
-}
+    Q_OBJECT
 
-Switch::Switch( QObject* parent, QString type, QString id )
-    : SwitchBase( parent, type, id )
-{
-    connect( m_button, SIGNAL( clicked() ),
-             this,     SLOT  ( onbuttonclicked() ));
-}
-Switch::~Switch(){}
+    public:
 
-void Switch::onbuttonclicked()
-{
-    m_closed = !m_closed;
-    m_changed = true;
-}
+        ToggleSwitch( QObject* parent, QString type, QString id );
+        ~ToggleSwitch();
+        
+        static Component* construct( QObject* parent, QString type, QString id );
+        static LibraryItem *libraryItem();
 
-void Switch::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
-{
-    Component::paint( p, option, widget );
-    
-    QPen pen = p->pen();
-    pen.setWidth(3);
-    p->setPen(pen);
+        void updateStep();
 
-    if( m_closed ) p->drawLine(-10, 0, 10, -2 );
-    else           p->drawLine(-10.5, 0, 8, -8 );
-}
+        virtual void initialize();
+        
+        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
-#include "moc_switch.cpp"
+    public slots:
+        void remove();
+        void onbuttonclicked();
+
+    protected:
+        bool m_changed;
+        bool m_closed;
+        
+        QPushButton          *m_button;
+        QGraphicsProxyWidget *m_proxy;
+};
+
+#endif

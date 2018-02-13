@@ -71,6 +71,7 @@
 #include "subcircuit.h"
 #include "switch.h"
 #include "textcomponent.h"
+#include "toggleswitch.h"
 #include "voltimeter.h"
 #include "volt_reg.h"
 #include "voltsource.h"
@@ -106,8 +107,9 @@ void ItemLibrary::loadItems()
     addItem( Rail::libraryItem() );
     addItem( Ground::libraryItem() );
     // Switches
-    addItem( Switch::libraryItem() );
     addItem( Push::libraryItem() );
+    addItem( Switch::libraryItem() );
+    addItem( ToggleSwitch::libraryItem() );
     addItem( RelaySPST::libraryItem() );
     // Passive
     addItem( Potentiometer::libraryItem() );

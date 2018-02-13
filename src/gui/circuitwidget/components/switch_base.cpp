@@ -27,6 +27,7 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
 {
     m_area =  QRectF( -11, -9, 22, 11 );
 
+    m_pin.resize(2);
     m_ePin.resize(2);
 
     m_changed = true;
@@ -35,12 +36,14 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
     QString pinid = m_id;
     pinid.append(QString("-lnod"));
     QPoint pinpos = QPoint(-8-8,0);
-    m_ePin[0] = new Pin( 180, pinpos, pinid, 0, this);
+    m_pin[0] = new Pin( 180, pinpos, pinid, 0, this);
+    m_ePin[0] = m_pin[0];
 
     pinid = m_id;
     pinid.append(QString("-rnod"));
     pinpos = QPoint(8+8,0);
-    m_ePin[1] = new Pin( 0, pinpos, pinid, 1, this);
+    m_pin[1] = new Pin( 0, pinpos, pinid, 1, this);
+    m_ePin[1] = m_pin[1];
 
     m_idLabel->setPos(-12,-24);
 
@@ -86,9 +89,6 @@ void SwitchBase::updateStep()
 
 void SwitchBase::remove()
 {
-    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
-    if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-
     Simulator::self()->remFromUpdateList( this );
 
     Component::remove();
