@@ -26,7 +26,7 @@
 #include <QIODevice>  
 #include <QAudioOutput>  
 
-class MAINMODULE_EXPORT AudioOut : public Component, public eResistor
+class AudioOut : public Component, public eResistor
 {
     Q_OBJECT
     Q_PROPERTY( double Impedance READ res   WRITE setResSafe  DESIGNABLE true USER true )

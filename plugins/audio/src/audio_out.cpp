@@ -29,7 +29,7 @@ Component* AudioOut::construct( QObject* parent, QString type, QString id )
 LibraryItem* AudioOut::libraryItem()
 {
     return new LibraryItem(
-            tr( "Speaker" ),
+            tr( "Audio Out" ),
             tr( "Outputs" ),
             "audio_out.png",
             "AudioOut",

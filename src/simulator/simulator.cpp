@@ -181,7 +181,7 @@ void Simulator::runContinuous()
     m_matrix.simplify();
 
     // Try to solve matrix, if fail stop simulation
-    m_matrix.printMatrix();
+    // m_matrix.printMatrix();
     if( !m_matrix.solveMatrix() )
     {
         std::cout << "Simulator::runContinuous, Failed to solve Matrix"
