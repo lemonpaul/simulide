@@ -148,6 +148,8 @@ void RelayBase::remove()
 
 void RelayBase::SetupSwitches( int poles, int throws )
 {
+    m_area = QRectF( -13, -8-16*poles-4, 26, 8+16*poles+8+4 );
+
     for( uint i=0; i<m_switches.size(); i++ )
         delete m_switches[i];
     //qDebug() << "RelayBase::SetupSwitches Pins:"<<poles<<throws<<m_numPoles<<m_numthrows;
@@ -222,6 +224,9 @@ void RelayBase::SetupSwitches( int poles, int throws )
         }
         cont++;
     }
+
+    foreach( Pin* pin, m_pin )
+        pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false ); // draw Pins on top
 }
 
 double RelayBase::rCoil() const
@@ -264,7 +269,10 @@ void RelayBase::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWid
 {
     Component::paint( p, option, widget );
 
-    QPen pen = p->pen();
+    //p->setBrush(Qt::NoBrush);
+    p->drawRect( m_area );
+
+    QPen pen = p->pen();                                       // Draw Coil
     pen.setWidth(2.8);
     p->setPen(pen);
 
@@ -286,13 +294,20 @@ void RelayBase::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWid
     pen.setWidth(3);
     p->setPen(pen);
 
-    for( int i=0; i<m_numPoles; i++ )                       // Draw Switches
+    for( int i=0; i<m_numPoles; i++ )                           // Draw Switches
     {
         int offset = 16*i;
 
-        if( m_switches[ i*m_numthrows ]->res() < 1 )                   // switch is closed
+        if( m_switches[ i*m_numthrows ]->res() < 1 )            // switch is closed
             p->drawLine(-10, -16-offset, 10, -18-offset );
-        else                                            // Switch is oppened
+        else                                                    // Switch is oppened
             p->drawLine(-10.5, -16-offset, 8, -24-offset );
+    }
+    if( m_numPoles > 1 )
+    {
+        pen.setStyle(Qt::DashLine);
+        pen.setWidth(1);
+        p->setPen(pen);
+        p->drawLine(-0, -12, 0, -12-16*m_numPoles+4 );
     }
 }
