@@ -34,6 +34,8 @@ cp "$TOOLCHAIN_DIR"/$TRGT_KEY/bin/libpng16-16.dll     "$TARGET_PREFIX"/bin
 cp "$TOOLCHAIN_DIR"/$TRGT_KEY/bin/libstdc++-6.dll     "$TARGET_PREFIX"/bin
 #cp "$TOOLCHAIN_DIR"/$TRGT_KEY/bin/libwinpthread-1.dll "$TARGET_PREFIX"/bin
 cp "$TOOLCHAIN_DIR"/$TRGT_KEY/bin/zlib1.dll           "$TARGET_PREFIX"/bin
+cp "$TOOLCHAIN_DIR"/$TRGT_KEY/bin/libeay32.dll        "$TARGET_PREFIX"/bin
+cp "$TOOLCHAIN_DIR"/$TRGT_KEY/bin/ssleay32.dll        "$TARGET_PREFIX"/bin
 
 cp "$QTDIR"/bin/Qt5Core.dll                           "$TARGET_PREFIX"/bin
 cp "$QTDIR"/bin/Qt5Gui.dll                            "$TARGET_PREFIX"/bin
@@ -41,7 +43,10 @@ cp "$QTDIR"/bin/Qt5Gui.dll                            "$TARGET_PREFIX"/bin
 cp "$QTDIR"/bin/Qt5Widgets.dll                        "$TARGET_PREFIX"/bin
 cp "$QTDIR"/bin/Qt5Xml.dll                            "$TARGET_PREFIX"/bin
 cp "$QTDIR"/bin/Qt5SerialPort.dll                     "$TARGET_PREFIX"/bin
+cp "$QTDIR"/bin/Qt5Network.dll                        "$TARGET_PREFIX"/bin
+cp "$QTDIR"/bin/Qt5Multimedia.dll                     "$TARGET_PREFIX"/bin
 
 mkdir "$TARGET_PREFIX"/bin/plugins
 cp -r $QTDIR/plugins/platforms                        "$TARGET_PREFIX"/bin/plugins/platforms
-
+cp -r $QTDIR/plugins/mediaservice                      "$TARGET_PREFIX"/bin/plugins/mediaservice
+cp -r $QTDIR/plugins/audio                            "$TARGET_PREFIX"/bin/plugins/audio
