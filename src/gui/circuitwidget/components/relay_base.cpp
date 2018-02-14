@@ -269,7 +269,7 @@ void RelayBase::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWid
 {
     Component::paint( p, option, widget );
 
-    //p->setBrush(Qt::NoBrush);
+    p->setBrush(Qt::white);
     p->drawRect( m_area );
 
     QPen pen = p->pen();                                       // Draw Coil
