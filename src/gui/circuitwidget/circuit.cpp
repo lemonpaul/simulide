@@ -82,6 +82,34 @@ void Circuit::setCircSpeed( int rate )
     Simulator::self()->simuRateChanged( rate );
 }
 
+<<<<<<< HEAD
+=======
+void Circuit::removeItems()                     // Remove Selected items
+{
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->pauseSim();
+
+    saveState();
+
+    foreach( Component* comp, m_compList )
+    {
+        bool isNode = comp->objectName().contains( "Node" ); // Don't remove Graphical Nodes
+        if( comp->isSelected() && !isNode )  removeComp( comp );
+    }
+
+    if( pauseSim ) Simulator::self()->runContinuous();
+}
+
+void Circuit::removeComp( Component* comp )
+{
+    comp->remove();
+    QPropertyEditorWidget::self()->removeObject( comp );
+    compList()->removeOne( comp );
+    removeItem( comp );
+    comp->deleteLater();
+}
+
+>>>>>>> trunk
 void Circuit::remove() // Remove everything
 {
     //qDebug() << m_compList.size();

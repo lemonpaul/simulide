@@ -22,12 +22,17 @@
 #include "circuit.h"
 
 SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eResistor( id.toStdString() )
+    : Component( parent, type, id )
+    , eElement( id.toStdString() )
 {
     m_area =  QRectF( -11, -9, 22, 11 );
-    
+
+    m_pin.resize(2);
+    m_ePin.resize(2);
+
     m_changed = true;
-    
+    m_closed = false;
+
     QString pinid = m_id;
     pinid.append(QString("-lnod"));
     QPoint pinpos = QPoint(-8-8,0);
@@ -38,13 +43,8 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
     pinpos = QPoint(8+8,0);
     m_ePin[1] = new Pin( 0, pinpos, pinid, 1, this);
 
-    //m_idLabel->setText( QString("") );
     m_idLabel->setPos(-12,-24);
-    
-    m_resist = 1e38;
-    //stampAdmit( 0 );
-    eResistor::stamp();
-    
+
     m_button = new QPushButton( );
     m_button->setMaximumSize( 16,16 );
     m_button->setGeometry(-20,-16,16,16);
@@ -53,25 +53,34 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
     m_proxy = Circuit::self()->addWidget( m_button );
     m_proxy->setParentItem( this );
     m_proxy->setPos( QPoint(-8, 4) );
-    
-    Simulator::self()->addToUpdateList( this );
 
+    Simulator::self()->addToUpdateList( this );
 }
 SwitchBase::~SwitchBase()
 {
 }
 
+void SwitchBase::initialize()
+{
+    m_ePin[0]->setEnodeComp( m_ePin[1]->getEnode() );
+    m_ePin[1]->setEnodeComp( m_ePin[0]->getEnode() );
+    m_ePin[0]->stampAdmitance( 1 ); // Restart circuit afther switch closed issue
+    m_ePin[1]->stampAdmitance( 1 );
+    m_changed = true;
+    updateStep();
+}
+
 void SwitchBase::updateStep()
 {
-    if( m_changed ) 
+    if( m_changed )
     {
-        /*if( m_resist >= high_imp )
-        {
-            m_ePin[0]->stampAdmitance( 0 );
-            m_ePin[1]->stampAdmitance( 0 );
-        }
-        else */
-        eResistor::stamp();
+        double admit = 1e-6;
+
+        if( m_closed ) admit = 1e3;
+
+        m_ePin[0]->stampAdmitance( admit );
+        m_ePin[1]->stampAdmitance( admit );
+
         m_changed = false;
     }
 }
@@ -80,9 +89,9 @@ void SwitchBase::remove()
 {
     if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
     if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-    
+
     Simulator::self()->remFromUpdateList( this );
-    
+
     Component::remove();
 }
 

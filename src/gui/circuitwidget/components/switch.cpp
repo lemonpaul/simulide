@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include "switch.h"
-#include "connector.h"
 #include "itemlibrary.h"
 
 
