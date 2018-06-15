@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -18,10 +18,11 @@
  ***************************************************************************/
 
 #include <math.h>   // fabs(x,y)
+#include <QDebug>
 
 #include "e-mosfet.h"
 #include "simulator.h"
-#include <QDebug>
+#include "e-node.h"
 
 
 eMosfet::eMosfet( std::string id )
@@ -29,7 +30,8 @@ eMosfet::eMosfet( std::string id )
 {
     m_Pchannel = false;
     
-    m_resist    = high_imp;
+    m_gateV     = 0;
+    m_resist    = 1;
     m_RDSon     = 1;
     m_threshold = 3;
 
@@ -39,12 +41,13 @@ eMosfet::~eMosfet(){}
 
 void eMosfet::initialize()
 {
-    m_converged = true;
-    m_resist    = high_imp;
-    m_lastAdmit = cero_doub;
-    m_DScurrent = 0;
-    m_convTh    = 1e-5;
-    m_lastGateV = 0;
+    eResistor::setRes( 1 );
+    
+    m_accuracy = Simulator::self()->NLaccuracy();
+
+    m_lastCurrent = 0;
+    m_Vs = 0;
+    m_Sfollow = false;
     
     m_kRDSon = m_RDSon*(10-m_threshold);
     m_Gth = m_threshold-m_threshold/4;
@@ -67,6 +70,12 @@ void eMosfet::setVChanged()
     double Vd = m_ePin[0]->getVolt();
     double Vs = m_ePin[1]->getVolt();
     double Vg = m_ePin[2]->getVolt();
+    
+    if(( m_Sfollow == false)&( fabs(Vs) > 1e-3 ))
+    {
+        if(( fabs(m_Vs) > 1e-3 )&( m_Vs != Vs )) m_Sfollow = true;
+        m_Vs = Vs;
+    }
 
     if( m_Pchannel )
     {
@@ -78,90 +87,27 @@ void eMosfet::setVChanged()
         Vgs = Vg-Vs;
         Vds = Vd-Vs;
     }
-
-    double GateV  = Vgs - m_Gth;
-    //double dGateV = fabs(m_lastGateV-GateV);
-    double Admit  = GateV/m_kRDSon;
-
-    /*qDebug() <<" ";
-    qDebug() << QString::fromStdString(m_elmId)<<"STAGE "<<m_converged;
-    qDebug() <<"m_lastGateV"<<m_lastGateV<<"  GateV"<<GateV ;
-    qDebug() <<"m_lastAdmit"<<m_lastAdmit<<"  Admit"<<Admit;*/
-
-    if( fabs(Admit-m_lastAdmit)<m_convTh )
-    {
-        qDebug() <<" ";
-        qDebug() << QString::fromStdString(m_elmId)<<"STAGE "<<m_converged;
-        qDebug() <<"CONVERGED:           ";
-        if( m_converged ) return;
-        Admit = m_lastAdmit;
-        m_converged = true;
-    }
-    else if( m_converged )
-    {
-        m_cAdmit = Admit;
-        //m_dAdmit = -1e-7;
-        m_dAdmit = (Admit-m_lastAdmit)/10;
-        //if( Admit>m_lastAdmit )m_dAdmit = 1e-7;
-
-        Admit = m_lastAdmit + m_dAdmit;
-        //qDebug() <<"Admit 0"<<Admit;
-
-        m_converged = false;
-    }
-    else if( m_lastGateV != GateV )
-    {
-        if( fabs(Vs - m_lastVs)>1e-6 )
-        {
-            qDebug() <<" ";
-            qDebug() << QString::fromStdString(m_elmId)<<"STAGE "<<m_converged;
-            qDebug() <<"Vs m_lastVs"<<Vs <<m_lastVs;
-            double nextVs = Vg-m_Gth;
-            double kVs = nextVs/Vs;
-            double kdVs = 1;
-            if( fabs(Vs-m_lastVs)>1 ) kdVs = 1/(fabs(Vs-m_lastVs));
-            Admit = m_lastAdmit*kVs*kdVs;
-            qDebug() <<"m_lastAdmit"<<m_lastAdmit<<"Admit"<<Admit;
-            m_converged = false;
-        }
-        else
-        {
-            double dCAdmit = m_cAdmit - Admit;
-            Admit= m_lastAdmit+(Admit-m_lastAdmit)/((1+dCAdmit/m_dAdmit));
-            //qDebug() <<"Admit 1"<<Admit;
-            m_converged = true;
-        }
-    }
+    m_gateV = Vgs - m_Gth;
     
-    if( Admit > high_imp  ) Admit = high_imp;
-    if( Admit < cero_doub ) Admit = cero_doub;
-    //qDebug() <<"Final Admit "<<Admit;
-    if( Admit != m_lastAdmit )
-    {
-        m_resist = 1/Admit;
-        eResistor::stamp();
-        //qDebug() <<".....................stamp";
-    }
-    else m_converged = true;
+    if( m_gateV < 0 ) m_gateV = 0;
+
+    double satK = 1+Vds/100;
+    double maxCurrDS = Vds/m_resist;
     
-    double DScurrent = 0;
-    if( (GateV>0)&(Vds > GateV) )
-    {
-        double Vdg = Vds-GateV;
-        DScurrent = Vdg/m_resist;
-        DScurrent -= DScurrent / (1 + Vdg );
-        if( DScurrent < 0 )  DScurrent = 0;
-    }
-    if( DScurrent != m_DScurrent)
-    {
-        m_DScurrent = DScurrent;
-        m_ePin[0]->stampCurrent( DScurrent );
-        m_ePin[1]->stampCurrent(-DScurrent );
-    }
-    //qDebug() << "m_resist"<<m_resist<< "     DScurrent"<<DScurrent;
-    m_lastVs    = Vs;
-    m_lastGateV = GateV;
-    m_lastAdmit = Admit;
+    if( Vds > m_gateV ) Vds = m_gateV;
+    
+    double DScurrent = (m_gateV*Vds-pow(Vds,2)/2)*satK/m_kRDSon;
+    //if( m_Sfollow ) DScurrent /= 2;
+    if( DScurrent > maxCurrDS ) DScurrent = maxCurrDS;
+    
+    double current = maxCurrDS-DScurrent;
+    if( m_Pchannel ) current = -current;
+
+    if( fabs(current-m_lastCurrent)<m_accuracy ) return;
+
+    m_lastCurrent = current;
+    m_ePin[0]->stampCurrent( current );
+    m_ePin[1]->stampCurrent(-current );
 }
 
 void eMosfet::setRDSon( double rdson )

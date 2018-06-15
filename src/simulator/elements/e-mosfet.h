@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -21,7 +21,8 @@
 #define EMOSFET_H
 
 #include "e-resistor.h"
-#include "e-source.h"
+
+class eSource;
 
 class MAINMODULE_EXPORT eMosfet : public eResistor
 {
@@ -48,20 +49,17 @@ class MAINMODULE_EXPORT eMosfet : public eResistor
         }
         
     protected:
-        double m_lastVs;
-        double m_lastGateV;
-        double m_DScurrent;
+        double m_accuracy;
+        double m_lastCurrent;
         double m_threshold;
-        double m_lastAdmit;
-        double m_dAdmit;
-        double m_cAdmit;
         double m_kRDSon;
         double m_RDSon;
+        double m_gateV;
         double m_Gth;
-        double m_convTh;
+        double m_Vs;
 
-        bool m_converged;
         bool m_Pchannel;
+        bool m_Sfollow;
         
         eSource* m_gate;
 };

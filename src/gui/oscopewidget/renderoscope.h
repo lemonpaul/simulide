@@ -4,7 +4,7 @@
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
 *   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation; either version 2 of the License, or     *
+*   the Free Software Foundation; either version 3 of the License, or     *
 *   (at your option) any later version.                                   *
 *                                                                         *
 *   This program is distributed in the hope that it will be useful,       *
@@ -20,8 +20,6 @@
 #ifndef RENDEROSCOPE_H
 #define RENDEROSCOPE_H
 
-#include <QBrush>
-#include <QPen>
 #include <QPixmap>
 #include <QtWidgets>
 
@@ -36,23 +34,26 @@ class RenderOscope : public QWidget
         QSize sizeHint() const;
 
         void setData( int data[] );
-
-        void setTick( int tickUs );
-        
-        void drawBackground();
+        void setMaxMin( double max, double min );
 
     protected:
         void paintEvent( QPaintEvent *event );
 
     private:
-        
-        QPixmap m_pixmap;
-
         int m_width;
         int m_height;
+        int* m_data;
+        
+        double m_hCenter;
+        double m_vCenter;
+        double m_vMax;
+        double m_vMin;
+        double m_margin;
+        double m_scale;
+        
+        QPointF lastPoint;
+        
         int m_sec;
-
-        QString m_tick;
 };
 
 #endif

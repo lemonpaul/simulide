@@ -20,6 +20,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 // *************************************************************************************************
+/***************************************************************************
+ *   Modified 2012 by santiago González                                    *
+ *   santigoro@gmail.com                                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include "QPropertyModel.h"
 
@@ -198,19 +203,13 @@ void QPropertyModel::addItem( QObject *propertyObject )
     
     // finally insert properties for classes containing them
     int i=rowCount();
-    Property* propertyItem = 0;
+    
+    // Create Property Item for class node
+    Property* propertyItem = new Property(propertyObject->objectName (), 0, m_rootItem); 
     beginInsertRows( QModelIndex(), i, i + finalClassList.count() );
+
     foreach(const QMetaObject* metaObject, finalClassList)
     {
-        // Set default name of the hierarchy property to the class name
-        QString name = metaObject->className();
-        
-        // Check if there is a special name for the class
-        int index = metaObject->indexOfClassInfo(qPrintable(name));
-        if (index != -1) name = metaObject->classInfo(index).value();
-        
-        // Create Property Item for class node
-        propertyItem = new Property(name, 0, m_rootItem);        
         foreach(PropertyPair pair, propertyMap)
         {
             // Check if the property is associated with the current class from the finalClassList

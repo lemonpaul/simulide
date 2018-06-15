@@ -1,27 +1,27 @@
 <circuit type="simulide_0.1">
  
-Diode-5: 
-<item labelx="42" labely="17" Zener_Volt="3.6000000000000001" vflip="1" x="-244" Show_id="true" threshold="0.69999999999999996" y="-108" id="Zener Diode 3.6 V&#xa;&#xa;To set a Diode as Zener&#xa;Just Change Zener Voltage &#xa;To other than 0." valLabelx="0" hflip="1" valLabRot="0" objectName="Diode-5" labelrot="90" itemtype="Diode" rotation="-90" valLabely="0"/>
+Probe-5: 
+<item itemtype="Probe" labelx="-16" Show_volt="true" id="Probe-5" rotation="-45" hflip="1" Show_id="false" labely="-24" valLabRot="45" vflip="1" y="-196" valLabely="0" valLabelx="16" objectName="Probe-5" x="-228" labelrot="0"/>
  
-Fixed Volt.-4: 
-<item Show_id="false" valLabRot="0" id="Fixed Volt.-4" x="-396" objectName="Fixed Volt.-4" rotation="0" hflip="1" y="-228" labely="-24" itemtype="Fixed Voltage" Voltage="5" labelx="-64" labelrot="0" Show_Volt="true" vflip="1" valLabelx="-16" valLabely="8" Unit=" V"/>
+Ground (0 V)-4: 
+<item itemtype="Ground" labelx="-16" id="Ground (0 V)-4" rotation="0" hflip="1" Show_id="false" labely="-24" valLabRot="0" vflip="1" y="4" valLabely="0" valLabelx="0" objectName="Ground (0 V)-4" x="-244" labelrot="0"/>
  
 Resistor-3: 
-<item Show_id="false" valLabRot="0" id="Resistor-3" Resistance="10" x="-316" objectName="Resistor-3" rotation="0" Show_res="true" hflip="1" y="-228" labely="-24" itemtype="Resistor" labelx="-12" labelrot="0" vflip="1" valLabelx="-16" valLabely="6" Unit=" kΩ"/>
+<item x="-316" vflip="1" id="Resistor-3" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Resistance="10" Show_id="false" Unit=" kΩ" y="-228" labely="-24" itemtype="Resistor" labelx="-12" objectName="Resistor-3" valLabely="6" rotation="0" Show_res="true"/>
  
-Ground (0 V)-2: 
-<item labelx="-16" labely="-24" vflip="1" x="-244" Show_id="false" y="4" id="Ground (0 V)-2" valLabelx="0" hflip="1" valLabRot="0" objectName="Ground (0 V)-2" labelrot="0" itemtype="Ground" rotation="0" valLabely="0"/>
+Fixed Volt.-2: 
+<item x="-396" vflip="1" id="Fixed Volt.-2" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-228" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-2" valLabely="8" rotation="0"/>
  
-Probe-1: 
-<item labelx="-16" labely="-24" vflip="1" Show_volt="true" x="-228" Show_id="false" y="-196" id="Probe-1" valLabelx="16" hflip="1" valLabRot="45" objectName="Probe-1" labelrot="0" itemtype="Probe" rotation="-45" valLabely="0"/>
+Diode-1: 
+<item itemtype="Diode" labelx="42" id="Zener Diode 3.6 V&#xa;&#xa;To set a Diode as Zener&#xa;Just Change Zener Voltage &#xa;To other than 0." rotation="-90" hflip="1" Show_id="true" threshold="0.69999999999999996" labely="17" valLabRot="0" vflip="1" y="-108" valLabely="0" valLabelx="0" objectName="Diode-1" x="-244" Zener_Volt="3.6000000000000001" labelrot="90"/>
  
 Connector-6: 
-<item Show_id="false" valLabRot="0" pointList="-380,-228,-332,-228" id="Connector-6" x="-380" objectName="Connector-6" startpinid="Fixed Volt.-4-outnod" rotation="0" enodeid="Circ_eNode-7" hflip="1" y="-228" labely="-24" itemtype="Connector" endpinid="Resistor-3lnod" labelx="-16" labelrot="0" vflip="1" valLabelx="0" valLabely="0"/>
+<item endpinid="Resistor-3-lPin" x="-380" vflip="1" id="Connector-6" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-7" Show_id="false" startpinid="Fixed Volt.-2-outnod" pointList="-380,-228,-332,-228" y="-228" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-6" valLabely="0" rotation="0"/>
  
 Connector-8: 
-<item Show_id="false" valLabRot="0" pointList="-300,-228,-244,-228,-244,-124" id="Connector-8" x="-300" objectName="Connector-8" startpinid="Resistor-3rnod" rotation="0" enodeid="Circ_eNode-9" hflip="1" y="-228" labely="-24" itemtype="Connector" endpinid="Diode-5rnod" labelx="-16" labelrot="0" vflip="1" valLabelx="0" valLabely="0"/>
+<item endpinid="Diode-1-rPin" x="-300" vflip="1" id="Connector-8" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-9" Show_id="false" startpinid="Resistor-3-rPin" pointList="-300,-228,-244,-228,-244,-124" y="-228" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-8" valLabely="0" rotation="0"/>
  
 Connector-10: 
-<item Show_id="false" valLabRot="0" pointList="-244,-12,-244,-92" id="Connector-10" x="-244" objectName="Connector-10" startpinid="Ground (0 V)-2Gnod" rotation="0" enodeid="Circ_eNode-11" hflip="1" y="-12" labely="-24" itemtype="Connector" endpinid="Diode-5lnod" labelx="-16" labelrot="0" vflip="1" valLabelx="0" valLabely="0"/>
+<item endpinid="Diode-1-lPin" x="-244" vflip="1" id="Connector-10" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-11" Show_id="false" startpinid="Ground (0 V)-4-Gnd" pointList="-244,-12,-244,-92" y="-12" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-10" valLabely="0" rotation="0"/>
  
 </circuit>

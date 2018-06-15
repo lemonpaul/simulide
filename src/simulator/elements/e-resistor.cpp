@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -74,9 +74,9 @@ void eResistor::updateVI()
     if( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() )
     {
         double volt = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
-        //if( volt < 0 ) volt = -volt;
+
         m_current = volt/m_resist;
-        //qDebug() << " current " <<m_current<<volt<<m_deltaV;
+        //qDebug() << " current " <<m_current<<volt;
     }
     else m_current = 0;
 }

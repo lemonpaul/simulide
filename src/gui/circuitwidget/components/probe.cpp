@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -21,8 +21,7 @@
 #include "connector.h"
 #include "simulator.h"
 #include "itemlibrary.h"
-#include "oscopewidget.h"
-#include "plotterwidget.h"
+#include "circuitwidget.h"
 
 bool Probe::m_oscopeBusy = false;
 
@@ -42,6 +41,8 @@ LibraryItem* Probe::libraryItem()
 Probe::Probe( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eElement( id.toStdString() )
 {
+    m_readPin = 0l;
+    m_readConn = 0l;
     m_haveOscope = false;
     m_voltTrig = 2.5;
     m_plotterLine = -1;
@@ -81,6 +82,9 @@ Probe::~Probe()
 
 void Probe::updateStep()
 {
+    m_readPin = 0l;
+    m_readConn = 0l;
+    
     if( !Simulator::self()->isRunning() )
     {
         setVolt( 0.0 );
@@ -101,25 +105,25 @@ void Probe::updateStep()
         setVolt( 0.0 );
         return;
     }
-
-    foreach( QGraphicsItem *it, list )
+    foreach( QGraphicsItem* it, list )
     {
         if( it->type() == 65536 )                           // Component
         {
-            ConnectorLine *line =  qgraphicsitem_cast<ConnectorLine *>( it );
+            ConnectorLine *line =  qgraphicsitem_cast<ConnectorLine*>( it );
 
             Connector *con = line->connector();
 
             if( con->objectName().startsWith("Connector") ) // Connector found
             {
                 setVolt( con->getVolt() ); //startPin()->volt();
+                m_readConn = con;
                 break;
             }
         }
         else if( it->type() == 65536+3 )                    // Pin found
         {
-            Pin *pin =  qgraphicsitem_cast<Pin *>( it );
-            setVolt( pin->getVolt() );
+            m_readPin =  qgraphicsitem_cast<Pin *>( it );
+            setVolt( m_readPin->getVolt() );
             //qDebug() << " probe: Pin found" << volt;
             break;
         }
@@ -134,7 +138,7 @@ void Probe::setVolt( double volt )
     m_voltIn = volt;
 
     if( fabs(volt) < 0.01 ) volt = 0;
-    int dispVolt = int( volt*100 );
+    int dispVolt = int( volt*100+0.5 );
 
     //if( m_showVolt ) m_dispvolt->setPlainText( QString("%1 V").arg(double(dispVolt)/100));
     //else             m_dispvolt->setPlainText("");
@@ -151,7 +155,9 @@ void Probe::setVolt( double volt )
 double Probe::getVolt()
 {
     double volt = 0;
-    if( m_inputpin->isConnected() ) volt = m_inputpin->getVolt();
+    if     ( m_inputpin->isConnected() ) volt = m_inputpin->getVolt();
+    else if( m_readConn != 0l )          volt = m_readConn->getVolt();
+    else if( m_readPin != 0l )           volt = m_readPin->getVolt();
     return volt;
 }
 
@@ -192,14 +198,11 @@ void Probe::slotPlotterRem()
 void Probe::slotOscopAdd()
 {
     if( m_oscopeBusy ) return; // Another probe is using oscope
-    
-    if( m_inputpin->isConnected() )
-    {
-        OscopeWidget::self()->setProbe( this );
-        OscopeWidget::self()->setVisible( true );
-        m_haveOscope = true;
-        m_oscopeBusy = true;
-    }
+
+    CircuitWidget::self()->oscope()->setProbe( this );
+    CircuitWidget::self()->oscope()->setVisible( true );
+    m_haveOscope = true;
+    m_oscopeBusy = true;
 }
 
 void Probe::slotOscopRem()
@@ -208,8 +211,8 @@ void Probe::slotOscopRem()
     
     //if( m_inputpin->isConnected() )
     {
-        OscopeWidget::self()->setProbe( 0l );
-        OscopeWidget::self()->setVisible( false );
+        CircuitWidget::self()->oscope()->setProbe( 0l );
+        CircuitWidget::self()->oscope()->setVisible( false );
         m_haveOscope = false;
         m_oscopeBusy = false;
     }
@@ -226,16 +229,13 @@ void Probe::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     QAction *plotterRemAction = menu->addAction(QIcon(":/fileopen.png"),"Remove from Plotter");
     connect(plotterRemAction, SIGNAL(triggered()), this, SLOT(slotPlotterRem()));
     
-    if( m_inputpin->isConnected() )
-    {
-        menu->addSeparator();
-        
-        QAction *oscopAddAction = menu->addAction(QIcon(":/fileopen.png"),"Add to Oscope");
-        connect(oscopAddAction, SIGNAL(triggered()), this, SLOT(slotOscopAdd()));
+    menu->addSeparator();
+    
+    QAction *oscopAddAction = menu->addAction(QIcon(":/fileopen.png"),"Add to Oscope");
+    connect(oscopAddAction, SIGNAL(triggered()), this, SLOT(slotOscopAdd()));
 
-        QAction *oscopRemAction = menu->addAction(QIcon(":/fileopen.png"),"Remove from Oscope");
-        connect(oscopRemAction, SIGNAL(triggered()), this, SLOT(slotOscopRem()));
-    }
+    QAction *oscopRemAction = menu->addAction(QIcon(":/fileopen.png"),"Remove from Oscope");
+    connect(oscopRemAction, SIGNAL(triggered()), this, SLOT(slotOscopRem()));
 
     menu->addSeparator();
 

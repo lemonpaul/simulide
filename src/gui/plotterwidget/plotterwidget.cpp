@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -37,6 +37,10 @@ PlotterWidget::PlotterWidget(  QWidget *parent  )
     m_color[3] = QColor( 30, 220, 150 );
 
     setupWidget();
+    
+    m_maxVolt = 500;
+    m_minVolt = -500;
+    m_offset  = 0;
 
     m_rArea->setAntialiased(true);
 
@@ -115,7 +119,13 @@ void PlotterWidget::setData( int channel, int data )
     volt.append( " V" );
     m_chanLabel[channel]->setText( volt );   // Update volt Label
     m_data[channel] = data;
-    m_rArea->setData( channel, data );
+    setRenderData( channel, data );
+}
+
+void PlotterWidget::setRenderData( int channel, int data )
+{
+    int renderData = data*1000/(m_maxVolt-m_minVolt)-m_offset;
+    m_rArea->setData( channel, renderData );
 }
 
 void PlotterWidget::setTicksPs( int tps )
@@ -126,6 +136,37 @@ void PlotterWidget::setTicksPs( int tps )
 void PlotterWidget::setPlotterTick( int tickUs )
 {
     m_rArea->setTick( tickUs );
+}
+
+void PlotterWidget::maxChanged( double value )
+{
+    m_maxVolt = value*100;
+    if( m_maxVolt <= m_minVolt ) 
+    {
+        m_maxVolt = m_minVolt+1;
+        m_maxValue->setValue( m_maxVolt/100 );
+    }
+    setScale();
+}
+
+void PlotterWidget::minChanged( double value )
+{
+    m_minVolt = value*100;
+    if( m_maxVolt <= m_minVolt ) 
+    {
+        m_minVolt = m_maxVolt-1;
+        m_minValue->setValue( m_minVolt/100 );
+    }
+    setScale();
+}
+
+void PlotterWidget::setScale()
+{
+    m_offset = (m_maxVolt+m_minVolt)*500/(m_maxVolt-m_minVolt);
+    m_rArea->setZero( -m_offset );
+    
+    for( int i=0; i<4; i++ ) 
+        if( m_channel[i] ) setRenderData( i, m_data[i] );
 }
 
 void PlotterWidget::setupWidget()
@@ -144,24 +185,47 @@ void PlotterWidget::setupWidget()
     {
         m_chanLabel[i] = new QLineEdit( this );
         m_chanLabel[i]->setObjectName(QString::fromUtf8("voltLabel"+i));
-        m_chanLabel[i]->setGeometry(QRect(0, 0, 80, 27));
         m_chanLabel[i]->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         m_chanLabel[i]->setMaxLength(7);
         m_chanLabel[i]->setFont(font);
         m_chanLabel[i]->setAcceptDrops(false);
         m_chanLabel[i]->setReadOnly(true);
         m_chanLabel[i]->setText("--.-- V");
-        //m_chanLabel[i]->setFixedHeight(30);
-        m_chanLabel[i]->setFixedWidth(75);
+        m_chanLabel[i]->setFixedHeight(25);
+        m_chanLabel[i]->setFixedWidth(85);
         m_chanLabel[i]->setVisible( true );
         m_chanLabel[i]->setEnabled( false );
 
         QPalette p = m_chanLabel[i]->palette();
         p.setColor( QPalette::Active, QPalette::Base, m_color[i] );
-        //p.setColor( QPalette::Active, QPalette::Text, QColor( 10, 15, 50 ));
         m_chanLabel[i]->setPalette(p);
         m_verticalLayout->addWidget( m_chanLabel[i] );
     }
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    m_verticalLayout->addWidget(line);
+    
+    m_maxValue = new QDoubleSpinBox( this );
+    m_maxValue->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Ignored);
+    m_maxValue->setMaximum( 1000000 );
+    m_maxValue->setMinimum(-1000000 );
+    m_maxValue->setPrefix( "Max " );
+    m_maxValue->setValue( 5 );
+    m_verticalLayout->addWidget( m_maxValue );
+    connect( m_maxValue, SIGNAL( valueChanged(double) ),
+                   this, SLOT( maxChanged(double) ));
+    
+    m_minValue = new QDoubleSpinBox( this );
+    m_minValue->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Ignored);
+    m_minValue->setMaximum( 1000000 );
+    m_minValue->setMinimum(-1000000 );
+    m_minValue->setPrefix( "Min " );
+    m_minValue->setValue( -5 );
+    m_verticalLayout->addWidget( m_minValue );
+    connect( m_minValue, SIGNAL( valueChanged(double) ),
+                   this, SLOT( minChanged(double) ));
+        
     m_horizontalLayout->addLayout( m_verticalLayout );
 
     m_rArea = new RenderArea( 1000, 180, this );

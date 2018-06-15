@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -92,18 +92,26 @@ void LogicInput::updateStep()
     }
 }
 
+double LogicInput::volt()  
+{ 
+    return m_value; 
+}
+
 void LogicInput::setVolt( double v )
 {
     Component::setValue( v );       // Takes care about units multiplier
     m_voltHight = m_value*m_unitMult;
     m_out->setVoltHigh( m_voltHight );
+    m_changed = true;
     //update();
 }
 
 void LogicInput::setUnit( QString un ) 
 {
     Component::setUnit( un );
-    setVolt( m_value*m_unitMult );
+    m_voltHight = m_value*m_unitMult;
+    m_out->setVoltHigh( m_voltHight );
+    m_changed = true;
 }
 
 void LogicInput::remove()

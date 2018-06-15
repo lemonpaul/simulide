@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -17,14 +17,16 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "mainwindow.h"
+#include <QSvgGenerator>
+
+#include "circuitwidget.h"
 #include "circuitview.h"
 #include "circuit.h"
 #include "component.h"
 #include "utils.h"
 
 CircuitView::CircuitView( QWidget *parent )
-    : QGraphicsView( parent )
+           : QGraphicsView( parent )
 {
     m_circuit     = 0l;
     m_enterItem   = 0l;
@@ -32,20 +34,17 @@ CircuitView::CircuitView( QWidget *parent )
 
     clear();
 
-    viewport()->setFixedSize(1600,1200);
+    viewport()->setFixedSize( 3200, 2400 );
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
-    setCacheMode( CacheBackground );
+    //setCacheMode( CacheBackground );
     //setRenderHint( QPainter::Antialiasing );
-    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    setRenderHints( QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
     //setRenderHint( QPainter::SmoothPixmapTransform );
     setTransformationAnchor( AnchorUnderMouse );
     setResizeAnchor( AnchorUnderMouse );
     setDragMode( QGraphicsView::RubberBandDrag );
-
-    //m_file = "";
-    //setWindowTitle(m_file + "[*]");
 
     setAcceptDrops(true);
 }
@@ -58,9 +57,9 @@ void CircuitView::clear()
         m_circuit->remove();
         m_circuit->deleteLater();
     }
-    m_circuit = new Circuit( -800, -600, 1600, 1200, this );
+    m_circuit = new Circuit( -1600, -1200, 3200, 2400, this );
     setScene( m_circuit );
-    centerOn( 300, 200 );
+    centerOn( 900, 600 );
 }
 
 void CircuitView::wheelEvent(QWheelEvent *event) { scaleView(pow( 2.0, event->delta() / 700.0)); }
@@ -69,7 +68,7 @@ void CircuitView::scaleView(qreal scaleFactor)
 {
     qreal factor = matrix().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 8, 8)).width();
 
-    if( factor < 2 || factor > 100 ) return;
+    if( factor < 1 || factor > 100 ) return;
 
     m_scalefactor *=  factor;
     scale(scaleFactor, scaleFactor);
@@ -107,7 +106,7 @@ void CircuitView::dragLeaveEvent(QDragLeaveEvent *event)
     event->accept();
     if ( m_enterItem )
     {
-        m_enterItem->remove();
+        m_circuit->removeComp( m_enterItem );
         m_enterItem = 0l;
     }
 }
@@ -138,6 +137,34 @@ void CircuitView::keyReleaseEvent( QKeyEvent *event )
     QGraphicsView::keyReleaseEvent( event );
 }
 
+void CircuitView::mousePressEvent( QMouseEvent *event )
+{
+    if( event->button() == Qt::MidButton )
+    {
+        setDragMode( QGraphicsView::ScrollHandDrag );
+        
+        QMouseEvent eve( QEvent::MouseButtonPress, event->pos(), 
+        Qt::LeftButton, Qt::LeftButton, Qt::NoModifier   );
+
+        QGraphicsView::mousePressEvent( &eve );
+    }
+    QGraphicsView::mousePressEvent( event );
+}
+
+void CircuitView::mouseReleaseEvent(QMouseEvent *event )
+{
+    if( event->button() == Qt::MidButton )
+    {
+        setDragMode( QGraphicsView::RubberBandDrag );
+        
+        QMouseEvent eve( QEvent::MouseButtonRelease, event->pos(), 
+        Qt::LeftButton, Qt::LeftButton, Qt::NoModifier   );
+
+        QGraphicsView::mouseReleaseEvent( &eve );
+    }
+    QGraphicsView::mouseReleaseEvent( event );
+}
+
 void CircuitView::contextMenuEvent(QContextMenuEvent* event)
 {
     QGraphicsView::contextMenuEvent( event );
@@ -149,27 +176,27 @@ void CircuitView::contextMenuEvent(QContextMenuEvent* event)
 
         QMenu menu;
 
-        QAction* pasteAction = menu.addAction(QIcon(":/paste.png"),"Paste");
+        QAction* pasteAction = menu.addAction(QIcon(":/paste.png"),"Paste\tCtrl+V");
         connect( pasteAction, SIGNAL( triggered()), this, SLOT(slotPaste()) );
 
-        QAction* undoAction = menu.addAction(QIcon(":/undo.png"),"Undo");
+        QAction* undoAction = menu.addAction(QIcon(":/undo.png"),"Undo\tCtrl+Z");
         connect( undoAction, SIGNAL( triggered()), Circuit::self(), SLOT(undo()) );
 
-        QAction* redoAction = menu.addAction(QIcon(":/redo.png"),"Redo");
+        QAction* redoAction = menu.addAction(QIcon(":/redo.png"),"Redo\tCtrl+Y");
         connect( redoAction, SIGNAL( triggered()), Circuit::self(), SLOT(redo()) );
         menu.addSeparator();
 
-        QAction* openCircAct = menu.addAction(QIcon(":/opencirc.png"), tr("Open Circuit") );
-        connect(openCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(openCirc()));
+        QAction* openCircAct = menu.addAction(QIcon(":/opencirc.png"), tr("Open Circuit\tCtrl+O") );
+        connect(openCircAct, SIGNAL(triggered()), CircuitWidget::self(), SLOT(openCirc()));
 
-        QAction* newCircAct = menu.addAction( QIcon(":/newcirc.png"), tr("New Circuit") );
-        connect( newCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(newCircuit()));
+        QAction* newCircAct = menu.addAction( QIcon(":/newcirc.png"), tr("New Circuit\tCtrl+N") );
+        connect( newCircAct, SIGNAL(triggered()), CircuitWidget::self(), SLOT(newCircuit()));
 
-        QAction* saveCircAct = menu.addAction(QIcon(":/savecirc.png"), tr("Save Circuit") );
-        connect(saveCircAct, SIGNAL(triggered()), MainWindow::self(), SLOT(saveCirc()));
+        QAction* saveCircAct = menu.addAction(QIcon(":/savecirc.png"), tr("Save Circuit\tCtrl+S") );
+        connect(saveCircAct, SIGNAL(triggered()), CircuitWidget::self(), SLOT(saveCirc()));
 
-        QAction* saveCircAsAct = menu.addAction(QIcon(":/savecircas.png"),tr("Save Circuit As...") );
-        connect(saveCircAsAct, SIGNAL(triggered()), MainWindow::self(), SLOT(saveCircAs()));
+        QAction* saveCircAsAct = menu.addAction(QIcon(":/savecircas.png"),tr("Save Circuit As...\tCtrl+Shift+S") );
+        connect(saveCircAsAct, SIGNAL(triggered()), CircuitWidget::self(), SLOT(saveCircAs()));
         menu.addSeparator();
 
         QAction* importCircAct = menu.addAction(QIcon(":/opencirc.png"), tr("Import Circuit") );
@@ -197,11 +224,28 @@ void CircuitView::slotPaste()
 
 void CircuitView::saveImage()
 {
-    QString fileName= QFileDialog::getSaveFileName(this, "Save image", QCoreApplication::applicationDirPath(), "BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)" );
+    QString fileName= QFileDialog::getSaveFileName(this, "Save image", QCoreApplication::applicationDirPath(), "BMP Files (*.bmp);;JPEG (*.jpg);;PNG (*.png);;SVG (*.svg)"  );
     if (!fileName.isNull())
     {
-        QPixmap pixMap = this->grab();
-        pixMap.save(fileName);
+        if( fileName.endsWith( "svg" ) )
+        {
+            QSvgGenerator svgGen;
+
+            svgGen.setFileName( fileName );
+            svgGen.setSize( QSize(3200, 2400) );
+            svgGen.setViewBox( QRect(0, 0, 3200, 2400) );
+            svgGen.setTitle(tr("Circuit Name"));
+            svgGen.setDescription(tr("Generated by SimulIDE"));
+
+            QPainter painter( &svgGen );
+            Circuit::self()->render( &painter );
+        }
+        else
+        {
+            QPixmap pixMap = this->grab();
+            pixMap.save( fileName );
+        }
     }
 }
 #include "moc_circuitview.cpp"
+

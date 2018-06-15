@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -19,8 +19,7 @@
 
 #include "diode.h"
 #include "connector.h"
-#include "itemlibrary.h"
-
+#include "pin.h"
 
 Component* Diode::construct( QObject* parent, QString type, QString id )
 { return new Diode( parent, type, id ); }
@@ -38,26 +37,20 @@ LibraryItem* Diode::libraryItem()
 Diode::Diode( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eDiode( id.toStdString() )
 {
-    m_ePin.resize(2);
+    m_pin.resize(2);
     QString nodid = m_id;
     nodid.append(QString("-lPin"));
     QPoint nodpos = QPoint(-16, 0 );
-    m_ePin[0] = new Pin( 180, nodpos, nodid, 0, this ); // pPin
+    m_pin[0] = new Pin( 180, nodpos, nodid, 0, this ); // pPin
+    m_ePin[0] = m_pin[0];
 
     nodid = m_id;
     nodid.append(QString("-rPin"));
     nodpos = QPoint( 16, 0 );
-    m_ePin[1] = new Pin( 0, nodpos, nodid, 1, this ); // nPin
+    m_pin[1] = new Pin( 0, nodpos, nodid, 1, this ); // nPin
+    m_ePin[1] = m_pin[1];
 }
 Diode::~Diode(){}
-
-void Diode::remove()
-{
-    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
-    if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-    Component::remove();
-}
-
 
 void Diode::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {

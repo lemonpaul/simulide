@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -23,6 +23,8 @@
 #include "e-resistor.h"
 #include "component.h"
 
+class eSource;
+class Pin;
 
 class MAINMODULE_EXPORT Meter : public Component, public eResistor
 {
@@ -42,6 +44,11 @@ class MAINMODULE_EXPORT Meter : public Component, public eResistor
 
     protected:
         double m_dispValue;
+
+        Pin*     m_outpin;
+        eSource* m_out;
+
+        QGraphicsSimpleTextItem m_display;
 };
 
 #endif

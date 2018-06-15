@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -18,122 +18,92 @@
  ***************************************************************************/
 
  #include "renderoscope.h"
+ 
+#include <QBrush>
+#include <QPen>
 
 RenderOscope::RenderOscope( int width, int height, QWidget *parent )
             : QWidget( parent )
 {
-    //setBackgroundRole( QPalette::Base );
-    //setAutoFillBackground( true );
-
     m_width  = width;
     m_height = height;
-
-    m_pixmap = QPixmap( m_width, m_height );
-    
-    drawBackground();
+    m_hCenter = (double)width/2;
+    m_vCenter = (double)height/2;
+    m_scale = ((double)width)/180;
+    m_margin = 15*m_scale;
+    m_scale = ((double)width-30*m_scale)/140;
+    m_vMax = 0;
+    m_vMin = 0;
+    m_data = 0l;
 }
 
-void RenderOscope::drawBackground()
+QSize RenderOscope::minimumSizeHint() const  {  return QSize( m_width, m_height );  }
+
+QSize RenderOscope::sizeHint() const  { return QSize( m_width, m_height ); }
+
+void RenderOscope::setMaxMin( double max, double min )
 {
-    m_pixmap.fill( QColor( 220, 220, 220 ) );
-    QPainter p( &m_pixmap );
-    p.setRenderHint( QPainter::Antialiasing, true );
-    
-    p.setBrush( QColor( 10, 15, 50 ) );
-    p.drawRoundRect(0, 0, 180, 180 );
-
-    QPen pen( QColor( 90, 90, 180 ), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
-    p.setPen( pen );
-
-    p.drawLine( 20, 90, 159, 90 );
-    p.drawLine( 90, 20, 90, m_height-21 );
-    
-    p.setPen( QColor( 70, 70, 140 ) );
-    
-    for( int i=30; i<160; i+=20 )
-    {
-        p.drawLine( i, 20, i, m_height-21 );
-    }
-    for( int i=20; i<161; i+=28 )
-    {
-        p.drawLine( 20, i, 160, i );
-    }
-    p.setPen( QColor( 200, 200, 255 ) );
-    for( int i=0; i<6; i++ )
-    {
-        int y = 15+i*28;
-        p.drawText( 5  , y-3, 20 , y+3, Qt::AlignLeft, QString::number(5-i) );
-        p.drawText( 166, y-3, 175, y+3, Qt::AlignLeft, QString::number(5-i) );
-    }
-    
-    
+    m_vMax = max;
+    m_vMin = min;
 }
-
-QSize RenderOscope::minimumSizeHint() const  {  return QSize( 180, 180 );  }
-
-QSize RenderOscope::sizeHint() const  { return QSize( 180, 180 ); }
-
-
 void RenderOscope::setData( int data[] )
 {
-    drawBackground();
-    
-    QPainter p( &m_pixmap );
-
-    p.setRenderHint( QPainter::Antialiasing, true );
-    p.setRenderHint( QPainter::SmoothPixmapTransform, true );
-    
-    QPen pen( QColor( 240, 240, 100 ), 2.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
-    
-    p.setPen( pen );
-    
-    int lastPoint = data[0];
-    for( int i=1; i<140; i++ )
-    {
-        int point = data[i];
-        int x = i+20;
-        p.drawLine( x-1, lastPoint, x, point );
-        lastPoint = point;
-    }
-    QFont font;
-    font.setPointSize(9);
-    p.setFont( font );
-
-    p.setPen( QColor( 200, 200, 255 ) );
-    p.drawText( 10, 2, 160, 20, Qt::AlignHCenter, "Tick: "+m_tick );
-    p.end();
+    m_data = data;
     update();
 }
 
-void RenderOscope::setTick( int tickUs )
+void RenderOscope::paintEvent( QPaintEvent* /* event */ )
 {
-    double tick = 20*tickUs;
+    QPainter p( this );
+
+    p.setRenderHint( QPainter::Antialiasing, true );
     
-    QString unit = " S";
+    p.setBrush( QColor( 10, 15, 50 ) );
+    p.drawRoundRect(0, 0, m_width, m_height );
+
+    QPen pen( QColor( 90, 90, 180 ), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
+    p.setPen( pen );
     
-    double temp = tick/1e6;
+    double cero = m_margin;
+    double end = m_width-m_margin;
+    p.drawLine( cero, m_vCenter, end, m_vCenter );
+    p.drawLine( m_hCenter, cero, m_hCenter, end );
     
-    if( temp < 1 )
+    p.setPen( QColor( 70, 70, 140 ) );
+    
+    for( double i=cero; i<end+1; i+=20*m_scale )
     {
-        unit = " mS";
-        temp = tick/1e3;
-        if( temp < 1 )
+        p.drawLine( i, cero, i, end );
+        p.drawLine( cero, i, end, i );
+    }
+    
+    if( m_data )
+    {
+        QPen pen2( QColor( 240, 240, 100 ), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
+        
+        p.setPen( pen2 );
+        
+        QPointF lastP = QPointF( m_margin, end-(double)m_data[0]*m_scale );
+        for( int i=1; i<140; i++ )
         {
-            unit = " uS";
-            temp = tick;
+            QPointF thisP = QPointF( (double)i*m_scale+m_margin, end-(double)m_data[i]*m_scale );
+            p.drawLine( lastP, thisP );
+            lastP = thisP;
         }
     }
-    m_tick.setNum(temp);
-    m_tick += unit;
-}
-
-void RenderOscope::paintEvent( QPaintEvent * /* event */ )
-{
-    QPainter painter( this );
-
-    painter.drawPixmap( 0, 0, m_pixmap );
     
-    painter.end();
+    QPen pen3( QColor( 200, 200, 200 ), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
+    p.setPen( pen3 );
+    
+    QFont font = p.font();
+    font.setPointSize(7);
+    font.setBold(true);
+    p.setFont( font );
+    
+    p.drawText( cero, 1,     end, m_margin, Qt::AlignCenter, "Max: "+QString::number(m_vMax,'f', 2)+" V" );
+    p.drawText( cero, end+1, end, m_margin, Qt::AlignCenter, "Min: "+QString::number(m_vMin,'f', 2)+" V" );
+    
+    p.end();
 }
 
 #include "moc_renderoscope.cpp"

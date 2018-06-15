@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -31,6 +31,8 @@ RelayBase::RelayBase( QObject* parent, QString type, QString id )
 
     m_numthrows = 0;
     m_numPoles = 0;
+    m_nClose = false;
+    m_closed = false;
 
     m_ePin.resize(4);
     m_pin.resize(2);
@@ -92,7 +94,7 @@ void RelayBase::initialize()
 
     for( int i=0; i<m_numPoles; i++ )
     {
-        eNode* node = m_pin[2+i*3]->getEnode();
+        eNode* node = m_pin[2+i*(1+m_numthrows)]->getEnode();
 
         int epinN = 4+i*m_numthrows*2;
         m_ePin[ epinN ]->setEnode( node );
@@ -101,34 +103,36 @@ void RelayBase::initialize()
             m_ePin[ epinN+2 ]->setEnode( node );
     }
 
-    setSwitch( false );
+    setSwitch( m_nClose );
 }
 
 void RelayBase::setVChanged()
 {
     eInductor::setVChanged();
 
-    bool newState = ( fabs(m_curSource) > m_trigCurrent );
+    bool closed = ( fabs(m_curSource) > m_trigCurrent );
+    
+    if( m_nClose ) closed = !closed;
 
-    if( newState != m_state ) setSwitch( newState );
+    if( closed != m_closed ) setSwitch( closed );
 }
 
-void RelayBase::setSwitch( bool state )
+void RelayBase::setSwitch( bool closed )
 {
-    m_state = state;
+    m_closed = closed;
 
     for( int i=0; i<m_numPoles; i++ )
     {
         int switchN = i*m_numthrows;
 
-        if( state ) m_switches[ switchN ]->setRes( 1e-3 );
+        if( closed ) m_switches[ switchN ]->setRes( 1e-3 );
         else        m_switches[ switchN ]->setRes( 1e6 );
 
         if( m_numthrows == 2 )
         {
             switchN++;
 
-            if( !state ) m_switches[ switchN ]->setRes( 1e-3 );
+            if( !closed ) m_switches[ switchN ]->setRes( 1e-3 );
             else         m_switches[ switchN ]->setRes( 1e6 );
         }
 
@@ -148,9 +152,11 @@ void RelayBase::remove()
 
 void RelayBase::SetupSwitches( int poles, int throws )
 {
+    m_area = QRectF( -13, -8-16*poles-4, 26, 8+16*poles+8+4 );
+
     for( uint i=0; i<m_switches.size(); i++ )
         delete m_switches[i];
-    //qDebug() << "RelayBase::SetupSwitches ePins:"<<poles<<throws<<m_numPoles<<m_numthrows;
+    //qDebug() << "RelayBase::SetupSwitches Pins:"<<poles<<throws<<m_numPoles<<m_numthrows;
     for( int i=0; i<m_numPoles; i++ )
     {
         int epinN = 4+i*m_numthrows*2;
@@ -164,7 +170,6 @@ void RelayBase::SetupSwitches( int poles, int throws )
     {
         Pin* pin = m_pin[i];
         if( pin->isConnected() ) pin->connector()->remove();
-        Circuit::self()->removeItem( pin );
         pin->reset();
         delete pin;
     }
@@ -223,6 +228,9 @@ void RelayBase::SetupSwitches( int poles, int throws )
         }
         cont++;
     }
+
+    foreach( Pin* pin, m_pin )
+        pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false ); // draw Pins on top
 }
 
 double RelayBase::rCoil() const
@@ -260,12 +268,26 @@ void RelayBase::setDt( bool dt )
         SetupSwitches( m_numPoles, throws );
 }
 
+bool RelayBase::nClose() const
+{
+    return m_nClose;
+}
+
+void RelayBase::setNClose( bool nc )
+{
+    m_nClose = nc;
+    setSwitch( m_nClose );
+}
+
 
 void RelayBase::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Component::paint( p, option, widget );
 
-    QPen pen = p->pen();
+    p->setBrush(Qt::white);
+    p->drawRect( m_area );
+
+    QPen pen = p->pen();                                       // Draw Coil
     pen.setWidth(2.8);
     p->setPen(pen);
 
@@ -291,7 +313,7 @@ void RelayBase::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWid
     {
         int offset = 16*i;
 
-        if( m_switches[ i*m_numthrows ]->res() < 1 )            // switch is closed
+        if( m_closed )                                          // switch is closed
             p->drawLine(-10, -16-offset, 10, -18-offset );
         else                                                    // Switch is oppened
             p->drawLine(-10.5, -16-offset, 8, -24-offset );

@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -153,10 +153,10 @@ void Component::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu 
 {
     m_eventpoint = mapToScene( togrid(event->pos()) );
 
-    QAction* copyAction = menu->addAction(QIcon(":/copy.png"),"Copy");
+    QAction* copyAction = menu->addAction(QIcon(":/copy.png"),"Copy\tCtrl+C");
     connect( copyAction, SIGNAL( triggered()), this, SLOT(slotCopy()) );
 
-    QAction* removeAction = menu->addAction( QIcon( ":/remove.png"),"Remove" );
+    QAction* removeAction = menu->addAction( QIcon( ":/remove.png"),"Remove\tDel" );
     connect( removeAction, SIGNAL( triggered()), this, SLOT(slotRemove()) );
     
     QAction* propertiesAction = menu->addAction( QIcon( ":/properties.png"),"Properties" );
@@ -198,11 +198,6 @@ void Component::remove()
 {
     for( uint i=0; i<m_pin.size(); i++ )               // Remove connectors attached
         if( m_pin[i]->isConnected() ) m_pin[i]->connector()->remove();
-        
-    QPropertyEditorWidget::self()->removeObject( this );
-    Circuit::self()->compList()->removeOne( this );
-    Circuit::self()->removeItem( this );
-    this->deleteLater();
 }
 
 void Component::slotProperties()
@@ -263,7 +258,6 @@ void Component::updateLabel( Label* label, QString txt )
         
         setUnit( unit );
         setValue( value.toDouble() );
-        
     }
 }
 
@@ -346,14 +340,6 @@ void Component::setUnit( QString un )
     m_mult     = " ";
     m_valLabel->setPlainText( QString::number(m_value)+m_mult+m_unit );
 }
-
-/*void Component::setIdLabel()
-{
-    m_idLabel->setPlainText( m_id );
-    
-    if( m_showId ) m_idLabel->setVisible( true );
-    else           m_idLabel->setVisible( false );
-}*/
 
 bool Component::showId()               { return m_showId; }
 void Component::setShowId( bool show ) 
@@ -513,7 +499,7 @@ void Label::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 }
 
 void Label::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
-{
+{qDebug() << "Label::contextMenuEvent";
     event->accept();
     QMenu menu;
 

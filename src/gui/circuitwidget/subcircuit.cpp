@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -34,6 +34,7 @@
 #include "e-gate_or.h"
 #include "e-gate_xor.h"
 #include "e-gate_xor.h"
+#include "e-flipflopd.h"
 #include "e-flipflopjk.h"
 #include "e-demux.h"
 #include "e-mux.h"
@@ -42,6 +43,7 @@
 #include "e-mosfet.h"
 #include "e-logic_device.h"
 #include "e-source.h"
+#include "e-volt_reg.h"
 #include "ledsmd.h"
 #include "simuapi_apppath.h"
 
@@ -73,7 +75,7 @@ SubCircuit::SubCircuit( QObject* parent, QString type, QString id )
 {
     m_numItems = 0;
 
-    m_dataFile = "subcircuits.xml";
+    //m_dataFile = "subcircuits.xml";
 
     initPackage();
 }
@@ -85,9 +87,11 @@ void SubCircuit::initPackage()
 {
     QString compName = m_id.split("-").first(); // for example: "atmega328-1" to: "atmega328"
 
-    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
-    qDebug() << "SubCircuit::initPackage datafile: " << compName << " <= " << dfPath;
-    QFile file(dfPath);
+    m_dataFile = ComponentSelector::self()->getXmlFile( compName );
+
+    //QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
+    //qDebug() << "SubCircuit::initPackage datafile: " << compName << " <= " << dfPath;
+    QFile file( m_dataFile );
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
           MessageBoxNB( "SubCircuit::initPackage",
@@ -119,11 +123,14 @@ void SubCircuit::initPackage()
             QDomElement element = node.toElement();
             if( element.attribute("name")==compName )
             {
-                m_dataFile = element.attribute( "package" );
+                QDir dataDir(  m_dataFile );
+                dataDir.cdUp();             // Indeed it doesn't cd, just take out file name
+                m_dataFile = dataDir.filePath( element.attribute( "package" ) );
+
                 Package::initPackage();
                 if( m_error != 0 ) return;
 
-                m_dataFile = element.attribute( "subcircuit" );
+                m_dataFile = dataDir.filePath( element.attribute( "subcircuit" ) );
                 break;
             }
             node = node.nextSibling();
@@ -136,9 +143,9 @@ void SubCircuit::initPackage()
 
 void SubCircuit::initSubcircuit()
 {
-    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
-    qDebug() << "SubCircuit::initSubcircuit datafile: " << dfPath;
-    QFile file(dfPath);
+    //QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
+    //qDebug() << "SubCircuit::initSubcircuit datafile: " << dfPath;
+    QFile file( m_dataFile );
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
           MessageBoxNB( "SubCircuit::initSubcircuit",
@@ -250,6 +257,12 @@ void SubCircuit::initSubcircuit()
                 efulladder->createPins();
                 ecomponent = efulladder;
             }
+            else if( type == "eFlipFlopD" )
+            {
+                eFlipFlopD* eFFD = new eFlipFlopD( id.toStdString() );
+                eFFD->createPins();
+                ecomponent = eFFD;
+            }
             else if( type == "eFlipFlopJK" )
             {
                 eFlipFlopJK* eFFJK = new eFlipFlopJK( id.toStdString() );
@@ -340,6 +353,15 @@ void SubCircuit::initSubcircuit()
                     if( element.attribute( "pChannel" ) == "true" ) emosfet->setPchannel( true );
                 }
                 ecomponent = emosfet;
+            }
+            else if( type == "eVoltReg" )
+            {
+                double volts = 1.2;
+                if( element.hasAttribute("Volts") ) volts = element.attribute( "Volts" ).toDouble();
+                eVoltReg* evoltreg = new eVoltReg( id.toStdString() );
+                evoltreg->setNumEpins(3);
+                evoltreg->setVRef( volts );
+                ecomponent = evoltreg;
             }
             else if( type == "LedSmd" )
             {

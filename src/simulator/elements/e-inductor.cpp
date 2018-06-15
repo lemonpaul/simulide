@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -45,15 +45,15 @@ void eInductor::initialize()
     
     eResistor::setRes( m_ind/m_tStep );
     eResistor::initialize();
+
+    m_curSource = 0;
 }
 
 void eInductor::setVChanged()
 {
     double volt = m_ePin[0]->getVolt() - m_ePin[1]->getVolt();
     
-    //if( volt == 0 ) return;
-    //if( abs(m_volt-volt) < 1e-9 ) return;
-    //m_volt = volt;
+    if( fabs(volt) < 1e-9 ) return;
 
     m_curSource += volt/m_resist;
 

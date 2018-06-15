@@ -24,6 +24,7 @@
         <file alias="find.png">../src/icons/mainwindow/find.png</file>
         
         <file alias="compile.png">../src/icons/mainwindow/verify.png</file>
+        <file alias="setroot.png">../src/icons/mainwindow/verify.png</file>
         
         <file alias="step.png">../src/icons/mainwindow/step.png</file>
         <file alias="stepover.png">../src/icons/mainwindow/stepover.png</file>
@@ -65,6 +66,7 @@
         <file alias="andgate.png">../src/icons/components/andgate.png</file>
         <file alias="orgate.png">../src/icons/components/orgate.png</file>
         <file alias="xorgate.png">../src/icons/components/xorgate.png</file>
+        <file alias="flipflopd.png">../src/icons/components/flipflopd.png</file>
         <file alias="flipflopjk.png">../src/icons/components/flipflopjk.png</file>
         <file alias="potentiometer.png">../src/icons/components/potentiometer.png</file>
         <file alias="push.png">../src/icons/components/push.png</file>
@@ -82,14 +84,20 @@
         <file alias="amperimeter.png">../src/icons/components/amperimeter.png</file>
         <file alias="servo.png">../src/icons/components/servo.png</file>
         <file alias="relay-spst.png">../src/icons/components/relay-spst.png</file>
-<<<<<<< HEAD
-=======
         <file alias="voltreg.png">../src/icons/components/voltreg.png</file>
         <file alias="bjt.png">../src/icons/components/bjt.png</file>
         <file alias="wavegen.png">../src/icons/components/wavegen.png</file>
         <file alias="oscope.png">../src/icons/components/oscope.png</file>
         <file alias="toggleswitch.png">../src/icons/components/toggleswitch.png</file>
->>>>>>> trunk
+        <file alias="audio_out.png">../src/icons/components/audio_out.png</file>
+        <file alias="keypad.png">../src/icons/components/keypad.png</file>
+        
+        <file alias="arduinoUnoIcon.png">../src/icons/components/arduinoUnoIcon.png</file>
+        <file alias="arduinoUno.png">../src/icons/components/arduinoUno.png</file>
+        <file alias="arduinoNano.png">../src/icons/components/arduinoNano.png</file>
+        <file alias="duemilanove.png">../src/icons/components/duemilanove.png</file>
+        <file alias="leonardo.png">../src/icons/components/leonardo.png</file>
+        
         <file alias="blanc.png">../src/icons/components/blanc.png</file>
         <file alias="font2.png">../src/icons/font/font2.png</file>
         

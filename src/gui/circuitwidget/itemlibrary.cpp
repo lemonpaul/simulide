@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -23,8 +23,12 @@
 //BEGIN Item includes
 #include "amperimeter.h"
 #include "adc.h"
+#include "arduino.h"
+#include "audio_out.h"
+#include "avrcomponent.h"
 #include "bcdtodec.h"
 #include "bincounter.h"
+#include "bjt.h"
 #include "buffer.h"
 #include "capacitor.h"
 #include "clock.h"
@@ -32,6 +36,7 @@
 #include "dectobcd.h"
 #include "demux.h"
 #include "diode.h"
+#include "flipflopd.h"
 #include "flipflopjk.h"
 #include "fulladder.h"
 #include "gate_and.h"
@@ -43,6 +48,7 @@
 #include "ic74.h"
 #include "inbus.h"
 #include "inductor.h"
+#include "keypad.h"
 #include "ks0108.h"
 #include "latchd.h"
 #include "led.h"
@@ -51,7 +57,9 @@
 #include "mosfet.h"
 #include "mux.h"
 #include "op_amp.h"
+#include "oscope.h"
 #include "outbus.h"
+#include "piccomponent.h"
 #include "pcd8544.h"
 #include "probe.h"
 #include "potentiometer.h"
@@ -70,7 +78,9 @@
 #include "textcomponent.h"
 #include "toggleswitch.h"
 #include "voltimeter.h"
+#include "volt_reg.h"
 #include "voltsource.h"
+#include "wavegen.h"
 //END Item includes
 
 #include "simuapi_apppath.h"
@@ -93,9 +103,11 @@ void ItemLibrary::loadItems()
     addItem( Probe::libraryItem() );
     addItem( Voltimeter::libraryItem() );
     addItem( Amperimeter::libraryItem() );
+    addItem( Oscope::libraryItem() );
     // Sources
     addItem( LogicInput::libraryItem() );
     addItem( Clock::libraryItem() );
+    addItem( WaveGen::libraryItem() );
     addItem( VoltSource::libraryItem() );
     addItem( Rail::libraryItem() );
     addItem( Ground::libraryItem() );
@@ -110,19 +122,27 @@ void ItemLibrary::loadItems()
     addItem( ResistorDip::libraryItem() );
     addItem( Capacitor::libraryItem() );
     addItem( Inductor::libraryItem() );
-    addItem( Diode::libraryItem() );
     // Active
+    addItem( Diode::libraryItem() );
+    addItem( VoltReg::libraryItem() );
     addItem( OpAmp::libraryItem() );
     addItem( Mosfet::libraryItem() );
+    addItem( BJT::libraryItem() );
     // Outputs
     addItem( Led::libraryItem() );
     addItem( LedBar::libraryItem() );
     addItem( SevenSegment::libraryItem() );
+    addItem( KeyPad::libraryItem() );
     addItem( Hd44780::libraryItem() );
     addItem( Pcd8544::libraryItem() );
     addItem( Ks0108::libraryItem() );
     addItem( Stepper::libraryItem() );
     addItem( Servo::libraryItem() );
+    addItem( AudioOut::libraryItem() );
+    // Micro
+    addItem( PICComponent::libraryItem() );
+    addItem( AVRComponent::libraryItem() );
+    addItem( Arduino::libraryItem() );
     // Logic
     //addItem( I2C::libraryItem() );
     addItem( SevenSegmentBCD::libraryItem() );
@@ -130,6 +150,7 @@ void ItemLibrary::loadItems()
     addItem( AndGate::libraryItem() );
     addItem( OrGate::libraryItem() );
     addItem( XorGate::libraryItem() );
+    addItem( FlipFlopD::libraryItem() );
     addItem( FlipFlopJK::libraryItem() );
     addItem( BinCounter::libraryItem() );
     addItem( FullAdder::libraryItem() );

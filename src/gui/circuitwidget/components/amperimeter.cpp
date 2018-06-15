@@ -1,10 +1,10 @@
 /***************************************************************************
- *   Copyright (C) 2012 by santiago González                               *
+ *   Copyright (C) 2017 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -19,7 +19,6 @@
 
 #include "amperimeter.h"
 #include "simulator.h"
-#include "connector.h"
 
 
 Component* Amperimeter::construct( QObject* parent, QString type, QString id )
@@ -39,17 +38,22 @@ Amperimeter::Amperimeter( QObject* parent, QString type, QString id )
     : Meter( parent, type, id )
 {
     m_unit = "A";
+    m_dispValue = 0;
     setRes( 1e-6 );
-    updateStep();
+    Meter::updateStep();
 }
 Amperimeter::~Amperimeter(){}
 
 void Amperimeter::updateStep()
 {
-    setUnit("A");
-    m_dispValue = current();
-
-    Meter::updateStep();
+    double curr = current();
+    
+    if( curr != m_dispValue )
+    {
+        setUnit("A");
+        m_dispValue = curr;
+        Meter::updateStep();
+    }
 }
 
 #include "moc_amperimeter.cpp"

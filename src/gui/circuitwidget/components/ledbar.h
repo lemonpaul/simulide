@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -27,6 +27,7 @@
 class MAINMODULE_EXPORT LedBar : public Component
 {
     Q_OBJECT
+    Q_PROPERTY( LedBase::LedColor Color    READ color      WRITE setColor      DESIGNABLE true USER true )
     Q_PROPERTY( double threshold  READ threshold  WRITE setThreshold  DESIGNABLE true USER true )
     Q_PROPERTY( double MaxCurrent READ maxCurrent WRITE setMaxCurrent DESIGNABLE true USER true )
     Q_PROPERTY( double Resistance READ res        WRITE setRes        DESIGNABLE true USER true )
@@ -40,6 +41,9 @@ class MAINMODULE_EXPORT LedBar : public Component
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
+        
+        void setColor( LedBase::LedColor color );
+        LedBase::LedColor color();
         
         double threshold();
         void  setThreshold( double threshold );

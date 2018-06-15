@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -19,6 +19,7 @@
 
 #include "switch.h"
 #include "itemlibrary.h"
+#include "pin.h"
 
 
 Component* Switch::construct( QObject* parent, QString type, QString id )
@@ -37,6 +38,22 @@ LibraryItem* Switch::libraryItem()
 Switch::Switch( QObject* parent, QString type, QString id )
     : SwitchBase( parent, type, id )
 {
+    m_area =  QRectF( -11, -9, 22, 11 );
+    
+    m_pin.resize(2);
+
+    QString pinid = m_id;
+    pinid.append(QString("-lnod"));
+    QPoint pinpos = QPoint(-8-8,0);
+    m_pin[0] = new Pin( 180, pinpos, pinid, 0, this);
+    m_ePin[0] = m_pin[0];
+
+    pinid = m_id;
+    pinid.append(QString("-rnod"));
+    pinpos = QPoint(8+8,0);
+    m_pin[1] = new Pin( 0, pinpos, pinid, 1, this);
+    m_ePin[1] = m_pin[1];
+    
     connect( m_button, SIGNAL( clicked() ),
              this,     SLOT  ( onbuttonclicked() ));
 }
@@ -44,16 +61,7 @@ Switch::~Switch(){}
 
 void Switch::onbuttonclicked()
 {
-    if( m_resist == cero_doub )                      // switch is Closed
-    {
-        m_resist = 1e38;                              // Open Switch
-        //stampAdmit( 0 );
-    }
-    else                                            // Switch is Oppened
-    {
-        m_resist = cero_doub;                            // Close Switch
-        //stampAdmit( high_imp );
-    }
+    m_closed = !m_closed;
     m_changed = true;
 }
 
@@ -65,10 +73,8 @@ void Switch::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
     pen.setWidth(3);
     p->setPen(pen);
 
-    if( m_resist == cero_doub )             // switch is closed
-        p->drawLine(-10, 0, 10, -2 );
-    else                                    // Switch is oppened
-        p->drawLine(-10.5, 0, 8, -8 );
+    if( m_closed ) p->drawLine(-10, 0, 10, -2 );
+    else           p->drawLine(-10.5, 0, 8, -8 );
 }
 
 #include "moc_switch.cpp"

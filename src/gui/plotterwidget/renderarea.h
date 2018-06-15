@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -17,52 +17,54 @@
  *                                                                         *
  ***************************************************************************/
 
- #ifndef RENDERAREA_H
- #define RENDERAREA_H
+#ifndef RENDERAREA_H
+#define RENDERAREA_H
 
- #include <QBrush>
- #include <QPen>
- #include <QPixmap>
- #include <QtWidgets>
+#include <QBrush>
+#include <QPen>
+#include <QPixmap>
+#include <QtWidgets>
 
- class RenderArea : public QWidget
- {
-     Q_OBJECT
+class RenderArea : public QWidget
+{
+    Q_OBJECT
 
-     public:
-         RenderArea( int width, int height, QWidget *parent = 0 );
+    public:
+        RenderArea( int width, int height, QWidget *parent = 0 );
 
-         QSize minimumSizeHint() const;
-         QSize sizeHint() const;
+        QSize minimumSizeHint() const;
+        QSize sizeHint() const;
 
-         void setData( const int channel, int data );
-         void printData();
-         void drawVmark();
+        void setData( const int channel, int data );
+        void printData();
+        void drawVmark();
          
-          void setTick( int tickUs );
+        void setTick( int tickUs );
+        
+        void setZero( int zero );
 
-     public slots:
-         void setPen( const int channel, const QPen &pen );
-         void setBrush( const QBrush &brush );
-         void setAntialiased( const bool antialiased );
+    public slots:
+        void setPen( const int channel, const QPen &pen );
+        void setBrush( const QBrush &brush );
+        void setAntialiased( const bool antialiased );
 
-     protected:
-         void paintEvent( QPaintEvent *event );
+    protected:
+        void paintEvent( QPaintEvent *event );
 
-     private:
-         //void drawBackground();
-         QPen m_pen[4];
-         QBrush brush;
-         bool antialiased;
-         QPixmap pixmap;
+    private:
+        QPen m_pen[4];
+        QBrush brush;
+        bool antialiased;
+        QPixmap pixmap;
 
-         int m_data[4];
-         int m_dataP[4];
-         int m_width;
-         int m_height;
-         int m_sec;
+        int m_data[4];
+        int m_dataP[4];
+        int m_width;
+        int m_height;
+        int m_sec;
+        int m_zero;
          
-         QString m_tick;
+        QString m_tick;
  };
 
  #endif

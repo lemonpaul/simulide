@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -20,10 +20,10 @@
 #ifndef SWITCH_BASE_H
 #define SWITCH_BASE_H
 
-#include "e-resistor.h"
-#include "pin.h"
+#include "e-element.h"
+#include "component.h"
 
-class MAINMODULE_EXPORT SwitchBase : public Component, public eResistor
+class MAINMODULE_EXPORT SwitchBase : public Component, public eElement
 {
     Q_OBJECT
 
@@ -33,14 +33,17 @@ class MAINMODULE_EXPORT SwitchBase : public Component, public eResistor
         ~SwitchBase();
 
         void updateStep();
+        
+        void setButtonText( QString text );
 
-        //void setRes( double resist );
+        virtual void initialize();
 
     public slots:
         void remove();
 
     protected:
         bool m_changed;
+        bool m_closed;
         
         QPushButton          *m_button;
         QGraphicsProxyWidget *m_proxy;

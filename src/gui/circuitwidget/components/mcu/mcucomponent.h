@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -47,6 +47,7 @@ class MAINMODULE_EXPORT McuComponent : public Package
 
         int  freq();
         virtual void setFreq( int freq );
+        virtual void initPackage();
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
   
@@ -70,7 +71,6 @@ class MAINMODULE_EXPORT McuComponent : public Package
 
         virtual void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )=0;
         virtual void attachPins()=0;
-        virtual void initPackage();
 
         BaseProcessor* m_processor;
 

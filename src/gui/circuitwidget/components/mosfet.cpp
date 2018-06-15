@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -20,7 +20,8 @@
 #include "mosfet.h"
 #include "connector.h"
 #include "itemlibrary.h"
-
+#include "e-source.h"
+#include "pin.h"
 
 Component* Mosfet::construct( QObject* parent, QString type, QString id )
 { return new Mosfet( parent, type, id ); }
@@ -79,9 +80,8 @@ void Mosfet::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
 {
     Component::paint( p, option, widget );
     
-    if( m_resist < 1e6 )  p->setBrush( Qt::yellow );
-    else
-    p->setBrush( Qt::white );
+    if( m_gateV > 0 )  p->setBrush( Qt::yellow );
+    else               p->setBrush( Qt::white );
 
     p->drawEllipse( m_area );
     

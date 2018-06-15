@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -31,9 +31,12 @@
 class MAINMODULE_EXPORT Circuit : public QGraphicsScene
 {
     Q_OBJECT
+    
+    Q_PROPERTY( int Speed     READ circSpeed WRITE setCircSpeed DESIGNABLE true USER true )
     Q_PROPERTY( int ReactStep READ reactStep WRITE setReactStep DESIGNABLE true USER true )
     Q_PROPERTY( int NoLinStep READ noLinStep WRITE setNoLinStep DESIGNABLE true USER true )
-    Q_PROPERTY( int Speed     READ circSpeed WRITE setCircSpeed DESIGNABLE true USER true )
+    Q_PROPERTY( int NoLinAcc  READ nlAcc     WRITE setNlAcc     DESIGNABLE true USER true )
+    Q_PROPERTY( bool Draw_Grid  READ drawGrid  WRITE setDrawGrid     DESIGNABLE true USER true )
 
     public:
         Circuit(qreal x, qreal y, qreal width, qreal height, QGraphicsView*  parent);
@@ -50,6 +53,14 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         int  circSpeed();
         void setCircSpeed( int rate );
         
+        int  nlAcc();
+        void setNlAcc( int ac );
+        
+        bool drawGrid();
+        void setDrawGrid( bool draw );
+        
+        void removeItems();
+        void removeComp( Component* comp );
         void remove();
         void saveState();
 
@@ -68,19 +79,14 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         void closeconnector( Pin* endpin );
         Connector* getNewConnector() { return new_connector; }
 
-        QList<Component*>* compList() { return &m_compList; }
-        QList<Component*>* conList()  { return &m_conList; }
+        QList<Component*>* compList();
+        QList<Component*>* conList();
 
-        /** a conector is been created*/
-        void constarted( bool started) { m_con_started = started; }
-        bool is_constarted() { return m_con_started ; }
+        void constarted( bool started);
+        bool is_constarted();
 
-        void removeItems();
-
-        bool  pasting() { return m_pasting; }
-        QPointF deltaMove(){ return m_deltaMove; }
-
-        QGraphicsView* widget(){ return m_widget; }
+        bool  pasting();
+        QPointF deltaMove();
 
         const QString getFileName() const { return m_fileName; }
 
@@ -108,18 +114,19 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         QString getCompId( QString name );
 
  static Circuit*  m_pSelf;
-
+ 
         QDomDocument m_domDoc;
         QDomDocument m_copyDoc;
         QString      m_fileName;
 
         QRect          m_scenerect;
-        QGraphicsView* m_widget;
+        QGraphicsView* m_graphicView;
         Connector*     new_connector;
 
         int  m_seqNumber;
         bool m_con_started;
         bool m_pasting;
+        bool m_drawGrid;
 
         QPointF m_eventpoint;
         QPointF m_deltaMove;
@@ -134,4 +141,3 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
 };
 
 #endif
-

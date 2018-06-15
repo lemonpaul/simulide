@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -26,24 +26,43 @@
 #include "oscopewidget.h"
 #include "plotterwidget.h"
 #include "terminalwidget.h"
+#include "serialportwidget.h"
 
 class MAINMODULE_EXPORT CircuitWidget : public QWidget
 {
     Q_OBJECT
 
     public:
-        CircuitWidget( QWidget *parent, QToolBar* toolbar );
+        CircuitWidget( QWidget *parent );
         ~CircuitWidget();
 
  static CircuitWidget* self() { return m_pSelf; }
+ 
+        OscopeWidget* oscope();
 
         void clear();
+        
+        void createActions();
+        
+        void createToolBars();
+        
+        void setRate( int rate );
 
-        void setSerialPortWidget( QWidget* serialPortWidget );
+        //void setSerialPortWidget( QWidget* serialPortWidget );
 
         void showSerialPortWidget( bool showIt );
         
         void writeSerialPortWidget( const QByteArray &data );
+        
+    public slots:
+        void newCircuit();
+        void openCirc();
+        void saveCirc();
+        bool saveCircAs();
+        void powerCircOn();
+        void powerCircOff();
+        void powerCirc();
+        void openInfo();
 
     signals:
         void dataAvailable( const QByteArray &data );
@@ -58,7 +77,21 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         TerminalWidget m_terminal;
         OscopeWidget   m_oscope;
         PlotterWidget  m_plotter;
-        QWidget*       m_serialPortWidget;
+        SerialPortWidget  m_serial;
+        //QWidget*       m_serialPortWidget;
+        QToolBar       m_circToolBar;
+        QLabel*        m_rateLabel;
+        
+        QAction* newCircAct;
+        QAction* openCircAct;
+        QAction* saveCircAct;
+        QAction* saveCircAsAct;
+        QAction* powerCircAct;
+        QAction* infoAct;
+        
+        QString     m_curCirc;
+        QString     m_lastCircDir;
+        
 };
 
 #endif

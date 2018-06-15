@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -29,6 +29,7 @@ class LibraryItem;
 class MAINMODULE_EXPORT SevenSegment : public Component, public eElement
 {
     Q_OBJECT
+    Q_PROPERTY( LedBase::LedColor Color    READ color      WRITE setColor      DESIGNABLE true USER true )
     Q_PROPERTY( int  NumDisplays   READ numDisplays     WRITE setNumDisplays   DESIGNABLE true USER true )
     Q_PROPERTY( bool CommonCathode READ isCommonCathode WRITE setCommonCathode DESIGNABLE true USER true )
     Q_PROPERTY( double Resistance  READ resistance      WRITE setResistance    DESIGNABLE true USER true )
@@ -41,6 +42,10 @@ class MAINMODULE_EXPORT SevenSegment : public Component, public eElement
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
+        
+        void setColor( LedBase::LedColor color );
+
+        LedBase::LedColor color();
 
         int numDisplays();
         void setNumDisplays( int dispNumber );

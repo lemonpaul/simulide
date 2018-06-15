@@ -1,10 +1,10 @@
 /***************************************************************************
- *   Copyright (C) 2012 by santiago González                               *
+ *   Copyright (C) 2016 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -20,12 +20,11 @@
 #ifndef PUSH_H
 #define PUSH_H
 
-#include "switch_base.h"
-#include "pin.h"
+#include "push_base.h"
 
 class LibraryItem;
 
-class MAINMODULE_EXPORT Push : public SwitchBase
+class MAINMODULE_EXPORT Push : public PushBase
 {
     Q_OBJECT
     
@@ -38,10 +37,6 @@ class MAINMODULE_EXPORT Push : public SwitchBase
         static LibraryItem *libraryItem();
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-
-    public slots:
-        void onbuttonPressed();
-        void onbuttonReleased();
 };
 
 #endif

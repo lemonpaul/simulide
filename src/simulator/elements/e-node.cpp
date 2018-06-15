@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -138,7 +138,12 @@ void eNode::stampMatrix()
         double totalCurr  = 0;
         foreach( double current, m_currList ) totalCurr  += current;
 
-        if( m_single ) setVolt( totalCurr/m_totalAdmit ); // single element in matrix
+        if( m_single )                   // single element in matrix
+        {
+            double volt = 0;
+            if( m_totalAdmit  > 0 )volt = totalCurr/m_totalAdmit;
+            setVolt( volt );
+        }
         else CircMatrix::self()->stampCoef( m_nodeNum, totalCurr );
         //m_currList.clear();
         m_currChanged  = false;

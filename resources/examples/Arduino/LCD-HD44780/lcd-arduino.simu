@@ -1,0 +1,27 @@
+<circuit type="simulide_0.1">
+ 
+Hd44780-2: 
+<item itemtype="Hd44780" labelx="62" id="Hd44780" rotation="0" hflip="1" Show_id="true" labely="-89" valLabRot="0" vflip="1" Cols="16" y="-316" valLabely="0" valLabelx="0" objectName="Hd44780-2" x="-372" labelrot="0" Rows="2"/>
+ 
+Arduino Uno-1: 
+<item itemtype="Arduino" labelx="52" id="Arduino Uno" rotation="0" hflip="1" Show_id="true" labely="-22" valLabRot="0" vflip="1" y="-276" valLabely="0" valLabelx="0" Mhz="16" program="Autoscroll.ino.hex" objectName="Arduino Uno-1" x="-268" labelrot="0"/>
+ 
+Connector-3: 
+<item endpinid="Arduino Uno-1-PD2" x="-276" vflip="1" id="Connector-3" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-4" Show_id="false" startpinid="Hd44780-2-dataPin7" pointList="-276,-308,-276,-244,-260,-244" y="-308" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-3" valLabely="0" rotation="0"/>
+ 
+Connector-5: 
+<item endpinid="Arduino Uno-1-PD3" x="-284" vflip="1" id="Connector-5" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-6" Show_id="false" startpinid="Hd44780-2-dataPin6" pointList="-284,-308,-284,-236,-260,-236" y="-308" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-5" valLabely="0" rotation="0"/>
+ 
+Connector-7: 
+<item endpinid="Arduino Uno-1-PD4" x="-292" vflip="1" id="Connector-7" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-8" Show_id="false" startpinid="Hd44780-2-dataPin5" pointList="-292,-308,-292,-228,-260,-228" y="-308" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-7" valLabely="0" rotation="0"/>
+ 
+Connector-9: 
+<item endpinid="Arduino Uno-1-PD5" x="-300" vflip="1" id="Connector-9" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-10" Show_id="false" startpinid="Hd44780-2-dataPin4" pointList="-300,-308,-300,-220,-260,-220" y="-308" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-9" valLabely="0" rotation="0"/>
+ 
+Connector-11: 
+<item endpinid="Arduino Uno-1-PB3" x="-340" vflip="1" id="Connector-11" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-12" Show_id="false" startpinid="Hd44780-2-PinEn" pointList="-340,-308,-340,-164,-260,-164" y="-308" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-11" valLabely="0" rotation="0"/>
+ 
+Connector-13: 
+<item endpinid="Arduino Uno-1-PB4" x="-356" vflip="1" id="Connector-13" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-14" Show_id="false" startpinid="Hd44780-2-PinRS" pointList="-356,-308,-356,-156,-260,-156" y="-308" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-13" valLabely="0" rotation="0"/>
+ 
+</circuit>

@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -30,15 +30,16 @@ Package::Package( QObject* parent, QString type, QString id )
     : Component( parent, type, id ), eElement( id.toStdString() )
 {
     m_color = QColor( 50, 50, 70 );
+    m_numpins = 0;
 }
 Package::~Package() {}
 
 void Package::initPackage()
 {
 
-    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
-    qDebug() << "Package::initPackage datafile: " << dfPath;
-    QFile file(dfPath);
+    //QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
+    //qDebug() << "Package::initPackage datafile: " << dfPath;
+    QFile file(m_dataFile);
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
         MessageBoxNB( "Package::initPackage",

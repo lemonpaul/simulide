@@ -1,0 +1,57 @@
+<circuit type="simulide_0.1">
+ 
+Ks0108-3: 
+<item itemtype="Ks0108" labelx="-25" CS_Active_Low="true" id="Ks0108" rotation="0" hflip="1" Show_id="true" labely="-73" valLabRot="0" vflip="1" y="-140" valLabely="0" valLabelx="0" objectName="Ks0108-3" x="-100" labelrot="0"/>
+ 
+pic18f4550-2: 
+<item itemtype="PIC" labelx="-14" id="pic18f4550" rotation="0" hflip="1" Show_id="true" labely="190" valLabRot="0" vflip="1" y="-28" valLabely="0" valLabelx="0" Mhz="20" program="KS0108_18f4550.hex" objectName="pic18f4550-2" x="-204" labelrot="0"/>
+ 
+Fixed Volt.-1: 
+<item x="-12" vflip="1" id="Change Image" hflip="1" labelrot="-180" valLabRot="-180" valLabelx="11" Show_Volt="true" Voltage="5" Show_id="true" Unit=" V" y="36" labely="30" itemtype="Fixed Voltage" labelx="37" objectName="Fixed Volt.-1" valLabely="-11" rotation="-180"/>
+ 
+Connector-4: 
+<item endpinid="Ks0108-3-dataPin0" x="-212" vflip="1" id="Connector-4" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-5" Show_id="false" startpinid="pic18f4550-2-RD0" pointList="-212,124,-260,124,-260,156,-132,156,-132,-84" y="124" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-4" valLabely="0" rotation="0"/>
+ 
+Connector-6: 
+<item endpinid="Ks0108-3-dataPin1" x="-212" vflip="1" id="Connector-6" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-7" Show_id="false" startpinid="pic18f4550-2-RD1" pointList="-212,132,-252,132,-252,148,-124,148,-124,-84" y="132" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-6" valLabely="0" rotation="0"/>
+ 
+Connector-8: 
+<item endpinid="Ks0108-3-dataPin2" x="-148" vflip="1" id="Connector-8" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-9" Show_id="false" startpinid="pic18f4550-2-RD2" pointList="-148,132,-116,132,-116,-84" y="132" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-8" valLabely="0" rotation="0"/>
+ 
+Connector-10: 
+<item endpinid="Ks0108-3-dataPin3" x="-148" vflip="1" id="Connector-10" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-11" Show_id="false" startpinid="pic18f4550-2-RD3" pointList="-148,124,-108,124,-108,-84" y="124" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-10" valLabely="0" rotation="0"/>
+ 
+Connector-12: 
+<item endpinid="Ks0108-3-dataPin4" x="-148" vflip="1" id="Connector-12" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-13" Show_id="false" startpinid="pic18f4550-2-RD4" pointList="-148,84,-100,84,-100,-84" y="84" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-12" valLabely="0" rotation="0"/>
+ 
+Connector-14: 
+<item endpinid="Ks0108-3-dataPin5" x="-148" vflip="1" id="Connector-14" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-15" Show_id="false" startpinid="pic18f4550-2-RD5" pointList="-148,76,-92,76,-92,-84" y="76" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-14" valLabely="0" rotation="0"/>
+ 
+Connector-16: 
+<item endpinid="Ks0108-3-dataPin6" x="-148" vflip="1" id="Connector-16" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-17" Show_id="false" startpinid="pic18f4550-2-RD6" pointList="-148,68,-84,68,-84,-84" y="68" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-16" valLabely="0" rotation="0"/>
+ 
+Connector-18: 
+<item endpinid="Ks0108-3-dataPin7" x="-148" vflip="1" id="Connector-18" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-19" Show_id="false" startpinid="pic18f4550-2-RD7" pointList="-148,60,-76,60,-76,-84" y="60" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-18" valLabely="0" rotation="0"/>
+ 
+Connector-20: 
+<item endpinid="Ks0108-3-PinCs1" x="-212" vflip="1" id="Connector-20" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-21" Show_id="false" startpinid="pic18f4550-2-RC0" pointList="-212,92,-268,92,-268,-60,-140,-60,-140,-84" y="92" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-20" valLabely="0" rotation="0"/>
+ 
+Connector-22: 
+<item endpinid="Ks0108-3-PinCs2" x="-212" vflip="1" id="Connector-22" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-23" Show_id="false" startpinid="pic18f4550-2-RC1" pointList="-212,100,-276,100,-276,-68,-148,-68,-148,-84" y="100" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-22" valLabely="0" rotation="0"/>
+ 
+Connector-24: 
+<item endpinid="Ks0108-3-PinDC" x="-212" vflip="1" id="Connector-24" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-25" Show_id="false" startpinid="pic18f4550-2-RE0" pointList="-212,36,-244,36,-244,-36,-52,-36,-52,-84" y="36" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-24" valLabely="0" rotation="0"/>
+ 
+Connector-26: 
+<item endpinid="Ks0108-3-PinRW" x="-212" vflip="1" id="Connector-26" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-27" Show_id="false" startpinid="pic18f4550-2-RE1" pointList="-212,44,-252,44,-252,-44,-60,-44,-60,-84" y="44" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-26" valLabely="0" rotation="0"/>
+ 
+Connector-28: 
+<item endpinid="Ks0108-3-PinEn" x="-212" vflip="1" id="Connector-28" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-29" Show_id="false" startpinid="pic18f4550-2-RE2" pointList="-212,52,-260,52,-260,-52,-68,-52,-68,-84" y="52" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-28" valLabely="0" rotation="0"/>
+ 
+Connector-30: 
+<item endpinid="Ks0108-3-PinRst" x="-212" vflip="1" id="Connector-30" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-31" Show_id="false" startpinid="pic18f4550-2-RC2" pointList="-212,108,-284,108,-284,-76,-156,-76,-156,-84" y="108" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-30" valLabely="0" rotation="0"/>
+ 
+Connector-32: 
+<item endpinid="pic18f4550-2-RB0" x="-28" vflip="1" id="Connector-32" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-33" Show_id="false" startpinid="Fixed Volt.-1-outnod" pointList="-28,36,-148,36" y="36" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-32" valLabely="0" rotation="0"/>
+ 
+</circuit>

@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -60,9 +60,18 @@ void McuComponent::initPackage()
 {
     QString compName = m_id.split("-").first(); // for example: "atmega328-1" to: "atmega328"
 
-    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
-    qDebug() << "McuComponent::initPackage datafile: " << compName << " <= " << dfPath;
-    QFile file(dfPath);
+    m_dataFile = ComponentSelector::self()->getXmlFile( compName );
+    
+    //QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
+    //qDebug() << "McuComponent::initPackage datafile: " << compName << " <= " << dfPath;
+    QFile file( m_dataFile );
+    
+    if(( m_dataFile == "" ) || ( !file.exists() ))
+    {
+        m_error = 1;
+        return;
+    }
+    
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
         QMessageBox* msgBox = new QMessageBox( MainWindow::self() );
@@ -72,6 +81,7 @@ void McuComponent::initPackage()
         msgBox->setText( tr("Cannot read file %1:\n%2.").arg(m_dataFile).arg(file.errorString()) );
         msgBox->setModal( false ); 
         msgBox->open();
+        m_error = 1;
         return;
     }
 
@@ -86,6 +96,7 @@ void McuComponent::initPackage()
         msgBox->setModal( false ); 
         msgBox->open();
         file.close();
+        m_error = 1;
         return;
     }
     file.close();
@@ -105,8 +116,9 @@ void McuComponent::initPackage()
             if( element.attribute("name")==compName )
             {
                 // Get package file
-                package = element.attribute( "package" );
-                m_dataFile = m_dataFile.replace( m_dataFile.split("/").last(), package.append(".package") );
+                QDir dataDir(  m_dataFile );
+                dataDir.cdUp();             // Indeed it doesn't cd, just take out file name
+                m_dataFile = dataDir.filePath( element.attribute( "package" ) )+".package";
                 
                 // Get device
                 m_device = element.attribute( "device" );
@@ -116,7 +128,8 @@ void McuComponent::initPackage()
                 //else qDebug() << compName << "ERROR!! McuComponent::initPackage m_processor: " << m_processor;
                 
                 // Get data file
-                QString dataFile = element.attribute( "data" );
+                QString dataFile = dataDir.filePath( element.attribute( "data" ) )+".data";
+                //qDebug() <<m_device<< dataFile;
                 m_processor->setDataFile( dataFile );
                 if( element.hasAttribute( "icon" ) ) m_BackGround = ":/" + element.attribute( "icon" );
 

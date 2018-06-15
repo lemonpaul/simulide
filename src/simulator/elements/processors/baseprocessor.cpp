@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -85,9 +85,10 @@ void BaseProcessor::setDataFile( QString datafile )
 { 
     //QDir compSetDir( qApp->applicationDirPath() );
     //compSetDir.cd( "../share/simulide/data" );
-    ////m_dataFile = QCoreApplication::applicationDirPath()+"/data/"+datafile+".data";
+    //m_dataFile = QCoreApplication::applicationDirPath()+"/data/"+datafile+".data";
     //m_dataFile = compSetDir.absolutePath() + datafile + ".data";
-    m_dataFile = SIMUAPI_AppPath::self()->availableDataFilePath(datafile + ".data");
+    //m_dataFile = SIMUAPI_AppPath::self()->availableDataFilePath(datafile + ".data");
+    m_dataFile = datafile;
 }
 
 /*void BaseProcessor::reset()

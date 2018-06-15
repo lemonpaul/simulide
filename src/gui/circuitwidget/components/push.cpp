@@ -1,10 +1,10 @@
 /***************************************************************************
- *   Copyright (C) 2012 by santiago González                               *
+ *   Copyright (C) 2016 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include "push.h"
-#include "connector.h"
+#include "pin.h"
 #include "itemlibrary.h"
 
 
@@ -36,30 +36,26 @@ LibraryItem* Push::libraryItem()
 }
 
 Push::Push( QObject* parent, QString type, QString id )
-    : SwitchBase( parent, type, id )
+    : PushBase( parent, type, id )
 {
-    connect( m_button, SIGNAL( pressed() ),
-                 this, SLOT  ( onbuttonPressed() ));
+    m_area =  QRectF( -11, -9, 22, 11 );
+    
+    m_pin.resize(2);
 
-    connect( m_button, SIGNAL( released() ),
-                 this, SLOT  ( onbuttonReleased() ));
+    QString pinid = m_id;
+    pinid.append(QString("-lnod"));
+    QPoint pinpos = QPoint(-8-8,0);
+    m_pin[0] = new Pin( 180, pinpos, pinid, 0, this);
+    m_ePin[0] = m_pin[0];
+
+    pinid = m_id;
+    pinid.append(QString("-rnod"));
+    pinpos = QPoint(8+8,0);
+    m_pin[1] = new Pin( 0, pinpos, pinid, 1, this);
+    m_ePin[1] = m_pin[1];
 }
 Push::~Push()
 {
-}
-
-void Push::onbuttonPressed()
-{
-    m_resist = cero_doub;                                  // Close Push
-    m_changed = true;
-    update();
-}
-void Push::onbuttonReleased()
-{
-    m_resist = 1e38;                                        // Open Push
-    m_button->setChecked(false);
-    m_changed = true;
-    update();
 }
 
 void Push::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
@@ -70,10 +66,8 @@ void Push::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *
     pen.setWidth(3);
     p->setPen(pen);
 
-    if( m_resist == cero_doub )             // Pushch is closed
-        p->drawLine(-9, -2, 9, -2 );
-    else                                    // Push is oppened
-        p->drawLine(-9, -8, 9, -8 );
+    if( m_closed ) p->drawLine(-9, -2, 9, -2 );
+    else           p->drawLine(-9, -8, 9, -8 );
 }
 
 #include "moc_push.cpp"

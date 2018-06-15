@@ -1,6 +1,139 @@
+ ###########################################################################
+ #   Copyright (C) 2012   by santiago González                             #
+ #   santigoro@gmail.com                                                   #
+ #                                                                         #
+ #   This program is free software; you can redistribute it and/or modify  #
+ #   it under the terms of the GNU General Public License as published by  #
+ #   the Free Software Foundation; either version 3 of the License, or     #
+ #   (at your option) any later version.                                   #
+ #                                                                         #
+ #   This program is distributed in the hope that it will be useful,       #
+ #   but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+ #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+ #   GNU General Public License for more details.                          #
+ #                                                                         #
+ #   You should have received a copy of the GNU General Public License     #
+ #   along with this program; if not, see <http://www.gnu.org/licenses/>.  #
+ #                                                                         #
+ ###########################################################################
+ 
+VERSION     = "0.1.7"
 
-VERSION     = "0.1.6"
-TARGET_NAME = SimulIDE_$$VERSION-$$_ARCH$$_BITS
+TEMPLATE = app
+
+QT += svg
+QT += xml
+QT += widgets
+QT += concurrent
+QT += serialport
+QT += multimedia widgets
+
+SOURCES += ../src/*.cpp \
+    ../src/gui/*.cpp \
+    ../src/gui/circuitwidget/*.cpp \
+    ../src/gui/circuitwidget/components/*.cpp \
+    ../src/gui/circuitwidget/components/mcu/*.cpp \
+    ../src/gui/oscopewidget/*.cpp \
+    ../src/gui/plotterwidget/*.cpp \
+    ../src/gui/terminalwidget/*.cpp \
+    ../src/gui/QPropertyEditor/*.cpp \
+    ../src/gui/componentselector/*.cpp \
+    ../src/gui/filebrowser/*.cpp \
+    ../src/gui/editorwidget/*.cpp \
+    ../src/gui/editorwidget/findreplacedialog/*.cpp \
+    ../src/gui/serialporwidget/*.cpp \
+    ../src/simulator/*.cpp \
+    ../src/simulator/elements/*.cpp \
+    ../src/simulator/elements/processors/*.cpp \
+    ../src/misc/simuapi_apppath.cpp \
+    ../src/simavr/sim/*.c \
+    ../src/simavr/cores/*.c 
+
+HEADERS += ../src/*.h \
+    ../src/gui/*.h \
+    ../src/gui/circuitwidget/*.h \
+    ../src/gui/circuitwidget/components/*.h \
+    ../src/gui/circuitwidget/components/mcu/*.h \
+    ../src/gui/oscopewidget/*.h \
+    ../src/gui/plotterwidget/*.h \
+    ../src/gui/terminalwidget/*.h \
+    ../src/gui/QPropertyEditor/*.h \
+    ../src/gui/componentselector/*.h \
+    ../src/gui/filebrowser/*.h \
+    ../src/gui/editorwidget/*.h \
+    ../src/gui/editorwidget/findreplacedialog/*.h \
+    ../src/gui/serialporwidget/*.h \
+    ../src/simulator/*.h \
+    ../src/simulator/elements/*.h \
+    ../src/simulator/elements/processors/*.h \
+    ../src/misc/simuapi_apppath.h \
+    ../src/simavr/sim/*.h \
+    ../src/simavr/sim/avr/*.h  \
+    ../src/simavr/cores/*.h 
+
+INCLUDEPATH += ../src \
+    ../src/gui \
+    ../src/gui/circuitwidget \
+    ../src/gui/circuitwidget/components \
+    ../src/gui/circuitwidget/components/mcu \
+    ../src/gui/oscopewidget \
+    ../src/gui/plotterwidget \
+    ../src/gui/terminalwidget \
+    ../src/gui/QPropertyEditor \
+    ../src/gui/componentselector \
+    ../src/gui/filebrowser \
+    ../src/gui/editorwidget \
+    ../src/gui/editorwidget/findreplacedialog \
+    ../src/gui/serialporwidget \
+    ../src/simulator \
+    ../src/simulator/elements \
+    ../src/simulator/elements/processors \
+    ../src/misc \
+    ../src/simavr \
+    ../src/simavr/sim \
+    ../src/simavr/sim/avr \
+    ../src/simavr/cores 
+    
+    
+RESOURCES = ../src/application.qrc
+
+QMAKE_CXXFLAGS_DEBUG -= -O
+QMAKE_CXXFLAGS_DEBUG -= -O1
+QMAKE_CXXFLAGS_DEBUG -= -O2
+QMAKE_CXXFLAGS_DEBUG -= -O3
+QMAKE_CXXFLAGS_DEBUG += -O0
+QMAKE_CXXFLAGS_RELEASE -= -O
+QMAKE_CXXFLAGS_RELEASE -= -O1
+QMAKE_CXXFLAGS_RELEASE -= -O2
+QMAKE_CXXFLAGS_RELEASE *= -O3
+QMAKE_CXXFLAGS += -Wno-unused-parameter
+QMAKE_CXXFLAGS += -Wno-missing-field-initializers
+
+QMAKE_CFLAGS += --std=gnu11
+QMAKE_CFLAGS += -Wno-unused-result
+QMAKE_CFLAGS += -Wno-unused-parameter
+QMAKE_CFLAGS += -Wno-missing-field-initializers
+QMAKE_CFLAGS += -Wno-implicit-function-declaration
+QMAKE_CFLAGS += -Wno-int-conversion
+QMAKE_CFLAGS += -Wno-sign-compare
+QMAKE_CFLAGS += -O2
+QMAKE_CFLAGS += -fPIC
+
+QMAKE_LIBS += -lelf
+
+LIBS += -lgpsim
+
+CONFIG += qt 
+CONFIG += warn_on
+CONFIG += no_qml_debug
+CONFIG *= c++11
+CONFIG += link_pkgconfig
+PKGCONFIG += glib-2.0
+
+DEFINES += MAINMODULE_EXPORT=
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+
+TARGET_NAME = SimulIDE_$$VERSION$$
 
 CONFIG(release, debug|release) {
         TARGET_PREFIX = $$BUILD_DIR/release/$$TARGET_NAME
@@ -14,134 +147,17 @@ OBJECTS_DIR *= $$_OBJECTS_DIR
 MOC_DIR     *= $$_OBJECTS_DIR
 INCLUDEPATH += $$OBJECTS_DIR
 
-#mkpath($$OBJECTS_DIR)
-mkpath($$TARGET_PREFIX/bin)
-mkpath($$TARGET_PREFIX/lib/simulide/plugins)
-
-# This required to build plugins in the same architecture
-_var_list  = "VERSION="$$VERSION
-_var_list += "_ARCH="$$_ARCH
-_var_list += "_BITS="$$_BITS
-_var_list += "TARGET_NAME="$$TARGET_NAME
-_var_list += "TARGET_PREFIX="$$TARGET_PREFIX
-_var_list += "QMAKE_EXEC="$$QMAKE_EXEC
-_var_list += "_CROSS="$$_CROSS
-write_file(version, _var_list)
-
-TEMPLATE = app
-
-isEqual( _ARCH,"Lin") {
-    DEFINES += MAINMODULE_EXPORT=
-
-    QMAKE_LIBS += -lutil
-    QMAKE_LFLAGS += -Wl,-export-dynamic
-    QT_EXTENSION_SHLIB="so"
-}
-
-isEqual( _ARCH,"Win") {
-    CONFIG -= console
-    CONFIG += windows
-    CONFIG -= debug_and_release debug_and_release_target
-    
-    #Have to use #include <QtCore/QtGlobal> everywhere for Q_DECL_EXPORT?
-    DEFINES += MAINMODULE_EXPORT=__declspec\\\(dllexport\\\)
-
-    DEP_DIR=$$PWD/dependencies/build-$$_ARCH$$_BITS/lib
-    mkpath( $$DEP_DIR )
-
-    QMAKE_LFLAGS += -Wl,--exclude-all-symbols
-    QMAKE_LFLAGS += -Wl,--out-implib,$$DEP_DIR/libsimulide.a
-    QMAKE_LFLAGS += -Wl,-output-def,$$DEP_DIR/simulide.def
-    QMAKE_LIBS += -lws2_32
-
-    RC_ICONS += ../src/icons/simulide.ico
-
-    QT_EXTENSION_SHLIB="dll"
-}
-
-DEFINES += APP_VERSION=\\\"$$VERSION\\\"
-DEFINES += QT_EXTENSION_SHLIB=$${QT_EXTENSION_SHLIB}
-
-SOURCES += ../src/*.cpp \
-    ../src/gui/*.cpp \
-    ../src/gui/circuitwidget/*.cpp \
-    ../src/gui/circuitwidget/components/*.cpp \
-    ../src/gui/circuitwidget/components/mcu/*.cpp \
-    ../src/gui/oscopewidget/*.cpp \
-    ../src/gui/plotterwidget/*.cpp \
-    ../src/gui/terminalwidget/*.cpp \
-    ../src/gui/QPropertyEditor/*.cpp \
-    ../src/gui/componentselector/*.cpp \
-    ../src/simulator/*.cpp \
-    ../src/simulator/elements/*.cpp \
-    ../src/simulator/elements/processors/*.cpp \
-    ../src/misc/simuapi_apppath.cpp
-
-HEADERS += ../src/*.h \
-    ../src/gui/*.h \
-    ../src/gui/circuitwidget/*.h \
-    ../src/gui/circuitwidget/components/*.h \
-    ../src/gui/circuitwidget/components/mcu/*.h \
-    ../src/gui/oscopewidget/*.h \
-    ../src/gui/plotterwidget/*.h \
-    ../src/gui/terminalwidget/*.h \
-    ../src/gui/QPropertyEditor/*.h \
-    ../src/gui/componentselector/*.h \
-    ../src/simulator/*.h \
-    ../src/simulator/elements/*.h \
-    ../src/simulator/elements/processors/*.h \
-    ../src/misc/simuapi_apppath.h
-
-INCLUDEPATH += ../src \
-    ../src/gui \
-    ../src/gui/circuitwidget \
-    ../src/gui/circuitwidget/components \
-    ../src/gui/circuitwidget/components/mcu \
-    ../src/gui/oscopewidget \
-    ../src/gui/plotterwidget \
-    ../src/gui/terminalwidget \
-    ../src/gui/QPropertyEditor \
-    ../src/gui/componentselector \
-    ../src/gui/editorwidget \
-    ../src/gui/editorwidget/findreplacedialog \
-    ../src/simulator \
-    ../src/simulator/elements \
-    ../src/simulator/elements/processors \
-    ../src/misc
-    
-FORMS += ../src/gui/componentselector/compplugin.ui
-
-QMAKE_CXXFLAGS_DEBUG -= -O
-QMAKE_CXXFLAGS_DEBUG -= -O1
-QMAKE_CXXFLAGS_DEBUG -= -O2
-QMAKE_CXXFLAGS_DEBUG -= -O3
-QMAKE_CXXFLAGS_DEBUG += -O0
-QMAKE_CXXFLAGS_RELEASE -= -O
-QMAKE_CXXFLAGS_RELEASE -= -O1
-QMAKE_CXXFLAGS_RELEASE -= -O2
-QMAKE_CXXFLAGS_RELEASE *= -O3
-QMAKE_CXXFLAGS += -Wno-unused-parameter
-
-RESOURCES = ../src/application.qrc
-
-QT += widgets
-QT += xml
-QT += concurrent
-
-CONFIG += qt 
-CONFIG += warn_on
-CONFIG += no_qml_debug
-CONFIG *= c++11
-
 DESTDIR = $$TARGET_PREFIX/bin
 
 TARGET = SimulIDE_$$VERSION
 
+mkpath($$TARGET_PREFIX/bin)
+
 copy2dest.commands = \
 $(MKDIR) $$TARGET_PREFIX/share/simulide/data ; \
-$(MKDIR) $$TARGET_PREFIX/share/simulide/examples ; \
+#$(MKDIR) $$TARGET_PREFIX/share/simulide/examples ; \
 $(COPY_DIR) ../resources/data $$TARGET_PREFIX/share/simulide ; \
-$(COPY_DIR) ../resources/examples $$TARGET_PREFIX/share/simulide
+#$(COPY_DIR) ../resources/examples $$TARGET_PREFIX/share/simulide
 
 QMAKE_EXTRA_TARGETS += copy2dest
 POST_TARGETDEPS += copy2dest

@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -52,15 +52,16 @@ class MAINMODULE_EXPORT eElement
         virtual void resetState(){;}
         virtual void stamp(){;}
 
+        virtual void simuClockStep(){;}
         virtual void updateStep(){;}
         virtual void setVChanged(){;}
         
-        virtual bool converged() { return m_converged; }
+        //virtual bool converged() { return m_converged; }
 
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double cero_doub = 1e-14;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double high_imp  = 1e14;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_high = 5.0;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_low  = 0.0;
+        static GNU_CONST_STATIC_FLOAT_DECLARATION double cero_doub         = 1e-14;
+        static GNU_CONST_STATIC_FLOAT_DECLARATION double high_imp          = 1e14;
+        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_high      = 5.0;
+        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_low       = 0.0;
         static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_threshold = 2.5;
 
     protected:
@@ -68,7 +69,7 @@ class MAINMODULE_EXPORT eElement
 
         std::string m_elmId;
         
-        bool m_converged;
+        //bool m_converged;
 };
 
 #endif

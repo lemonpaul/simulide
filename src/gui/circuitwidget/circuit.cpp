@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -28,13 +28,15 @@ Circuit*  Circuit::m_pSelf = 0l;
 Circuit::Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  parent)
     : QGraphicsScene(x, y, width, height, parent)
 {
+    setObjectName( "Circuit" );
     setParent( parent );
-    m_widget = parent;
+    m_graphicView = parent;
     m_scenerect.setRect( x, y, width, height );
     setSceneRect( QRectF(x, y, width, height) );
 
     m_pSelf = this;
 
+    m_drawGrid = true;
     m_pasting = false;
     m_con_started = false;
     new_connector = 0l;
@@ -44,13 +46,26 @@ Circuit::Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  p
 Circuit::~Circuit()
 {
     // Avoid PropertyEditor problem: comps not unregistered
-    
+
     QPropertyEditorWidget::self()->removeObject( this );
-    
+
     foreach( Component* comp, m_compList )
     {
         QPropertyEditorWidget::self()->removeObject( comp );
     }
+}
+
+QList<Component*>* Circuit::compList() { return &m_compList; }
+QList<Component*>* Circuit::conList()  { return &m_conList; }
+
+int Circuit::nlAcc()
+{
+    return Simulator::self()->nlAcc();
+}
+
+void  Circuit::setNlAcc( int ac )
+{
+    Simulator::self()->setNlAcc( ac );
 }
 
 int Circuit::reactStep()
@@ -82,8 +97,6 @@ void Circuit::setCircSpeed( int rate )
     Simulator::self()->simuRateChanged( rate );
 }
 
-<<<<<<< HEAD
-=======
 void Circuit::removeItems()                     // Remove Selected items
 {
     bool pauseSim = Simulator::self()->isRunning();
@@ -109,23 +122,22 @@ void Circuit::removeComp( Component* comp )
     comp->deleteLater();
 }
 
->>>>>>> trunk
 void Circuit::remove() // Remove everything
 {
     //qDebug() << m_compList.size();
     foreach( Component* comp, m_compList )
     {
         //qDebug() << "Circuit::remove" << comp->itemID();
-        
+
         // Don't remove internal items
         bool isNumber = false;
         comp->objectName().split("-").last().toInt( &isNumber ); // TODO: Find a proper way !!!!!!!!!!!
         // Don't remove Graphical Nodes
-        bool isNode = comp->objectName ().contains( "Node" );
-        
-        if( isNumber && !isNode )  comp->remove();
+        bool isNode = comp->objectName().contains( "Node" );
+
+        if( isNumber && !isNode )  removeComp( comp );
     }
-        
+
 }
 
 void Circuit::saveState()
@@ -138,6 +150,10 @@ void Circuit::saveState()
     circuitToDom();
     m_undoStack.append( new QDomDocument() );
     m_undoStack.last()->setContent( m_domDoc.toString() );
+    
+    QString title = MainWindow::self()->windowTitle();
+    if (!title.endsWith('*'))
+        MainWindow::self()->setWindowTitle(title+'*');
 }
 
 /*void Circuit::setChanged()
@@ -145,16 +161,27 @@ void Circuit::saveState()
     m_changed = true;
 }*/
 
+bool Circuit::drawGrid()
+{
+    return m_drawGrid;
+}
+void Circuit::setDrawGrid( bool draw )
+{
+    m_drawGrid = draw;
+}
+
 void Circuit::drawBackground ( QPainter*  painter, const QRectF & rect )
 {
     Q_UNUSED( rect );
     /*painter->setBrush(QColor( 255, 255, 255 ) );
     painter->drawRect( m_scenerect );*/
-    
+
     painter->setBrush(QColor( 240, 240, 210 ) );
     painter->drawRect( m_scenerect );
     painter->setPen( QColor( 210, 210, 210 ) );
 
+    if( !m_drawGrid ) return;
+    
     int startx = int(m_scenerect.x());///2;
     int endx   = int(m_scenerect.width())/2;
     int starty = int(m_scenerect.y());///2;
@@ -170,6 +197,7 @@ void Circuit::drawBackground ( QPainter*  painter, const QRectF & rect )
         painter->drawLine( startx, i, endx, i);
         painter->drawLine( startx,-i, endx,-i);
     }
+    
 }
 
 void Circuit::importCirc(  QPointF eventpoint  )
@@ -227,10 +255,10 @@ QString Circuit::getCompId( QString name )
 {
     QStringList nameSplit = name.split("-");
     if( nameSplit.isEmpty() ) return "";
-    
+
     QString compId  = nameSplit.takeFirst();
     if( nameSplit.isEmpty() ) return "";
-    
+
     QString compNum = nameSplit.takeFirst();
 
     int num = 0;
@@ -417,12 +445,16 @@ void Circuit::loadDomDoc( QDomDocument* doc )
                     {
                         QString itemType = item->itemType();
 
-                        if( itemType == "FlipFlopJK" )
+                        if( itemType == "FlipFlopD" )
+                        {
+                            item->setProperty( "S_R_Inverted", true );
+                        }
+                        else if( itemType == "FlipFlopJK" )
                         {
                             item->setProperty( "S_R_Inverted", true );
                         }
                         else if( (itemType == "Counter") || (itemType == "ShiftReg") )
-                        {qDebug() << "Reset_Inverted";
+                        {
                             item->setProperty( "Reset_Inverted", true );
                         }
                     }
@@ -449,13 +481,13 @@ void Circuit::loadDomDoc( QDomDocument* doc )
             Connector* con = static_cast<Connector*>( item );
             con->setSelected( true );
             con->move( m_deltaMove );
-
         }
     }
+    else 
+        m_graphicView->centerOn( QPointF( 1200+itemsBoundingRect().center().x(), 950+itemsBoundingRect().center().y() ) );
+    
     // Take care about unconnected Joints
     foreach( Node* joint, jointList ) joint->remove(); // Only removed if some missing connector
-
-    m_widget->ensureVisible( itemsBoundingRect() );
 }
 
 bool Circuit::saveCircuit( QString &fileName )
@@ -495,7 +527,7 @@ void Circuit::listToDom( QDomDocument* doc, QList<Component*>* complist )
         // Don't save internal items
         bool isNumber = false;
         item->objectName().split("-").last().toInt( &isNumber );
-        
+
         if ( item && isNumber)
         {
             QDomElement pin = m_domDoc.createElement("item");
@@ -554,6 +586,9 @@ void Circuit::undo()
 {
     if( m_undoStack.isEmpty() ) return;
 
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->stopSim();
+
     circuitToDom();
     m_redoStack.prepend( new QDomDocument() );
     m_redoStack.first()->setContent( m_domDoc.toString() );
@@ -564,11 +599,16 @@ void Circuit::undo()
 
     m_seqNumber = 0;
     loadDomDoc( &m_domDoc );
+
+    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void Circuit::redo()
 {
     if( m_redoStack.isEmpty() ) return;
+
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->stopSim();
 
     circuitToDom();
     m_undoStack.append( new QDomDocument() );
@@ -580,6 +620,8 @@ void Circuit::redo()
 
     m_seqNumber = 0;
     loadDomDoc( &m_domDoc );
+
+    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 Component* Circuit::createItem( QString type, QString id )
@@ -609,25 +651,25 @@ void Circuit::loadProperties( QDomElement element, Component* Item )
             QStringList list= value.toString().split(",");
             Item->setProperty( name, list );
         }
-        else if ( metaproperty.type() == QVariant::Int    ) 
+        else if ( metaproperty.type() == QVariant::Int    )
                   Item->setProperty( name, value.toInt() );
-                  
+
         //else if ( metaproperty.type() == QMetaType::Float ) Item->setProperty( name, value.toFloat() );
-        
-        else if ( metaproperty.type() == QVariant::Double ) 
+
+        else if ( metaproperty.type() == QVariant::Double )
                   Item->setProperty( name, value.toDouble() );
-            
-        else if ( metaproperty.type() == QVariant::PointF ) 
+
+        else if ( metaproperty.type() == QVariant::PointF )
                   Item->setProperty( name, value.toPointF() );
-            
-        else if ( metaproperty.type() == QVariant::Bool   ) 
+
+        else if ( metaproperty.type() == QVariant::Bool   )
                   Item->setProperty( name, value.toBool() );
-                  
+
         else qDebug() << "    ERROR!!! Circuit::LoadProperties\n  unknown type:  "<<"name "<<name<<"   value "<<value ;
     }
     Item->setLabelPos();
     Item->setValLabelPos();
-    
+
     addItem(Item);
 
     int number = Item->objectName().split("-").last().toInt();
@@ -673,6 +715,9 @@ void Circuit::copy( QPointF eventpoint )
 
 void Circuit::paste( QPointF eventpoint )
 {
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->stopSim();
+
     saveState();
 
     m_pasting = true;
@@ -682,12 +727,17 @@ void Circuit::paste( QPointF eventpoint )
     loadDomDoc( &m_copyDoc );
 
     m_pasting = false;
+
+    if( pauseSim ) Simulator::self()->runContinuous();
 }
+
+bool  Circuit::pasting() { return m_pasting; }
+QPointF Circuit::deltaMove(){ return m_deltaMove; }
 
 void Circuit::createSubcircuit()
 {
     QHash<QString, QString> compList;        // Get Components properties
-    
+
     //qDebug() << compIdTip<<"--------------------------";
     foreach( Component* component, m_compList)
     {
@@ -725,7 +775,7 @@ void Circuit::createSubcircuit()
 
     QList<eNode*> eNodeList = simulator.geteNodes();
     QList<QStringList> connectionList;
-    
+
     int nodes = 0;
     foreach( eNode* node,  eNodeList  ) // Get all the connections in each eNode
     {
@@ -754,7 +804,7 @@ void Circuit::createSubcircuit()
             }
         }
         QString conType = "Node";
-        if( pinConList.length() == 4 ) conType = "Connection"; 
+        if( pinConList.length() == 4 ) conType = "Connection";
 
         if( conType == "Connection" )               // PackagePin to pin
         {
@@ -877,6 +927,9 @@ void Circuit::closeconnector( Pin* endpin )
     new_connector->closeCon( endpin );
 }
 
+void Circuit::constarted( bool started) { m_con_started = started; }
+bool Circuit::is_constarted() { return m_con_started ; }
+
 void Circuit::mousePressEvent( QGraphicsSceneMouseEvent* event )
 {
     if( event->button() == Qt::LeftButton )
@@ -931,28 +984,45 @@ void Circuit::keyPressEvent( QKeyEvent* event )
 {
     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
     {
-        ;//copy( QPointF(0,0));
+        QPoint p = CircuitWidget::self()->mapFromGlobal(QCursor::pos());
+
+        copy( m_graphicView->mapToScene( p ) );
+        clearSelection();
     }
     else if (event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier))
     {
-        ;//paste( QPointF(50,50) );
+        QPoint p = CircuitWidget::self()->mapFromGlobal(QCursor::pos());
+
+        paste( m_graphicView->mapToScene( p ) );
+    }
+    else if (event->key() == Qt::Key_Z && (event->modifiers() & Qt::ControlModifier))
+    {
+        undo();
+    }
+    else if (event->key() == Qt::Key_Y && (event->modifiers() & Qt::ControlModifier))
+    {
+        redo();
+    }
+    else if (event->key() == Qt::Key_Delete)
+    {
+        removeItems();
+    }
+    if (event->key() == Qt::Key_N && (event->modifiers() & Qt::ControlModifier))
+    {
+        CircuitWidget::self()->newCircuit();
     }
     else if (event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
     {
-        ;//paste( QPointF(50,50) );
+        if (event->modifiers() & Qt::ShiftModifier)
+            CircuitWidget::self()->saveCircAs();
+        else
+            CircuitWidget::self()->saveCirc();
+    }
+    else if (event->key() == Qt::Key_O && (event->modifiers() & Qt::ControlModifier))
+    {
+        CircuitWidget::self()->openCirc();
     }
     else QGraphicsScene::keyPressEvent(event);
-}
-
-void Circuit::removeItems()                     // Remove Selected items
-{
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
-
-    foreach( Component* comp, m_compList )
-        if( comp->isSelected() ) comp->remove();
-        
-    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void Circuit::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)

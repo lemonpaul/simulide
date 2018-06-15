@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -66,10 +66,22 @@ LedBar::LedBar( QObject* parent, QString type, QString id )
 }
 LedBar::~LedBar(){}
 
+void LedBar::setColor( LedBase::LedColor color ) 
+{ 
+    foreach( LedSmd* led, m_led )
+        led->setColor( color ); 
+}
+
+LedBase::LedColor LedBar::color() 
+{ 
+    return m_led[0]->color(); 
+}
+
 double LedBar::threshold()                     
 { 
     return m_led[0]->threshold(); 
 }
+
 void LedBar::setThreshold( double threshold ) 
 { 
     for( int i=0; i<8; i++ ) m_led[i]->setThreshold( threshold );

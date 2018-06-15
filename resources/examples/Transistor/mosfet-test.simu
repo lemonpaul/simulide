@@ -1,0 +1,36 @@
+<circuit type="simulide_0.1">
+ 
+Probe-7: 
+<item Show_id="false" labelx="16" objectName="Probe-7" id="Probe-7" labely="-16" vflip="1" valLabelx="16" Show_volt="true" x="-348" labelrot="45" rotation="-45" y="-292" valLabely="0" itemtype="Probe" valLabRot="45" hflip="1"/>
+ 
+Mosfet-6: 
+<item Show_id="false" rotation="0" valLabelx="0" valLabRot="0" itemtype="Mosfet" labely="-24" labelrot="0" Threshold="3" hflip="1" objectName="Mosfet-6" x="-372" valLabely="0" RDSon="1" labelx="-16" vflip="1" y="-220" P_Channel="false" id="Mosfet-6"/>
+ 
+Volt. Source-5: 
+<item Show_id="false" rotation="0" Voltage="15" valLabelx="-26" valLabRot="0" itemtype="Voltage Source" labely="-24" labelrot="0" hflip="1" objectName="Volt. Source-5" x="-468" Unit=" V" valLabely="10" labelx="-16" vflip="1" Show_Volt="true" y="-316" id="Volt. Source-5"/>
+ 
+Amperimeter-4: 
+<item Show_id="false" labelx="-12" objectName="Amperimeter-4" id="Amperimeter-4" labely="-24" vflip="1" valLabelx="-20" x="-372" labelrot="0" rotation="0" y="-332" valLabely="-22" itemtype="Amperimeter" valLabRot="0" hflip="1"/>
+ 
+Ground (0 V)-3: 
+<item Show_id="false" labelx="-16" objectName="Ground (0 V)-3" id="Ground (0 V)-3" labely="-24" vflip="1" valLabelx="0" x="-364" labelrot="0" rotation="0" y="-140" valLabely="0" itemtype="Ground" valLabRot="0" hflip="1"/>
+ 
+Volt. Source-2: 
+<item Show_id="false" rotation="0" Voltage="10" valLabelx="-26" valLabRot="0" itemtype="Voltage Source" labely="-24" labelrot="0" hflip="1" objectName="Volt. Source-2" x="-468" Unit=" V" valLabely="10" labelx="-16" vflip="1" Show_Volt="true" y="-220" id="Volt. Source-2"/>
+ 
+Probe-1: 
+<item Show_id="false" labelx="16" objectName="Probe-1" id="Probe-1" labely="-16" vflip="1" valLabelx="16" Show_volt="true" x="-404" labelrot="45" rotation="-45" y="-236" valLabely="0" itemtype="Probe" valLabRot="45" hflip="1"/>
+ 
+Connector-8: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-452,-316,-380,-316" valLabRot="0" itemtype="Connector" endpinid="Amperimeter-4-lPin" labely="-24" labelrot="0" hflip="1" objectName="Connector-8" enodeid="Circ_eNode-9" x="-452" valLabely="0" labelx="-16" vflip="1" y="-316" id="Connector-8" startpinid="Volt. Source-5-outPin"/>
+ 
+Connector-10: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-364,-156,-364,-204" valLabRot="0" itemtype="Connector" endpinid="Mosfet-6-Sour" labely="-24" labelrot="0" hflip="1" objectName="Connector-10" enodeid="Circ_eNode-11" x="-364" valLabely="0" labelx="-16" vflip="1" y="-156" id="Connector-10" startpinid="Ground (0 V)-3-Gnd"/>
+ 
+Connector-12: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-364,-316,-364,-236" valLabRot="0" itemtype="Connector" endpinid="Mosfet-6-Dren" labely="-24" labelrot="0" hflip="1" objectName="Connector-12" enodeid="Circ_eNode-13" x="-364" valLabely="0" labelx="-16" vflip="1" y="-316" id="Connector-12" startpinid="Amperimeter-4-rPin"/>
+ 
+Connector-14: 
+<item Show_id="false" rotation="0" valLabelx="0" pointList="-452,-220,-388,-220" valLabRot="0" itemtype="Connector" endpinid="Mosfet-6-Gate" labely="-24" labelrot="0" hflip="1" objectName="Connector-14" enodeid="Circ_eNode-15" x="-452" valLabely="0" labelx="-16" vflip="1" y="-220" id="Connector-14" startpinid="Volt. Source-2-outPin"/>
+ 
+</circuit>

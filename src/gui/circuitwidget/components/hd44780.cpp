@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -87,6 +87,7 @@ void Hd44780::resetState()
 {
     //qDebug() << "Hd44780::resetState()" ;
     m_lastClock = false;
+    m_writeDDRAM = true;
     m_cursPos     = 0;
     m_shiftPos    = 0;
     m_direction   = 1;
@@ -160,21 +161,31 @@ void Hd44780::setVChanged()             // Called when clock Pin changes
 
 void Hd44780::writeData( int data )
 {
-    //qDebug() << "Hd44780::writeData: " << data << m_cursPos<<m_DDaddr;
-    m_DDram[m_DDaddr] = data;
-    m_DDaddr += m_direction;
-    
-    if( m_DDaddr > 79 ) m_DDaddr = 0;
-    if( m_DDaddr < 0 )  m_DDaddr = 79;
-    
-    if( m_shiftDisp )
+    if( m_writeDDRAM )                                 // Write to DDRAM
     {
-        m_shiftPos += m_direction;
+        //qDebug() << "Hd44780::writeData: " << data << m_cursPos<<m_DDaddr;
+        m_DDram[m_DDaddr] = data;
+        m_DDaddr += m_direction;
         
-        int lineEnd = m_lineLength-1;
+        if( m_DDaddr > 79 ) m_DDaddr = 0;
+        if( m_DDaddr < 0 )  m_DDaddr = 79;
+        
+        if( m_shiftDisp )
+        {
+            m_shiftPos += m_direction;
+            
+            int lineEnd = m_lineLength-1;
 
-        if( m_shiftPos>lineEnd ) m_shiftPos = 0;
-        if( m_shiftPos<0 )       m_shiftPos = lineEnd;
+            if( m_shiftPos>lineEnd ) m_shiftPos = 0;
+            if( m_shiftPos<0 )       m_shiftPos = lineEnd;
+        }
+    }
+    else                                               // Write to CGRAM
+    {
+        m_CGram[m_CGaddr] = data;
+        m_CGaddr += 1;
+        
+        if( m_CGaddr > 63 ) m_CGaddr = 0;
     }
 }
 
@@ -263,12 +274,16 @@ void Hd44780::setDDaddr( int addr )
 {
     if( (m_lineLength==40) & (addr>63) ) addr -= 24;
     m_DDaddr = addr & 0b01111111;
+    
+    m_writeDDRAM = true;
     //qDebug() << "Hd44780::setDDaddr: "<< addr << m_DDaddr;
 }
 
 void Hd44780::setCGaddr( int addr )
 {
     m_CGaddr = addr & 0b00111111;
+    
+    m_writeDDRAM = false;
     //qDebug() << "set_CGaddr: " << m_CGaddr;
 }
 
@@ -363,6 +378,29 @@ void Hd44780::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
             //qDebug() << row << col << mem_pos;
             int char_num = m_DDram[mem_pos];
             QImage charact = m_fontImg.copy(char_num*10, 0, 10, 14);
+            
+            if( char_num < 8 )                        // CGRam Character
+            {
+                int addr = char_num*8;
+                
+                for( int y=0; y<14; y+=2 )
+                {
+                    int data = m_CGram[ addr ];
+                    addr++;
+                    
+                    for( int x=9; x>0; x-=2 )
+                    {
+                        if( data & 1 )
+                        {
+                            charact.setPixel(x,   y,   qRgb(0, 0, 0));
+                            charact.setPixel(x-1, y,   qRgb(0, 0, 0));
+                            charact.setPixel(x,   y+1, qRgb(0, 0, 0));
+                            charact.setPixel(x-1, y+1, qRgb(0, 0, 0));
+                        }
+                        data = data>>1;
+                    }
+                }
+            }
             p->drawImage(10+col*12,-(m_imgHeight+22)+row*18,charact );
             
             if( (mem_pos == m_DDaddr) & m_cursorOn )      // Draw cursor

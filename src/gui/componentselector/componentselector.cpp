@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -46,9 +46,8 @@ ComponentSelector::ComponentSelector( QWidget* parent )
     //QWhatsThis::add( this, QString::fromUtf8( gettext("Drag a Component and drop it into the Circuit." ) ) );
 
     LoadLibraryItems();
-    LoadCompSet();
+    //LoadCompSet();
 
-    
     setContextMenuPolicy( Qt::CustomContextMenu );
 
     connect( this, SIGNAL(customContextMenuRequested(const QPoint&)),
@@ -71,49 +70,30 @@ void ComponentSelector::LoadLibraryItems()
     }
 }
 
-void ComponentSelector::LoadCompSet()
+/*void ComponentSelector::LoadCompSet()
 {
-    QStringList compSetUnique;
-    // First, load the system component sets, because user sets can depend on it
     QDir compSetDir = SIMUAPI_AppPath::self()->RODataFolder();
-            //( qApp->applicationDirPath() );
 
-    //compSetDir.cd( "../share/simulide/data" );
-    
-    if( compSetDir.exists() ) 
-    {
-        compSetDir.setNameFilters( QStringList( "*.xml" ) );
-        qDebug() << "\n    Loading Component sets at:\n"<<compSetDir.absolutePath()<<"\n";
-        
-        foreach( QString compSetName, compSetDir.entryList( QDir::Files ) )
-        {
-            // This way user can override selected component sets
-            QString compSetFilePath = SIMUAPI_AppPath::self()->availableDataFilePath(compSetName);
-            //loadXml( compSetDir.absoluteFilePath(compSetName) );
-            if (!compSetFilePath.isEmpty()) {
-                loadXml(compSetFilePath);
-                qDebug() << "        Loaded Component set:  "<< compSetName;
-                compSetUnique.append(compSetName);
-            }
-        }
-        qDebug() << "\n";
-    }
+    if( compSetDir.exists() ) LoadCompSetAt( compSetDir );
+}*/
 
-    compSetDir = SIMUAPI_AppPath::self()->RWDataFolder();
-    if( compSetDir.exists() ) 
+void ComponentSelector::LoadCompSetAt( QDir compSetDir )
+{
+    compSetDir.setNameFilters( QStringList( "*.xml" ) );
+
+    QStringList xmlList = compSetDir.entryList( QDir::Files );
+
+    if( xmlList.isEmpty() ) return;                  // No comp sets to load
+
+    qDebug() << "\n    Loading Component sets at:\n"<<compSetDir.absolutePath()<<"\n";
+
+    foreach( QString compSetName, xmlList )
     {
-        compSetDir.setNameFilters( QStringList( "*.xml" ) );
-        qDebug() << "\n    Loading Component sets at:\n"<<compSetDir.absolutePath()<<"\n";
-        
-        foreach( QString compSetName, compSetDir.entryList( QDir::Files ) )
-        {
-            if (compSetUnique.contains(compSetName)) continue;
-            
-            loadXml( compSetDir.absoluteFilePath(compSetName) );
-            qDebug() << "        Loaded Component set:  "<< compSetName;
-        }
-        qDebug() << "\n";
+        QString compSetFilePath = compSetDir.absoluteFilePath( compSetName );
+
+        if( !compSetFilePath.isEmpty( ))  loadXml( compSetFilePath );
     }
+    qDebug() << "\n";
 }
 
 void ComponentSelector::loadXml( const QString &setFile )
@@ -145,6 +125,7 @@ void ComponentSelector::loadXml( const QString &setFile )
         QString type     = element.attribute( "type");
 
         //LibraryItem* parent = m_itemLibrary.itemByName(category);
+
         LibraryItem* parent = m_itemLibrary.libraryItem(type);
 
         if( parent )
@@ -164,14 +145,27 @@ void ComponentSelector::loadXml( const QString &setFile )
                     //icon.append(element.attribute("icon"));
                     icon = compSetDir.absoluteFilePath(element.attribute("icon"));
                 }
-                addItem( element.attribute( "name" ), category, icon, type );
+                QString name = element.attribute( "name" );
+
+                addItem( name, category, icon, type );
+
+                m_xmlFileList[ name ] = setFile;   // Save xml File used to create this item
 
                 node = node.nextSibling();
             }
         }
-
         rNode = rNode.nextSibling();
     }
+    QString compSetName = setFile.split( "/").last();
+
+    qDebug() << "        Loaded Component set:           "<< compSetName;
+
+    m_compSetUnique.append( compSetName );
+}
+
+QString ComponentSelector::getXmlFile( QString compName )
+{
+    return m_xmlFileList[ compName ];
 }
 
 void ComponentSelector::addLibraryItem( LibraryItem* libItem ) // Used By Plugins
@@ -203,7 +197,7 @@ void ComponentSelector::addItem( const QString &name, const QString &_category, 
     if( !m_categories.contains(category, Qt::CaseSensitive) )  // Create new Category
     {
         bool c_hidden =  MainWindow::self()->settings()->value( category+"/hidden" ).toBool();
-        bool expanded =  !MainWindow::self()->settings()->value( category+"/collapsed" ).toBool();
+        bool expanded = !MainWindow::self()->settings()->value( category+"/collapsed" ).toBool();
 
         m_categories.append(category);
         titulo = new QTreeWidgetItem(0);
@@ -248,7 +242,8 @@ void ComponentSelector::addItem( const QString &name, const QString &_category, 
 
                 for( int j=0; j<it->childCount(); j++ )
                 {
-                    if( it->child(j)->text(0) == category ) {
+                    if( it->child(j)->text(0) == category )
+                    {
                         titulo = it->child(j);
                         break;
                     }
@@ -314,7 +309,7 @@ void ComponentSelector::slotItemClicked( QTreeWidgetItem* item, int column)
     if( !item ) return;
     
     QString type = item->data(0, Qt::UserRole).toString();
-    m_lastItemClicked = type;
+    //m_lastItemClicked = type;
     
     if( type == "" ) return;
     

@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -30,6 +30,7 @@ LedBase::LedBase( QObject* parent, QString type, QString id )
     m_scrEnode = 0l;
     
     m_color = QColor( Qt::black );
+    setColor( yellow );
     
     m_valLabel->setEnabled( false );
     m_valLabel->setVisible( false );
@@ -140,11 +141,20 @@ void LedBase::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     p->setPen(pen);
 
     drawBackground( p );
+    
+    QColor color = QColor( m_bright, m_bright, overBight ); // Default = yellow
+    
+    if     ( m_ledColor == red )    color = QColor( m_bright,  m_bright/3, overBight );
+    else if( m_ledColor == green )  color = QColor( overBight, m_bright,   m_bright*2/3 );
+    else if( m_ledColor == blue )   color = QColor( overBight, m_bright/2, m_bright );
+    else if( m_ledColor == orange ) color = QColor( m_bright,  m_bright*2/3, overBight );
+    else if( m_ledColor == purple ) color = QColor( m_bright,  overBight,  m_bright*2/3 );
+    
 
-    pen.setColor( QColor( m_bright, m_bright, overBight ));
+    pen.setColor( color );
     pen.setWidth(2.5);
     p->setPen(pen);
-    p->setBrush( QColor( m_bright, m_bright, overBight) );
+    p->setBrush( color );
 
     drawForeground( p );
 }

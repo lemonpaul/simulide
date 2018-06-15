@@ -1,0 +1,54 @@
+ ###########################################################################
+ #   Copyright (C) 2017   by santiago González                             #
+ #   santigoro@gmail.com                                                   #
+ #                                                                         #
+ #   This program is free software; you can redistribute it and/or modify  #
+ #   it under the terms of the GNU General Public License as published by  #
+ #   the Free Software Foundation; either version 3 of the License, or     #
+ #   (at your option) any later version.                                   #
+ #                                                                         #
+ #   This program is distributed in the hope that it will be useful,       #
+ #   but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+ #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+ #   GNU General Public License for more details.                          #
+ #                                                                         #
+ #   You should have received a copy of the GNU General Public License     #
+ #   along with this program; if not, see <http://www.gnu.org/licenses/>.  #
+ #                                                                         #
+ ###########################################################################
+ 
+MaxMHz=20
+
+INDF,0
+TMR0,1
+PCL,2
+STATUS, EQU 
+FSR,4
+PORTA,5
+PORTB,6
+PORTC,7
+PCLATH,10
+INTCON,11
+PIR1,12
+TMR1L,14
+TMR1H,15
+T1CON,16
+TMR2,17
+T2CON,18
+SSPBUF,19
+SSPCON,20
+CCPR1L,21
+CCPR1H,22
+CCP1CON,2 EQU 
+ADRES, EQU 0
+ADCON0, EQU 1
+OPTION_REG,129
+TRISA,1 EQU  EQU 
+TRISB,1 EQU 4
+TRISC,1 EQU 5
+PIE1,140
+PCON,142
+PR2,146
+SSPADD,147
+SSPSTAT,148
+ADCON1,159
