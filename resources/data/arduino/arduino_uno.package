@@ -53,7 +53,7 @@
     <pin side="right"   pos="11" type="gnd"   id="GND2" label="GND "/>
     <pin side="right"   pos="12" type="v5v"   id="V5V"  label="5V "/>
     <pin side="right"   pos="13" type="v3v"   id="V3V"  label="3V3 "/>
-    <pin side="right"   pos="14" type="reset" id="PC6"  label="RST "/>
+    <pin side="right"   pos="14" type="reset" id="RST"  label="RST "/>
     
 </package>
 

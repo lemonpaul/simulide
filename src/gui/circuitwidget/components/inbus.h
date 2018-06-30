@@ -29,7 +29,7 @@ class MAINMODULE_EXPORT InBus : public LogicComponent, public eInBus
     Q_OBJECT
     Q_PROPERTY( double Out_High_V   READ outHighV   WRITE setOutHighV   DESIGNABLE true USER true )
     Q_PROPERTY( double Out_Low_V    READ outLowV    WRITE setOutLowV    DESIGNABLE true USER true )
-    Q_PROPERTY( double Out_Imped    READ outImp     WRITE setOutImp     DESIGNABLE true USER true )
+    //Q_PROPERTY( double Out_Imped    READ outImp     WRITE setOutImp     DESIGNABLE true USER true )
     Q_PROPERTY( int    Num_Bits     READ numOuts    WRITE setNumOuts    DESIGNABLE true USER true )
 
     public:

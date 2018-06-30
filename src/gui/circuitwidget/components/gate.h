@@ -38,8 +38,8 @@ class MAINMODULE_EXPORT Gate : public Component, public eGate
     
 
     public:
-        QRectF boundingRect() const { return QRect( -18, -8*m_numInputs, 36, 8*2*m_numInputs ); }
-
+        QRectF boundingRect() const { return QRect( -20, -8*m_numInputs, 40, 8*2*m_numInputs ); }
+        
         Gate( QObject* parent, QString type, QString id, int inputs );
         ~Gate();
         

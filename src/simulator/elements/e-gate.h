@@ -31,9 +31,14 @@ class MAINMODULE_EXPORT eGate : public eLogicDevice
 
         virtual void initialize();
         virtual void setVChanged();
+        
+        bool tristate();
+        void setTristate( bool t );
 
     protected:           
         virtual bool calcOutput( int inputs );
+
+        bool m_tristate;
 
 };
 

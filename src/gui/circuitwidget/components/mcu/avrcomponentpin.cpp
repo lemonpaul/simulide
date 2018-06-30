@@ -104,22 +104,18 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
     else if( m_type == "reset" ) 
     {
         m_pinType = 21;
-        eSource::setImp( high_imp );
     }
     else if( m_type == "vcc"  ) 
     {
         m_pinType = 22;
-        eSource::setImp( high_imp );
     }
     else if( m_type == "avcc" ) 
     {
         m_pinType = 23;
-        eSource::setImp( high_imp );
     }
     else if( m_type == "aref" )
     {
          m_pinType = 24;
-         eSource::setImp( high_imp );
     }
     m_attached = true;
 }
@@ -155,9 +151,8 @@ void AVRComponentPin::setVChanged()
     }
     else if( m_pinType == 21 ) // reset
     {
-        ;
-        //if( volt > 3 )  avr_reset( m_AvrProcessor );
-        //else            m_mcuComponent->setMclr( false );
+        if( volt < 3 )  BaseProcessor::self()->hardReset( true );
+        else            BaseProcessor::self()->hardReset( false );
     }
     else if( m_pinType == 22 ) { m_AvrProcessor->vcc  = volt*1000;}
     else if( m_pinType == 23 ) { m_AvrProcessor->avcc = volt*1000;}

@@ -58,7 +58,7 @@
     <pin side="right" pos="5"  type="bidir" id="PB7"  label="B7"/>
     <pin side="right" pos="4"  type="bidir" id="PC7"  label="C7"/>
     <pin side="right" pos="3"  type="bidir" id="PC6"  label="C6"/>
-    <pin side="right" pos="2"  type="reset" id="Rst"  label="Rst"/>
+    <pin side="right" pos="2"  type="reset" id="RST"  label="Rst"/>
     
     
 </package>

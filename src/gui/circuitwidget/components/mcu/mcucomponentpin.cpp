@@ -21,7 +21,8 @@
 
 
 McuComponentPin::McuComponentPin( McuComponent *mcuComponent, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
-    : QObject( mcuComponent ), eSource( id.toStdString(), 0l )
+               : QObject( mcuComponent )
+               , eSource( id.toStdString(), 0l )
 {
     m_id   = id;
     m_Rth  = high_imp;
@@ -44,9 +45,6 @@ McuComponentPin::McuComponentPin( McuComponent *mcuComponent, QString id, QStrin
 
 McuComponentPin::~McuComponentPin()
 {
-    //delete pin();
-    /*if( m_ePin[0]->isConnected() )
-        m_ePin[0]->getEnode()->remFromChangedList(this);*/
 }
 
 void McuComponentPin::terminate()
@@ -68,6 +66,8 @@ void McuComponentPin::initialize()
 {
     if( m_ePin[0]->isConnected() && m_attached )
         m_ePin[0]->getEnode()->addToChangedFast(this);
+        
+    //if( m_pinType == 21 ) BaseProcessor::self()->hardReset( true );
 
     eSource::initialize();
 }
@@ -83,10 +83,5 @@ void McuComponentPin::move( int dx, int dy )
     pin()->moveBy( dx, dy );
 }
 
-/*void McuComponentPin::moveLabel( int dx, int dy )
-{
-    pin()->setLabelPos();
-    //m_pinLabel->moveBy( dx, dy );
-}*/
 
 #include "moc_mcucomponentpin.cpp"

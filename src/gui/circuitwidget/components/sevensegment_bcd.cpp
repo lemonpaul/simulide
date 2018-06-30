@@ -38,7 +38,8 @@ LibraryItem* SevenSegmentBCD::libraryItem()
 }
 
 SevenSegmentBCD::SevenSegmentBCD( QObject* parent, QString type, QString id )
-        : LogicComponent( parent, type, id ), eLogicDevice( id.toStdString() )
+               : LogicComponent( parent, type, id )
+               , eBcdTo7S( id.toStdString() )
 {
     m_width  = 4;
     m_height = 6;
@@ -46,197 +47,32 @@ SevenSegmentBCD::SevenSegmentBCD( QObject* parent, QString type, QString id )
     QStringList pinList;
 
     pinList // Inputs:
-            << "IL06  "
-            << "IL04  "
-            << "IL02  "
-            << "IL00  "
+            << "ID04  "
+            << "ID03  "
+            << "ID02  "
+            << "ID01  "
             ;
     init( pinList );
 
     for( int i=0; i<m_numInPins; i++ )
         eLogicDevice::createInput( m_inPin[i] );
         
-    m_outValue.resize( 7 );
-    
     Simulator::self()->addToUpdateList( this );
 }
 SevenSegmentBCD::~SevenSegmentBCD(){}
-
-void SevenSegmentBCD::initialize()
-{
-    for( int i=0; i<m_numInPins; i++ )
-    {
-        eNode* enode = m_input[i]->getEpin()->getEnode(); 
-        if( enode ) enode->addToChangedFast(this);
-    }
-}
 
 void SevenSegmentBCD::resetState()
 {
     for( int i=0; i<7; i++ ) m_outValue[i] = false;
 }
 
-void SevenSegmentBCD::setVChanged()
-{
-    bool a = eLogicDevice::getInputState( 0 );
-    bool b = eLogicDevice::getInputState( 1 );
-    bool c = eLogicDevice::getInputState( 2 );
-    bool d = eLogicDevice::getInputState( 3 );
-
-    int digit = a*1+b*2+c*4+d*8;
-
-    switch( digit)
-    {
-    case 0:
-        m_outValue[0] = true;
-        m_outValue[1] = true;
-        m_outValue[2] = true;
-        m_outValue[3] = true;
-        m_outValue[4] = true;
-        m_outValue[5] = true;
-        m_outValue[6] = false;
-        break;
-    case 1:
-        m_outValue[0] = false;
-        m_outValue[1] = true;
-        m_outValue[2] = true;
-        m_outValue[3] = false;
-        m_outValue[4] = false;
-        m_outValue[5] = false;
-        m_outValue[6] = false;
-        break;
-    case 2:
-        m_outValue[0] = true;
-        m_outValue[1] = true;
-        m_outValue[2] = false;
-        m_outValue[3] = true;
-        m_outValue[4] = true;
-        m_outValue[5] = false;
-        m_outValue[6] = true;
-        break;
-    case 3:
-        m_outValue[0] = true;
-        m_outValue[1] = true;
-        m_outValue[2] = true;
-        m_outValue[3] = true;
-        m_outValue[4] = false;
-        m_outValue[5] = false;
-        m_outValue[6] = true;
-        break;
-    case 4:
-        m_outValue[0] = false;
-        m_outValue[1] = true;
-        m_outValue[2] = true;
-        m_outValue[3] = false;
-        m_outValue[4] = false;
-        m_outValue[5] = true;
-        m_outValue[6] = true;
-        break;
-    case 5:
-        m_outValue[0] = true;
-        m_outValue[1] = false;
-        m_outValue[2] = true;
-        m_outValue[3] = true;
-        m_outValue[4] = false;
-        m_outValue[5] = true;
-        m_outValue[6] = true;
-        break;
-    case 6:
-        m_outValue[0] = true;
-        m_outValue[1] = false;
-        m_outValue[2] = true;
-        m_outValue[3] = true;
-        m_outValue[4] = true;
-        m_outValue[5] = true;
-        m_outValue[6] = true;
-        break;
-    case 7:
-        m_outValue[0] = true;
-        m_outValue[1] = true;
-        m_outValue[2] = true;
-        m_outValue[3] = false;
-        m_outValue[4] = false;
-        m_outValue[5] = false;
-        m_outValue[6] = false;
-        break;
-    case 8:
-        m_outValue[0] = true;
-        m_outValue[1] = true;
-        m_outValue[2] = true;
-        m_outValue[3] = true;
-        m_outValue[4] = true;
-        m_outValue[5] = true;
-        m_outValue[6] = true;
-        break;
-    case 9:
-        m_outValue[0] = true;
-        m_outValue[1] = true;
-        m_outValue[2] = true;
-        m_outValue[3] = true;
-        m_outValue[4] = false;
-        m_outValue[5] = true;
-        m_outValue[6] = true;
-        break;
-    case 10:
-        m_outValue[0] = true;
-        m_outValue[1] = true;
-        m_outValue[2] = true;
-        m_outValue[3] = false;
-        m_outValue[4] = true;
-        m_outValue[5] = true;
-        m_outValue[6] = true;
-        break;
-    case 11:
-        m_outValue[0] = false;
-        m_outValue[1] = false;
-        m_outValue[2] = true;
-        m_outValue[3] = true;
-        m_outValue[4] = true;
-        m_outValue[5] = true;
-        m_outValue[6] = true;
-        break;
-    case 12:
-        m_outValue[0] = true;
-        m_outValue[1] = false;
-        m_outValue[2] = false;
-        m_outValue[3] = true;
-        m_outValue[4] = true;
-        m_outValue[5] = true;
-        m_outValue[6] = false;
-        break;
-    case 13:
-        m_outValue[0] = false;
-        m_outValue[1] = true;
-        m_outValue[2] = true;
-        m_outValue[3] = true;
-        m_outValue[4] = true;
-        m_outValue[5] = false;
-        m_outValue[6] = true;
-        break;
-    case 14:
-        m_outValue[0] = true;
-        m_outValue[1] = false;
-        m_outValue[2] = false;
-        m_outValue[3] = true;
-        m_outValue[4] = true;
-        m_outValue[5] = true;
-        m_outValue[6] = true;
-        break;
-    case 15:
-        m_outValue[0] = true;
-        m_outValue[1] = false;
-        m_outValue[2] = false;
-        m_outValue[3] = false;
-        m_outValue[4] = true;
-        m_outValue[5] = true;
-        m_outValue[6] = true;
-        break;
-    }
-}
-
 void SevenSegmentBCD::updateStep()
 {
-    update();
+    if( m_changed )
+    {
+        update();
+        m_changed = false;
+    }
 }
 
 void SevenSegmentBCD::remove()

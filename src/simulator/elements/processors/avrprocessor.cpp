@@ -182,7 +182,6 @@ bool AvrProcessor::loadFirmware( QString fileN )
 void AvrProcessor::reset()
 {
     if( !m_loadStatus ) return;
-    //qDebug() << "AvrProcessor::reset";
 
     avr_reset( m_avrProcessor );
     m_avrProcessor->pc = 0;
@@ -190,7 +189,8 @@ void AvrProcessor::reset()
 
 void AvrProcessor::step()
 {
-    if( !m_loadStatus ) return;
+    if( !m_loadStatus || m_resetStatus ) return;
+    
     while( m_avrProcessor->cycle < m_nextCycle )
     {
         m_avrProcessor->run(m_avrProcessor);

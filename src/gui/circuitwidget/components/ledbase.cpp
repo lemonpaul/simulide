@@ -23,11 +23,13 @@
 #include "pin.h"
 
 LedBase::LedBase( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eLed( id.toStdString() )
+       : Component( parent, type, id )
+       , eLed( id.toStdString() )
 {
     m_grounded = false;
     m_ground   = 0l;
     m_scrEnode = 0l;
+    m_bright = 0;
     
     m_color = QColor( Qt::black );
     setColor( yellow );
@@ -43,6 +45,7 @@ LedBase::~LedBase()
 
 void LedBase::updateStep()
 {
+    eLed::updateBright();
     update();
 }
 
@@ -81,7 +84,7 @@ void LedBase::setGrounded( bool grounded )
         if( !m_grounded ) return;
         
         Pin* pin1 = (static_cast<Pin*>(m_ePin[1]));
-        //if( m_ePin[1]->isConnected() ) pin1->connector()->remove();
+
         pin1->setEnabled( true );
         pin1->setVisible( true );
         
@@ -100,12 +103,19 @@ void LedBase::setGrounded( bool grounded )
 
 void LedBase::remove()
 {
-    if( m_ePin[0] && m_ePin[0]->isConnected() )
-        (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
-    if(( m_ePin[1] && m_ePin[1]->isConnected() )&( !m_grounded ))
-        (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-
-    if( m_ground )   delete m_ground;
+    /*for( int i=0; i<2; i++ )
+    {
+        if( ( !m_grounded )&&( m_ePin[i]  ) )
+        {
+            Pin* pin = static_cast<Pin*>(m_ePin[i]);
+            if( pin && pin->isConnected())
+            {
+                Connector* con = pin->connector();
+                if( con ) con->remove();
+            }
+        }
+    }*/
+    if( m_ground ) delete m_ground;
     
     Simulator::self()->remFromUpdateList( this ); 
     
@@ -116,8 +126,6 @@ void LedBase::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
 {
     Component::paint( p, option, widget );
 
-    eLed::updateBright();
-
     QPen pen(Qt::black, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
     if( m_bright > 255+75 )                               // Max Current
@@ -126,18 +134,18 @@ void LedBase::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
         p->setBrush( Qt::white );
         pen.setColor( QColor( Qt::white ));
     }
-
     int overBight = 100;
+    
     if( m_bright > 40 )
     {
         m_bright += 10;                          // Set a Minimun Bright
+        
         if( m_bright > 255 ) 
         {
             overBight += m_bright-255;
             m_bright = 255;
         }
     }
-
     p->setPen(pen);
 
     drawBackground( p );
@@ -150,7 +158,6 @@ void LedBase::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     else if( m_ledColor == orange ) color = QColor( m_bright,  m_bright*2/3, overBight );
     else if( m_ledColor == purple ) color = QColor( m_bright,  overBight,  m_bright*2/3 );
     
-
     pen.setColor( color );
     pen.setWidth(2.5);
     p->setPen(pen);

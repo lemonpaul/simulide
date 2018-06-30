@@ -151,12 +151,36 @@ void Servo::remove()
     Component::remove();
 }
 
+QPainterPath Servo::shape() const
+{
+    QPainterPath path;
+    
+    QVector<QPointF> points;
+    
+    points << QPointF(-40,-24 )
+           << QPointF(-40, 24 )
+           << QPointF(-16, 24 )
+           << QPointF(  0, 40 )
+           << QPointF( 32, 40 )
+           << QPointF( 56, 8  )
+           << QPointF( 56,-8  )
+           << QPointF( 32,-40 )
+           << QPointF(  0,-40 )
+           << QPointF(-16,-24 )
+           << QPointF(-40,-24 );
+        
+    path.addPolygon( QPolygonF(points) );
+    path.closeSubpath();
+    return path;
+}
+
 void Servo::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
     Component::paint( p, option, widget );
-
     p->setBrush( QColor(50, 70, 100) );
     p->drawRoundedRect( m_area, 4, 4 );
+    //p->drawEllipse( -24, -40, 80, 80 );
+    
 
     //p->setBrush( QColor(50, 70, 100) );
 

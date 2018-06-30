@@ -19,21 +19,18 @@
 
 #include "gcbdebugger.h"
 #include "baseprocessor.h"
-#include "mainwindow.h"
 #include "utils.h"
 #include "simuapi_apppath.h"
 
 GcbDebugger::GcbDebugger( QObject* parent, OutPanelText* outPane, QString filePath ) 
             : BaseDebugger( parent,outPane, filePath )
-{    
-    QSettings* settings = MainWindow::self()->settings();
-    //( SIMUAPI_AppPath::self()->availableDataFilePath("codeeditor/config.ini"),
-    //                    QSettings::IniFormat );
-
-    m_gcBasic = "";
+{
+    setObjectName( "GcBasic Compiler" );
     
-    if( settings->contains("gcbasic_Path") )
-        m_gcBasic = settings->value("gcbasic_Path").toString();
+    m_compilerPath = "";
+    m_compSetting = "gcbasic_Path";
+    
+    readSettings();
 
     m_typesList["byte"]    = "uint8";
     m_typesList["integer"] = "int16";
@@ -234,7 +231,7 @@ void GcbDebugger::mapLstToAsm()
 
 int GcbDebugger::compile()
 {
-    QDir gcBasicDir( m_gcBasic );
+    QDir gcBasicDir( m_compilerPath );
     if( !gcBasicDir.exists() )
     {
         m_outPane->appendText( "\nGcBasic ToolChain not found\n" );
@@ -244,7 +241,7 @@ int GcbDebugger::compile()
 
     QString file = m_fileDir+m_fileName+m_fileExt;
     QString args = " -NP -K:L -A:GCASM  ";
-    QString command = m_gcBasic + "gcbasic";
+    QString command = m_compilerPath + "gcbasic";
     
     #ifndef Q_OS_UNIX
     command  = addQuotes( command );
@@ -290,24 +287,6 @@ int GcbDebugger::compile()
         }
     }
     return error;
-}
-
-void GcbDebugger::getCompilerPath()
-{
-        m_gcBasic = QFileDialog::getExistingDirectory( 0L,
-                               tr("Select GcBasic toolchain directory"),
-                               m_gcBasic,
-                               QFileDialog::ShowDirsOnly
-                             | QFileDialog::DontResolveSymlinks);
-
-        m_gcBasic += "/";
-        //QSettings settings( SIMUAPI_AppPath::self()->availableDataFilePath("codeeditor/config.ini"),
-        //                    QSettings::IniFormat );
-
-        MainWindow::self()->settings()->setValue("gcbasic_Path", m_gcBasic);
-
-        m_outPane->appendText( "Using GcBasic Path: \n" );
-        m_outPane->writeText( m_gcBasic+"\n\n" );
 }
 
 void  GcbDebugger::getProcType()

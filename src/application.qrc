@@ -79,6 +79,7 @@
         <file alias="clock.png">../src/icons/components/clock.png</file>
         <file alias="resistordip.png">../src/icons/components/resistordip.png</file>
         <file alias="ledbar.png">../src/icons/components/ledbar.png</file>
+        <file alias="ledmatrix.png">../src/icons/components/ledmatrix.png</file>
         <file alias="text.png">../src/icons/components/text.png</file>
         <file alias="voltimeter.png">../src/icons/components/voltimeter.png</file>
         <file alias="amperimeter.png">../src/icons/components/amperimeter.png</file>
@@ -91,6 +92,9 @@
         <file alias="toggleswitch.png">../src/icons/components/toggleswitch.png</file>
         <file alias="audio_out.png">../src/icons/components/audio_out.png</file>
         <file alias="keypad.png">../src/icons/components/keypad.png</file>
+        <file alias="ellipse.png">../src/icons/components/ellipse.png</file>
+        <file alias="line.png">../src/icons/components/line.png</file>
+        <file alias="rectangle.png">../src/icons/components/rectangle.png</file>
         
         <file alias="arduinoUnoIcon.png">../src/icons/components/arduinoUnoIcon.png</file>
         <file alias="arduinoUno.png">../src/icons/components/arduinoUno.png</file>

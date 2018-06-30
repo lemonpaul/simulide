@@ -42,13 +42,8 @@ void eMux::initialize()
 
 void eMux::setVChanged()
 {
-    if( m_outEnablePin )
-    {
-        bool outEnPrev = m_outEnable;
-        bool outEn = eLogicDevice::outputEnabled();
-        
-        if( outEnPrev != outEn ) eLogicDevice::setOutputEnabled( outEn );
-    }
+    eLogicDevice::updateOutEnabled();
+    
     int address = 0;
     
     for( int i=8; i<11; i++ )

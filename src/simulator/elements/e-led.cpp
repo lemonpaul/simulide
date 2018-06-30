@@ -20,7 +20,8 @@
 #include "e-led.h"
 #include "simulator.h"
 
-eLed::eLed( std::string id ) : eDiode( id )
+eLed::eLed( std::string id ) 
+    : eDiode( id )
 {
     m_threshold = 2.4;
 
@@ -28,9 +29,9 @@ eLed::eLed( std::string id ) : eDiode( id )
     m_maxCurrent = 0.03;
     m_lastCurrent = 0.0;
 
-    disp_brightness  = 0;
-    avg_brightness   = 0;
-    lastUpdatePeriod = 0;
+    m_disp_brightness  = 0;
+    m_avg_brightness   = 0;
+    m_lastUpdatePeriod = 0;
 }
 eLed::~eLed() {}
 
@@ -41,9 +42,9 @@ void eLed::initialize()
     m_lastCurrent = 0.0;
     m_bright = 0;
 
-    disp_brightness  = 0;
-    avg_brightness   = 0;
-    lastUpdatePeriod = 0;
+    m_disp_brightness  = 0;
+    m_avg_brightness   = 0;
+    m_lastUpdatePeriod = 0;
 
     eDiode::initialize();
 }
@@ -61,11 +62,13 @@ void eLed::updateVI()
     int period = step - m_prevStep;    
 
     m_prevStep = step;
-    lastUpdatePeriod += period;
+    m_lastUpdatePeriod += period;
 
-    if( m_lastCurrent > 0) avg_brightness += m_lastCurrent * period / m_maxCurrent;
+    if( m_lastCurrent > 0) m_avg_brightness += m_lastCurrent * period / m_maxCurrent;
+    
     m_lastCurrent = m_current;
-    //qDebug()<<"current"<< m_current<<m_lastCurrent<<period<< lastUpdatePeriod <<avg_brightness;
+    
+    //qDebug()<<"current"<< m_current<<m_lastCurrent<<period<< m_lastUpdatePeriod <<m_avg_brightness;
     //label->setText( QString("%1 A"). arg(double(int(m_current*1000))/1000) );
 }
 
@@ -73,20 +76,21 @@ void eLed::updateBright()
 {
     if( !Simulator::self()->isRunning() )
     {
-        avg_brightness = 0;
-        lastUpdatePeriod = 0;
+        m_avg_brightness = 0;
+        m_lastUpdatePeriod = 0;
         m_bright = 40;
         return;
     }
     updateVI();
     
-    if( lastUpdatePeriod != 0. )
+    if( m_lastUpdatePeriod > 20000 )
     {
-        disp_brightness = avg_brightness/lastUpdatePeriod;
-        //qDebug() << disp_brightness << avg_brightness << lastUpdatePeriod;
-        avg_brightness   = 0;
-        lastUpdatePeriod = 0;
+        m_disp_brightness = m_avg_brightness/m_lastUpdatePeriod;
+
+        m_avg_brightness   = 0;
+        m_lastUpdatePeriod = 0;
+        m_bright = uint(m_disp_brightness*255)+40;
     }
-    m_bright = uint(disp_brightness*255)+40;
+    //qDebug()<<"current"<< m_current<<m_lastCurrent<<m_lastUpdatePeriod;
     //qDebug() << m_bright;
 }

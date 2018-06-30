@@ -38,10 +38,27 @@ class LineNumberArea;
 class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
+    //Q_PROPERTY( bool   centerOnScroll   READ centerOnScroll    WRITE setCenterOnScroll  DESIGNABLE true USER true )
+    Q_PROPERTY( int  Font_Size   READ fontSize    WRITE setFontSize   DESIGNABLE true USER true )
+    Q_PROPERTY( int  Tab_Size    READ tabSize     WRITE setTabSize    DESIGNABLE true USER true )
+    Q_PROPERTY( bool Spaces_Tabs READ spaceTabs   WRITE setSpaceTabs  DESIGNABLE true USER true )
+    Q_PROPERTY( bool Show_Spaces READ showSpaces  WRITE setShowSpaces DESIGNABLE true USER true )
 
     public:
         CodeEditor( QWidget *parent, OutPanelText *outPane, RamTable *ramTable );
         ~CodeEditor();
+        
+        int fontSize();
+        void setFontSize( int size );
+        
+        int tabSize();
+        void setTabSize( int size );
+        
+        bool showSpaces();
+        void setShowSpaces( bool on );
+        
+        bool spaceTabs();
+        void setSpaceTabs( bool on );
 
         void setFile(const QString &filePath);
         QString getFilePath();
@@ -52,9 +69,12 @@ class CodeEditor : public QPlainTextEdit
         void setCompiled( bool compiled ) { m_isCompiled = compiled; }
         
         bool debugStarted() { return m_debugging; }
+        bool initDebbuger();
 
         bool hasDebugger() { return m_debugger!=0l; }
         void setCompilerPath();
+        
+        void writeSettings();
 
     signals:
         void msg( QString text );
@@ -74,12 +94,13 @@ class CodeEditor : public QPlainTextEdit
 
     protected:
         void resizeEvent(QResizeEvent *event);
+        void focusInEvent( QFocusEvent* );
+        void keyPressEvent( QKeyEvent* event );
 
     private slots:
         void updateLineNumberAreaWidth(int newBlockCount);
         void updateLineNumberArea( const QRect &, int );
         void highlightCurrentLine();
-        void initDebbuger();
 
     private:
         int  getSintaxCoincidences(QString& fileName, QStringList& instructions );
@@ -89,6 +110,8 @@ class CodeEditor : public QPlainTextEdit
 
         void runClockTick( bool over=false );
         void setupDebugTimer();
+        
+        void indentSelection( bool unIndent );
         
         BaseDebugger*  m_debugger;
         RamTable*      m_ramTable;
@@ -102,6 +125,8 @@ class CodeEditor : public QPlainTextEdit
         QString m_fileDir;
         QString m_fileName;
         QString m_fileExt;
+        
+        QString m_tab;
 
         QList<int> m_brkPoints;
 
@@ -113,9 +138,11 @@ class CodeEditor : public QPlainTextEdit
         bool m_debugging;
         bool m_running;
         
-        QTimer m_timer;
-        int m_timerTick;
-        int m_stepsPT;
+ static bool  m_showSpaces;
+ static bool  m_spaceTabs;
+ static int   m_fontSize;
+ static int   m_tabSize;
+ static QFont m_font;
 };
 
 
@@ -140,3 +167,4 @@ class LineNumberArea : public QWidget
 };
 
 #endif
+

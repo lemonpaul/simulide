@@ -19,7 +19,7 @@
 <!-- *                                                                         * -->
 <!-- *************************************************************************** -->
 
-<package name="atmega169" pins="44" width="14" height="14">
+<package name="atmega32u4" pins="44" width="14" height="14">
 
     <pin side="left" pos="2"  type="bidir" id="PE6" label="E6"/>
     <pin side="left" pos="3"  type="uvcc"  id="UVCC" label="UVcc"/>
@@ -34,7 +34,7 @@
     <pin side="left" pos="12" type="bidir" id="PB3" label="B3"/>
 
     <pin side="bottom" pos="2"  type="bidir" id="PB7" label="B7"/>
-    <pin side="bottom" pos="3"  type="rst"   id="RST" label="RESET"/>
+    <pin side="bottom" pos="3"  type="reset" id="RST" label="Rst"/>
     <pin side="bottom" pos="4"  type="vcc"   id="VCC" label="Vcc"/>
     <pin side="bottom" pos="5"  type="gnd"   id="GND" label="Gnd"/>
     <pin side="bottom" pos="6"  type="osc"   id="XTAL2" label="XTAL2"/>

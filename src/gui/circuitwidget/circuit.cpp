@@ -26,7 +26,7 @@
 Circuit*  Circuit::m_pSelf = 0l;
 
 Circuit::Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  parent)
-    : QGraphicsScene(x, y, width, height, parent)
+       : QGraphicsScene(x, y, width, height, parent)
 {
     setObjectName( "Circuit" );
     setParent( parent );
@@ -63,7 +63,7 @@ int Circuit::nlAcc()
     return Simulator::self()->nlAcc();
 }
 
-void  Circuit::setNlAcc( int ac )
+void Circuit::setNlAcc( int ac )
 {
     Simulator::self()->setNlAcc( ac );
 }
@@ -73,7 +73,7 @@ int Circuit::reactStep()
     return Simulator::self()->reaClock();
 }
 
-void  Circuit::setReactStep( int steps )
+void Circuit::setReactStep( int steps )
 {
     Simulator::self()->setReaClock( steps );
 }
@@ -88,7 +88,7 @@ void Circuit::setNoLinStep( int steps )
     Simulator::self()->setNoLinClock( steps );
 }
 
-int  Circuit::circSpeed()
+int Circuit::circSpeed()
 {
     return Simulator::self()->simuRate();
 }
@@ -109,7 +109,6 @@ void Circuit::removeItems()                     // Remove Selected items
         bool isNode = comp->objectName().contains( "Node" ); // Don't remove Graphical Nodes
         if( comp->isSelected() && !isNode )  removeComp( comp );
     }
-
     if( pauseSim ) Simulator::self()->runContinuous();
 }
 
@@ -118,7 +117,7 @@ void Circuit::removeComp( Component* comp )
     comp->remove();
     QPropertyEditorWidget::self()->removeObject( comp );
     compList()->removeOne( comp );
-    removeItem( comp );
+    if( items().contains( comp ) ) removeItem( comp );
     comp->deleteLater();
 }
 
@@ -128,16 +127,15 @@ void Circuit::remove() // Remove everything
     foreach( Component* comp, m_compList )
     {
         //qDebug() << "Circuit::remove" << comp->itemID();
-
-        // Don't remove internal items
-        bool isNumber = false;
+        
+        bool isNumber = false;               // Don't remove internal items
+        
         comp->objectName().split("-").last().toInt( &isNumber ); // TODO: Find a proper way !!!!!!!!!!!
-        // Don't remove Graphical Nodes
-        bool isNode = comp->objectName().contains( "Node" );
+        
+        bool isNode = comp->objectName().contains( "Node" );// Don't remove Graphical Nodes
 
         if( isNumber && !isNode )  removeComp( comp );
     }
-
 }
 
 void Circuit::saveState()
@@ -176,7 +174,7 @@ void Circuit::drawBackground ( QPainter*  painter, const QRectF & rect )
     /*painter->setBrush(QColor( 255, 255, 255 ) );
     painter->drawRect( m_scenerect );*/
 
-    painter->setBrush(QColor( 240, 240, 210 ) );
+    painter->setBrush( QColor( 240, 240, 210 ) );
     painter->drawRect( m_scenerect );
     painter->setPen( QColor( 210, 210, 210 ) );
 
@@ -187,43 +185,37 @@ void Circuit::drawBackground ( QPainter*  painter, const QRectF & rect )
     int starty = int(m_scenerect.y());///2;
     int endy   = int(m_scenerect.height())/2;
 
-    for (int i = 4; i<endx; i+=8)
+    for( int i = 4; i<endx; i+=8 )
     {
         painter->drawLine( i, starty, i, endy );
         painter->drawLine(-i, starty,-i, endy );
     }
-    for (int i = 4; i<endy; i+=8)
+    for( int i = 4; i<endy; i+=8 )
     {
         painter->drawLine( startx, i, endx, i);
         painter->drawLine( startx,-i, endx,-i);
     }
-    
 }
 
 void Circuit::importCirc(  QPointF eventpoint  )
 {
-    //saveState();
-
     m_pasting = true;
 
     m_deltaMove = QPointF( 160, 160 );//togrid(eventpoint);
 
-    const QString dir = m_fileName;
+    const QString dir = m_filePath;
     QString fileName = QFileDialog::getOpenFileName( 0l, tr("Load Circuit"), dir,
                                           tr("Circuits (*.simu);;All files (*.*)"));
 
     if( !fileName.isEmpty() && fileName.endsWith(".simu") )
         loadCircuit( fileName );
+        
     m_pasting = false;
-
-    //copy( eventpoint );
-    //removeItems();
-    //paste( eventpoint );
 }
 
 void Circuit::loadCircuit( QString &fileName )
 {
-    m_fileName = fileName;
+    m_filePath = fileName;
     QFile file( fileName );
 
     if( !file.open(QFile::ReadOnly | QFile::Text) )
@@ -232,23 +224,21 @@ void Circuit::loadCircuit( QString &fileName )
         tr("Cannot read file %1:\n%2.").arg(fileName).arg(file.errorString()));
         return;
     }
-
     saveState();
 
-    if (!m_domDoc.setContent(&file))
+    if( !m_domDoc.setContent(&file) )
     {
-        QMessageBox::warning(0l, tr("MainWindow::loadCircuit"),
+        QMessageBox::warning( 0l, "MainWindow::loadCircuit",
         tr("Cannot set file %1\nto DomDocument").arg(fileName));
         file.close();
         return;
     }
     file.close();
 
-    //m_seqNumber = 1;
-
     loadDomDoc( &m_domDoc );
-
     m_domDoc.clear();
+    
+    m_graphicView->centerOn( QPointF( 1200+itemsBoundingRect().center().x(), 950+itemsBoundingRect().center().y() ) );
 }
 
 QString Circuit::getCompId( QString name )
@@ -295,12 +285,13 @@ Pin* Circuit::findPin( int x, int y, QString id )
 //qDebug()<< it->scenePos() << pointList.first().toInt()<< pointList.at(1).toInt();
         if( pin ) return pin;
     }
-
     return 0l;
 }
 
 void Circuit::loadDomDoc( QDomDocument* doc )
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    
     int firstSeqNumber = m_seqNumber+1;
 
     QDomElement root = doc->documentElement();
@@ -483,11 +474,10 @@ void Circuit::loadDomDoc( QDomDocument* doc )
             con->move( m_deltaMove );
         }
     }
-    else 
-        m_graphicView->centerOn( QPointF( 1200+itemsBoundingRect().center().x(), 950+itemsBoundingRect().center().y() ) );
-    
     // Take care about unconnected Joints
     foreach( Node* joint, jointList ) joint->remove(); // Only removed if some missing connector
+    
+    QApplication::restoreOverrideCursor();
 }
 
 bool Circuit::saveCircuit( QString &fileName )
@@ -502,7 +492,6 @@ bool Circuit::saveCircuit( QString &fileName )
           tr("Cannot write file %1:\n%2.").arg(fileName).arg(file.errorString()));
           return false;
     }
-
     QTextStream out(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -512,8 +501,42 @@ bool Circuit::saveCircuit( QString &fileName )
     file.close();
     QApplication::restoreOverrideCursor();
 
-    //m_changed = false;
     return true;
+}
+
+void Circuit::bom()
+{
+    QStringList bom;
+    
+    foreach( Component* comp, m_compList )
+    {
+        bool isNumber = false;
+        comp->objectName().split("-").last().toInt( &isNumber );
+
+        if( isNumber ) bom.append( comp->print() );
+    }
+    
+    QString fileName = m_filePath; 
+    fileName.replace( ".simu", "" );
+    fileName += "-bom.txt";
+
+    QFile file( fileName );
+
+    if( !file.open(QFile::WriteOnly | QFile::Text) )
+    {
+          QMessageBox::warning(0l, tr("Application"),
+          tr("Cannot write file %1:\n%2.").arg(fileName).arg(file.errorString()));
+    }
+    bom.sort();
+    
+    QTextStream out(&file);
+    out <<  "\nCircuit: ";
+    out <<  QFileInfo( m_filePath ).fileName();
+    out <<  "\n\n";
+    out <<  "Bill of Materials:\n\n";
+    foreach( QString line, bom ) out << line;
+    
+    file.close();
 }
 
 void Circuit::listToDom( QDomDocument* doc, QList<Component*>* complist )
@@ -524,11 +547,12 @@ void Circuit::listToDom( QDomDocument* doc, QList<Component*>* complist )
     for (int i=0; i<count; i++)
     {
         Component* item = complist->at(i);
+
         // Don't save internal items
         bool isNumber = false;
         item->objectName().split("-").last().toInt( &isNumber );
 
-        if ( item && isNumber)
+        if( isNumber)
         {
             QDomElement pin = m_domDoc.createElement("item");
             const QMetaObject* metaobject = item->metaObject();
@@ -626,11 +650,24 @@ void Circuit::redo()
 
 Component* Circuit::createItem( QString type, QString id )
 {
-    //qDebug() << type << id;
+    //qDebug() << "Circuit::createItem" << type << id;
     foreach( LibraryItem* libItem, ItemLibrary::self()->items() )
+    {
         if( libItem->type()==type )
-            return libItem->createItemFnPtr()( this, type, id );
-
+        {
+            Component* comp = libItem->createItemFnPtr()( this, type, id );
+            
+            if( comp )
+            {
+                QString category = libItem->category();
+                if( ( category != "Meters" )
+                &&  ( category != "Sources" )
+                &&  ( category != "Other" ) )
+                    comp->setPrintable( true );
+            }
+            return comp;
+        }
+    }
     return 0l;
 }
 
@@ -638,33 +675,22 @@ void Circuit::loadProperties( QDomElement element, Component* Item )
 {
     const QMetaObject* metaobject = Item->metaObject();
     int count = metaobject->propertyCount();
-    for (int i=0; i<count; ++i)
+    for( int i=0; i<count; ++i )
     {
         QMetaProperty metaproperty = metaobject->property(i);
         const char* name = metaproperty.name();
         QVariant value( element.attribute( name ) );
 
-        if ( metaproperty.type() == QVariant::String )  Item->setProperty( name, value );
-
-        else if ( metaproperty.type() == QVariant::StringList )
+        if     ( metaproperty.type() == QVariant::String ) Item->setProperty( name, value );
+        else if( metaproperty.type() == QVariant::Int    ) Item->setProperty( name, value.toInt() );
+        else if( metaproperty.type() == QVariant::Double ) Item->setProperty( name, value.toDouble() );
+        else if( metaproperty.type() == QVariant::PointF ) Item->setProperty( name, value.toPointF() );
+        else if( metaproperty.type() == QVariant::Bool   ) Item->setProperty( name, value.toBool() );
+        else if( metaproperty.type() == QVariant::StringList )
         {
             QStringList list= value.toString().split(",");
             Item->setProperty( name, list );
         }
-        else if ( metaproperty.type() == QVariant::Int    )
-                  Item->setProperty( name, value.toInt() );
-
-        //else if ( metaproperty.type() == QMetaType::Float ) Item->setProperty( name, value.toFloat() );
-
-        else if ( metaproperty.type() == QVariant::Double )
-                  Item->setProperty( name, value.toDouble() );
-
-        else if ( metaproperty.type() == QVariant::PointF )
-                  Item->setProperty( name, value.toPointF() );
-
-        else if ( metaproperty.type() == QVariant::Bool   )
-                  Item->setProperty( name, value.toBool() );
-
         else qDebug() << "    ERROR!!! Circuit::LoadProperties\n  unknown type:  "<<"name "<<name<<"   value "<<value ;
     }
     Item->setLabelPos();
@@ -685,8 +711,7 @@ void Circuit::copy( QPointF eventpoint )
 
     QList<QGraphicsItem*> itemlist = selectedItems();
 
-    QGraphicsItem* item;
-    foreach( item , itemlist )
+    foreach( QGraphicsItem* item , itemlist )
     {
         Component* comp =  qgraphicsitem_cast<Component*>( item );
         if( comp )
@@ -704,7 +729,6 @@ void Circuit::copy( QPointF eventpoint )
             }
         }
     }
-
     m_copyDoc.clear();
     QDomElement root = m_copyDoc.createElement("circuit");
     root.setAttribute( "type", "simulide_0.1" );
@@ -739,7 +763,7 @@ void Circuit::createSubcircuit()
     QHash<QString, QString> compList;        // Get Components properties
 
     //qDebug() << compIdTip<<"--------------------------";
-    foreach( Component* component, m_compList)
+    foreach( Component* component, m_compList )
     {
         QString compId     = "";
         QString propString = "";
@@ -747,7 +771,7 @@ void Circuit::createSubcircuit()
         const QMetaObject* metaObject = component->metaObject();
 
         int count = metaObject->propertyCount();
-        for (int i=0; i<count; ++i)
+        for( int i=0; i<count; ++i )
         {
             QMetaProperty property = metaObject->property(i);
             if( property.isUser() )
@@ -772,7 +796,6 @@ void Circuit::createSubcircuit()
         }
         compList[compId] = propString;
     }
-
     QList<eNode*> eNodeList = simulator.geteNodes();
     QList<QStringList> connectionList;
 
@@ -821,7 +844,7 @@ void Circuit::createSubcircuit()
             QString pin2   = "eNode"+QString::number(nodes);
             bool isNode = true;
 
-            foreach (QString entry, pinConList)
+            foreach( QString entry, pinConList )
             {
                 if( entry.contains("packagePin") ) // No Node, connection to packagePin
                 {
@@ -880,18 +903,22 @@ void Circuit::createSubcircuit()
         subcircuit +="\" >\n    </item>\n\n";
     }
     subcircuit +="</subcircuit>";
-    QString fileName = "subcirc.xml";
+    
+    QString fileName = m_filePath;                    // Save Subcircuit
+    
+    fileName.replace( m_filePath.lastIndexOf( ".simu" ), 5, ".subcircuit" );
+    
     QFile file( fileName );
 
     if( !file.open(QFile::WriteOnly | QFile::Text) )
     {
-          QMessageBox::warning(0l, tr("Application"),
+          QMessageBox::warning(0l, tr("Save Subcircuit"),
           tr("Cannot write file %1:\n%2.").arg(fileName).arg(file.errorString()));
     }
-    QTextStream out(&file);
+    QTextStream out( &file );
     out << subcircuit;
     file.close();
-    //qDebug() << subcircuit;
+    //qDebug() <<"Circuit::createSubcircuit\n" << subcircuit;
 }
 
 QString Circuit::newSceneId()
@@ -939,13 +966,10 @@ void Circuit::mousePressEvent( QGraphicsSceneMouseEvent* event )
         if( m_con_started )  event->accept();//new_connector->incActLine() ;
         QGraphicsScene::mousePressEvent( event );
     }
-    else if ( event->button() == Qt::RightButton )
+    else if( event->button() == Qt::RightButton )
     {
-        if( m_con_started )
-        {
-            event->accept();
-        }
-        else QGraphicsScene::mousePressEvent( event );
+        if( m_con_started ) event->accept();
+        else                QGraphicsScene::mousePressEvent( event );
     }
 }
 
@@ -953,12 +977,10 @@ void Circuit::mouseReleaseEvent( QGraphicsSceneMouseEvent* event )
 {
     if( event->button() == Qt::LeftButton )
     {
-        //QPropertyEditorWidget::self()->setObject( this );
-
         if( m_con_started )  new_connector->incActLine() ;
         QGraphicsScene::mouseReleaseEvent( event );
     }
-    else if ( event->button() == Qt::RightButton )
+    else if( event->button() == Qt::RightButton )
     {
         if( m_con_started )
         {
@@ -982,50 +1004,50 @@ void Circuit::mouseMoveEvent( QGraphicsSceneMouseEvent* event )
 
 void Circuit::keyPressEvent( QKeyEvent* event )
 {
-    if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
+    if( event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
     {
         QPoint p = CircuitWidget::self()->mapFromGlobal(QCursor::pos());
 
         copy( m_graphicView->mapToScene( p ) );
         clearSelection();
     }
-    else if (event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier))
+    else if( event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier))
     {
         QPoint p = CircuitWidget::self()->mapFromGlobal(QCursor::pos());
 
         paste( m_graphicView->mapToScene( p ) );
     }
-    else if (event->key() == Qt::Key_Z && (event->modifiers() & Qt::ControlModifier))
+    else if( event->key() == Qt::Key_Z && (event->modifiers() & Qt::ControlModifier))
     {
         undo();
     }
-    else if (event->key() == Qt::Key_Y && (event->modifiers() & Qt::ControlModifier))
+    else if( event->key() == Qt::Key_Y && (event->modifiers() & Qt::ControlModifier))
     {
         redo();
     }
-    else if (event->key() == Qt::Key_Delete)
+    else if( event->key() == Qt::Key_Delete)
     {
         removeItems();
     }
-    if (event->key() == Qt::Key_N && (event->modifiers() & Qt::ControlModifier))
+    if( event->key() == Qt::Key_N && (event->modifiers() & Qt::ControlModifier))
     {
         CircuitWidget::self()->newCircuit();
     }
-    else if (event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
+    else if( event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
     {
-        if (event->modifiers() & Qt::ShiftModifier)
+        if( event->modifiers() & Qt::ShiftModifier)
             CircuitWidget::self()->saveCircAs();
         else
             CircuitWidget::self()->saveCirc();
     }
-    else if (event->key() == Qt::Key_O && (event->modifiers() & Qt::ControlModifier))
+    else if( event->key() == Qt::Key_O && (event->modifiers() & Qt::ControlModifier))
     {
         CircuitWidget::self()->openCirc();
     }
     else QGraphicsScene::keyPressEvent(event);
 }
 
-void Circuit::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+void Circuit::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 {
     QGraphicsScene::contextMenuEvent( event );
 

@@ -94,6 +94,9 @@ class MAINMODULE_EXPORT Connector : public Component
         void splitCon( int index, Pin* pin1, Pin* pin2 );
 
         void updateLines();
+        
+        void setIsBus( bool bus );
+        bool isBus();
 
     signals:
         void selected(bool yes);
@@ -116,6 +119,8 @@ class MAINMODULE_EXPORT Connector : public Component
 
         int m_actLine;
         int m_lastindex;
+        
+        bool m_isBus;
 
         QString m_startpinid;
         QString m_endpinid;

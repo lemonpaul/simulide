@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "baseprocessor.h"
+#include "mcucomponent.h"
 #include "circuitwidget.h"
 #include "mainwindow.h"
 #include "simulator.h"
@@ -27,9 +28,10 @@
 BaseProcessor* BaseProcessor::m_pSelf = 0l;
 
 BaseProcessor::BaseProcessor( QObject* parent )
-     : QObject( parent )
+             : QObject( parent )
 {
     m_loadStatus = false;
+    m_resetStatus = false;
     m_usartTerm  = false;
     m_serialPort = false;
     m_ramTable   = 0l;
@@ -53,7 +55,6 @@ void BaseProcessor::terminate()
     m_pSelf = 0l;
     m_loadStatus = false;
     m_symbolFile = "";
-    //m_device     = "";
 }
 
 void BaseProcessor::initialized()
@@ -61,7 +62,6 @@ void BaseProcessor::initialized()
     //qDebug() << "\nBaseProcessor::initialized  Firmware: " << m_symbolFile;
     //qDebug() << "\nBaseProcessor::initialized Data File: " << m_dataFile;
 
-    setRegisters();
     m_loadStatus = true;
     m_nextCycle = m_mcuStepsPT;
 
@@ -83,21 +83,21 @@ QString BaseProcessor::getDevice() { return m_device;}
 
 void BaseProcessor::setDataFile( QString datafile ) 
 { 
-    //QDir compSetDir( qApp->applicationDirPath() );
-    //compSetDir.cd( "../share/simulide/data" );
-    //m_dataFile = QCoreApplication::applicationDirPath()+"/data/"+datafile+".data";
-    //m_dataFile = compSetDir.absolutePath() + datafile + ".data";
-    //m_dataFile = SIMUAPI_AppPath::self()->availableDataFilePath(datafile + ".data");
     m_dataFile = datafile;
+    setRegisters();
 }
 
-/*void BaseProcessor::reset()
+void BaseProcessor::hardReset( bool rst )
 {
-    //qDebug()<<"BaseProcessor::reset"<<m_device<<"m_loadStatus"<<m_loadStatus;
-    //emit chipReset();
-}*/
+    m_resetStatus = rst;
+    
+    if( rst ) McuComponent::self()->reset();
+}
 
-int BaseProcessor::getRegAddress( QString name ) { return m_regsTable.value( name ); }
+int BaseProcessor::getRegAddress( QString name ) 
+{ 
+    return m_regsTable.value( name ); 
+}
 
 void BaseProcessor::updateRamValue( QString name )
 {
@@ -149,11 +149,12 @@ void BaseProcessor::updateRamValue( QString name )
         else memcpy(&value, ba, 4);
 
         m_ramTable->setItemValue( 1, value  );
+        
         if( type.contains( "8" ) )
             m_ramTable->setItemValue( 2, decToBase(value, 2, 8)  );
         
     }
-    //qDebug()<<name<<type <<address;
+    //qDebug()<<name<<type <<address<<value;
     if( !type.contains( "8" ) ) m_ramTable->setItemValue( 2, type  );
 }
 
@@ -175,15 +176,21 @@ void BaseProcessor::addWatchVar( QString name, int address, QString type )
     if( !m_regsTable.contains(name) ) 
     {
         m_regsTable.insert( name, address );
-        m_typeTable.insert( name, type ); 
+        m_typeTable.insert( name, type );
+        m_regList.append( name );
     }
 }
 
-void BaseProcessor::setRegisters()// get register addresses from data file
+void BaseProcessor::setRegisters() // get register addresses from data file
 {
     QStringList lineList = fileToStringList( m_dataFile, "BaseProcessor::setRegisters" );
 
-    if( !m_regsTable.isEmpty() ) m_regsTable.clear();
+    if( !m_regsTable.isEmpty() ) 
+    {
+        m_regList.clear();
+        m_regsTable.clear();
+        m_typeTable.clear();
+    }
 
     foreach( QString line, lineList )
     {
@@ -236,9 +243,5 @@ void BaseProcessor::uartIn( uint32_t value ) // Receive one byte on Uart
         TerminalWidget::self()->uartIn( value );
     }
 }
-/*QStringList BaseProcessor::getDefsList( QString fileName )
-{
-    return QStringList( getRegsTable( fileName ).uniqueKeys() );
-}*/
 
 #include "moc_baseprocessor.cpp"

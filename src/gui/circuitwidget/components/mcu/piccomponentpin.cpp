@@ -42,6 +42,8 @@ void PICComponentPin::attach( pic_processor *PicProcessor )
 
     if( m_id.startsWith("R") || m_id.startsWith("GP") )
     {
+        m_pinType = 1;
+        
         m_port = m_id.at(1).toLatin1();
         m_pinN = m_id.mid(2,1).toInt();
 
@@ -67,21 +69,32 @@ void PICComponentPin::attach( pic_processor *PicProcessor )
         m_pStimulusNode->attach_stimulus(iopin);
         m_pStimulusNode->attach_stimulus(this);
 
-        setImp( high_imp );
-        setOut( 0 );
     }
+    else if( m_id.startsWith("MCLR") )
+    {
+        m_pinType = 21;
+    }
+    
     m_attached = true;
 }
 
 void PICComponentPin::setVChanged()
 {
-    if(!m_PicProcessor) return;
+    //if(!m_PicProcessor) return;
 
     if( m_imp!=high_imp ) return;      // Nothing to do if pin is output
 
     double volt = m_ePin[0]->getVolt();
-    
-    if( m_pIOPIN ) m_pIOPIN->set_nodeVoltage(volt);
+    if( m_pinType == 1 )                                 // Is an IO Pin
+    {
+        //if( m_pIOPIN ) 
+        m_pIOPIN->set_nodeVoltage(volt);
+    }
+    else if( m_pinType == 21 ) // reset
+    {
+        if( volt < 3 )  BaseProcessor::self()->hardReset( true );
+        else            BaseProcessor::self()->hardReset( false );
+    }
 }
 
 void PICComponentPin::set_nodeVoltage( double v )     // Called by Gpsim

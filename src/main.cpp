@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <QApplication>
+#include <QTranslator>
 
 #include "mainwindow.h"
 
@@ -39,16 +40,24 @@ int main(int argc, char *argv[])
 #endif
 
     //QApplication::setGraphicsSystem( "raster" );//native, raster, opengl
-    QApplication app(argc, argv);
+    QApplication app( argc, argv );
+
+    QString locale   = QLocale::system().name().split("_").first();
+    QString langFile = "../share/simulide/translations/simulide_"+locale+".qm";
+    
+    QTranslator translator;
+    translator.load( langFile );
+    app.installTranslator( &translator );
+
     MainWindow window;
     
     QRect screenGeometry = QApplication::desktop()->screenGeometry();
-    int x = (screenGeometry.width()-window.width()) / 2;
-    int y = (screenGeometry.height()-window.height()) / 2;
-    window.move(x, y);
+    int x = ( screenGeometry.width()-window.width() ) / 2;
+    int y = ( screenGeometry.height()-window.height() ) / 2;
+    window.move( x, y );
 
     window.show();
-    app.setApplicationVersion(APP_VERSION);
+    app.setApplicationVersion( APP_VERSION );
     return app.exec();
 }
 

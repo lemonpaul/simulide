@@ -60,7 +60,7 @@ Component* Arduino::construct( QObject* parent, QString type, QString id )
 }
 
 Arduino::Arduino( QObject* parent, QString type, QString id )
-    : McuComponent( parent, type, id )
+       : McuComponent( parent, type, id )
 {
     m_pSelf = this;
     m_dataFile = "arduinos.xml";
@@ -69,9 +69,6 @@ Arduino::Arduino( QObject* parent, QString type, QString id )
     setLabelPos( 100,-21, 0); // X, Y, Rot
     
     setTransformOriginPoint( boundingRect().center() );
-
-    //if( m_id.split("-").first() == "Arduino" ) m_id.replace( "Arduino", "Arduino Uno" );
-    
 
     initPackage();
     if( m_error == 0 )
@@ -193,11 +190,9 @@ void Arduino::initBoard()
     //m_boardLedEnode = new eNode( m_id+"-boardLedeNode" );
     m_boardLedEnode = 0l;
     
-    //ePin* boardLedEpin0 = m_boardLed->getEpin(0);
     ePin* boardLedEpin1 = m_boardLed->getEpin(1);
 
     // Connect board led to ground
-    //boardLedEpin0->setEnode( m_boardLedEnode );
     boardLedEpin1->setEnode( m_groundEnode );
 
     for( int i=0; i<m_numpins; i++ )                      // Create Pins
@@ -239,6 +234,12 @@ void Arduino::initBoard()
         {
             //pin->setEnode( m_boardLedEnode );
             m_pb5Pin = pin;
+        }
+        else if( pinId.toUpper().contains( "RST" ) )      // Reset Pins
+        {
+            mcuPin->setImp( 20000 );
+            mcuPin->setVoltHigh( 5 );
+            mcuPin->setVoltLow( 5 );
         }
     }
 }

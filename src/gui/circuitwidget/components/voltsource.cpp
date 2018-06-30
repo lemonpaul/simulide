@@ -54,6 +54,7 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
 
     m_button = m_voltw.pushButton;
     m_dial   = m_voltw.dial;
+    m_dial->setMaximum( 1000 );
 
     m_button->setText( QString("-- V") );
 
@@ -64,6 +65,9 @@ VoltSource::VoltSource( QObject* parent, QString type, QString id )
 
     nodid.append("-eSource");
     m_out = new eSource( nodid.toStdString(), outpin );
+    
+    m_out->setVoltHigh( 0 );
+    m_out->setVoltLow( 0 );
     
     m_unit = "V";
     setVolt(5.0);
@@ -115,9 +119,9 @@ void VoltSource::onbuttonclicked()
     m_changed = true;
 }
 
-void VoltSource::voltChanged( int volt )
+void VoltSource::voltChanged( int val )
 {
-    m_voltOut = double( volt )/100;
+    m_voltOut = double( m_voltHight*val/1000 );
     m_changed = true;
 }
 
@@ -125,13 +129,14 @@ void VoltSource::setVolt( double v )            // Sets the Maximum Volt
 {
     Component::setValue( v );       // Takes care about units multiplier
     m_voltHight = m_value*m_unitMult;
-    m_dial->setMaximum( int(m_voltHight*100) );
+    voltChanged( m_dial->value() );
 }
 
 void VoltSource::setUnit( QString un ) 
 {
     Component::setUnit( un );
-    setVolt( m_value*m_unitMult );
+    m_voltHight = m_value*m_unitMult;
+    voltChanged( m_dial->value() );
 }
 
 void VoltSource::remove()

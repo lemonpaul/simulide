@@ -30,10 +30,10 @@
     <pin side="left"  pos="7"  type="bidir" id="RA5" label="A5"/>
     <pin side="left"  pos="8"  type="bidir" id="RE0" label="E0"/>    
     <pin side="left"  pos="9"  type="bidir" id="RE1" label="E1"/> 
-    <pin side="left"  pos="10"  type="bidir" id="RE2" label="E2"/> 
+    <pin side="left"  pos="10" type="bidir" id="RE2" label="E2"/> 
 
-    <pin side="left"  pos="11"  type="vdd"   id="VDD" label="Vdd"/>
-    <pin side="left"  pos="12"  type="gnd" id="VSS" label="Vss"/>
+    <pin side="left"  pos="11"  type="vdd"  id="VDD" label="Vdd"/>
+    <pin side="left"  pos="12"  type="gnd"  id="VSS" label="Vss"/>
 
     <pin side="left"  pos="13" type="bidir" id="RA7" label="A7"/>
     <pin side="left"  pos="14" type="bidir" id="RA6" label="A6"/>
@@ -41,23 +41,23 @@
     <pin side="left"  pos="15" type="bidir" id="RC0" label="C0"/>
     <pin side="left"  pos="16" type="bidir" id="RC1" label="C1"/>
     <pin side="left"  pos="17" type="bidir" id="RC2" label="C2"/>
-    <pin side="left"  pos="18" type="bidir" id="RC3" label="C3"/>
+    <pin side="left"  pos="18" type="vusb"  id="RC3" label="C3"/>
 
     <pin side="left"  pos="19" type="bidir" id="RD0" label="D0"/>
     <pin side="left"  pos="20" type="bidir" id="RD1" label="D1"/>    
 
-    <pin side="right"  pos="20" type="bidir" id="RD2" label="D2"/>
-    <pin side="right"  pos="19" type="bidir" id="RD3" label="D3"/>
+    <pin side="right" pos="20" type="bidir" id="RD2" label="D2"/>
+    <pin side="right" pos="19" type="bidir" id="RD3" label="D3"/>
     
     <pin side="right" pos="18" type="bidir" id="RC4" label="C4"/>
     <pin side="right" pos="17" type="bidir" id="RC5" label="C5"/>
     <pin side="right" pos="16" type="bidir" id="RC6" label="C6"/>
     <pin side="right" pos="15" type="bidir" id="RC7" label="C7"/>
 
-    <pin side="right"  pos="14" type="bidir" id="RD4" label="D4"/>
-    <pin side="right"  pos="13" type="bidir" id="RD5" label="D5"/>
-    <pin side="right"  pos="12" type="bidir" id="RD6" label="D6"/>
-    <pin side="right"  pos="11" type="bidir" id="RD7" label="D7"/>
+    <pin side="right" pos="14" type="bidir" id="RD4" label="D4"/>
+    <pin side="right" pos="13" type="bidir" id="RD5" label="D5"/>
+    <pin side="right" pos="12" type="bidir" id="RD6" label="D6"/>
+    <pin side="right" pos="11" type="bidir" id="RD7" label="D7"/>
     
     <pin side="right" pos="10" type="gnd"   id="VSS" label="Vss"/>
     <pin side="right" pos="9"  type="vdd"   id="VDD" label="Vdd"/>

@@ -22,7 +22,7 @@
 #include "simulator.h"
 
 eOpAmp::eOpAmp( std::string id )
-    : eElement( id )
+      : eElement( id )
 {
     m_ePin.resize(3);
     m_gain = 1000;

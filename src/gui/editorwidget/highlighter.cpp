@@ -106,6 +106,10 @@ void Highlighter::readSintaxFile( const QString &fileName )
             break;
         }
     }
+    format.setForeground( QColor(12303291) ); // Show Spaces color
+    addRule( format, QString( " " ) );
+    addRule( format, QString( "\t" ) );
+    
     this->rehighlight();
 }
 
@@ -114,6 +118,7 @@ void Highlighter::addRegisters( QStringList patterns )
     QTextCharFormat format;
     format.setFontWeight( QFont::Bold );
     format.setForeground( QColor( 55, 65, 20 ) );
+    
     foreach( QString exp, patterns ) addRule( format, "\\b"+exp+"\\b" );
     //addRuleSet( format, patterns );
     this->rehighlight();
@@ -126,20 +131,13 @@ void Highlighter::highlightBlock( const QString &text )
 
     foreach( const HighlightingRule &rule, m_highlightingRules )
     {
-        QRegExp expression( rule.pattern );
-        int index = expression.indexIn( lcText );
-        while( index >= 0 )
-        {
-            int length = expression.matchedLength();
-            setFormat( index, length, rule.format );
-            index = expression.indexIn( lcText, index + length );
-        }
+        processRule( rule, lcText );
     }
 
     // Multiline comment:
     setCurrentBlockState( 0 );
     int startIndex = 0;
-    if( previousBlockState(   )!= 1 )
+    if( previousBlockState() != 1 )
         startIndex = commentStartExpression.indexIn( text );
 
     while( startIndex >= 0 )
@@ -160,6 +158,17 @@ void Highlighter::highlightBlock( const QString &text )
     }
 }
 
+void Highlighter::processRule( HighlightingRule rule, QString lcText )
+{
+    QRegExp expression( rule.pattern );
+    int index = expression.indexIn( lcText );
+    while( index >= 0 )
+    {
+        int length = expression.matchedLength();
+        setFormat( index, length, rule.format );
+        index = expression.indexIn( lcText, index + length );
+    }
+}
 
 /*void Highlighter::addRuleSet( QTextCharFormat format, QStringList regExps )
 {

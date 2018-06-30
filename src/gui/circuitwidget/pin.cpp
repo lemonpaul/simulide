@@ -29,7 +29,10 @@ Pin::Pin( int angle, const QPoint &pos, QString id, int index, Component* parent
    , m_label( parent )
 {
     m_component  = parent;
-    m_blocked    = false;
+    
+    m_blocked = false;
+    m_isBus   = false;
+    
     my_connector = 0l;
     m_conPin     = 0l;
     m_enode      = 0l;
@@ -74,13 +77,16 @@ void Pin::findConnectedPins()     // Called by node,  for connected pins
         
     if( m_conPin ) 
         m_conPin->findNodePins(); // Call pin at other side of Connector
+
 }
 
 void Pin::findNodePins()     // Called by connector closing or other pin
 {    
     m_blocked = true;
+    
     if( m_connected )
         m_enode->addSubEpin( this );// Notify that this pin is connected
+        
     m_component->inStateChanged( 0 );       // Used by node to find pins
     m_blocked = false;
 }
@@ -94,8 +100,16 @@ void  Pin::setConnector( Connector* connector )
 {
     my_connector = connector;
     
-    if( my_connector ) setCursor( Qt::ArrowCursor );
-    else               setCursor( Qt::CrossCursor );
+    if( my_connector ) 
+    {
+        setCursor( Qt::ArrowCursor );
+        if( m_isBus ) 
+        {
+            my_connector->setIsBus( true );
+            //m_component->inStateChanged( 2 );
+        }
+    }
+    else setCursor( Qt::CrossCursor );
 }
 
 Connector* Pin::connector() { return my_connector; }
@@ -111,6 +125,15 @@ void Pin::mousePressEvent(QGraphicsSceneMouseEvent* event)
     {
         if( my_connector==0l )
         {
+            if( Circuit::self()->is_constarted() )
+            {
+                Connector* con = Circuit::self()->getNewConnector();
+                if( con->isBus() != m_isBus ) // Avoid connect Bus with no-Bus
+                {
+                    event->ignore();
+                    return;
+                }
+            }
             event->accept();
             if( Circuit::self()->is_constarted() ) Circuit::self()->closeconnector( this );
             else                                   Circuit::self()->newconnector( this );
@@ -184,6 +207,22 @@ void Pin::setBoundingRect( QRect area )
     m_area = area;
 }
 
+void Pin::setIsBus( bool bus )
+{
+    if( m_isBus == bus ) return;
+    if( !bus ) return;
+    m_isBus = bus;
+    
+    if( my_connector ) my_connector->setIsBus( true );
+    if( m_conPin ) m_conPin->setIsBus( true );
+    
+    m_component->inStateChanged( 2 );
+}
+
+bool Pin::isBus()
+{
+    return m_isBus;
+}
 
 void Pin::paint( QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {

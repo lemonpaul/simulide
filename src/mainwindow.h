@@ -23,10 +23,12 @@
 #include <QtGui>
 #include <QDomDocument>
 
-#include "QPropertyEditorWidget.h"
+#include "propertieswidget.h"
 #include "componentselector.h"
 #include "circuitwidget.h"
-#include "filebrowser.h"
+//#include "filebrowser.h"
+#include "editorwindow.h"
+#include "filewidget.h"
 
 class MAINMODULE_EXPORT MainWindow : public QMainWindow
 {
@@ -38,7 +40,7 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
 
  static MainWindow* self() { return m_pSelf; }
 
-        QSettings* settings() { return &m_settings; }
+        QSettings* settings();
 
         void loadPlugins();
         void unLoadPugin( QString pluginName );
@@ -46,14 +48,10 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         void readSettings();
         
         void setTitle( QString title );
-
-        QTabWidget*         m_sidepanel;
-        QSplitter*          m_Centralsplitter;
-        QWidget*            m_ramTabWidget;
-        QGridLayout*        m_ramTabWidgetLayout;
-        FileBrowser*        m_fileSystemTree;
         
-        QPropertyEditorWidget* m_itemprop;
+        QTabWidget*  m_sidepanel;
+        QWidget*     m_ramTabWidget;
+        QGridLayout* m_ramTabWidgetLayout;
 
     protected:
         void closeEvent(QCloseEvent* event);
@@ -73,7 +71,6 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         void createMenus();
         void createToolBars();
         void writeSettings();
-
         void applyStile();
         
         QSettings m_settings;
@@ -82,8 +79,14 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         QString m_styleSheet;
 
         QHash<QString, QPluginLoader*>  m_plugins;
-        CircuitWidget* m_circuit;
-        ComponentSelector* components;
+        
+        CircuitWidget*      m_circuit;
+        ComponentSelector*  m_components;
+        PropertiesWidget*   m_itemprop;
+        EditorWindow*       m_editor;
+        
+        QSplitter*   m_Centralsplitter;
+        FileWidget* m_fileSystemTree;
 };
 
 #endif

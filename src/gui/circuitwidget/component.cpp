@@ -22,15 +22,19 @@
 #include "connector.h"
 #include "circuit.h"
 #include "utils.h"
+#include "simuapi_apppath.h"
 
 int Component::m_error = 0;
+QString Component::m_noHelpMsg = "Sorry... no Help Available";
 
 Component::Component( QObject* parent , QString type, QString id )
-    : QObject(parent), QGraphicsItem()
-    ,multUnits( "TGMk munp" )
+         : QObject(parent), QGraphicsItem()
+         , multUnits( "TGMk munp" )
 {
     //setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-    
+
+    m_help = &m_noHelpMsg;
+    m_value    = 0;
     m_unitMult = 1;
     m_Hflip  = 1;
     m_Vflip  = 1;
@@ -40,6 +44,7 @@ Component::Component( QObject* parent , QString type, QString id )
     m_color  = QColor( Qt::white );
     m_showId = false;
     m_moving = false;
+    m_printable = false;
     
     m_idLabel = new Label( this );
     m_idLabel->setDefaultTextColor( Qt::darkBlue );
@@ -57,7 +62,6 @@ Component::Component( QObject* parent , QString type, QString id )
     setObjectName( id );
     setId(id);
 
-    //setToolTip( QString("Left-Click and Move this Component \nRight-Click for Context Menu \nSelect and change properties in Right Panel") );
     setCursor(Qt::OpenHandCursor);
     this->setFlag( QGraphicsItem::ItemIsSelectable, true );
     
@@ -84,6 +88,8 @@ void Component::mousePressEvent(QGraphicsSceneMouseEvent* event)
         }
 
         QPropertyEditorWidget::self()->setObject( this );
+        PropertiesWidget::self()->setHelpText( m_help );
+        
         setCursor( Qt::ClosedHandCursor );
         grabMouse();
     }
@@ -94,7 +100,8 @@ void Component::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* event )
     if ( event->button() == Qt::LeftButton )
     {
         QPropertyEditorWidget::self()->setObject( this );
-        QPropertyEditorWidget::self()->setVisible( true );
+        PropertiesWidget::self()->setHelpText( m_help );
+        //QPropertyEditorWidget::self()->setVisible( true );
     }
 }
 
@@ -196,14 +203,22 @@ void Component::slotRemove()
 
 void Component::remove()
 {
-    for( uint i=0; i<m_pin.size(); i++ )               // Remove connectors attached
-        if( m_pin[i]->isConnected() ) m_pin[i]->connector()->remove();
+    for( uint i=0; i<m_pin.size(); i++ )   // Remove connectors attached
+    {
+        Pin* pin = m_pin[i];
+        if( pin && pin->isConnected())
+        {
+            Connector* con = pin->connector();
+            if( con ) con->remove();
+        }
+    }
 }
 
 void Component::slotProperties()
 {
     QPropertyEditorWidget::self()->setObject( this );
-    MainWindow::self()->m_sidepanel->setCurrentIndex( 2 );
+    PropertiesWidget::self()->setHelpText( m_help );
+    MainWindow::self()->m_sidepanel->setCurrentIndex( 2 ); // Open Properties tab
 }
 
 void Component::H_flip()
@@ -406,6 +421,45 @@ QIcon   Component::icon()      { return m_icon; }
 
 //bool Component::isChanged(){ return m_changed;}
 
+QString Component::getHelp( QString hfile )
+{
+    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( hfile );
+
+    QFile file( dfPath );
+    
+    if( !file.open(QFile::ReadOnly | QFile::Text) )
+    {
+        MessageBoxNB( "Component::loadHelp",
+                  tr("Cannot read Help file:\n%1:\n%2.").arg(dfPath).arg(file.errorString()) );
+          return m_noHelpMsg;
+    }
+    QTextStream s1( &file );
+    
+    QString help;
+    help.append(s1.readAll());
+
+    file.close();
+    
+    return help;
+}
+
+void Component::setPrintable( bool p )
+{
+    m_printable = p;
+}
+
+QString Component::print()
+{
+    if( !m_printable ) return "";
+    
+    QString str = m_id+" : ";
+    str += objectName().split("-").first()+" ";
+    if( m_value > 0 ) str += QString::number( m_value );
+    str += m_mult+m_unit+"\n";
+    
+    return str;
+}
+
 void Component::paint( QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Q_UNUSED(option); Q_UNUSED(widget);
@@ -499,7 +553,7 @@ void Label::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 }
 
 void Label::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
-{qDebug() << "Label::contextMenuEvent";
+{
     event->accept();
     QMenu menu;
 

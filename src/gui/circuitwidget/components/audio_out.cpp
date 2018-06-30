@@ -40,7 +40,7 @@ AudioOut::AudioOut( QObject* parent, QString type, QString id )
         : Component( parent, type, id ),
           eResistor( id.toStdString() )
 {
-    m_area = QRect( -10, -12, 20, 16 );
+    m_area = QRect( -12, -24, 24, 40 );
     
     m_pin.resize( 2 );
     
@@ -66,9 +66,12 @@ AudioOut::AudioOut( QObject* parent, QString type, QString id )
     
     m_resist = 8;
     
+    int refreshPeriod = 100; // mS
+    int sampleRate    = 40000; // samples/S
+    
     m_deviceinfo = QAudioDeviceInfo::defaultOutputDevice(); 
 
-    m_format.setSampleRate( 40000 );  
+    m_format.setSampleRate( sampleRate );  
     m_format.setChannelCount(1);
     m_format.setSampleSize(8);
     m_format.setCodec( "audio/pcm" );  
@@ -83,7 +86,17 @@ AudioOut::AudioOut( QObject* parent, QString type, QString id )
         qDebug() << m_format.sampleRate() << m_format.channelCount()<<m_format.sampleSize();
     }  
     m_audioOutput = new QAudioOutput( m_deviceinfo, m_format );   
-    m_audioOutput->setBufferSize( 10000 );
+    
+    m_dataSize = 6*refreshPeriod*sampleRate/1000;
+    
+    m_dataBuffer = new char[ m_dataSize ];
+    m_audioOutput->setBufferSize( m_dataSize );
+    
+    m_audioOutput->setNotifyInterval( refreshPeriod ); 
+    
+    connect( m_audioOutput, SIGNAL( notify() ), 
+             this,          SLOT(   OnAudioNotify() ));
+
 }
 
 AudioOut::~AudioOut(){
@@ -98,6 +111,7 @@ void AudioOut::initialize()
     eResistor::initialize();
     
     m_counter = 0;
+    m_dataCount = 0;
     
     m_auIObuffer = m_audioOutput->start();
 }
@@ -112,10 +126,25 @@ void AudioOut::simuClockStep()
         double voltPN = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
         if( voltPN > 5 ) voltPN = 5;
  
-        uint8_t outVal = voltPN*51;
+        char outVal = voltPN*51;
         
-        m_auIObuffer->write( (const char*)&outVal, 1 );
+        m_dataBuffer[ m_dataCount ] = outVal;
+        m_dataCount++;
+        
+        if( m_dataCount == m_dataSize )
+        {
+            //qDebug() << m_dataCount;
+            m_dataCount = 0;
+            m_auIObuffer->write( (const char*)m_dataBuffer, m_dataSize );
+        }
     }
+}
+
+void AudioOut::OnAudioNotify()
+{
+    //qDebug() << "AudioOut::OnAudioNotify()"<<m_dataCount;
+    m_auIObuffer->write( (const char*)m_dataBuffer, m_dataCount );
+    m_dataCount = 0;
 }
 
 void AudioOut::remove()
@@ -125,6 +154,25 @@ void AudioOut::remove()
     if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
     if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
     Component::remove();
+}
+
+QPainterPath AudioOut::shape() const
+{
+    QPainterPath path;
+    
+    QVector<QPointF> points;
+    
+    points << QPointF(-10,-12 )
+           << QPointF(-10, 4 )
+           << QPointF( 0, 4 )
+           << QPointF( 10, 16 )
+           << QPointF( 10, -24 )
+           << QPointF( 0, -12 )
+           << QPointF(-10, -12 );
+        
+    path.addPolygon( QPolygonF(points) );
+    path.closeSubpath();
+    return path;
 }
 
 void AudioOut::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

@@ -28,9 +28,14 @@
 class AvrAsmDebugger : public BaseDebugger
 {
     Q_OBJECT
+    Q_PROPERTY( QString  Avra_Inc_Path   READ avraIncPath    WRITE setAvraIncPath   DESIGNABLE true USER true )
+    
     public:
         AvrAsmDebugger( QObject* parent, OutPanelText* outPane, QString filePath  );
         ~AvrAsmDebugger();
+        
+        QString avraIncPath();
+        void    setAvraIncPath( QString path );
 
         virtual bool loadFirmware();
 
@@ -44,11 +49,11 @@ class AvrAsmDebugger : public BaseDebugger
     private:
         void mapLstToAsm();
 
-        QHash<int, int> m_asmToFlash;               // Map .asm code line to flash adress
-        QHash<int, int> m_flashToAsm;               // Map flash adress to .asm code line
+        QHash<int, int> m_asmToFlash; // Map .asm code line to flash adress
+        QHash<int, int> m_flashToAsm; // Map flash adress to .asm code line
         
-        QString m_avra;                          // path to avra executable
-        QString m_avraInc;                       // path to avra includes
+        //QString m_avra;                     // path to avra executable
+        QString m_avraIncPath;                  // path to avra includes
 };
 
 

@@ -49,6 +49,26 @@ bool XorGate::calcOutput( int inputs )
     return false;
 }
 
+QPainterPath XorGate::shape() const
+{
+    QPainterPath path;
+    
+    QVector<QPointF> points;
+    
+    points << QPointF(-20,-18 )
+           << QPointF(-16,-8  )
+           << QPointF(-16, 8  )
+           << QPointF(-20, 18 )
+           << QPointF(  0, 16 )
+           << QPointF( 16, 8  )
+           << QPointF( 16,-8  )
+           << QPointF(  0,-16 );
+        
+    path.addPolygon( QPolygonF(points) );
+    path.closeSubpath();
+    return path;
+}
+
 void XorGate::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
     int y_orig = this->boundingRect().y();

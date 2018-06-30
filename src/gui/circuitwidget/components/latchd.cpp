@@ -37,7 +37,8 @@ LibraryItem* LatchD::libraryItem()
 }
 
 LatchD::LatchD( QObject* parent, QString type, QString id )
-        : LogicComponent( parent, type, id ), eLatchD( id.toStdString() )
+      : LogicComponent( parent, type, id )
+      , eLatchD( id.toStdString() )
 {
     m_width  = 4;
     m_height = 10;

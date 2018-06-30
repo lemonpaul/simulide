@@ -31,6 +31,7 @@ class MAINMODULE_EXPORT Servo : public LogicComponent, public eLogicDevice
     Q_PROPERTY( double Speed   READ speed    WRITE setSpeed    DESIGNABLE true USER true )
 
     public:
+        QRectF boundingRect() const { return QRect( -40, -40, 96, 80 ); }
 
         Servo( QObject* parent, QString type, QString id );
         ~Servo();
@@ -46,6 +47,7 @@ class MAINMODULE_EXPORT Servo : public LogicComponent, public eLogicDevice
         void setVChanged();
         void updateStep();
         
+        virtual QPainterPath shape() const;
         void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
     public slots:

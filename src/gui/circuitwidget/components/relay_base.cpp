@@ -68,8 +68,8 @@ RelayBase::RelayBase( QObject* parent, QString type, QString id )
     m_resistor->setEpin( 0, m_ePin[2] );
     m_resistor->setEpin( 1, m_ePin[3] );
 
-    m_resistor->setRes( 50 );
-    m_trigCurrent = 0.075;
+    m_resistor->setRes( 100 );
+    m_trigCurrent = 0.02;
 
     m_internalEnode = new eNode( m_id+"-internaleNode" );
     m_ePin[1]->setEnode( m_internalEnode );
@@ -102,6 +102,12 @@ void RelayBase::initialize()
         if( m_numthrows > 1 )
             m_ePin[ epinN+2 ]->setEnode( node );
     }
+    for( uint i=4; i<m_ePin.size(); i++ )
+    {
+        eNode* node = m_ePin[i]->getEnode();
+        
+        if( node ) node->setSwitched( true );
+    }
 
     setSwitch( m_nClose );
 }
@@ -125,17 +131,16 @@ void RelayBase::setSwitch( bool closed )
     {
         int switchN = i*m_numthrows;
 
-        if( closed ) m_switches[ switchN ]->setRes( 1e-3 );
-        else        m_switches[ switchN ]->setRes( 1e6 );
+        if( closed ) m_switches[ switchN ]->setAdmit( 1e3 );
+        else         m_switches[ switchN ]->setAdmit( 0 );
 
         if( m_numthrows == 2 )
         {
             switchN++;
 
-            if( !closed ) m_switches[ switchN ]->setRes( 1e-3 );
-            else         m_switches[ switchN ]->setRes( 1e6 );
+            if( !closed ) m_switches[ switchN ]->setAdmit( 1e3 );
+            else          m_switches[ switchN ]->setAdmit( 0 );
         }
-
     }
     update();
 }

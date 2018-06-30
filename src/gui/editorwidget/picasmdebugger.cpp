@@ -25,26 +25,13 @@
 PicAsmDebugger::PicAsmDebugger( QObject* parent, OutPanelText* outPane, QString filePath )
             : BaseDebugger( parent,outPane, filePath )
 {
-    m_gpasm = "";
-    //m_appPath+"/data/codeeditor/config"
-    /*QStringList lines = fileToStringList( SIMUAPI_AppPath::self()->availableDataFilePath("codeeditor/config"),
-                                          "PicAsmDebugger::CodeEditor" );
+    setObjectName( "PIC asm Compiler" );
+    
+    m_compilerPath = "";
+    m_compSetting = "gpasm_Path";
+    
+    readSettings();
 
-    foreach( QString line, lines )  // Get path to gpasm folder
-    {
-        if( line.contains("gpasm_Path:") )
-        {
-            m_gpasm = line.remove("gpasm_Path:");
-            while( m_gpasm.startsWith(" ") )
-                m_gpasm.remove( 0, 1 );
-                
-            while( m_gpasm.endsWith(" ") )
-                m_gpasm.remove( m_gpasm.length()-1, 1 );
-            
-            m_gpasm = m_gpasm+"/";
-            break;
-        }
-    }*/
     m_typesList["byte"]    = "uint8";
 }
 PicAsmDebugger::~PicAsmDebugger()
@@ -152,7 +139,7 @@ int PicAsmDebugger::compile()
     QString file = m_fileDir+m_fileName+m_fileExt;
     
     m_outPane->writeText( "-------------------------------------------------------\n" );
-    QString command = m_gpasm+"gpasm";
+    QString command = m_compilerPath+"gpasm";
     
     #ifndef Q_OS_UNIX
     command  = addQuotes( command );

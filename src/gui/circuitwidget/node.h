@@ -49,5 +49,7 @@ class MAINMODULE_EXPORT Node : public Component
         void joinConns( int co0, int c1);
 
         Pin* m_pin[3];
+        
+        bool m_isBus;
 };
 #endif

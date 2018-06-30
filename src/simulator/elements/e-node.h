@@ -56,14 +56,24 @@ class MAINMODULE_EXPORT eNode
         double getVolt();
         void  setVolt( double volt );
         
-        bool needFastUpdate() { return m_needFastUpdate; }
+        void solveSingle();
+        
+        bool needFastUpdate() { return m_fastUpdated; }
 
         void initialize();
         void stampMatrix();
-        void setSingle( bool single ){ m_single = single; }      // This eNode can calculate it's own Volt
+        void stampAdmit();
+        void stampCurr();
+        
+        void setSingle( bool single );// This eNode can calculate it's own Volt
+        bool isSingle();
+        
+        void setSwitched( bool switched ); // This eNode has switches attached
+        bool isSwitched();
 
         QList<ePin*> getEpins();
         QList<ePin*> getSubEpins();
+        QList<int> getConnections();
 
     private:
         QList<ePin*>     m_ePinList;
@@ -75,10 +85,10 @@ class MAINMODULE_EXPORT eNode
         QHash<ePin*, double> m_admitList;
         QHash<ePin*, double> m_currList;
         QHash<ePin*, int>    m_nodeList;
-        //std::Hash<ePin*, double> m_pru;
+        QHash<int, double>   m_admit;
+        QHash<int, double>   m_admitPrev;
         
-        QHash<int, double> admit;
-        //double m_totalCurr;
+        double m_totalCurr;
         double m_totalAdmit;
 
         double m_volt;
@@ -87,11 +97,12 @@ class MAINMODULE_EXPORT eNode
 
         QString m_id;
         
-        bool m_needFastUpdate;
+        bool m_fastUpdated;
         bool m_currChanged;
         bool m_admitChanged;
         bool m_changed;
         bool m_single;
+        bool m_switched;
 };
 #endif
 

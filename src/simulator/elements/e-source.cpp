@@ -81,12 +81,14 @@ void eSource::setVoltHigh( double v )
     m_voltHigh = v;
     if( m_out ) m_voltOut = v;
 }
+double eSource::voltHight() { return m_voltHigh; }
 
 void eSource::setVoltLow( double v )
 {
     m_voltLow = v;
     if( !m_out ) m_voltOut = v;
 }
+double eSource::voltLow() { return m_voltLow; }
 
 void eSource::setOut( bool out )           // Set Output to Hight or Low
 {
@@ -96,6 +98,7 @@ void eSource::setOut( bool out )           // Set Output to Hight or Low
     if( m_out ) m_voltOut = m_voltHigh;
     else        m_voltOut = m_voltLow;
 }
+bool  eSource::out() { return m_out; }
 
 void eSource::setInverted( bool inverted )
 {
@@ -105,6 +108,7 @@ void eSource::setInverted( bool inverted )
     m_ePin[0]->setInverted( inverted );
     setOut( m_out );
 }
+bool eSource::isInverted() { return m_inverted; }
 
 void eSource::setImp( double imp )
 {
@@ -112,6 +116,8 @@ void eSource::setImp( double imp )
     m_admit = 1/m_imp;
     stamp();
 }
+
+double eSource::imp() { return m_imp; }
 
 ePin* eSource::getEpin()
 {

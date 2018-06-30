@@ -57,15 +57,17 @@ void MainWindow::closeEvent( QCloseEvent *event )
     {
         const QMessageBox::StandardButton ret
         = QMessageBox::warning(this, tr("Application"),
-                               tr("Circuit has been modified.\n"
-                                  "Do you want to save your changes?"),
+                               tr("\nCircuit has been modified.\n"
+                                  "Do you want to save your changes?\n"),
                                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
                                
         if(ret == QMessageBox::Save ) m_circuit->saveCirc();
         else if(ret == QMessageBox::Cancel ) { event->ignore(); return; }
     }
-    CircuitWidget::self()->newCircuit();
+    if( !m_editor->close() ) { event->ignore(); return; }
+    m_circuit->newCircuit();
     writeSettings();
+    
     event->accept();
 }
 
@@ -82,7 +84,7 @@ void MainWindow::writeSettings()
     m_settings.setValue( "windowState", saveState() );
     m_settings.setValue( "Centralsplitter/geometry", m_Centralsplitter->saveState() );
 
-    foreach( QTreeWidgetItem* item, components->findItems("",Qt::MatchStartsWith)  )
+    foreach( QTreeWidgetItem* item, m_components->findItems("",Qt::MatchStartsWith)  )
     {
         m_settings.setValue( item->text(0)+"/collapsed", !item->isExpanded() );
         for( int j=0; j<item->childCount(); j++ )
@@ -90,6 +92,7 @@ void MainWindow::writeSettings()
             m_settings.setValue( item->child(j)->text(0)+"/collapsed", !item->child(j)->isExpanded() );
         }
     }
+    FileWidget::self()->writeSettings();
 }
 
 void MainWindow::setTitle( QString title )
@@ -124,9 +127,9 @@ void MainWindow::createWidgets()
     m_sidepanel->setTabPosition( QTabWidget::West );
     m_Centralsplitter->addWidget( m_sidepanel );
 
-    components = new ComponentSelector( m_sidepanel );
-    components->setObjectName(QString::fromUtf8("components"));
-    m_sidepanel->addTab( components, QString::fromUtf8("Components") );
+    m_components = new ComponentSelector( m_sidepanel );
+    m_components->setObjectName(QString::fromUtf8("components"));
+    m_sidepanel->addTab( m_components, QString::fromUtf8("Components") );
 
     m_ramTabWidget = new QWidget( this );
     m_ramTabWidget->setObjectName("ramTabWidget");
@@ -136,11 +139,11 @@ void MainWindow::createWidgets()
     m_ramTabWidgetLayout->setObjectName("ramTabWidgetLayout");
     m_sidepanel->addTab( m_ramTabWidget, tr("RamTable")  );
 
-    m_itemprop = new QPropertyEditorWidget( this );
+    m_itemprop = new PropertiesWidget( this );
     m_itemprop->setObjectName(QString::fromUtf8("properties"));
     m_sidepanel->addTab( m_itemprop, QString::fromUtf8("Properties") );
     
-    m_fileSystemTree = new FileBrowser( this );
+    m_fileSystemTree = new FileWidget( this );
     m_fileSystemTree->setObjectName(QString::fromUtf8("fileExplorer"));
     m_sidepanel->addTab( m_fileSystemTree, QString::fromUtf8("File explorer") );
 
@@ -148,9 +151,9 @@ void MainWindow::createWidgets()
     m_circuit->setObjectName(QString::fromUtf8("circuit"));
     m_Centralsplitter->addWidget( m_circuit );
     
-    EditorWindow* editor = new EditorWindow( this );
-    m_circuit->setObjectName(QString::fromUtf8("editor"));
-    m_Centralsplitter->addWidget( editor );
+    m_editor = new EditorWindow( this );
+    m_editor->setObjectName(QString::fromUtf8("editor"));
+    m_Centralsplitter->addWidget( m_editor );
 
     baseWidgetLayout->addWidget( m_Centralsplitter, 0, 0 );
 
@@ -280,6 +283,8 @@ void MainWindow::applyStile()
 
     qApp->setStyleSheet( m_styleSheet );
 }
+
+QSettings* MainWindow::settings() { return &m_settings; }
 
 #include  "moc_mainwindow.cpp"
 

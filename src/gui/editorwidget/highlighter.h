@@ -45,14 +45,17 @@ class Highlighter : public QSyntaxHighlighter
         void highlightBlock(const QString &text);
 
     private:
-        //void addRuleSet( QTextCharFormat, QString );
-        void addRule( QTextCharFormat, QString );
-
         struct HighlightingRule
         {
             QRegExp pattern;
             QTextCharFormat format;
         };
+        
+        //void addRuleSet( QTextCharFormat, QString );
+        void addRule( QTextCharFormat, QString );
+        void processRule( HighlightingRule rule, QString lcText );
+
+        
         QVector<HighlightingRule> m_highlightingRules;
 
         QRegExp commentStartExpression;

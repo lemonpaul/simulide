@@ -37,7 +37,7 @@ class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
         ~OscopeWidget();
         
         void setOscope( Oscope* oscope );
-        void setProbe( Probe* probe );
+        void read();
         void clear();
         void setupWidget( int size );
         double filter()                 { return m_filter; }
@@ -49,7 +49,7 @@ class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
     public slots:
         void HscaleChanged( int Hscale );
         void VscaleChanged( int Vscale );
-        void HposChanged( int Hpos );
+        void HposChanged( int hPos );
         void VposChanged( int Vpos );
         void autoChanged( int au );
 
@@ -67,7 +67,7 @@ class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
         QDial* m_VposDial;
         RenderOscope* m_display;
         
-        Probe* m_probe;
+        //Probe* m_probe;
         Oscope* m_oscope;
         
         bool newReading;
@@ -79,7 +79,9 @@ class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
         int m_updtCount;
         int m_ticksPs;
         int m_tick;
+        int m_lastMax;
         int m_numMax;
+        int m_numCycles;
         int m_freq;
         
         int m_Hscale;
@@ -96,12 +98,15 @@ class MAINMODULE_EXPORT OscopeWidget : public QWidget, public eElement
         
         
         int Hpos;
-        double lastData;
-        double max;
-        double mid;
-        double min;
-        bool   up;
-        bool   down;
+        double m_lastData;
+        double m_max;
+        double m_mid;
+        double m_min;
+        
+        bool m_reading;
+        bool m_haveFreq;
+        bool m_rising;
+        bool m_falling;
         bool m_auto;
 };
 

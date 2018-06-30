@@ -45,9 +45,9 @@ class MAINMODULE_EXPORT eLed : public eDiode
 
         double m_maxCurrent;
         double m_lastCurrent;
-        double lastUpdatePeriod;
-        double avg_brightness;
-        double disp_brightness;
+        double m_lastUpdatePeriod;
+        double m_avg_brightness;
+        double m_disp_brightness;
 };
 
 #endif

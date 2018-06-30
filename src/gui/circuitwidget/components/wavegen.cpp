@@ -37,21 +37,37 @@ LibraryItem* WaveGen::libraryItem()
 }
 
 WaveGen::WaveGen( QObject* parent, QString type, QString id )
-    : ClockBase( parent, type, id )
+       : ClockBase( parent, type, id )
 {
     m_voltBase = 0;
+    m_lastVout = 0;
     m_type = Sine;
+    
+    setQuality( 4 );
+    setDuty( 50 );
+    
+    connect( this, SIGNAL( freqChanged() )
+           , this, SLOT( updateValues() ));
 }
 WaveGen::~WaveGen(){}
 
 void WaveGen::simuClockStep()
 {
     m_step++;
+    
+    if(( m_qSteps > 0 )
+    &&( remainder( m_step, m_qSteps )!= 0 )) return;
+    
     if( m_type == Sine )     genSine();
     if( m_type == Saw )      genSaw();
     if( m_type == Triangle ) genTriangle();
     if( m_type == Square )   genSquare();
-
+    
+    if( m_step >= m_stepsPC ) m_step = 0;
+    
+    if( m_vOut == m_lastVout ) return;
+    m_lastVout = m_vOut;
+    
     m_out->setVoltHigh( m_voltHight*m_vOut+m_voltBase );
     m_out->stampOutput();
 }
@@ -78,30 +94,64 @@ void WaveGen::genSaw()
 void WaveGen::genTriangle()
 {
     int halfW = m_stepsPC/2;
+    
     if( m_step >= halfW )
     {
         m_vOut = 1-(double)(m_step-halfW)/halfW;
-        if( m_step >= m_stepsPC ) m_step = 0;
     }
     else m_vOut = (double)m_step/halfW;
 }
+
 void WaveGen::genSquare()
 {
-    int halfW = m_stepsPC/2;
-    if( m_step >= halfW )
+    if( m_step >= m_halfW )
     {
         m_vOut = 0;
-        if( m_step >= m_stepsPC ) m_step = 0;
     }
     else m_vOut = 1;
 }
+
 void WaveGen::updateStep()
 {
-    if(( !m_out-> out() )&( m_isRunning ))
+    if(( !m_out->out() )&&( m_isRunning ))
     {
         m_out->setOut( true );
     }
     ClockBase::updateStep();
+}
+
+void WaveGen::updateValues()
+{
+    setDuty( m_duty );
+    setQuality( m_quality );
+}
+
+double WaveGen::duty()
+{
+    return m_duty;
+}
+
+void WaveGen::setDuty( double duty )
+{
+    m_duty = duty;
+    
+    m_halfW = m_stepsPC*m_duty/100;
+}
+
+int WaveGen::quality()
+{
+    return m_quality;
+}
+
+void WaveGen::setQuality( int q )
+{
+    if( q > 5 ) q = 5;
+    if( q < 1 ) q = 1;
+    
+    m_quality = q;
+    int range = m_stepsPC/100;
+    m_qSteps  = (5-q)*range;
+    //qDebug()<<"WaveGen::setQuality"<<m_stepsPC<<q <<m_qSteps;
 }
 
 void WaveGen::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

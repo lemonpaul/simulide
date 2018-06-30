@@ -27,11 +27,14 @@
 class BaseDebugger : public QObject    // Base Class for all debuggers
 {
     Q_OBJECT
-    
+    Q_PROPERTY( QString  Compiler_Path   READ compilerPath    WRITE setCompilerPath   DESIGNABLE true USER true )
     public:
         BaseDebugger( QObject* parent=0, OutPanelText* outPane=0, QString filePath=0 );
         ~BaseDebugger();
         //QString getFileName() { return m_symbolFile; }  // Returns symbol file
+        
+        QString compilerPath();
+        virtual void setCompilerPath( QString path );
 
         virtual bool loadFirmware();
         virtual void upload();
@@ -47,7 +50,9 @@ class BaseDebugger : public QObject    // Base Class for all debuggers
         virtual int getValidLine( int line );       // Returns next asm line with code
         virtual int getProgramStart(){return 1;}
 
-        virtual void getCompilerPath(){;}
+        virtual void getCompilerPath();
+        
+        virtual void readSettings();
         
     public slots:
         void ProcRead();
@@ -69,6 +74,8 @@ class BaseDebugger : public QObject    // Base Class for all debuggers
         QString m_fileDir;
         QString m_fileName;
         QString m_fileExt;
+        QString m_compilerPath;
+        QString m_compSetting;
         
         QHash<QString, QString> m_typesList;
         QHash<QString, QString> m_varList;

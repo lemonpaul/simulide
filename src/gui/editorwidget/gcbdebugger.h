@@ -39,8 +39,6 @@ class GcbDebugger : public BaseDebugger
         int  getValidLine( int line );
         int  compile();
 
-        void getCompilerPath();
-
     private:
         void mapGcbToAsm();
         void mapLstToAsm();
@@ -54,7 +52,7 @@ class GcbDebugger : public BaseDebugger
         int m_lastGcbLine;
         int m_processorType;
         
-        QString m_gcBasic;                      // path to gcBasic executable
+        //QString m_gcBasic;                      // path to gcBasic executable
 };
 
 

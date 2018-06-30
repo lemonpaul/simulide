@@ -32,10 +32,12 @@ ConnectorLine::ConnectorLine( int x1, int y1, int x2, int y2, Connector* connect
    m_p1Y = y1;
    m_p2X = x2;
    m_p2Y = y2;
+   
+   m_isBus = false;
 
    this->setFlag( QGraphicsItem::ItemIsSelectable, true );
 
-   setToolTip( QString("Wire:\n Left-Click to start a wire \n Ctrl+Left-Click to move Line \n Right-Click for Context Menu ") );
+   //setToolTip( QString("Wire:\n Left-Click to start a wire \n Ctrl+Left-Click to move Line \n Right-Click for Context Menu ") );
 
    setCursor(Qt::CrossCursor);
 
@@ -134,7 +136,7 @@ void ConnectorLine::remove() { m_pConnector->remove(); }
 
 void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-   if( event->button() == Qt::LeftButton ) // If havent endPin means try to connect myself
+   if( event->button() == Qt::LeftButton )
    {
        if( event->modifiers() == Qt::ControlModifier )      // Move Line
        {
@@ -145,13 +147,21 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
            grabMouse();
        }
-       else                              // Connecting a wire here: Add a graphic Node
+       else                                    // Connecting a wire here
        {
-           if( Circuit::self()->is_constarted() )       // Avoid connect to same eNode
+           if( Circuit::self()->is_constarted() )       
            {
-               eNode* eNode1 = Circuit::self()->getNewConnector()->enode();
+               Connector* con = Circuit::self()->getNewConnector();
+               
+               if( con->isBus() != m_isBus ) // Avoid connect Bus with no-Bus
+               {
+                   event->ignore();
+                   return;
+               }
+               eNode* eNode1 = con->enode();
                eNode* eNode2 = m_pConnector->enode();
-               if( eNode1 == eNode2 )
+               
+               if( eNode1 == eNode2 )     // Avoid connect to same eNode
                {
                    event->ignore();
                    return;
@@ -163,11 +173,11 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
            ConnectorLine* line;
 
-           if( ( ( (dy() == 0) && ( abs( point1.x()-m_p2X ) < 8 ) ) // point near the p2 corner
-             ||( (dx() == 0) && ( abs( point1.y()-m_p2Y ) < 8 ) ) )
+           if(( ( (dy() == 0) && ( abs( point1.x()-m_p2X ) < 8 ) ) // point near the p2 corner
+             || ( (dx() == 0) && ( abs( point1.y()-m_p2Y ) < 8 ) ) )
              && ( myindex != m_pConnector->lineList()->size()-1 ) )
            {
-               if ( myindex == m_pConnector->lineList()->size()-1 )
+               if( myindex == m_pConnector->lineList()->size()-1 )
                {
                    event->ignore();
                    return;
@@ -177,11 +187,11 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
                index = myindex+1;
                line = m_pConnector->lineList()->at( index );
            }
-           else if( ( ( (dy() == 0) && ( abs( point1.x()-m_p1X ) < 8 ) ) // point near the p1 corner
-                  ||( (dx() == 0) && ( abs( point1.y()-m_p1Y ) < 8 ) ) )
-                  &&( myindex != 0 ) )
+           else if(( ( (dy() == 0) && ( abs( point1.x()-m_p1X ) < 8 ) ) // point near the p1 corner
+                  || ( (dx() == 0) && ( abs( point1.y()-m_p1Y ) < 8 ) ) )
+                  && ( myindex != 0 ) )
            {
-               if ( myindex == 0 )
+               if( myindex == 0 )
                {
                    event->ignore();
                    return;
@@ -195,7 +205,7 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
            {
                event->accept();
 
-               if ( dy() == 0 )    point1.setY( m_p1Y );
+               if( dy() == 0 )    point1.setY( m_p1Y );
                else                point1.setX( m_p1X );
 
                index = myindex+1;
@@ -275,6 +285,11 @@ void ConnectorLine::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
    }
 }
 
+void ConnectorLine::setIsBus( bool bus )
+{
+    m_isBus = bus;
+}
+
 void ConnectorLine::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Q_UNUSED(option);
@@ -304,6 +319,12 @@ void ConnectorLine::paint( QPainter* p, const QStyleOptionGraphicsItem* option, 
     QPen pen( color, 2.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
     //p->setBrush( Qt::green );
     //p->drawRect( boundingRect() );
+    
+    if( m_isBus ) 
+    {
+        //pen.setColor( Qt::darkBlue);
+        pen.setWidth( 4 );
+    }
 
     p->setPen( pen );
     p->drawLine( 0, 0, dx(), dy());

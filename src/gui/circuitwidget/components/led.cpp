@@ -36,12 +36,15 @@ LibraryItem* Led::libraryItem()
 Led::Led( QObject* parent, QString type, QString id )
     : LedBase( parent, type, id )
 {
+    m_pin.resize( 2 );
+    
     QString nodid = m_id;
     nodid.append(QString("-lPin"));
     QPoint nodpos = QPoint(-16, 0 );
     Pin* pin = new Pin( 180, nodpos, nodid, 0, this);
     pin->setPos(-8-8,0);
     m_ePin[0] = pin;
+    m_pin[0] = pin;
 
     nodid = m_id;
     nodid.append(QString("-rPin"));
@@ -49,6 +52,7 @@ Led::Led( QObject* parent, QString type, QString id )
     pin = new Pin( 0, nodpos, nodid, 1, this);
     pin->setPos( 8+8,0);
     m_ePin[1] = pin;
+    m_pin[1] = pin;
 }
 Led::~Led(){}
 

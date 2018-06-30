@@ -27,13 +27,13 @@
 #include "terminalwidget.h"
 #include "connector.h"
 #include "simulator.h"
-#include "simuapi_apppath.h"
+//#include "simuapi_apppath.h"
 
 McuComponent* McuComponent::m_pSelf = 0l;
 bool McuComponent::m_canCreate = true;
 
 McuComponent::McuComponent( QObject* parent, QString type, QString id )
-    : Package( parent, type, id )
+            : Package( parent, type, id )
 {    
     qDebug() << "        Initializing"<<m_id<<"...";
     
@@ -62,8 +62,7 @@ void McuComponent::initPackage()
 
     m_dataFile = ComponentSelector::self()->getXmlFile( compName );
     
-    //QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
-    //qDebug() << "McuComponent::initPackage datafile: " << compName << " <= " << dfPath;
+    //qDebug() << "McuComponent::initPackage datafile: " << compName << " <= " << m_dataFile;
     QFile file( m_dataFile );
     
     if(( m_dataFile == "" ) || ( !file.exists() ))
@@ -71,7 +70,6 @@ void McuComponent::initPackage()
         m_error = 1;
         return;
     }
-    
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
         QMessageBox* msgBox = new QMessageBox( MainWindow::self() );
@@ -84,8 +82,8 @@ void McuComponent::initPackage()
         m_error = 1;
         return;
     }
-
     QDomDocument domDoc;
+    
     if( !domDoc.setContent(&file) )
     {
         QMessageBox* msgBox = new QMessageBox( MainWindow::self() );
@@ -153,7 +151,7 @@ int McuComponent::freq()
 }
 void McuComponent::setFreq( int freq )
 { 
-    if     ( freq < 0  ) freq = 0;
+    if     ( freq < 0  )  freq = 0;
     else if( freq > 100 ) freq = 100;
     
     Simulator::self()->setMcuClock( freq );
@@ -227,33 +225,26 @@ void McuComponent::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 
 void McuComponent::slotOpenSerial()
 {
-    //if( m_serialTerm ) return;
     CircuitWidget::self()->showSerialPortWidget( true );
     m_processor->setSerPort( true );
-    //m_serialTerm = true;
 }
 
 void McuComponent::slotCloseSerial()
 {
     CircuitWidget::self()->showSerialPortWidget( false );
-    //SerialPortWidget::self()->close();
     m_processor->setSerPort( false );
-    //m_serialTerm = false;
 }
 
 void McuComponent::slotOpenTerm()
 {
-    //if( m_serialTerm ) return;
     TerminalWidget::self()->setVisible( true );
     m_processor->setUsart( true );
-    //m_serialTerm = true;
 }
 
 void McuComponent::slotCloseTerm()
 {
     TerminalWidget::self()->setVisible( false );
     m_processor->setUsart( false );
-    //m_serialTerm = false;
 }
 
 void McuComponent::slotLoad()
@@ -261,8 +252,8 @@ void McuComponent::slotLoad()
     const QString dir = m_lastFirmDir;
     QString fileName = QFileDialog::getOpenFileName( 0l, tr("Load Firmware"), dir,
                        tr("Hex Files (*.hex);;ELF Files (*.elf);;all files (*.*)"));
-    if (fileName.isEmpty())
-        return; // User cancels loading
+                       
+    if (fileName.isEmpty()) return; // User cancels loading
 
     QDir circuitDir = QFileInfo(Circuit::self()->getFileName()).absoluteDir();
     load( circuitDir.relativeFilePath(fileName) );
@@ -276,13 +267,6 @@ void McuComponent::slotReload()
 
 void McuComponent::load( QString fileName )
 {
-    /*bool haveTerm = m_serialTerm;
-    if( m_serialTerm )
-    {
-        slotCloseTerm();
-        slotCloseSerial();
-    }*/
-
     QDir circuitDir = QFileInfo(Circuit::self()->getFileName()).absoluteDir();
     QString fileNameAbs = circuitDir.absoluteFilePath(fileName);
     QString cleanPathAbs = circuitDir.cleanPath(fileNameAbs);
@@ -304,7 +288,6 @@ void McuComponent::load( QString fileName )
     else QMessageBox::warning( 0, tr("Error:"), tr("Could not load ")+ fileName );
     
     if( pauseSim ) Simulator::self()->runContinuous();
-    //if( haveTerm ) slotOpenTerm();
 }
 
 void McuComponent::setProgram( QString pro )

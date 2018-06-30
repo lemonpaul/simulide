@@ -38,6 +38,9 @@ class MAINMODULE_EXPORT ClockBase : public LogicInput
         
         int freq() { return m_freq; }
         virtual void setFreq( int freq );
+        
+    signals:
+        void freqChanged();
 
     public slots:
         virtual void onbuttonclicked();
@@ -47,9 +50,10 @@ class MAINMODULE_EXPORT ClockBase : public LogicInput
         bool m_isRunning;
         bool m_changed;
         
-        int m_step;
-        double m_stepsPC;
         int m_freq;
+        int m_step;
+        
+        double m_stepsPC;
 };
 
 #endif

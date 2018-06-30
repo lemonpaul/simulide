@@ -54,6 +54,8 @@ public:
     void moveLine( QPoint delta );
 
     void updatePos();
+    
+    void setIsBus( bool bus );
 
     void mousePressEvent(QGraphicsSceneMouseEvent* event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
@@ -78,6 +80,8 @@ private:
     int m_p1Y;
     int m_p2X;
     int m_p2Y;
+    
+    bool m_isBus;
 
     Connector* m_pConnector;
 };

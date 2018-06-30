@@ -39,17 +39,17 @@ LibraryItem* Potentiometer::libraryItem()
 }
 
 Potentiometer::Potentiometer( QObject* parent, QString type, QString id )
-    : Component( parent, type, id )
-    , eElement( (id+"-eElement").toStdString() )
-    , m_pinA( 180, QPoint(-16,0 ), id+"-PinA", 0, this )
-    , m_pinM( 270, QPoint( 0,16), id+"-PinM", 0, this )
-    , m_pinB(   0, QPoint( 16,0 ), id+"-PinB", 0, this )
-    , m_ePinA( (id+"-ePinA").toStdString(), 0 )
-    , m_ePinB( (id+"-ePinB").toStdString(), 1 )
-    , m_resA(  (id+"-resA").toStdString() )
-    , m_resB(  (id+"-resB").toStdString() )
+             : Component( parent, type, id )
+             , eElement( (id+"-eElement").toStdString() )
+             , m_pinA( 180, QPoint(-16,0 ), id+"-PinA", 0, this )
+             , m_pinM( 270, QPoint( 0,16), id+"-PinM", 0, this )
+             , m_pinB(   0, QPoint( 16,0 ), id+"-PinB", 0, this )
+             , m_ePinA( (id+"-ePinA").toStdString(), 0 )
+             , m_ePinB( (id+"-ePinB").toStdString(), 1 )
+             , m_resA(  (id+"-resA").toStdString() )
+             , m_resB(  (id+"-resB").toStdString() )
 {
-    m_area = QRectF( -11, -4.5, 22, 9 );
+    m_area = QRectF( -12, -4.5, 24, 12.5 );
     
     m_dialW.setupWidget();
     m_dialW.setFixedSize( 24, 24 );
@@ -101,10 +101,22 @@ void Potentiometer::updateStep()
 {
     if( m_changed ) 
     {
-        double res = m_dial->value();
-
-        m_resA.setRes( res );
-        m_resB.setRes( m_resist-res );
+        double res1 = double( m_resist*m_dial->value()/1000 );
+        double res2 = m_resist-res1;
+        
+        if( res1 < 1e-6 ) 
+        {
+            res1 = 1e-3;
+            res2 = m_resist-res1;
+        }
+        if( res2 < 1e-6 ) 
+        {
+            res2 = 1e-6;
+            res1 = m_resist-res2;
+        }
+        
+        m_resA.setRes( res1 );
+        m_resB.setRes( res2 );
         
         m_changed = false;
     }
@@ -120,7 +132,6 @@ void Potentiometer::setRes( double res ) // Called when property resistance is c
 {
     Component::setValue( res );       // Takes care about units multiplier
     m_resist = m_value*m_unitMult;
-    m_dial->setMaximum( int(m_resist) );
     
     m_changed = true;
 }
@@ -129,20 +140,19 @@ void Potentiometer::setUnit( QString un )
 {
     Component::setUnit( un );
     m_resist = m_value*m_unitMult;
-    m_dial->setMaximum( int(m_resist) );
 
     m_changed = true;
 }
 
 void Potentiometer::setVal( int val )
 {
-    m_dial->setValue( val );
+    m_dial->setValue( val*1000/m_resist );
     //resChanged( val );
 }
 
 int Potentiometer::val()
 {
-    return m_dial->value();
+    return m_resist*m_dial->value()/1000;
 }
 
 void Potentiometer::remove()
@@ -172,8 +182,8 @@ void Potentiometer::paint( QPainter *p, const QStyleOptionGraphicsItem *option, 
     pen.setWidth(3);
     p->setPen(pen);
 
-    p->drawLine( 0, 6, -4, 10 );
-    p->drawLine( 0, 6,  4, 10 );
+    p->drawLine( 0, 6, -3, 9 );
+    p->drawLine( 0, 6,  3, 9 );
 }
 
 #include "moc_potentiometer.cpp"

@@ -23,7 +23,8 @@
 #include "itemlibrary.h"
 #include "circuitwidget.h"
 
-bool Probe::m_oscopeBusy = false;
+bool     Probe::m_oscopeBusy = false;
+QString* Probe::m_helpStatic=0l;
 
 Component* Probe::construct( QObject* parent, QString type, QString id )
 { return new Probe( parent, type, id ); }
@@ -39,11 +40,12 @@ LibraryItem* Probe::libraryItem()
 }
 
 Probe::Probe( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eElement( id.toStdString() )
+     : Component( parent, type, id )
+     , eElement( id.toStdString() )
 {
     m_readPin = 0l;
     m_readConn = 0l;
-    m_haveOscope = false;
+    //m_haveOscope = false;
     m_voltTrig = 2.5;
     m_plotterLine = -1;
     m_plotterColor = QColor( 255, 255, 255 );
@@ -72,6 +74,13 @@ Probe::Probe( QObject* parent, QString type, QString id )
     setShowVal( true );
     
     setLabelPos( 16, -16 , 45 );
+    
+    if( !m_helpStatic  )         // Only load Help Text once for a class
+    {
+        m_helpStatic = new QString();
+        m_helpStatic->append( getHelp( "help/probe.txt" ) );
+    }
+    m_help = m_helpStatic;
 
     Simulator::self()->addToUpdateList( this );
 }
@@ -139,13 +148,8 @@ void Probe::setVolt( double volt )
 
     if( fabs(volt) < 0.01 ) volt = 0;
     int dispVolt = int( volt*100+0.5 );
-
-    //if( m_showVolt ) m_dispvolt->setPlainText( QString("%1 V").arg(double(dispVolt)/100));
-    //else             m_dispvolt->setPlainText("");
     
     m_valLabel->setPlainText( QString("%1 V").arg(double(dispVolt)/100) );
-    //Component::setUnit( "V" );
-    //Component::setValue( double(dispVolt)/100 );
 
     if( m_plotterLine > -1 ) PlotterWidget::self()->setData(m_plotterLine, m_voltIn*100 );
 
@@ -165,7 +169,6 @@ void Probe::remove()
 {
     if( m_inputpin->isConnected() ) m_inputpin->connector()->remove();
 
-    slotOscopRem();
     slotPlotterRem();
     
     Simulator::self()->remFromUpdateList( this );
@@ -195,29 +198,6 @@ void Probe::slotPlotterRem()
     update();       // Repaint
 }
 
-void Probe::slotOscopAdd()
-{
-    if( m_oscopeBusy ) return; // Another probe is using oscope
-
-    CircuitWidget::self()->oscope()->setProbe( this );
-    CircuitWidget::self()->oscope()->setVisible( true );
-    m_haveOscope = true;
-    m_oscopeBusy = true;
-}
-
-void Probe::slotOscopRem()
-{
-    if( !m_haveOscope ) return; // this probe is not using oscope
-    
-    //if( m_inputpin->isConnected() )
-    {
-        CircuitWidget::self()->oscope()->setProbe( 0l );
-        CircuitWidget::self()->oscope()->setVisible( false );
-        m_haveOscope = false;
-        m_oscopeBusy = false;
-    }
-}
-
 void Probe::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     event->accept();
@@ -230,21 +210,10 @@ void Probe::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     connect(plotterRemAction, SIGNAL(triggered()), this, SLOT(slotPlotterRem()));
     
     menu->addSeparator();
-    
-    QAction *oscopAddAction = menu->addAction(QIcon(":/fileopen.png"),"Add to Oscope");
-    connect(oscopAddAction, SIGNAL(triggered()), this, SLOT(slotOscopAdd()));
-
-    QAction *oscopRemAction = menu->addAction(QIcon(":/fileopen.png"),"Remove from Oscope");
-    connect(oscopRemAction, SIGNAL(triggered()), this, SLOT(slotOscopRem()));
-
-    menu->addSeparator();
 
     Component::contextMenu( event, menu );
     menu->deleteLater();
 }
-
-//bool Probe::Show_volt()                { return  m_showVolt; }
-//void Probe::setShow_volt( bool show )  { m_showVolt = show; setVolt(m_voltIn); }
 
 void Probe::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
@@ -255,11 +224,6 @@ void Probe::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget 
     else                              p->setBrush( QColor( 230, 230, 255 ) );
 
     p->drawEllipse( -8, -8, 16, 16 );
-    if( m_haveOscope )
-    {
-        p->drawLine( -8, 0, 8, 0 );
-        p->drawLine(  0,-8, 0, 8 );
-    }
 }
 
 #include "moc_probe.cpp"

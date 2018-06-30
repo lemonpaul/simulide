@@ -22,10 +22,10 @@
 
 #include "itemlibrary.h"
 #include "logiccomponent.h"
-#include "e-logic_device.h"
+#include "e-bcdto7s.h"
 
 
-class MAINMODULE_EXPORT SevenSegmentBCD : public LogicComponent, public eLogicDevice
+class MAINMODULE_EXPORT SevenSegmentBCD : public LogicComponent, public eBcdTo7S
 {
     Q_OBJECT
 
@@ -36,20 +36,16 @@ class MAINMODULE_EXPORT SevenSegmentBCD : public LogicComponent, public eLogicDe
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
-        void initialize();
         void resetState();
         void updateStep();
         void remove();
         
-        void setVChanged();
 
         void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     private:
         int m_origx;
         int m_origy;
-        
-        std::vector<bool> m_outValue;
 };
 
 #endif

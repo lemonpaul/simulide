@@ -44,19 +44,21 @@ void eNode::pinChanged( ePin* epin, int enodeComp ) // Add node at other side of
 
 void eNode::initialize()
 {
-    m_single  = false;
-    m_changed = false;
+    m_switched     = false;
+    m_single       = false;
+    m_changed      = false;
     m_currChanged  = false;
     m_admitChanged = false;
-    m_needFastUpdate = false;
+    m_fastUpdated  = false;
+    
     m_ePinSubList.clear();
     m_changedFast.clear();
+    m_nonLinear.clear();
     m_reactiveList.clear();
     m_admitList.clear();
     m_currList.clear();
     m_nodeList.clear();
-
-    //m_totalCurr = 0;
+    
     m_volt = 0;
 }
 
@@ -92,62 +94,101 @@ void eNode::setNodeNumber( int n ) { m_nodeNum = n; }
 
 void eNode::stampMatrix()
 {
+    if( m_nodeNum == 0 ) return; 
+    
     m_changed = false;
     
     if( m_admitChanged )
     {
-        QHash<int, double> admit;
-        double totalAdmit = 0;
-        double adm;
-        int    enode;
+        m_admit.clear();
+        m_totalAdmit = 0;
         
         QHashIterator<ePin*, double> i(m_admitList); // ePin-Admit
         while ( i.hasNext() ) 
         {
             i.next();
 
-            adm   = i.value(); //m_admitList[epin];
-            if( !m_single ) 
-            {
-                ePin* epin = i.key();
-                enode = m_nodeList[epin];
-                admit[enode] += adm;
-            }
-            totalAdmit   += adm;
+            double adm = i.value();
+
+            ePin* epin = i.key();
+            int enode = m_nodeList[epin];
+            m_admit[enode] += adm;
+            m_totalAdmit   += adm;
         }
+        if( !m_single || m_switched ) stampAdmit();
         
-        if( m_single ) m_totalAdmit = totalAdmit;   // single element in matrix
-        else 
+        if( m_switched )                       // Find open/close events
         {
-            QHashIterator<int, double> ai(admit); // iterate admitance hash: eNode-Admit
-            while ( ai.hasNext() ) 
+            QHashIterator<int, double> ai(m_admit);
+            while ( ai.hasNext() )                // Iterate eNode-Admit
             {
                 ai.next();
-                enode = ai.key();
-                if( enode > 0 )
-                    CircMatrix::self()->stampMatrix( m_nodeNum, enode, -ai.value() );
+                int enode = ai.key();
+                double admit = ai.value();
+                double admitP = m_admitPrev[enode];
+
+                if( admit == admitP ) continue;
+                
+                if( (admit==0)||(admitP==0) ) CircMatrix::self()->setCircChanged();
             }
-            
-            CircMatrix::self()->stampMatrix( m_nodeNum, m_nodeNum, totalAdmit );
+            m_admitPrev = m_admit;
         }
         m_admitChanged = false;
     }
     
     if( m_currChanged )
     {
-        double totalCurr  = 0;
-        foreach( double current, m_currList ) totalCurr  += current;
+        m_totalCurr  = 0;
+        foreach( double current, m_currList ) m_totalCurr += current;
 
-        if( m_single )                   // single element in matrix
-        {
-            double volt = 0;
-            if( m_totalAdmit  > 0 )volt = totalCurr/m_totalAdmit;
-            setVolt( volt );
-        }
-        else CircMatrix::self()->stampCoef( m_nodeNum, totalCurr );
-        //m_currList.clear();
+        if( !m_single || m_switched ) stampCurr();
+        
         m_currChanged  = false;
     }
+    if( m_single ) solveSingle();
+}
+
+void eNode::stampAdmit()
+{
+    QHashIterator<int, double> ai(m_admit); // iterate admitance hash: eNode-Admit
+    while ( ai.hasNext() ) 
+    {
+        ai.next();
+        int enode = ai.key();
+        if( enode>0 ) CircMatrix::self()->stampMatrix( m_nodeNum, enode, -ai.value() );
+    }
+    CircMatrix::self()->stampMatrix( m_nodeNum, m_nodeNum, m_totalAdmit );
+}
+
+void eNode::stampCurr()
+{
+    CircMatrix::self()->stampCoef( m_nodeNum, m_totalCurr );
+}
+
+void eNode::setSingle( bool single ){ m_single = single; }      // This eNode can calculate it's own Volt
+
+bool eNode::isSingle(){ return m_single; }
+
+void eNode::setSwitched( bool switched ){ m_switched = switched; } // This eNode has switches attached
+
+bool eNode::isSwitched(){ return m_switched; }
+
+void eNode::solveSingle()
+{
+    double volt = 0;
+    
+    if( m_totalAdmit > 0 ) volt = m_totalCurr/m_totalAdmit;
+    setVolt( volt );
+}
+
+QList<int> eNode::getConnections()
+{
+    QList<int> cons;
+    foreach( int nodeNum, m_nodeList ) 
+    {
+        if( m_admit[nodeNum] > 0 ) cons.append( nodeNum );
+    }
+    return cons;
 }
 
 void  eNode::setVolt( double v )
@@ -199,13 +240,13 @@ void eNode::remEpin( ePin* epin )
 void eNode::addToChangedFast( eElement* el )   
 { 
     if( !m_changedFast.contains(el) ) m_changedFast.append(el); 
-    m_needFastUpdate = true;
+    m_fastUpdated = true;
 }
 
 void eNode::remFromChangedFast( eElement* el ) 
 { 
     m_changedFast.removeOne(el); 
-    if( m_changedFast.isEmpty() & m_nonLinear.isEmpty()) m_needFastUpdate = false;
+    if( m_changedFast.isEmpty() & m_nonLinear.isEmpty()) m_fastUpdated = false;
 }
 
 void eNode::addToReactiveList( eElement* el )
@@ -221,13 +262,13 @@ void eNode::remFromReactiveList( eElement* el )
 void eNode::addToNoLinList( eElement* el )
 {
     if( !m_nonLinear.contains(el) ) m_nonLinear.append(el);
-    m_needFastUpdate = true;
+    m_fastUpdated = true;
 }
 
 void eNode::remFromNoLinList( eElement* el )
 {
     m_nonLinear.removeOne(el);
-    if( m_changedFast.isEmpty() & m_nonLinear.isEmpty()) m_needFastUpdate = false;
+    if( m_changedFast.isEmpty() & m_nonLinear.isEmpty()) m_fastUpdated = false;
 }
 
 int eNode::getNodeNumber() { return m_nodeNum; }

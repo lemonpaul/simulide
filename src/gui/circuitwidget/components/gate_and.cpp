@@ -41,6 +41,24 @@ AndGate::AndGate( QObject* parent, QString type, QString id )
 }
 AndGate::~AndGate(){}
 
+QPainterPath AndGate::shape() const
+{
+    QPainterPath path;
+    
+    QVector<QPointF> points;
+    
+    points << QPointF(-16,-18 )
+           << QPointF(-16, 18 )
+           << QPointF(  0, 16 )
+           << QPointF( 16,  8 )
+           << QPointF( 16, -8 )
+           << QPointF(  0,-16 );
+        
+    path.addPolygon( QPolygonF(points) );
+    path.closeSubpath();
+    return path;
+}
+
 void AndGate::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
     Component::paint( p, option, widget );

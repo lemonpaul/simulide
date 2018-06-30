@@ -37,7 +37,8 @@ LibraryItem* FlipFlopD::libraryItem()
 }
 
 FlipFlopD::FlipFlopD( QObject* parent, QString type, QString id )
-          : LogicComponent( parent, type, id ), eFlipFlopD( id.toStdString() )
+         : LogicComponent( parent, type, id )
+         , eFlipFlopD( id.toStdString() )
 {
     m_width  = 4;
     m_height = 4;

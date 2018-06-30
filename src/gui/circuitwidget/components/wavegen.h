@@ -27,8 +27,10 @@
 class MAINMODULE_EXPORT WaveGen : public ClockBase
 {
     Q_OBJECT
-    Q_PROPERTY( double    Volt_Base  READ voltBase    WRITE setVoltBase    DESIGNABLE true USER true )
-    Q_PROPERTY( wave_type Wave_Type  READ waveType    WRITE setWaveType      DESIGNABLE true USER true )
+    Q_PROPERTY( double    Volt_Base   READ voltBase    WRITE setVoltBase DESIGNABLE true USER true )
+    Q_PROPERTY( double    Duty_Square READ duty        WRITE setDuty     DESIGNABLE true USER true )
+    Q_PROPERTY( int       Quality     READ quality     WRITE setQuality  DESIGNABLE true USER true )
+    Q_PROPERTY( wave_type Wave_Type   READ waveType    WRITE setWaveType DESIGNABLE true USER true )
     Q_ENUMS( wave_type )
     
     public:
@@ -49,6 +51,12 @@ class MAINMODULE_EXPORT WaveGen : public ClockBase
         double voltBase()            { return m_voltBase; }
         void setVoltBase( double v ) { m_voltBase = v; }
         
+        double duty();
+        void setDuty( double duty );
+        
+        int quality();
+        void setQuality( int q );
+        
         wave_type waveType()              { return m_type; }
         void setWaveType( wave_type typ ) { m_type = typ; }
         
@@ -57,6 +65,9 @@ class MAINMODULE_EXPORT WaveGen : public ClockBase
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
         
+    private slots:
+        void updateValues();
+        
     private:
         void genSine();
         void genSaw();
@@ -64,8 +75,14 @@ class MAINMODULE_EXPORT WaveGen : public ClockBase
         void genSquare();
         
         wave_type m_type;
+        double m_duty;
         double m_vOut;
         double m_voltBase;
+        double m_lastVout;
+        double m_halfW;
+        
+        int m_quality;
+        int m_qSteps;
 };
 
 #endif

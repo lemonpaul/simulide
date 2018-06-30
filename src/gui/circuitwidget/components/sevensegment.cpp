@@ -40,7 +40,8 @@ LibraryItem* SevenSegment::libraryItem()
 }
 
 SevenSegment::SevenSegment( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eElement( id.toStdString() )
+            : Component( parent, type, id )
+            , eElement( id.toStdString() )
 {
     setId( id );
     m_idLabel->setPos( 30, -70);
@@ -52,8 +53,8 @@ SevenSegment::SevenSegment( QObject* parent, QString type, QString id )
     m_area = QRect( -16, -24-1, 32, 48+2 );
 
     m_ePin.resize(8);
+    m_pin.resize(8);
 
-    // Create Pins
     QString nodid;
     QString pinid;
 
@@ -64,12 +65,14 @@ SevenSegment::SevenSegment( QObject* parent, QString type, QString id )
 
         nodid = m_id;
         nodid.append(QString("-pin_")).append( pinid );
-        m_ePin[i] = new Pin( 180, QPoint( -16-8, -24+i*8 ), nodid, 0, this );
+        m_pin[i] = new Pin( 180, QPoint( -16-8, -24+i*8 ), nodid, 0, this );
+        m_ePin[i] = m_pin[i];
     }
     // Pin dot
     nodid = m_id;
     nodid.append(QString("-pin_dot"));
-    m_ePin[7] = new Pin( 270, QPoint( -8, 24+8 ), nodid, 0, this );
+    m_pin[7] = new Pin( 270, QPoint( -8, 24+8 ), nodid, 0, this );
+    m_ePin[7] = m_pin[7];
 
     setNumDisplays(1);
 }
@@ -181,9 +184,7 @@ void SevenSegment::deleteDisplay( int dispNumber )
     Pin* pin = static_cast<Pin*>(m_commonPin[dispNumber]);
     if( pin->isConnected() ) pin->connector()->remove();
 
-    //pin->deleteLater();
-
-    for( int i=0; i<8; i++ ) m_segment[dispNumber*8+i]->remove();
+    for( int i=0; i<8; i++ ) Circuit::self()->removeComp( m_segment[dispNumber*8+i] );
     Circuit::self()->update();
     update();
 }
@@ -235,31 +236,20 @@ void SevenSegment::createDisplay( int dispNumber )
 
 void SevenSegment::remove()
 {
-    for( int i=0; i<8; i++ )
+    /*for( int i=0; i<8; i++ )
         if( m_ePin[i]->isConnected() ) (static_cast<Pin*>(m_ePin[i]))->connector()->remove();
 
     for( int i=0; i<m_numDisplays; i++ )
     {
         int pin;
-        if( m_commonCathode )
+
+        for( int j=0; j<8; j++ )
         {
-            for( int j=0; j<8; j++ )
-            {
-                pin = i*8+j;
-                m_cathodePin[pin]->setEnode( 0l );
-                m_anodePin[pin]->setEnode( 0l );
-            }
+            pin = i*8+j;
+            m_cathodePin[pin]->setEnode( 0l );
+            m_anodePin[pin]->setEnode( 0l );
         }
-        else
-        {
-            for( int j=0; j<8; j++ )
-            {
-                pin = i*8+j;
-                m_anodePin[pin]->setEnode( 0l );
-                m_cathodePin[pin]->setEnode( 0l );
-            }
-        }
-    }
+    }*/
 
     for( int i=0; i<m_numDisplays; i++ ) deleteDisplay( i );
         

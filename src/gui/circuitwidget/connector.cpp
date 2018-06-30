@@ -25,17 +25,20 @@
 
 
 Connector::Connector( QObject* parent, QString type, QString id, Pin* startpin, Pin* endpin )
-                : Component( parent, type, id )
+         : Component( parent, type, id )
 {
     //m_eNode = 0l;
     m_actLine   = 0;
     m_lastindex = 0;
+    
+    m_isBus = false;
 
     if( startpin )
     {
         m_startPin   =  startpin;
         m_startpinid = startpin->itemID();
         setPos( startpin->scenePos() );
+        if( m_startPin->isBus() ) setIsBus( true );
     }
 
     if( endpin )
@@ -46,6 +49,7 @@ Connector::Connector( QObject* parent, QString type, QString id, Pin* startpin, 
         m_endPin->setConnector( this );
         m_startPin->setConPin( m_endPin );
         m_endPin->setConPin( m_startPin );
+        if( m_isBus ) m_endPin->setIsBus( true );
     }
     else
     {
@@ -140,6 +144,7 @@ void Connector::addConLine( ConnectorLine* line, int index )
         connectLines( index, index+1 );
         m_conLineList.at( index+1 )->sSetP1( line->p2() );
     }
+    line->setIsBus( m_isBus );
 }
 
 ConnectorLine* Connector::addConLine( int x1, int y1, int x2, int y2, int index )
@@ -380,6 +385,12 @@ void Connector::closeCon( Pin* endpin )
 
     m_startPin->setConnector( this );
     m_endPin->setConnector( this );
+    
+    if( m_isBus )
+    {
+        m_startPin->setIsBus( true );
+        m_endPin->setIsBus( true );
+    }
 
     m_startPin->setConPin( m_endPin );
     m_endPin->setConPin( m_startPin );
@@ -473,5 +484,20 @@ double Connector::getVolt()
 QList<ConnectorLine*>* Connector::lineList() { return &m_conLineList; }
 
 void Connector::incActLine() { if( m_actLine < m_conLineList.size()-1 ) m_actLine += 1;}
+
+void Connector::setIsBus( bool bus )
+{
+    if( m_isBus == bus ) return;
+    if( !bus ) return;
+    
+    foreach( ConnectorLine* line, m_conLineList ) line->setIsBus( bus );
+    
+    m_isBus = bus;
+}
+
+bool Connector::isBus()
+{
+    return m_isBus;
+}
 
 #include "moc_connector.cpp"

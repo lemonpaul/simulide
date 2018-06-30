@@ -23,7 +23,7 @@
 #include "e-outbus.h"
 
 eOutBus::eOutBus( std::string id )
-    : eLogicDevice( id )
+       : eLogicDevice( id )
 {
 }
 eOutBus::~eOutBus()
@@ -34,7 +34,13 @@ void eOutBus::initialize()
 {
     for( int i=0; i<m_numInputs; i++ )
     {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
+        m_threshold = (m_inputHighV+m_inputLowV)/2;
+        eSource* esource = m_input[i];
+        esource->setImp( 1e7 );
+        esource->setVoltHigh( m_threshold );
+        esource->setVoltLow( m_threshold );
+        
+        eNode* enode = esource->getEpin()->getEnode();
         if( enode ) enode->addToChangedFast(this);
     }
     m_output[0]->setImp( cero_doub );
@@ -46,13 +52,37 @@ void eOutBus::setVChanged()
 {
     int address = 0;
     
+    bool haveInput = true;
+    
     for( int i=0; i<m_numInputs; i++ )
     {
-        if( getInputState( i ) ) address += pow( 2, i );
+        double volt = m_input[i]->getVolt();
+        if( fabs( volt-m_threshold ) < m_threshold/2 ) haveInput = false;
+        //qDebug() << "eOutBus::setVChanged" <<volt<<m_threshold<<haveInput;
+        bool  state = m_inputState[i];
+
+        if     ( volt > m_inputHighV ) state = true;
+        else if( volt < m_inputLowV )  state = false;
+
+        if( m_input[i]->isInverted() ) state = !state;
+        m_inputState[i] = state;
+        
+        if( state ) address += pow( 2, 7-i );
     }
-    double volt = m_maxVolt*address/m_maxAddr;
-    //qDebug() << "eOutBus::setVChanged" << address<<m_numInputs;
+    double v = m_maxVolt*address/m_maxAddr;
+    double imp = m_outImp;
     
-    m_output[0]->setVoltHigh( volt );
-    m_output[0]->stampOutput();
+    if( !haveInput ) 
+    {
+        imp = m_inputImp;
+        v = 0;
+    }
+    eSource* output = m_output[0];
+    
+    if( output->imp() != imp ) output->setImp( imp );
+
+    //qDebug() << "eOutBus::setVChanged" << v << address<<m_maxAddr<<m_maxVolt;
+    
+    output->setVoltHigh( v );
+    output->stampOutput();
 }

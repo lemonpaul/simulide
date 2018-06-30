@@ -40,6 +40,8 @@ class MAINMODULE_EXPORT Oscope : public Component, public eElement
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
+        
+        void updateStep();
 
         void initialize();
         

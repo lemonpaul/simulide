@@ -36,8 +36,6 @@ class AvrProcessor : public BaseProcessor
         AvrProcessor( QObject* parent=0 );
         ~AvrProcessor();
 
- //static AvrProcessor* self() { return m_pSelf; }
-
         bool loadFirmware( QString file );
         void terminate();
 
@@ -63,11 +61,6 @@ class AvrProcessor : public BaseProcessor
         }
 
     private:
- //static AvrProcessor *m_pSelf;
- 
-        //QHash<QString, int> getRegsTable( QString lstFileName );
-        
-        //virtual void setRegisters();
         virtual int  validate( int address );
 
         //From simavr

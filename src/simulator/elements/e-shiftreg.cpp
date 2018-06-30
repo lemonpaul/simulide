@@ -86,6 +86,7 @@ void eShiftReg::resetState()
 
 void eShiftReg::setVChanged()
 {
+    eLogicDevice::updateOutEnabled();
     // Get Clk to don't miss any clock changes
     bool clkRising = (eLogicDevice::getClockState() == Rising);
 
@@ -125,14 +126,8 @@ void eShiftReg::setVChanged()
         
         m_changed = true;                      // Shift Register changed
     }
-    if( m_outEnablePin )
-    {
-        bool outEn = true;
-        bool outEnPrev = m_outEnable;
-        outEn = eLogicDevice::outputEnabled();  // Refresh m_outEnable
-        
-        if( outEnPrev != outEn ) eLogicDevice::setOutputEnabled( outEn );
-    }
+    
+    
     if( m_latchClockPin )                            // find rising edge
     {
         bool lastLcClock = m_latchClock;
@@ -150,13 +145,13 @@ void eShiftReg::setVChanged()
             {
                 bool data = m_shiftReg[i];
                 m_latch[i] = data;
-                if( m_outEnable ) eLogicDevice::setOut( i, data );
+                eLogicDevice::setOut( i, data );
             }
         }
     }
     else
     {
-        if( m_changed & m_outEnable )
+        if( m_changed )
         {
             m_changed = false;
             

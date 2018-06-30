@@ -37,7 +37,7 @@ LibraryItem* Clock::libraryItem()
 }
 
 Clock::Clock( QObject* parent, QString type, QString id )
-    : ClockBase( parent, type, id )
+     : ClockBase( parent, type, id )
 {
 }
 Clock::~Clock(){}

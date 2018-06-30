@@ -35,25 +35,22 @@ class MAINMODULE_EXPORT FileBrowser : public QTreeView
         void setPath(QString path);
         
     public slots:
-    
-        void setRoot();
-        void resetRoot();
-        void resetRootToHome();
-        void openFile();
+        void cdUp();
+        void open();
+        void openInEditor();
+        void addBookMark();
         
     signals:
-    
-        void openFileWithEditor(QString path);
+        void openFileWithEditor( QString path );
         
     protected:
-        void contextMenuEvent(QContextMenuEvent* event);
+        void contextMenuEvent( QContextMenuEvent* event );
 
     private:
     
  static FileBrowser*  m_pSelf;
  
         void mouseDoubleClickEvent(QMouseEvent *event);
-
         void keyPressEvent( QKeyEvent *event );
         
         QFileSystemModel* m_fileSystemModel;

@@ -50,13 +50,8 @@ void eLatchD::initialize()
 
 void eLatchD::setVChanged()
 {
-    if( m_outEnablePin )
-    {
-        bool outEnPrev = m_outEnable;
-        bool outEn = eLogicDevice::outputEnabled();
-        
-        if( outEnPrev != outEn ) eLogicDevice::setOutputEnabled( outEn );
-    }
+    eLogicDevice::updateOutEnabled();
+    
     if( m_inEnablePin )
     {
         if( !eLogicDevice::inputEnabled() ) return;

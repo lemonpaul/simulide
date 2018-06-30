@@ -20,6 +20,7 @@
 //#include <QtGui>
 
 #include "editorwindow.h"
+#include "mainwindow.h"
 #include "filebrowser.h"
 #include "utils.h"
 
@@ -39,13 +40,19 @@ EditorWindow::EditorWindow( QWidget* parent )
     connect( FileBrowser::self(), SIGNAL( openFileWithEditor(QString) )
            , this               , SLOT( loadFile(QString) ));
 }
-EditorWindow::~EditorWindow(){ writeSettings(); }
+EditorWindow::~EditorWindow(){}
 
-void EditorWindow::closeEvent(QCloseEvent* event)
+bool EditorWindow::close()
 {
-    Q_UNUSED( event );
-    maybeSave();
+    getCodeEditor()->writeSettings();
     writeSettings();
+    
+    for( int i=0; i<m_docWidget->count(); i++ )
+    {
+        closeTab( m_docWidget->currentIndex() );
+    }
+    
+    return maybeSave();
 }
 
 void EditorWindow::keyPressEvent( QKeyEvent* event )
@@ -70,10 +77,13 @@ void EditorWindow::keyPressEvent( QKeyEvent* event )
 void EditorWindow::newFile()
 {
     CodeEditorWidget* baseWidget = new CodeEditorWidget( this );
-    docWidget->addTab( baseWidget, "New" );
-    docWidget->setCurrentWidget( baseWidget );
-    connect(baseWidget->m_codeEditor->document(), SIGNAL(contentsChanged()),
-            this,                                 SLOT(documentWasModified()));
+    
+    m_docWidget->addTab( baseWidget, "New" );
+    m_docWidget->setCurrentWidget( baseWidget );
+    
+    connect(baseWidget->m_codeEditor->document(), SIGNAL( contentsChanged()),
+            this,                                 SLOT(   documentWasModified()));
+            
     m_fileList << "New";
     enableFileActs( true ); 
     enableDebugActs( true );
@@ -83,25 +93,27 @@ void EditorWindow::open()
 {
     const QString dir = m_lastDir;
     QString fileName = QFileDialog::getOpenFileName( this, tr("Load File"), dir, tr("All files (*)"));
-    if (!fileName.isEmpty()) loadFile(fileName);
+    if( !fileName.isEmpty() ) loadFile( fileName );
 }
 
 void EditorWindow::loadFile(const QString &fileName)
 {
     if( m_fileList.contains( fileName ) )
     {
-        docWidget->setCurrentIndex( m_fileList.indexOf( fileName ) );
+        m_docWidget->setCurrentIndex( m_fileList.indexOf( fileName ) );
         return;
     }
     newFile();
     QApplication::setOverrideCursor(Qt::WaitCursor);
+    
     CodeEditor* ce = getCodeEditor();
     ce->setPlainText( fileToString( fileName, "EditorWindow" ) );
     ce->setFile( fileName );
+    
     m_lastDir = fileName;
-    int index = docWidget->currentIndex();
+    int index = m_docWidget->currentIndex();
     m_fileList.replace( index, fileName );
-    docWidget->setTabText( index, strippedName(fileName) );
+    m_docWidget->setTabText( index, strippedName(fileName) );
     enableFileActs( true );   // enable file actions
     //if( ce->hasDebugger() )
         enableDebugActs( true );
@@ -120,9 +132,9 @@ bool EditorWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this);
     if (fileName.isEmpty()) return false;
 
-    m_fileList.replace( docWidget->currentIndex(), fileName );
+    m_fileList.replace( m_docWidget->currentIndex(), fileName );
 
-    return saveFile(fileName);
+    return saveFile( fileName );
 }
 
 bool EditorWindow::saveFile(const QString &fileName)
@@ -146,37 +158,38 @@ bool EditorWindow::saveFile(const QString &fileName)
     ce->document()->setModified(false);
     documentWasModified();
 
-    docWidget->setTabText( docWidget->currentIndex(), strippedName(fileName) );
+    m_docWidget->setTabText( m_docWidget->currentIndex(), strippedName(fileName) );
     return true;
 }
 
 bool EditorWindow::maybeSave()
 {
-    if( m_fileList.isEmpty() ) return false;
+    if( m_fileList.isEmpty() ) return true;
     if( getCodeEditor()->document()->isModified() )
     {
         QMessageBox::StandardButton ret;
         ret = QMessageBox::warning(this, tr("Application"),
-              tr("The document has been modified.\nDo you want to save your changes?"),
+              tr("\nThe Document has been modified.\nDo you want to save your changes?\n"),
               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         if      (ret == QMessageBox::Save)   return save();
         else if (ret == QMessageBox::Cancel) return false;
     }
     return true;
+    //"+strippedName( m_lastDir )+"
 }
 
 void EditorWindow::documentWasModified(  )
 {
-    QTextDocument *doc     = getCodeEditor()->document();
+    QTextDocument *doc = getCodeEditor()->document();
     
     bool    modified = doc->isModified();
-    int     index      = docWidget->currentIndex();
-    QString tabText  = docWidget->tabText( index );
+    int     index      = m_docWidget->currentIndex();
+    QString tabText  = m_docWidget->tabText( index );
 
     if     ( modified && !tabText.endsWith("*") ) tabText.append("*");
     else if( !modified && tabText.endsWith("*") ) tabText.remove("*");
 
-    docWidget->setTabText( index, tabText );
+    m_docWidget->setTabText( index, tabText );
 
     redoAct->setEnabled( false );
     undoAct->setEnabled( false );
@@ -237,21 +250,27 @@ void EditorWindow::createWidgets()
     
     m_editorToolBar = new QToolBar( this );
     baseWidgetLayout->addWidget( m_editorToolBar );
+    
     m_debuggerToolBar = new QToolBar( this );
     m_debuggerToolBar->setVisible( false );
     baseWidgetLayout->addWidget( m_debuggerToolBar );
     
-
-    docWidget = new QTabWidget( this );
-    docWidget->setObjectName("docWidget");
-    docWidget->setTabPosition( QTabWidget::North );
-    docWidget->setTabsClosable ( true );
-    docWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    //docWidget->setMovable( true );
-    baseWidgetLayout->addWidget( docWidget );
-    connect( docWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
-    connect( docWidget, SIGNAL(customContextMenuRequested(const QPoint &)), SLOT(tabContextMenu(const QPoint &)));
-    //connect( docWidget, SIGNAL(currentChanged(int)), this, SLOT(documentWasModified(int)));
+    m_docWidget = new QTabWidget( this );
+    m_docWidget->setObjectName("docWidget");
+    m_docWidget->setTabPosition( QTabWidget::North );
+    m_docWidget->setTabsClosable ( true );
+    m_docWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    //m_docWidget->setMovable( true );
+    baseWidgetLayout->addWidget( m_docWidget );
+    
+    connect( m_docWidget, SIGNAL( tabCloseRequested(int)), 
+             this,      SLOT(   closeTab(int)));
+             
+    connect( m_docWidget, SIGNAL( customContextMenuRequested(const QPoint &)), 
+                        SLOT(   tabContextMenu(const QPoint &)));
+                        
+    //connect( m_docWidget, SIGNAL(currentChanged(int)), this, SLOT(documentWasModified(int)));
+    
     setLayout( baseWidgetLayout );
     
     findRepDiaWidget = new FindReplaceDialog(this);
@@ -371,7 +390,7 @@ void EditorWindow::createActions()
 
 CodeEditor* EditorWindow::getCodeEditor()
 {
-    CodeEditorWidget* actW = dynamic_cast<CodeEditorWidget*>(docWidget->currentWidget());
+    CodeEditorWidget* actW = dynamic_cast<CodeEditorWidget*>(m_docWidget->currentWidget());
     if( actW )return actW->m_codeEditor;
     else      return 0l;
 }
@@ -387,13 +406,13 @@ void EditorWindow::closeTab( int index )
         enableDebugActs( false );
     }
     
-    CodeEditorWidget *actW = dynamic_cast<CodeEditorWidget*>(docWidget->widget(index));
-    docWidget->removeTab( index );
+    CodeEditorWidget *actW = dynamic_cast<CodeEditorWidget*>( m_docWidget->widget(index));
+    m_docWidget->removeTab( index );
     delete actW;
 
-    int last = docWidget->count()-1;
-    if( index > last ) docWidget->setCurrentIndex( last );
-    else               docWidget->setCurrentIndex( index );
+    int last = m_docWidget->count()-1;
+    if( index > last ) m_docWidget->setCurrentIndex( last );
+    else               m_docWidget->setCurrentIndex( index );
 }
 
 void EditorWindow::cut()     { getCodeEditor()->cut(); }
@@ -405,8 +424,8 @@ void EditorWindow::redo()    { getCodeEditor()->redo(); }
 void EditorWindow::debug()    
 { 
     CodeEditor* ce = getCodeEditor();
-    ce->step();
-    if( ce->debugStarted() )
+
+    if( ce->initDebbuger() )
     {
         m_editorToolBar->setVisible( false);
         m_debuggerToolBar->setVisible( true );
@@ -423,7 +442,12 @@ void EditorWindow::stop()
     m_debuggerToolBar->setVisible( false );
     m_editorToolBar->setVisible( true);
 }
-void EditorWindow::compile() { getCodeEditor()->compile(); }
+void EditorWindow::compile() 
+{ 
+    CodeEditor* ce = getCodeEditor();
+    if( ce->document()->isModified() ) save();
+    ce->compile(); 
+}
 void EditorWindow::upload()  { getCodeEditor()->upload(); }
 
 void EditorWindow::findReplaceDialog() 
@@ -466,18 +490,21 @@ void EditorWindow::createToolBars()
 
 void EditorWindow::readSettings()
 {
-    QSettings settings("PicLinux", "debuger");
-    restoreGeometry(settings.value("geometry").toByteArray());
-    docWidget->restoreGeometry(settings.value("docWidget/geometry").toByteArray());
-    m_lastDir = settings.value("lastDir").toString();
+    QSettings* settings = MainWindow::self()->settings();
+    
+    restoreGeometry( settings->value("geometry").toByteArray() );
+    
+    m_docWidget->restoreGeometry( settings->value("docWidget/geometry").toByteArray() );
+    
+    m_lastDir = settings->value("lastDir").toString();
 }
 
 void EditorWindow::writeSettings()
 {
-    QSettings settings("PicLinux", "debuger");
-    settings.setValue( "geometry", saveGeometry() );
-    settings.setValue( "docWidget/geometry", docWidget->saveGeometry() );
-    settings.setValue( "lastDir", m_lastDir );
+    QSettings* settings = MainWindow::self()->settings();
+    settings->setValue( "geometry", saveGeometry() );
+    settings->setValue( "docWidget/geometry", m_docWidget->saveGeometry() );
+    settings->setValue( "lastDir", m_lastDir );
 }
 
 QString EditorWindow::strippedName(const QString &fullFileName)

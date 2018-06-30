@@ -26,7 +26,7 @@
 #include "QVariantDelegate.h"
 #include "Property.h"
 
-QPropertyEditorWidget * QPropertyEditorWidget::m_pSelf = 0l;
+QPropertyEditorWidget* QPropertyEditorWidget::m_pSelf = 0l;
 
 QPropertyEditorWidget::QPropertyEditorWidget(QWidget* parent /*= 0*/) : QTreeView(parent)
 {

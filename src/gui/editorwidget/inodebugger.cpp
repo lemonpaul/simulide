@@ -19,21 +19,22 @@
 
 #include "inodebugger.h"
 #include "baseprocessor.h"
-#include "mainwindow.h"
 #include "utils.h"
 #include "simuapi_apppath.h"
 
 InoDebugger::InoDebugger( QObject* parent, OutPanelText* outPane, QString filePath ) 
            : BaseDebugger( parent, outPane, filePath )
 {
-    //QSettings settings( SIMUAPI_AppPath::self()->availableDataFilePath("codeeditor/config.ini"),
-    //                    QSettings::IniFormat );
-    QSettings* settings = MainWindow::self()->settings();
-
-    m_arduino = "";
-     
-    if( settings->contains("arduino_Path") )
-        m_arduino = settings->value("arduino_Path").toString();
+    setObjectName( "Arduino Compiler" );
+    
+    m_compilerPath = "";
+    m_compSetting = "arduino_Path";
+    
+    readSettings();
+    
+    boardList << "uno" << "nano" << "diecimila" << "leonardo";
+    
+    m_board = Uno;
     
     m_typesList["char"]   = "int8";
     m_typesList["uchar"]  = "uint8";
@@ -60,7 +61,7 @@ bool InoDebugger::loadFirmware()
 
 int InoDebugger::compile()
 {
-    QDir arduinoDir( m_arduino );
+    QDir arduinoDir( m_compilerPath );
     if( !arduinoDir.exists() )
     {
         m_outPane->appendText( "\nArduino ToolChain not found\n" );
@@ -130,7 +131,7 @@ int InoDebugger::compile()
     /// , then debugger will hang!
     QString cBuildPath = buildPath;
     QString preferencesPath = SIMUAPI_AppPath::self()->availableDataFilePath("codeeditor/preferences.txt");
-    QString command  = m_arduino +"arduino";
+    QString command  = m_compilerPath +"arduino";
     
     #ifndef Q_OS_UNIX
     command    += "_debug";
@@ -138,10 +139,15 @@ int InoDebugger::compile()
     cBuildPath  = addQuotes( cBuildPath );
     ProcInoFile = addQuotes( ProcInoFile );
     #endif
+    
+    QString boardName;
+    
+    if( m_board < Custom ) boardName = boardList.at(m_board);
+    else                   boardName = m_customBoard;
                 
-    command += " -v --board arduino:avr:uno --pref build.path=" + cBuildPath;
+    command += " -v --board arduino:avr:"+boardName+" --pref build.path=" + cBuildPath;
     if( !preferencesPath.isEmpty() )
-        command += " --preferences-file " + preferencesPath; //m_appPath+"/data/codeeditor/preferences.txt"
+        command += " --preferences-file " + preferencesPath;
     command += " --preserve-temp-files --verify " + ProcInoFile;
     m_firmware = "";
     
@@ -170,7 +176,7 @@ int InoDebugger::compile()
         {
             if( !(line.contains( "error:" )) ) continue;
             QStringList words = line.split(":");
-            error = words.at(1).toInt();
+            error = words.at(1).toInt()-1;
             break;
         }
     }
@@ -178,7 +184,7 @@ int InoDebugger::compile()
     {
         m_firmware = buildPath + "/"+ m_fileName + ".ino.hex";
 
-        QString objdump = m_arduino+"hardware/tools/avr/bin/avr-objdump";
+        QString objdump = m_compilerPath+"hardware/tools/avr/bin/avr-objdump";
         //objdump.remove( objdump.lastIndexOf( "arduino" ), 7 );
         //objdump = objdump+"hardware/tools/avr/bin/avr-objdump";
         
@@ -200,23 +206,6 @@ int InoDebugger::compile()
         error = 0;
     }
     return error;
-}
-
-void InoDebugger::getCompilerPath()
-{
-        m_arduino = QFileDialog::getExistingDirectory( 0L,
-                               tr("Select Arduino toolchain directory, version 1.8.0 and up"),
-                               m_arduino,
-                               QFileDialog::ShowDirsOnly
-                             | QFileDialog::DontResolveSymlinks);
-        m_arduino += "/";
-
-        //QSettings settings( SIMUAPI_AppPath::self()->availableDataFilePath("codeeditor/config.ini"),
-        //                    QSettings::IniFormat );
-        MainWindow::self()->settings()->setValue("arduino_Path", m_arduino);
-
-        m_outPane->appendText( "\nUsing Arduino Path: \n" );
-        m_outPane->writeText( m_arduino+"\n\n" );
 }
 
 int InoDebugger::step() // returns source line

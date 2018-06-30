@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
+ *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -23,6 +23,7 @@
 eResistor::eResistor( std::string id ) : eElement( id )
 {
     m_resist = 100;
+    m_admit  = 1/m_resist;
     m_current = 0;
     m_ePin.resize(2);
 }
@@ -38,9 +39,9 @@ void eResistor::initialize()
 
 void eResistor::stamp()
 {
-    double admit = 1/m_resist;
-    m_ePin[0]->stampAdmitance( admit );
-    m_ePin[1]->stampAdmitance( admit );
+    //double admit = 1/m_resist;
+    m_ePin[0]->stampAdmitance( m_admit );
+    m_ePin[1]->stampAdmitance( m_admit );
     //qDebug() << "eResistor::stamp" << m_resist;
 }
 
@@ -49,7 +50,14 @@ double eResistor::res() { return m_resist; }
 void eResistor::setRes( double resist )
 {
     if( resist<1e-9 ) resist = 1e-9;
+    m_admit = 1/resist;
     m_resist = resist;
+    stamp();
+}
+
+void eResistor::setAdmit( double admit )
+{
+    m_admit = admit;
     stamp();
 }
 
@@ -80,3 +88,4 @@ void eResistor::updateVI()
     }
     else m_current = 0;
 }
+

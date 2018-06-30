@@ -71,6 +71,7 @@ class MAINMODULE_EXPORT eLogicDevice : public eElement
         void setInvertInps( bool invert );
         
         void setOutputEnabled( bool enabled );
+        void updateOutEnabled();
 
         void initEpins(){;}
         //ePin* getEpin( int pin );

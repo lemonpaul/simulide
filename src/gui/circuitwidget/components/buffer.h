@@ -30,16 +30,27 @@ class LibraryItem;
 class MAINMODULE_EXPORT Buffer : public Gate
 {
     Q_OBJECT
+    Q_PROPERTY( bool Tristate READ tristate WRITE setTristate DESIGNABLE true USER true )
     
     public:
+        QRectF boundingRect() const { return m_area; }
     
         Buffer( QObject* parent, QString type, QString id );
         ~Buffer();
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
-
+        
+        void setTristate( bool t );
+        
+        virtual QPainterPath shape() const;
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
+    
+    public slots:
+        virtual void remove();
+        
+    private:
+        Pin* m_outEnPin;
 };
 
 #endif

@@ -31,7 +31,8 @@
 
 Simulator* Simulator::m_pSelf = 0l;
 
-Simulator::Simulator( QObject* parent ) : QObject(parent)
+Simulator::Simulator( QObject* parent ) 
+         : QObject(parent)
 {
     m_pSelf = this;
 
@@ -64,25 +65,30 @@ inline void Simulator::solveMatrix()
     foreach( eNode* node,  m_eChangedNodeList ) node->stampMatrix();
     m_eChangedNodeList.clear();
 
-    if( !m_matrix.solveMatrix() )            // Try to solve matrix,
-    {                                     // if fail stop simulation
-        std::cout << "Simulator::runStep, Failed to solve Matrix" << std::endl;
-        CircuitWidget::self()->powerCircOff();//stopSim();
-        CircuitWidget::self()->setRate( -1 );
+    if( !m_matrix.solveMatrix() )                // Try to solve matrix,
+    {                                         // if fail stop simulation
+        std::cout << "Simulator::solveMatrix(), Failed to solve Matrix" << std::endl;
+        m_error = true;
     }                                // m_matrix sets the eNode voltages
 }
 
 void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 ms, 20 Hz max)
 {
     e->accept();
+    
     if( !m_isrunning ) return;
-
-    //m_CircuitFuture.waitForFinished();
-    if( m_CircuitFuture.isFinished() )  // Run Circuit in a parallel thread
+    if(!m_CircuitFuture.isFinished() ) return;
+    
+    if( m_error ) 
     {
-        foreach( eElement* el, m_updateList ) el->updateStep();
-        m_CircuitFuture = QtConcurrent::run( this, &Simulator::runCircuit );
+        
+        CircuitWidget::self()->powerCircOff();
+        CircuitWidget::self()->setRate( -1 );
+        return;
     }
+    //m_CircuitFuture.waitForFinished();
+    foreach( eElement* el, m_updateList ) el->updateStep();
+    m_CircuitFuture = QtConcurrent::run( this, &Simulator::runCircuit ); // Run Circuit in a parallel thread
 
     // Run Graphic Elements
     PlotterWidget::self()->step();
@@ -136,21 +142,31 @@ void Simulator::runCircuit()
                 foreach( eElement* el, m_nonLinear ) el->setVChanged();
                 m_nonLinear.clear();
 
-                if( !m_eChangedNodeList.isEmpty() ) { solveMatrix(); }
-                if( !m_isrunning ) return;
-
-                if( ++counter > 1000 ) break; // Limit the number of loops
+                if( !m_eChangedNodeList.isEmpty() ) 
+                { 
+                    solveMatrix();
+                    if( !m_isrunning ) return;
+                }
+                
+                if( ++counter > 100 ) break; // Limit the number of loops
             }
             //if( counter > 0 ) qDebug() << "\nSimulator::runCircuit  Non-Linear Solved in steps:"<<counter;
         }
-        if( !m_eChangedNodeList.isEmpty() ) { solveMatrix(); }
-        if( !m_isrunning ) return;
+        if( !m_eChangedNodeList.isEmpty() ) 
+        { 
+            solveMatrix();
+            if( !m_isrunning ) return;
+        }
     }
  }
 
 void Simulator::runExtraStep()
 {
-    if( !m_eChangedNodeList.isEmpty() ) { solveMatrix(); }
+    if( !m_eChangedNodeList.isEmpty() ) 
+    {
+        solveMatrix();
+        if( !m_isrunning ) return;
+    }
 
     // Run Fast elements
     foreach( eElement* el, m_changedFast ) el->setVChanged();
@@ -168,7 +184,7 @@ void Simulator::runContinuous()
     {
         if( !m_paused )
         {
-            //std::cout << "el->resetState()"
+            //std::cout << "el->resetState()<< getId()
             //      <<  std::endl;
             el->resetState();
             m_paused = false;
@@ -177,8 +193,6 @@ void Simulator::runContinuous()
     }
     // Initialize Matrix
     m_matrix.createMatrix( m_eNodeList, m_elementList );
-
-    m_matrix.simplify();
 
     // Try to solve matrix, if fail stop simulation
     // m_matrix.printMatrix();
@@ -197,6 +211,7 @@ void Simulator::runContinuous()
     simuRateChanged( m_simuRate );
 
     m_isrunning = true;
+    m_error = false;
     std::cout << "\n    Running \n"<<std::endl;
     m_timerId = this->startTimer( m_timerTick );
 }

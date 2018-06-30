@@ -34,19 +34,19 @@ class MAINMODULE_EXPORT eSource : public eElement
         void stamp();
         void stampOutput();
 
-        double voltHight() { return m_voltHigh; }
+        double voltHight();
         void  setVoltHigh( double v );
 
-        double voltLow() { return m_voltLow; }
+        double voltLow();
         void  setVoltLow( double v );
         
-        bool  out() { return m_out; }
+        bool  out();
         void  setOut( bool hight );
 
-        bool  isInverted() { return m_inverted; }
+        bool  isInverted();
         void  setInverted( bool inverted );
 
-        double imp()       { return m_imp; }
+        double imp();
         void  setImp( double imp );
 
         double getVolt();

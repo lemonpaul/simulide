@@ -30,7 +30,7 @@
     <pin side="left" pos="7"  type="bidir" id="PB6"  label="B6"/>
     <pin side="left" pos="8"  type="bidir" id="PB7"  label="B7"/>
 
-    <pin side="left" pos="9"  type="mclr"  id="MCLR" label="Rst"/>
+    <pin side="left" pos="9"  type="reset" id="RST"  label="Rst"/>
     <pin side="left" pos="10" type="vcc"   id="VCC"  label="Vcc"/>
     <pin side="left" pos="11" type="gnd"   id="GND"  label="Gnd"/>
     <pin side="left" pos="12" type="osc"   id="OSC2" label="Osc"/>

@@ -41,10 +41,12 @@ class AudioOut : public Component, public eResistor
         virtual void initialize();
         virtual void simuClockStep();
         
+        virtual QPainterPath shape() const;
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
     
     public slots:
         void remove();
+        void OnAudioNotify();
         
     private:
         QAudioDeviceInfo m_deviceinfo;
@@ -52,6 +54,10 @@ class AudioOut : public Component, public eResistor
         
         QAudioOutput*    m_audioOutput;
         QIODevice*       m_auIObuffer;
+        
+        char* m_dataBuffer;
+        int    m_dataSize;
+        int    m_dataCount;
         
         int m_counter;
 };

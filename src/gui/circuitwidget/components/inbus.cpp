@@ -36,7 +36,8 @@ LibraryItem* InBus::libraryItem()
 }
 
 InBus::InBus( QObject* parent, QString type, QString id )
-       : LogicComponent( parent, type, id ), eInBus( id.toStdString() )
+     : LogicComponent( parent, type, id )
+     , eInBus( id.toStdString() )
 {    
     m_width  = 1;
     m_height = 8;
@@ -46,6 +47,8 @@ InBus::InBus( QObject* parent, QString type, QString id )
     LogicComponent::setNumInps( 1 );
     
     m_inPin[0] = new Pin( 0, QPoint( 8, 0 ), m_id+"-out", 1, this );
+    
+    m_inPin[0]->setIsBus( true );
                           
     eLogicDevice::createInput( m_inPin[0] );
 }
@@ -57,9 +60,9 @@ void InBus::setNumOuts( int outs )
     if( outs == m_numOutputs ) return;
     if( outs < 1 ) return;
 
-    LogicComponent::setNumOuts( outs );
     eLogicDevice::deleteOutputs( m_numOutputs );
-
+    LogicComponent::setNumOuts( outs );
+    
     for( int i=0; i<outs; i++ )
     {
         m_outPin[i] = new Pin( 180, QPoint(-8,-8*outs+i*8+8 )
@@ -67,6 +70,7 @@ void InBus::setNumOuts( int outs )
 
         //m_outPin[i]->setLength( 2 );
         //m_outPin[i]->setFlag( QGraphicsItem::ItemStacksBehindParent, false );
+        
 
         eLogicDevice::createOutput( m_outPin[i] );
     }

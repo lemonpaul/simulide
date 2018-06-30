@@ -41,6 +41,7 @@ class MAINMODULE_EXPORT eOutBus : public eLogicDevice
     protected:
         double m_maxVolt;
         double m_maxAddr;
+        double m_threshold;
         
 };
 

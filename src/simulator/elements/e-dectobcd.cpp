@@ -41,13 +41,8 @@ void eDecToBcd::initialize()
 
 void eDecToBcd::setVChanged()
 {
-    if( m_outEnablePin )
-    {
-        bool outEnPrev = m_outEnable;
-        bool outEn = eLogicDevice::outputEnabled();
-        
-        if( outEnPrev != outEn ) eLogicDevice::setOutputEnabled( outEn );
-    }
+    eLogicDevice::updateOutEnabled();
+    
     int address = 0;
     
     for( int i=0; i<9; i++ )

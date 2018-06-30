@@ -40,19 +40,19 @@ class MAINMODULE_EXPORT ePin
         eNode* getEnode();
         void   setEnode( eNode* enode );
 
-        eNode* getEnodeComp(){ return m_enodeCon; }
+        eNode* getEnodeComp();
         void   setEnodeComp( eNode* enode ); // The enode at other side of component
 
-        bool inverted() { return m_inverted; }
-        void setInverted( bool inverted ){ m_inverted = inverted; }
+        bool inverted();
+        void setInverted( bool inverted );
 
         void stampAdmitance( double data );
         void stampCurrent( double data );
 
         void reset();
         
-        std::string getId()          { return m_id; }
-        void setId( std::string id ) { m_id = id; }
+        std::string getId();
+        void setId( std::string id );
 
     protected:
         eNode* m_enode;

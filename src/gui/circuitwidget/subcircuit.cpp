@@ -71,11 +71,9 @@ LibraryItem* SubCircuit::libraryItem()
 }
 
 SubCircuit::SubCircuit( QObject* parent, QString type, QString id )
-    : Package( parent, type, id )
+          : Package( parent, type, id )
 {
     m_numItems = 0;
-
-    //m_dataFile = "subcircuits.xml";
 
     initPackage();
 }
@@ -89,8 +87,6 @@ void SubCircuit::initPackage()
 
     m_dataFile = ComponentSelector::self()->getXmlFile( compName );
 
-    //QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath(m_dataFile);
-    //qDebug() << "SubCircuit::initPackage datafile: " << compName << " <= " << dfPath;
     QFile file( m_dataFile );
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
@@ -137,7 +133,6 @@ void SubCircuit::initPackage()
         }
         rNode = rNode.nextSibling();
     }
-
     initSubcircuit();
 }
 
@@ -217,6 +212,9 @@ void SubCircuit::initSubcircuit()
                 eGate* egate = new eGate( id.toStdString(), 1 );
                 egate->createPins( 1, 1 );
                 ecomponent = egate;
+                
+                if( element.attribute( "tristate" ) == "true" )
+                    egate->setTristate( true );
             }
             else if( type == "eOrGate" )
             {
@@ -262,12 +260,26 @@ void SubCircuit::initSubcircuit()
                 eFlipFlopD* eFFD = new eFlipFlopD( id.toStdString() );
                 eFFD->createPins();
                 ecomponent = eFFD;
+                
+                bool srInv = true;
+                if( element.hasAttribute("sRInverted" ) )
+                {
+                    if( element.attribute( "sRInverted" ) == "false" ) srInv = false;
+                }
+                eFFD->setSrInv( srInv );
             }
             else if( type == "eFlipFlopJK" )
             {
                 eFlipFlopJK* eFFJK = new eFlipFlopJK( id.toStdString() );
                 eFFJK->createPins();
                 ecomponent = eFFJK;
+                
+                bool srInv = true;
+                if( element.hasAttribute("sRInverted" ) )
+                {
+                    if( element.attribute( "sRInverted" ) == "false" ) srInv = false;
+                }
+                eFFJK->setSrInv( srInv );
             }
             else if( type == "eShiftReg" )  
             {

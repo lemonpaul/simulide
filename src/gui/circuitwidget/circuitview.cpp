@@ -30,14 +30,13 @@ CircuitView::CircuitView( QWidget *parent )
 {
     m_circuit     = 0l;
     m_enterItem   = 0l;
-    m_scalefactor = 1;
 
     clear();
 
     viewport()->setFixedSize( 3200, 2400 );
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
+    //setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
     //setCacheMode( CacheBackground );
     //setRenderHint( QPainter::Antialiasing );
     setRenderHints( QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
@@ -57,21 +56,17 @@ void CircuitView::clear()
         m_circuit->remove();
         m_circuit->deleteLater();
     }
+    resetMatrix();
+    
     m_circuit = new Circuit( -1600, -1200, 3200, 2400, this );
     setScene( m_circuit );
     centerOn( 900, 600 );
 }
 
-void CircuitView::wheelEvent(QWheelEvent *event) { scaleView(pow( 2.0, event->delta() / 700.0)); }
-
-void CircuitView::scaleView(qreal scaleFactor)
-{
-    qreal factor = matrix().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 8, 8)).width();
-
-    if( factor < 1 || factor > 100 ) return;
-
-    m_scalefactor *=  factor;
-    scale(scaleFactor, scaleFactor);
+void CircuitView::wheelEvent( QWheelEvent *event ) 
+{ 
+    qreal scaleFactor = pow( 2.0, event->delta() / 700.0);
+    scale( scaleFactor, scaleFactor );
 }
 
 void CircuitView::dragEnterEvent(QDragEnterEvent *event)
@@ -80,7 +75,7 @@ void CircuitView::dragEnterEvent(QDragEnterEvent *event)
 
     event->accept();
     bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    if( pauseSim )  Simulator::self()->pauseSim();
 
     QString type = event->mimeData()->html();
     QString id = event->mimeData()->text()+"-"+m_circuit->newSceneId(); //event->mimeData()->text();
@@ -98,7 +93,7 @@ void CircuitView::dragEnterEvent(QDragEnterEvent *event)
 void CircuitView::dragMoveEvent(QDragMoveEvent *event)
 {
     event->accept();
-    if (m_enterItem ) m_enterItem->setPos( togrid( mapToScene( event->pos() ) ) );
+    if( m_enterItem ) m_enterItem->setPos( togrid( mapToScene( event->pos() ) ) );
 }
 
 void CircuitView::dragLeaveEvent(QDragLeaveEvent *event)
@@ -207,6 +202,9 @@ void CircuitView::contextMenuEvent(QContextMenuEvent* event)
 
         QAction* createSubCircAct = menu.addAction(QIcon(":/load.png"), tr("Create SubCircuit") );
         connect(createSubCircAct, SIGNAL(triggered()), Circuit::self(), SLOT( createSubcircuit() ));
+        
+        QAction* createBomAct = menu.addAction(QIcon(":/savecirc.png"), tr("Bom") );
+        connect(createBomAct, SIGNAL(triggered()), Circuit::self(), SLOT( bom() ));
 
         menu.exec( mapFromScene( eventPos ) );
     }
@@ -224,7 +222,10 @@ void CircuitView::slotPaste()
 
 void CircuitView::saveImage()
 {
-    QString fileName= QFileDialog::getSaveFileName(this, "Save image", QCoreApplication::applicationDirPath(), "BMP Files (*.bmp);;JPEG (*.jpg);;PNG (*.png);;SVG (*.svg)"  );
+    QString fileName= QFileDialog::getSaveFileName( this
+                            , "Save image"
+                            , Circuit::self()->getFileName()
+                            , "BMP Files (*.*)"  );
     if (!fileName.isNull())
     {
         if( fileName.endsWith( "svg" ) )

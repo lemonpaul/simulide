@@ -37,7 +37,8 @@ LibraryItem* FlipFlopJK::libraryItem()
 }
 
 FlipFlopJK::FlipFlopJK( QObject* parent, QString type, QString id )
-          : LogicComponent( parent, type, id ), eFlipFlopJK( id.toStdString() )
+          : LogicComponent( parent, type, id )
+          , eFlipFlopJK( id.toStdString() )
 {
     m_width  = 4;
     m_height = 6;

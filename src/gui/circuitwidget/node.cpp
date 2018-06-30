@@ -25,9 +25,11 @@
 Node::Node( QObject* parent, QString type, QString id )
     : Component( parent, type, id )
 {
-    setZValue(1e6);
+    setZValue(2);
     
     m_color = QColor( Qt::black );
+    
+    m_isBus = false;
     
     QString nodid;
     QPoint nodpos;
@@ -46,11 +48,17 @@ Node::~Node(){}
 
 void Node::inStateChanged( int rem ) // Called by pin when connector is removed
 {
-    if( rem==1 ) remove();
-    else
+    if( rem == 1 ) remove();
+    else if( rem == 0 )
     {
         for( int i=0; i< 3; i++)
             if( m_pin[i]->isConnected() ) m_pin[i]->findConnectedPins();
+
+    }
+    else if( rem == 2 ) // Propagate Is Bus
+    {
+        for( int i=0; i< 3; i++) m_pin[i]->setIsBus( true );
+        m_isBus = true;
     }
 }
 
@@ -71,9 +79,10 @@ void Node::remove()
     }
     //qDebug() << conectors << " connectors";
 
-    if( conectors == 2 ) 
+    if( conectors < 3 ) 
     { 
-        joinConns( con[0], con[1] ); 
+        if( conectors == 2 ) joinConns( con[0], con[1] ); 
+        
         Circuit::self()->compList()->removeOne( this );
         Circuit::self()->removeItem( this );
     }
@@ -155,8 +164,6 @@ void Node::joinConns( int c0, int c1 )
     con->closeCon( pin1->conPin() );
     con->remNullLines();
     
-    
-    
     Circuit::self()->addItem( con );
 }
 
@@ -169,8 +176,16 @@ void Node::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* 
     //p->drawRect( boundingRect() );
 
     Component::paint( p, option, widget );
-
-    p->drawEllipse( QRect( -2, -2, 4, 4 ) );
+    
+    int a =-2;
+    int b = 4;
+    if( m_isBus )
+    {
+        a =-3;
+        b = 6;
+    }
+    
+    p->drawEllipse( QRect( a, a, b, b ) );
 }
 
 #include "moc_node.cpp"

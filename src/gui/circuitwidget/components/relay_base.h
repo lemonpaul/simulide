@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2012 by santiago González                               *
+ *   Copyright (C) 2016 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,7 @@ class MAINMODULE_EXPORT RelayBase : public Component, public eInductor
     Q_PROPERTY( double Itrig READ iTrig    WRITE setITrig    DESIGNABLE true USER true )
     Q_PROPERTY( int    Poles READ poles    WRITE setPoles    DESIGNABLE true USER true )
     Q_PROPERTY( bool   DT    READ dt       WRITE setDt       DESIGNABLE true USER true )
-    Q_PROPERTY( bool Norm_Close READ nClose() WRITE setNClose DESIGNABLE true USER true )
+    Q_PROPERTY( bool Norm_Close READ nClose WRITE setNClose DESIGNABLE true USER true )
 
     public:
 

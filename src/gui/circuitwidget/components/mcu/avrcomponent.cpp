@@ -60,18 +60,11 @@ Component* AVRComponent::construct( QObject* parent, QString type, QString id )
 }
 
 AVRComponent::AVRComponent( QObject* parent, QString type, QString id )
-    : McuComponent( parent, type, id )
+            : McuComponent( parent, type, id )
 {
     m_pSelf = this;
     m_dataFile = "avrs.xml";
     m_processor = AvrProcessor::self();
-    //m_processor = new AvrProcessor();
-    
-    /*m_t.start();
-    AvrProcessor* ap = dynamic_cast<AvrProcessor*>( m_processor );
-    ap->moveToThread( &m_t );*/
-
-    //if( m_id.startsWith("AVR") ) m_id.replace( "AVR", "atmega328" );
 
     initPackage();
     if( m_error == 0 )

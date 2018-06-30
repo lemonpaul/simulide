@@ -88,7 +88,7 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         bool  pasting();
         QPointF deltaMove();
 
-        const QString getFileName() const { return m_fileName; }
+        const QString getFileName() const { return m_filePath; }
 
     public slots:
         void createSubcircuit();
@@ -97,6 +97,7 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         void undo();
         void redo();
         void importCirc(  QPointF eventpoint  );
+        void bom();
 
     protected:
         void mousePressEvent(QGraphicsSceneMouseEvent* event);
@@ -117,7 +118,7 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
  
         QDomDocument m_domDoc;
         QDomDocument m_copyDoc;
-        QString      m_fileName;
+        QString      m_filePath;
 
         QRect          m_scenerect;
         QGraphicsView* m_graphicView;

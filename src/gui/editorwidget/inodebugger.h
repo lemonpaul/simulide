@@ -27,11 +27,27 @@
 class InoDebugger : public BaseDebugger
 {
     Q_OBJECT
+    Q_PROPERTY( board_t Board        READ board       WRITE setBoard       DESIGNABLE true USER true )
+    Q_PROPERTY( QString Custom_Board READ customBoard WRITE setCustomBoard DESIGNABLE true USER true )
+    Q_ENUMS( board_t )
+    
     public:
         InoDebugger( QObject* parent, OutPanelText* outPane, QString filePath  );
         ~InoDebugger();
-
-        //QString getFileName() { return m_symbolFile; }
+        
+        enum board_t {
+            Uno = 0,
+            Nano,
+            Duemilanove,
+            Leonardo,
+            Custom
+        };
+        
+        QString customBoard() { return m_customBoard; }
+        void setCustomBoard( QString b ){ m_customBoard = b; }
+        
+        board_t board() { return m_board; }
+        void setBoard( board_t b ){ m_board = b; }
 
         bool loadFirmware();
 
@@ -40,8 +56,6 @@ class InoDebugger : public BaseDebugger
         int getValidLine( int line );
         
         int compile();
-
-        void getCompilerPath();
         
     private:
         void mapInoToFlash();
@@ -52,7 +66,9 @@ class InoDebugger : public BaseDebugger
         int m_lastInoLine;
         int m_processorType;
         
-        QString m_arduino;                      // path to arduino executable
+        QStringList boardList;
+        QString m_customBoard;
+        board_t m_board;
 };
 
 

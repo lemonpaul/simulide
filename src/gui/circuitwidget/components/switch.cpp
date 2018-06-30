@@ -63,6 +63,8 @@ void Switch::onbuttonclicked()
 {
     m_closed = !m_closed;
     m_changed = true;
+    
+    update();
 }
 
 void Switch::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

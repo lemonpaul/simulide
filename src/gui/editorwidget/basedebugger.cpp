@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "basedebugger.h"
+#include "mainwindow.h"
 
 bool BaseDebugger::m_loadStatus = false;
 
@@ -103,6 +104,41 @@ void BaseDebugger::ProcRead()
         m_outPane->appendText( m_compProcess.readLine() );
         m_outPane->writeText( "\n" );
     }
+}
+
+QString BaseDebugger::compilerPath()
+{
+    return m_compilerPath;
+}
+
+void BaseDebugger::readSettings()
+{
+    QSettings* settings = MainWindow::self()->settings();
+    
+    if( settings->contains( m_compSetting ) )
+        m_compilerPath = settings->value( m_compSetting ).toString();
+}
+
+void BaseDebugger::getCompilerPath()
+{
+        m_compilerPath = QFileDialog::getExistingDirectory( 0L,
+                               tr("Select Compiler toolchain directory"),
+                               m_compilerPath,
+                               QFileDialog::ShowDirsOnly
+                             | QFileDialog::DontResolveSymlinks);
+
+        if( m_compilerPath != "" ) m_compilerPath += "/";
+
+        MainWindow::self()->settings()->setValue( m_compSetting, m_compilerPath);
+
+        m_outPane->appendText( "Using Compiler Path: \n" );
+        m_outPane->writeText( m_compilerPath+"\n\n" );
+}
+
+void BaseDebugger::setCompilerPath( QString path )
+{
+    m_compilerPath = path;
+    MainWindow::self()->settings()->setValue( m_compSetting, m_compilerPath );
 }
 #include "moc_basedebugger.cpp"
 

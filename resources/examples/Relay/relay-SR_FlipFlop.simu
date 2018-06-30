@@ -34,10 +34,10 @@ Ground (0 V)-3:
 <item y="-172" id="Ground (0 V)-3" labely="-24" valLabelx="0" valLabRot="0" valLabely="0" Show_id="false" itemtype="Ground" labelx="-16" labelrot="0" hflip="1" vflip="1" rotation="0" objectName="Ground (0 V)-3" x="-388"/>
  
 Relay (all)-2: 
-<item itemtype="RelaySPST" labelx="-16" valLabRot="0" rotation="0" Rcoil="50" x="-356" hflip="-1" valLabely="6" id="Relay (all)-2" labely="-24" y="-220" Poles="1" objectName="Relay (all)-2" Show_id="false" vflip="1" Itrig="0.074999999999999997" DT="true" valLabelx="-16" labelrot="0"/>
+<item itemtype="RelaySPST" labelx="-16" valLabRot="0" rotation="0" Rcoil="100" x="-356" hflip="-1" valLabely="6" id="Relay (all)-2" labely="-24" y="-220" Poles="1" objectName="Relay (all)-2" Show_id="false" vflip="1" Itrig="0.02" DT="true" valLabelx="-16" labelrot="0"/>
  
 Relay (all)-1: 
-<item itemtype="RelaySPST" labelx="-16" valLabRot="0" rotation="-180" Rcoil="50" x="-356" hflip="1" valLabely="6" id="Relay (all)-1" labely="-24" y="-268" Poles="2" objectName="Relay (all)-1" Show_id="false" vflip="-1" Itrig="0.074999999999999997" DT="true" valLabelx="-16" labelrot="0"/>
+<item itemtype="RelaySPST" labelx="-16" valLabRot="0" rotation="-180" Rcoil="100" x="-356" hflip="1" valLabely="6" id="Relay (all)-1" labely="-24" y="-268" Poles="2" objectName="Relay (all)-1" Show_id="false" vflip="-1" Itrig="0.02" DT="true" valLabelx="-16" labelrot="0"/>
  
 Connector-13: 
 <item itemtype="Connector" labelx="-16" valLabRot="0" rotation="0" x="-380" startpinid="Node-12-2" hflip="1" valLabely="0" id="Connector-13" labely="-24" y="-300" endpinid="Relay (all)-1-switch2pinN" objectName="Connector-13" Show_id="false" enodeid="enode-42" vflip="1" valLabelx="0" pointList="-380,-300,-372,-300" labelrot="0"/>

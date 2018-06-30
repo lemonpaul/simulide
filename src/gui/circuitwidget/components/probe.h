@@ -29,7 +29,7 @@ class LibraryItem;
 class MAINMODULE_EXPORT Probe : public Component, public eElement
 {
     Q_OBJECT
-    Q_PROPERTY( bool     Show_volt READ showVal  WRITE setShowVal DESIGNABLE true USER true )
+    Q_PROPERTY( bool Show_volt READ showVal  WRITE setShowVal DESIGNABLE true USER true )
 
     public:
         QRectF boundingRect() const { return QRect( -10, -10, 20, 20 ); }
@@ -54,21 +54,18 @@ static  bool  m_oscopeBusy;
 
         void slotPlotterAdd();
         void slotPlotterRem();
-        
-        void slotOscopAdd();
-        void slotOscopRem();
 
     protected:
         void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
     private:
+ static QString* m_helpStatic;
+ 
         double m_voltIn;
         double m_voltTrig;
 
         int    m_plotterLine;
         QColor m_plotterColor;
-
-        bool  m_haveOscope;
 
         Pin*       m_inputpin;
         Pin*       m_readPin;

@@ -1,10 +1,10 @@
 <circuit type="simulide_0.1">
  
 Relay (all)-16: 
-<item Rcoil="50" labelrot="0" labely="-24" Itrig="0.074999999999999997" vflip="-1" x="-284" valLabRot="0" y="-260" objectName="Relay (all)-16" valLabelx="-16" DT="true" itemtype="RelaySPST" rotation="-180" Poles="2" id="Relay (all)-16" hflip="1" labelx="-16" Show_id="false" valLabely="6"/>
+<item Rcoil="100" labelrot="0" labely="-24" Itrig="0.02" vflip="-1" x="-284" valLabRot="0" y="-260" objectName="Relay (all)-16" valLabelx="-16" DT="true" itemtype="RelaySPST" rotation="-180" Poles="2" id="Relay (all)-16" hflip="1" labelx="-16" Show_id="false" valLabely="6"/>
  
 Relay (all)-15: 
-<item Rcoil="50" labelrot="0" labely="-24" Itrig="0.074999999999999997" vflip="1" x="-284" valLabRot="0" y="-196" objectName="Relay (all)-15" valLabelx="-16" DT="true" itemtype="RelaySPST" rotation="0" Poles="1" id="Relay (all)-15" hflip="-1" labelx="-16" Show_id="false" valLabely="6"/>
+<item Rcoil="100" labelrot="0" labely="-24" Itrig="0.02" vflip="1" x="-284" valLabRot="0" y="-196" objectName="Relay (all)-15" valLabelx="-16" DT="true" itemtype="RelaySPST" rotation="0" Poles="1" id="Relay (all)-15" hflip="-1" labelx="-16" Show_id="false" valLabely="6"/>
  
 Ground (0 V)-14: 
 <item Show_id="false" labelx="-16" valLabely="0" itemtype="Ground" x="-348" labely="-24" id="Ground (0 V)-14" valLabRot="0" labelrot="0" vflip="1" objectName="Ground (0 V)-14" rotation="0" valLabelx="0" hflip="1" y="-140"/>
@@ -34,7 +34,7 @@ Node-6:
 <item Show_id="false" labelx="-16" valLabely="0" itemtype="Node" x="-364" labely="-24" id="Node-6" valLabRot="0" labelrot="0" vflip="1" objectName="Node-6" rotation="0" valLabelx="0" hflip="1" y="-292"/>
  
 Relay (all)-5: 
-<item Rcoil="50" labelrot="0" labely="-24" Itrig="0.074999999999999997" vflip="1" x="-396" valLabRot="0" y="-260" objectName="Relay (all)-5" valLabelx="-16" DT="false" itemtype="RelaySPST" rotation="0" Poles="1" id="Relay (all)-5" hflip="-1" labelx="-16" Show_id="false" valLabely="6"/>
+<item Rcoil="100" labelrot="0" labely="-24" Itrig="0.02" vflip="1" x="-396" valLabRot="0" y="-260" objectName="Relay (all)-5" valLabelx="-16" DT="false" itemtype="RelaySPST" rotation="0" Poles="1" id="Relay (all)-5" hflip="-1" labelx="-16" Show_id="false" valLabely="6"/>
  
 Node-4: 
 <item Show_id="false" labelx="-16" valLabely="0" itemtype="Node" x="-316" labely="-24" id="Node-4" valLabRot="0" labelrot="0" vflip="1" objectName="Node-4" rotation="0" valLabelx="0" hflip="1" y="-276"/>

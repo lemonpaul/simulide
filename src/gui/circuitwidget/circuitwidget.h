@@ -23,7 +23,6 @@
 #include <QtWidgets>
 
 #include "circuitview.h"
-#include "oscopewidget.h"
 #include "plotterwidget.h"
 #include "terminalwidget.h"
 #include "serialportwidget.h"
@@ -37,8 +36,6 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         ~CircuitWidget();
 
  static CircuitWidget* self() { return m_pSelf; }
- 
-        OscopeWidget* oscope();
 
         void clear();
         
@@ -57,6 +54,7 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
     public slots:
         void newCircuit();
         void openCirc();
+        void loadCirc( QString path );
         void saveCirc();
         bool saveCircAs();
         void powerCircOn();
@@ -75,10 +73,11 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         QHBoxLayout    m_horizontLayout;
         CircuitView    m_circView;
         TerminalWidget m_terminal;
-        OscopeWidget   m_oscope;
         PlotterWidget  m_plotter;
+        
         SerialPortWidget  m_serial;
         //QWidget*       m_serialPortWidget;
+        
         QToolBar       m_circToolBar;
         QLabel*        m_rateLabel;
         

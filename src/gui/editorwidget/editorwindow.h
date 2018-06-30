@@ -33,8 +33,7 @@ class EditorWindow : public QWidget
         EditorWindow( QWidget *parent );
         ~EditorWindow();
 
-    protected:
-        void closeEvent(QCloseEvent *event);
+        bool close();
 
     private slots:
         void newFile();
@@ -81,7 +80,7 @@ class EditorWindow : public QWidget
         QString strippedName(const QString &fullFileName);
         
         QGridLayout* baseWidgetLayout;
-        QTabWidget*  docWidget;
+        QTabWidget*  m_docWidget;
         
         FindReplaceDialog* findRepDiaWidget;
         

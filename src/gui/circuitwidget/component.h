@@ -102,6 +102,11 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         void setValLabelPos();
         
         void updateLabel( Label* label, QString txt );
+        
+        QString getHelp( QString file );
+        
+        void setPrintable( bool p );
+        QString print();
 
         QString itemType();
         QString category();
@@ -156,6 +161,10 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         QString m_id;
         QString m_type;
         QString m_category;
+        
+ static QString m_noHelpMsg;
+        QString* m_help;
+        
         QIcon   m_icon;
         QColor  m_color;
         QRectF  m_area;         // bounding rect
@@ -164,6 +173,7 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         bool m_showId;
         bool m_showVal;
         bool m_moving;
+        bool m_printable;
         
         std::vector<Pin*> m_pin;
 };

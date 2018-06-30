@@ -32,10 +32,12 @@
 #include "buffer.h"
 #include "capacitor.h"
 #include "clock.h"
+#include "currsource.h"
 #include "dac.h"
 #include "dectobcd.h"
 #include "demux.h"
 #include "diode.h"
+#include "ellipse.h"
 #include "flipflopd.h"
 #include "flipflopjk.h"
 #include "fulladder.h"
@@ -45,7 +47,6 @@
 #include "ground.h"
 #include "hd44780.h"
 #include "i2c.h"
-#include "ic74.h"
 #include "inbus.h"
 #include "inductor.h"
 #include "keypad.h"
@@ -53,6 +54,8 @@
 #include "latchd.h"
 #include "led.h"
 #include "ledbar.h"
+#include "ledmatrix.h"
+#include "line.h"
 #include "logicinput.h"
 #include "mosfet.h"
 #include "mux.h"
@@ -65,6 +68,7 @@
 #include "potentiometer.h"
 #include "push.h"
 #include "rail.h"
+#include "rectangle.h"
 #include "relay-spst.h"
 #include "resistor.h"
 #include "resistordip.h"
@@ -109,6 +113,7 @@ void ItemLibrary::loadItems()
     addItem( Clock::libraryItem() );
     addItem( WaveGen::libraryItem() );
     addItem( VoltSource::libraryItem() );
+    addItem( CurrSource::libraryItem() );
     addItem( Rail::libraryItem() );
     addItem( Ground::libraryItem() );
     // Switches
@@ -131,6 +136,7 @@ void ItemLibrary::loadItems()
     // Outputs
     addItem( Led::libraryItem() );
     addItem( LedBar::libraryItem() );
+    addItem( LedMatrix::libraryItem() );
     addItem( SevenSegment::libraryItem() );
     addItem( KeyPad::libraryItem() );
     addItem( Hd44780::libraryItem() );
@@ -165,10 +171,12 @@ void ItemLibrary::loadItems()
     addItem( OutBus::libraryItem() );
     addItem( InBus::libraryItem() );
     // Subcircuits
-    //addItem( Ic74::libraryItem() );
     addItem( SubCircuit::libraryItem() );
     // Other
     addItem( TextComponent::libraryItem() );
+    addItem( Rectangle::libraryItem() );
+    addItem( Ellipse::libraryItem() );
+    addItem( Line::libraryItem() );
 }
 
 void ItemLibrary::addItem( LibraryItem* item )

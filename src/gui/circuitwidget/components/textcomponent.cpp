@@ -70,6 +70,7 @@ void TextComponent::updateGeometry(int, int, int)
 {
     m_text->document()->setTextWidth(-1);
     m_area = QRect( -m_margin, -m_margin, m_text->boundingRect().width()+m_margin*2, m_text->boundingRect().height()+m_margin*2 );
+    update();
 }
 
 void TextComponent::setMargin( int margin )
@@ -77,6 +78,7 @@ void TextComponent::setMargin( int margin )
     if( margin < 2 ) margin = 2;
     m_margin = margin;
     updateGeometry( 0, 0, 0 );
+    update();
 }
 
 void TextComponent::setFixedW( bool fixedW ) 
@@ -91,6 +93,7 @@ void TextComponent::setFixedW( bool fixedW )
     sansFont.setFixedPitch( fixedW );
     m_text->setFont( sansFont );
     updateGeometry( 0, 0, 0 );
+    update();
 }
 
 

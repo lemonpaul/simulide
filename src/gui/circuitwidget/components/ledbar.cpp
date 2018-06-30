@@ -19,6 +19,7 @@
 
 #include "ledbar.h"
 #include "connector.h"
+#include "circuit.h"
 #include "pin.h"
 
 
@@ -39,7 +40,7 @@ LedBar::LedBar( QObject* parent, QString type, QString id )
     : Component( parent, type, id )
 {
     m_led.resize( 8 );
-    //m_pin.resize( 16 );
+    m_pin.resize( 16 );
     
     // Create Leds
     for( int i=0; i<8; i++ )
@@ -55,12 +56,12 @@ LedBar::LedBar( QObject* parent, QString type, QString id )
         QPoint nodpos = QPoint(-16,-32+8+i*8 );
         Pin* pin = new Pin( 180, nodpos, ledid+"-pinP", 0, this);
         m_led[i]->setEpin( 0, pin );
-        //m_pin[i] = pin;
+        m_pin[i] = pin;
         
         nodpos = QPoint( 16,-32+8+i*8 );
         pin = new Pin( 0, nodpos, ledid+"-pinN", 0, this);
         m_led[i]->setEpin( 1, pin );
-        //m_pin[8+i] = pin;
+        m_pin[8+i] = pin;
     }
     setRes( 0.6 ); 
 }
@@ -117,7 +118,7 @@ void LedBar::setGrounded( bool grounded )
 
 void LedBar::remove()
 {
-    for( int i=0; i<8; i++ ) m_led[i]->remove();
+    for( int i=0; i<8; i++ )  Circuit::self()->removeComp( m_led[i] );
     
     Component::remove();
 }

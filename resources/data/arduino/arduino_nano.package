@@ -23,7 +23,7 @@
 
     <pin side="left" pos="2"  type="bidir" id="PD1"  label=" 1 Tx"/>
     <pin side="left" pos="3"  type="bidir" id="PD0"  label=" 0 Rx"/>
-    <pin side="left" pos="4"  type="reset" id="PC6"  label=" Rst" />
+    <pin side="left" pos="4"  type="reset" id="RST"  label=" Rst" />
     <pin side="left" pos="5"  type="gnd"   id="GND0" label=" Gnd" />
     
     <pin side="left" pos="6"  type="bidir" id="PD2"  label=" 2"   />
@@ -42,7 +42,7 @@
     
     <pin side="right" pos="2"  type="vin"   id="Vin"  label="Vin "/>
     <pin side="right" pos="3"  type="gnd"   id="GND1" label="Gnd "/>
-    <pin side="right" pos="4"  type="reset" id="PC6"  label="Rst "/>
+    <pin side="right" pos="4"  type="reset" id="RST"  label="Rst "/>
     <pin side="right" pos="5"  type="v5v"   id="V5V"  label="5V " />
     
     <pin side="right" pos="6"  type="adc7"  id="PC7"  label="A7 " />

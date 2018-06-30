@@ -22,7 +22,7 @@
 #include "e-logic_device.h"
 
 eLogicDevice::eLogicDevice( std::string id )
-    : eElement( id )
+            : eElement( id )
 {
     m_numInputs  = 0;
     m_numOutputs = 0;
@@ -95,12 +95,25 @@ bool eLogicDevice::outputEnabled()
     return m_outEnable;
 }
 
+void eLogicDevice::updateOutEnabled()
+{
+    if( m_outEnablePin )
+    {
+        bool outEn = true;
+        bool outEnPrev = m_outEnable;
+        outEn = outputEnabled();              // Refresh m_outEnable
+
+        if( outEnPrev != outEn ) setOutputEnabled( outEn );
+    }
+}
+
 void eLogicDevice::setOutputEnabled( bool enabled )
 {
     double imp = 1e28;
     if( enabled ) imp = m_outImp;
-    
+
     for( int i=0; i<m_numOutputs; i++ ) m_output[i]->setImp( imp );
+
 }
 
 bool eLogicDevice::inputEnabled()
@@ -345,26 +358,25 @@ void eLogicDevice::setInputImp( double imp )
     for( int i=0; i<m_numInputs; i++ )
     {
         m_input[i]->setImp( imp );
-        //m_input[i]->stampOutput();
     }
 }
 
 void eLogicDevice::setOutImp( double imp )
 {
     if( m_outImp == imp ) return;
-    
+
     m_outImp = imp;
 
     for( int i=0; i<m_numOutputs; i++ )
     {
         m_output[i]->setImp( imp );
-        //m_output[i]->stampOutput();
     }
 }
 
 void eLogicDevice::setInverted( bool inverted )
 {
     m_inverted = inverted;
+    
     for( int i=0; i<m_numOutputs; i++ )
     {
         m_output[i]->setInverted( inverted );

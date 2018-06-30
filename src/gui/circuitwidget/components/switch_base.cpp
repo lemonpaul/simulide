@@ -50,10 +50,15 @@ SwitchBase::~SwitchBase()
 
 void SwitchBase::initialize()
 {
-    m_ePin[0]->setEnodeComp( m_ePin[1]->getEnode() );
-    m_ePin[1]->setEnodeComp( m_ePin[0]->getEnode() );
-    m_ePin[0]->stampAdmitance( 1 ); // Restart circuit afther switch closed issue
-    m_ePin[1]->stampAdmitance( 1 );
+    eNode* node0 = m_ePin[0]->getEnode();
+    eNode* node1 = m_ePin[1]->getEnode();
+    
+    if( node0 ) node0->setSwitched( true );
+    if( node1 ) node1->setSwitched( true );
+    
+    m_ePin[0]->setEnodeComp( node1 );
+    m_ePin[1]->setEnodeComp( node0 );
+
     m_changed = true;
     updateStep();
 }
@@ -62,7 +67,7 @@ void SwitchBase::updateStep()
 {
     if( m_changed )
     {
-        double admit = 1e-6;
+        double admit = 0;
 
         if( m_closed ) admit = 1e3;
 
@@ -70,6 +75,8 @@ void SwitchBase::updateStep()
         m_ePin[1]->stampAdmitance( admit );
 
         m_changed = false;
+        
+        //update();
     }
 }
 

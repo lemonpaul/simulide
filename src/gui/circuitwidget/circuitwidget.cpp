@@ -13,9 +13,8 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
  ***************************************************************************/
  
 #include "circuitwidget.h"
@@ -26,20 +25,16 @@
 CircuitWidget*  CircuitWidget::m_pSelf = 0l;
 
 CircuitWidget::CircuitWidget( QWidget *parent  )
-    : QWidget( parent )
-    ,m_verticalLayout(this)
-    ,m_horizontLayout()
-    ,m_circView(this)
-    ,m_terminal(this)
-    ,m_oscope(this)
-    ,m_plotter(this)
-    ,m_serial(this)
-    ,m_circToolBar(this)
-    ,m_lastCircDir(MainWindow::self()->settings()->value("lastCircDir").toByteArray())
+             : QWidget( parent )
+             , m_verticalLayout(this)
+             , m_horizontLayout()
+             , m_circView(this)
+             , m_terminal(this)
+             , m_plotter(this)
+             , m_serial(this)
+             , m_circToolBar(this)
 {
     m_pSelf = this;
-    
-    m_oscope.setupWidget( 180 );
 
     m_verticalLayout.setObjectName(tr("verticalLayout"));
     m_verticalLayout.setContentsMargins(0, 0, 0, 0);
@@ -49,12 +44,11 @@ CircuitWidget::CircuitWidget( QWidget *parent  )
     m_verticalLayout.addWidget( &m_circView );
     
     m_verticalLayout.addLayout( &m_horizontLayout );
-    m_horizontLayout.addWidget( &m_oscope );
     m_horizontLayout.addWidget( &m_plotter );
     m_horizontLayout.addWidget( &m_terminal );
     m_horizontLayout.addWidget( &m_serial);
     
-    connect( this,     &CircuitWidget::dataAvailable,
+    connect( this,      &CircuitWidget::dataAvailable,
              &m_serial, &SerialPortWidget::slotWriteData );
     
     m_rateLabel = new QLabel( this );
@@ -65,18 +59,16 @@ CircuitWidget::CircuitWidget( QWidget *parent  )
     
     QString appPath = QCoreApplication::applicationDirPath();
     
-    if( m_lastCircDir.isEmpty() )  m_lastCircDir = appPath + "/examples/Arduino/Voltimeter/voltimeter.simu";
+    m_lastCircDir = MainWindow::self()->settings()->value("lastCircDir").toByteArray();
+    if( m_lastCircDir.isEmpty() )  m_lastCircDir = appPath + "..share/simulide/examples";
     
     newCircuit();
 }
 CircuitWidget::~CircuitWidget() { }
 
-OscopeWidget* CircuitWidget::oscope() { return &m_oscope; }
-
 void CircuitWidget::clear()
 {
     m_circView.clear();
-    Simulator::self()->addToElementList( &m_oscope );
 }
 
 void CircuitWidget::createActions()
@@ -145,16 +137,21 @@ void CircuitWidget::openCirc()
     QString fileName = QFileDialog::getOpenFileName( 0l, tr("Load Circuit"), dir,
                                           tr("Circuits (*.simu);;All files (*.*)"));
 
-    if( !fileName.isEmpty() && fileName.endsWith(".simu") )
+    loadCirc( fileName );
+}
+
+void CircuitWidget::loadCirc( QString path )
+{
+    if( !path.isEmpty() && path.endsWith(".simu") )
     {
         newCircuit();
-        Circuit::self()->loadCircuit( fileName );
+        Circuit::self()->loadCircuit( path );
    
-        m_curCirc = fileName;
-        m_lastCircDir = fileName;
-        MainWindow::self()->setTitle(fileName.split("/").last());
+        m_curCirc = path;
+        m_lastCircDir = path;
+        MainWindow::self()->setTitle(path.split("/").last());
         MainWindow::self()->settings()->setValue( "lastCircDir", m_lastCircDir );
-        FileBrowser::self()->setPath(m_lastCircDir);
+        //FileBrowser::self()->setPath(m_lastCircDir);
     }
 }
 
@@ -187,7 +184,7 @@ bool CircuitWidget::saveCircAs()
         QString fileName = m_curCirc;
         MainWindow::self()->setTitle(fileName.split("/").last());
         MainWindow::self()->settings()->setValue( "lastCircDir", m_lastCircDir );
-        FileBrowser::self()->setPath(m_lastCircDir);
+        //FileBrowser::self()->setPath(m_lastCircDir);
     }
     return saved;
 }

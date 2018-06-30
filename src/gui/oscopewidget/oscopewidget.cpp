@@ -24,8 +24,8 @@
 #include <math.h>   // fabs(x,y)
 
 OscopeWidget::OscopeWidget(  QWidget *parent  )
-    : QWidget( parent ),
-      eElement( "oscope" )
+    : QWidget( parent )
+    , eElement( "oscope" )
 {
     this->setVisible( false );
 
@@ -53,12 +53,10 @@ OscopeWidget::OscopeWidget(  QWidget *parent  )
     m_updtCount = 0;
     m_counter = 0;
     m_tick    = 0;
-    m_probe   = 0l;
     m_oscope  = 0l;
 }
 OscopeWidget::~OscopeWidget()
 { 
-    Simulator::self()->remFromSimuClockList( this );
 }
 
 void OscopeWidget::initialize()
@@ -66,20 +64,17 @@ void OscopeWidget::initialize()
     clear();
 }
 
-void OscopeWidget::setProbe( Probe* probe )
-{
-    if( m_probe == probe ) return;
-    m_probe = probe;
-    if( probe == 0l ) Simulator::self()->remFromSimuClockList( this );
-    else              Simulator::self()->addToSimuClockList( this );
-}
-
 void OscopeWidget::setOscope( Oscope* oscope )
 {
-    if( m_oscope == oscope ) return;
     m_oscope = oscope;
-    if( oscope == 0l ) Simulator::self()->remFromSimuClockList( this );
-    else              Simulator::self()->addToSimuClockList( this );
+    
+    if( oscope  ) Simulator::self()->addToSimuClockList( this );
+    else          Simulator::self()->remFromSimuClockList( this );
+}
+
+void OscopeWidget::read()
+{
+    m_reading = true;
 }
 
 void OscopeWidget::clear()
@@ -88,11 +83,24 @@ void OscopeWidget::clear()
     m_display->setData( m_data );
     
     newReading = true;
+    m_rising   = false;
+    m_falling  = false;
+    m_haveFreq = false;
     
     m_newReadCount = 0;
     m_stepCount = 0;
     m_updtCount = 0;
+    m_numCycles = 0;
+    m_numMax = 0;
+    m_lastData =0;
     m_counter = 0;
+    m_ampli = 0;
+    m_tick = 0;
+    m_max =-1e12;
+    m_min = 1e12;
+    m_mid = 0;
+    Hpos = 0;
+    m_freq = 500;
     
     m_freqLabel->setText( "Freq: 000 Hz" );
     m_ampLabel->setText( "Amp: 0.00 V" );
@@ -100,81 +108,81 @@ void OscopeWidget::clear()
 
 void OscopeWidget::simuClockStep()
 {
-    if( ++m_newReadCount == 1000500 )
-    {
-        m_ampli = 0;
-        m_newReadCount = 0;
-        clear();
-    }
+    //if( !m_reading ) return;
     
-    double data = 0;
-    if     ( m_probe != 0l )  data = m_probe->getVolt();
-    else if( m_oscope != 0l ) data = m_oscope->getVolt();
+    if( ++m_newReadCount == 2000000 ) clear();
 
-//qDebug() << "OscopeWidget::setData"<< lastData << data << max << min << up << down;
+    double data = m_oscope->getVolt();
     
-    if( data > max ) max = data;
-    if( data < min ) min = data;
+    if( data > m_max ) m_max = data;
+    if( data < m_min ) m_min = data;
     
-    if( (data-lastData)>m_filter )                       // Filter noise 
+    if( (data-m_lastData)>m_filter )                           // Rising 
     {
-        if( newReading )
+        if( m_reading && newReading )
         {
-            mid = min + m_ampli/2;
-            
-            if( data>=mid )                               // Rising edge
+            if( m_numCycles > 1 )                // Wait for a full wave
             {
-                int per = 1e6/m_freq;
-                if( per > 1 )
+                m_mid = m_min + m_ampli/2;
+
+                if( data>=m_mid )                         // Rising edge
                 {
-                    if( m_auto ) 
+                    m_numCycles = 0;
+                    int per = 1e6/m_freq;
+                    if( per > 1 )
                     {
-                        m_Vpos = mid;
-                        m_Hpos = 0;
-                        m_Vscale = 5/m_ampli;
-                        if( m_Vscale > 1000 ) m_Vscale = 1000;
-                        if( m_Vscale < 0.001 ) m_Vscale = 0.001;
-                        
-                        m_Hscale = (abs(per/70)+1);
-                        if( m_Hscale > 10000 ) m_Hscale = 10000;
-                        if( m_Hscale < 1 )    m_Hscale = 1;
+                        if( m_auto ) 
+                        {
+                            m_Vpos = m_mid;
+                            m_Hpos = 0;
+                            m_Vscale = 5/m_ampli;
+                            if     ( m_Vscale > 1000 )  m_Vscale = 1000;
+                            else if( m_Vscale < 0.001 ) m_Vscale = 0.001;
+                            
+                            m_Hscale = abs(per/70)+1;
+                            if( m_Hscale > 10000 ) m_Hscale = 10000;
+                            //if( m_Hscale < 1 )     m_Hscale = 1;
+                        }
+                        Hpos = 0;
+                        m_tick = 0;
+                        m_counter = 0;
+                        m_newReadCount = 0;
+                        newReading = false;
                     }
-//qDebug()<<"OscopeWidget::simuClockStep"<<max<<min <<m_ampli << m_Vscale;
-//qDebug()<<"OscopeWidget::simuClockStep" <<m_sampleR <<per << m_freq;
-                    
-                    Hpos = 0;
-                    m_tick = 0;
-                    m_counter = 0;
-                    m_newReadCount = 0;
-                    
-                    newReading = false;
                 }
             }
         }
-        if( down & !up )                                    // Min Found
+        if( m_falling && !m_rising )                         // Min Found
         {
-            m_ampli = max-min;
-            m_display->setMaxMin( max, min );
-            down = false;
-            max = -1e12;
+            m_ampli = m_max-m_min;
+            m_display->setMaxMin( m_max, m_min );
+            m_falling = false;
+            m_max = -1e12;
         }
-        up = true;
-        lastData = data;
+        m_rising = true;
+        m_lastData = data;
     }
-    else if( (data-lastData) < -m_filter )
+    else if( (data-m_lastData) < -m_filter )                  // Falling
     {
-        if( up & !down )                                    // Max Found
+        if( m_rising && !m_falling )                         // Max Found
         {
-            m_numMax++;
-            m_ampli = max-min;
-            m_display->setMaxMin( max, min );
-            up = false;
-            min = 1e12;
-        }
-        down = true;
-        lastData = data;
-    }
+            if( !m_haveFreq )          // Estimate Freq with first cycle
+            {
+                if( m_numMax > 0 ) 
+                    m_freq = 1e6/(m_newReadCount-m_lastMax);
 
+                m_lastMax = m_newReadCount;
+            }
+            m_numMax++;
+            m_numCycles++;
+            m_ampli = m_max-m_min;
+            m_display->setMaxMin( m_max, m_min );
+            m_rising = false;
+            m_min = 1e12;
+        }
+        m_falling = true;
+        m_lastData = data;
+    }
     if( ++m_stepCount == 50000 )                          // 5 ms Update
     {
         m_stepCount = 0;
@@ -198,38 +206,35 @@ void OscopeWidget::simuClockStep()
 
         if( ++m_updtCount >= 20 )                        // 1 Seg Update
         {
+            m_haveFreq = true;
             m_freq = m_numMax; 
             m_updtCount = 0;
             m_numMax = 0;
             m_freqLabel->setText( "Freq: "+QString::number(m_freq)+" Hz" );
         }
-        if( m_counter == 140 )              // Data set Ready to display
-        {
-            m_display->setData( m_data );
-            newReading = true;
-            m_counter = 0;
-            return; 
-        }
     }
-
+    if( m_counter == 140 )                   // DataSet Ready to display
+    {
+        m_display->setData( m_data );
+        newReading = true;
+        m_reading = false;
+        m_numCycles = 0;
+        m_counter = 0;
+        return; 
+    }
     if( newReading == false )                         // Data Set saving
     {
         if( m_counter == 140 ) return;          // Done, Wait for update
 
         if( Hpos < m_Hpos ) Hpos++;                 // Wait for H offset
-        else                                          // Actual Data Set 
+        else                                                // Save data 
         {
-            if( ++m_tick == m_Hscale )
+            if(( m_counter == 0 )||( ++m_tick == m_Hscale ))
             {
                 m_data[m_counter] = ((data-m_Vpos)*m_Vscale+2.5)*28;
-                //qDebug() << "data"<<data;
+
                 m_counter++;
                 m_tick = 0;
-                if( m_counter == 140 )
-                {
-                    down = false;
-                    up = false;
-                }
             }
         }
     }
@@ -258,22 +263,22 @@ void OscopeWidget::VscaleChanged( int Vscale )
     double vscale = (double)Vscale;
     if( vscale > m_prevVscale ) 
     {
-        m_Vscale *= 1.005;
+        m_Vscale *= 1.01;
         if( m_Vscale > 1000 ) m_Vscale = 1000;
     }
     else
     {
-        m_Vscale /= 1.005;
+        m_Vscale /= 1.01;
         if( m_Vscale < 0.001 ) m_Vscale = 0.001;
     }
     m_prevVscale = vscale;
 }
 
-void OscopeWidget::HposChanged( int Hpos )
+void OscopeWidget::HposChanged( int hPos )
 {
     if( m_auto ) return;
     
-    if( Hpos < m_prevHpos ) 
+    if( hPos < m_prevHpos ) 
     {
         m_Hpos += m_Hscale;
         if( m_Hpos > 200*m_Hscale ) m_Hpos = 200*m_Hscale;
@@ -283,7 +288,7 @@ void OscopeWidget::HposChanged( int Hpos )
         m_Hpos -= m_Hscale;
         if( m_Hpos < 0 ) m_Hpos = 0;
     }
-    m_prevHpos = Hpos;
+    m_prevHpos = hPos;
 }
 
 void OscopeWidget::VposChanged( int Vpos )
@@ -294,11 +299,11 @@ void OscopeWidget::VposChanged( int Vpos )
     
     if( vpos < m_prevVpos ) 
     {
-        m_Vpos += 0.01*m_Vscale;
+        m_Vpos += 0.02*m_Vscale;
     }
     else
     {
-        m_Vpos -= 0.01*m_Vscale;
+        m_Vpos -= 0.02*m_Vscale;
     }
     m_prevVpos = vpos;
 }

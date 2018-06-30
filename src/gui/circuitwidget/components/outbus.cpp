@@ -36,7 +36,8 @@ LibraryItem* OutBus::libraryItem()
 }
 
 OutBus::OutBus( QObject* parent, QString type, QString id )
-       : LogicComponent( parent, type, id ), eOutBus( id.toStdString() )
+      : LogicComponent( parent, type, id )
+      , eOutBus( id.toStdString() )
 {    
     m_width  = 1;
     m_height = 8;
@@ -48,6 +49,8 @@ OutBus::OutBus( QObject* parent, QString type, QString id )
     m_outPin[0] = new Pin( 0, QPoint( 8, 0 ), m_id+"-out", 1, this );
                           
     eLogicDevice::createOutput( m_outPin[0] );
+    
+    m_outPin[0]->setIsBus( true );
 }
 OutBus::~OutBus(){
 }
@@ -57,9 +60,9 @@ void OutBus::setNumInps( int inputs )
     if( inputs == m_numInputs ) return;
     if( inputs < 1 ) return;
 
-    LogicComponent::setNumInps( inputs );
     eLogicDevice::deleteInputs( m_numInputs );
-
+    LogicComponent::setNumInps( inputs );
+    
     for( int i=0; i<inputs; i++ )
     {
         m_inPin[i] = new Pin( 180, QPoint(-8,-8*inputs+i*8+8 )

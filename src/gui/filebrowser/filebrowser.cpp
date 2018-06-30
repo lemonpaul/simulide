@@ -20,7 +20,7 @@
 #include "filebrowser.h"
 #include "circuitwidget.h"
 #include "circuit.h"
-#include "mainwindow.h"
+#include "filewidget.h"
 
 FileBrowser*  FileBrowser::m_pSelf = 0l;
 
@@ -29,110 +29,116 @@ FileBrowser::FileBrowser( QWidget *parent )
 {
     m_pSelf = this;
     m_fileSystemModel = new QFileSystemModel(this);
-    m_fileSystemModel->setRootPath(QDir::rootPath());
-    m_currentPath = m_fileSystemModel->rootPath();
+    m_fileSystemModel->setRootPath( QDir::rootPath() );
+    
+    m_currentPath = QDir::rootPath();
+    
     setModel(m_fileSystemModel);
-    setRootIndex(m_fileSystemModel->index(QDir::rootPath()));
+    setRootIndex( m_fileSystemModel->index( QDir::rootPath() ));
+    
+    setHeaderHidden( true );
+    hideColumn( 1 );
+    hideColumn( 2 );
+    hideColumn( 3 );
+    
+    setStyleSheet("border: 0px solid red");
 }
 
 FileBrowser::~FileBrowser() { }
 
-void FileBrowser::setRoot()
+void FileBrowser::cdUp()
 {
-    QModelIndex currentDir = m_fileSystemModel->index(m_currentPath);
-    setRootIndex(currentDir);
+    QModelIndex currentDir = m_fileSystemModel->index( m_currentPath );
+    
+    setPath( m_fileSystemModel->filePath( currentDir.parent() ) );
 }
 
-void FileBrowser::resetRoot()
+void FileBrowser::openInEditor()
 {
-    setRootIndex(m_fileSystemModel->index(QDir::rootPath()));
+    QString path = m_fileSystemModel->filePath( currentIndex() );
+    emit openFileWithEditor( path );
 }
 
-void FileBrowser::resetRootToHome()
+void FileBrowser::open()
 {
-    setRootIndex(m_fileSystemModel->index(QDir::homePath()));
+    QString path = m_fileSystemModel->filePath( currentIndex() );
+    
+    if( path.isEmpty() ) return;
+    
+    if( m_fileSystemModel->isDir( currentIndex() ) )
+    {
+        setPath( path );
+    }
+    else  
+    {
+        if( path.endsWith(".simu") ) CircuitWidget::self()->loadCirc( path );
+        else                         emit openFileWithEditor( path );
+
+    }
 }
 
-void FileBrowser::openFile()
+void FileBrowser::setPath( QString path )
 {
-    emit openFileWithEditor(m_currentPath);
+    m_currentPath = path;
+    
+    FileWidget::self()->setPath( path );
+    
+    QModelIndex index = m_fileSystemModel->index( path );
+    
+    if( path == QDir::rootPath() ) index = index.parent();
+    setRootIndex( index );
 }
 
-void FileBrowser::setPath(QString path)
+void FileBrowser::addBookMark()
 {
-    setCurrentIndex(m_fileSystemModel->index(path));
+    
+    QString fileName = m_fileSystemModel->fileName( currentIndex() );
+    QString filePath = m_fileSystemModel->filePath( currentIndex() );
+    
+    FileWidget::self()->addBookMark( filePath );
 }
 
-void FileBrowser::contextMenuEvent(QContextMenuEvent* event)
+void FileBrowser::contextMenuEvent( QContextMenuEvent* event )
 {
     QTreeView::contextMenuEvent( event );
 
     if( !event->isAccepted() )
     {
+        event->accept();
         QPoint eventPos = event->globalPos();
-        QModelIndex eventIndex = indexAt( event->pos() );
-        
-        m_currentPath = m_fileSystemModel->filePath( eventIndex );
 
         QMenu menu;
         
-        if (m_fileSystemModel->isDir(eventIndex))
+        if( m_fileSystemModel->isDir( currentIndex()) )
         {
-            QAction* changeRootAction = menu.addAction(QIcon(":/setroot.png"),"Set directory as root");
-            connect( changeRootAction, SIGNAL( triggered()), this, SLOT(setRoot()) );
+            QAction* addBookMarkAction = menu.addAction(QIcon(":/setroot.png"),"Add Bookmark");
+            connect( addBookMarkAction, SIGNAL( triggered()), 
+                     this,              SLOT(   addBookMark() ) );
+                     
+            menu.addSeparator();
         }
         else
         {
             QAction* openWithEditor = menu.addAction(QIcon(":/open.png"),"Open in editor");
-            connect( openWithEditor, SIGNAL( triggered()), this, SLOT(openFile()) );
+            connect( openWithEditor, SIGNAL( triggered()), 
+                     this,           SLOT(   openInEditor()) );
+                     
             menu.addSeparator();
         }
-        
-        QAction* restoreRootAction = menu.addAction(QIcon(":/reset.png"),"Restore root as /");
-        connect( restoreRootAction, SIGNAL( triggered()), this, SLOT(resetRoot()) );
-        
-        QAction* restoreRootAsHomeAction = menu.addAction(QIcon(":/reset.png"),"Restore root as ~");
-        connect( restoreRootAsHomeAction, SIGNAL( triggered()), this, SLOT(resetRootToHome()) );
-
         menu.exec( eventPos );
     }
 }
 
 void FileBrowser::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (m_fileSystemModel->isDir(currentIndex()))
-        QTreeView::mouseDoubleClickEvent( event );
-    else
-    {
-        QString fileName = m_fileSystemModel->filePath(currentIndex());
-        if( !fileName.isEmpty() && fileName.endsWith(".simu") )
-        {
-            CircuitWidget::self()->newCircuit();
-            Circuit::self()->loadCircuit( fileName );
-       
-            MainWindow::self()->setTitle(fileName.split("/").last());
-            MainWindow::self()->settings()->setValue( "lastCircDir", fileName );
-        }
-    }
+    open();
 }
 
 void FileBrowser::keyPressEvent( QKeyEvent *event )
 {
     bool isEnter = ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return));
-    if (!m_fileSystemModel->isDir(currentIndex()) && isEnter)
-    {
-        QString fileName = m_fileSystemModel->filePath(currentIndex());
-        if( !fileName.isEmpty() && fileName.endsWith(".simu") )
-        {
-            CircuitWidget::self()->newCircuit();
-            Circuit::self()->loadCircuit( fileName );
-       
-            MainWindow::self()->setTitle(fileName.split("/").last());
-            MainWindow::self()->settings()->setValue( "lastCircDir", fileName );
-        }
-    }
-    else
-        QTreeView::keyPressEvent( event );
+    
+    if( isEnter ) open();
 }
 
 #include  "moc_filebrowser.cpp"

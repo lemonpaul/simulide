@@ -23,7 +23,7 @@
 #include "e-inbus.h"
 
 eInBus::eInBus( std::string id )
-    : eLogicDevice( id )
+      : eLogicDevice( id )
 {
 }
 eInBus::~eInBus()
@@ -42,14 +42,13 @@ void eInBus::setVChanged()
 {
     double volt = m_input[0]->getVolt();
 
-    int address = volt*m_maxAddr/m_maxVolt;
-
+    int address = (int)(volt*m_maxAddr/m_maxVolt+0.1);
+    //qDebug()<<"\n" << "eInBus::setVChanged"<<volt << address<<(volt*m_maxAddr/m_maxVolt)<<(int)(volt*m_maxAddr/m_maxVolt);
     for( int i=0; i<m_numOutputs; i++ )
     {
         //qDebug() << "eInBus::setVChanged" << i << (address & 1);
-        eLogicDevice::setOut( i, address & 1 );
+        eLogicDevice::setOut( 7-i, address & 1 );
         address >>= 1;
 
     }
-    //qDebug() << "eInBus::setVChanged"<<volt << address<<(volt*m_maxAddr/m_maxVolt)<<"\n";
 }

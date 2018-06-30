@@ -23,7 +23,7 @@
 
 
 LogicComponent::LogicComponent( QObject* parent, QString type, QString id )
-       : Component( parent, type, id )
+              : Component( parent, type, id )
 {
     m_numInPins  = 0;
     m_numOutPins = 0;

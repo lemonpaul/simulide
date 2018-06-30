@@ -26,7 +26,6 @@
 ePN::ePN( std::string id ) : eResistor(id )
 {
     m_threshold = 0.7;
-    m_resist = 0.6;
 }
 ePN::~ePN()
 { 
@@ -34,6 +33,7 @@ ePN::~ePN()
 
 void ePN::initialize()
 {
+    eResistor::setRes( 0.6 );
     m_accuracy = Simulator::self()->NLaccuracy();
     m_voltPN  = 0;
     m_deltaV  = 0;

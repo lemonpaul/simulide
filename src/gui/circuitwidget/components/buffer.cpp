@@ -37,10 +37,51 @@ LibraryItem* Buffer::libraryItem()
 }
 
 Buffer::Buffer( QObject* parent, QString type, QString id )
-        : Gate( parent, type, id, 1 )
+      : Gate( parent, type, id, 1 )
 {
+    m_area = QRect( -19, -17, 38, 34 ); 
+    m_outEnPin = new Pin( 90, QPoint( 0,-16 ), m_id+"-ePin-outEnable", 0, this );
+    eLogicDevice::createOutEnablePin( m_outEnPin );
+    
+    setTristate( false );
 }
 Buffer::~Buffer(){}
+
+void Buffer::setTristate( bool t )
+{
+    if( !t ) 
+    {
+        if( m_outEnPin->isConnected() ) m_outEnPin->connector()->remove();
+        m_outEnPin->reset();
+    }
+    m_outEnPin->setVisible( t );
+    m_tristate = t;
+    eLogicDevice::updateOutEnabled();
+}
+
+void Buffer::remove()
+{
+    if( m_tristate )
+        if( m_outEnPin->isConnected() ) m_outEnPin->connector()->remove();
+    
+    Gate::remove();
+}
+
+QPainterPath Buffer::shape() const
+{
+    QPainterPath path;
+    
+    QVector<QPointF> points;
+    
+    points << QPointF(-16,-16 )
+           << QPointF(-16, 16 )
+           << QPointF( 16,  1 )
+           << QPointF( 16, -1 );
+        
+    path.addPolygon( QPolygonF(points) );
+    path.closeSubpath();
+    return path;
+}
 
 void Buffer::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
@@ -58,7 +99,7 @@ void Buffer::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
 
     p->drawPolygon(points, 4);
 
-    Gate::paint( p, option, widget );            // draw inverted circle
+    //Gate::paint( p, option, widget );            // draw inverted circle
 }
 
 #include "moc_buffer.cpp"

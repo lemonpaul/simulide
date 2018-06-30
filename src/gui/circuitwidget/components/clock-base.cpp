@@ -23,7 +23,7 @@
 
 
 ClockBase::ClockBase( QObject* parent, QString type, QString id )
-    : LogicInput( parent, type, id )
+         : LogicInput( parent, type, id )
 {
     m_isRunning = false;
 
@@ -59,6 +59,8 @@ void ClockBase::setFreq( int freq )
     if (m_stepsPC < 1) m_stepsPC = 1;
     
     m_freq = 1e6/m_stepsPC;
+    
+    emit freqChanged();
 }
 
 void ClockBase::onbuttonclicked()

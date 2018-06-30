@@ -37,7 +37,8 @@ LibraryItem* LogicInput::libraryItem()
 }
 
 LogicInput::LogicInput( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eElement( id.toStdString() )
+          : Component( parent, type, id )
+          , eElement( id.toStdString() )
 {
     setLabelPos(-64,-24 );
     
@@ -81,6 +82,7 @@ void LogicInput::onbuttonclicked()
     m_out->setOut( m_button->isChecked() );
     m_changed = true;
     //qDebug() << "LogicInput::onbuttonclicked" ;
+    update();
 }
 
 void LogicInput::updateStep()

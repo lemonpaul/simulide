@@ -116,6 +116,7 @@ class MAINMODULE_EXPORT Simulator : public QObject
 
         bool m_isrunning;
         bool m_paused;
+        bool m_error;
         int  m_timerId;
         
         int m_nlAcc;

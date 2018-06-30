@@ -19,37 +19,29 @@
 
 #include "avrasmdebugger.h"
 #include "baseprocessor.h"
+#include "mainwindow.h"
 #include "utils.h"
 #include "simuapi_apppath.h"
 
 AvrAsmDebugger::AvrAsmDebugger( QObject* parent, OutPanelText* outPane, QString filePath )
             : BaseDebugger( parent,outPane, filePath )
 {
-    //m_avra = m_appPath+"/data/codeeditor/tools/avra";
-    m_avraInc = SIMUAPI_AppPath::self()->availableDataDirPath("codeeditor/tools/avra");
-    #ifndef Q_OS_UNIX
-    m_avraInc = addQuotes( m_avraInc );
-    #endif
-    m_avra = "";
-    /*//m_appPath+"/data/codeeditor/config"
-    QStringList lines = fileToStringList( SIMUAPI_AppPath::self()->availableDataFilePath("codeeditor/config"),
-                                          "CodeEditor::CodeEditor" );
+    setObjectName( "AVR asm Compiler" );
+    
+    m_compilerPath = "";
+    m_avraIncPath  = "";
+    m_compSetting = "avra_Path";
+    
+    readSettings();
+    
+    QSettings* settings = MainWindow::self()->settings();
+    
+    if( settings->contains("avra_Inc_Path") )
+        m_avraIncPath = settings->value("avra_Inc_Path").toString();
+    
+    if( m_avraIncPath == "" )
+        m_avraIncPath = SIMUAPI_AppPath::self()->availableDataDirPath("codeeditor/tools/avra");
 
-    foreach( QString line, lines )  // Get path to avra executable folder
-    {
-        if( line.contains("avra_Path:") )
-        {
-            m_avra = line.remove("avra_Path:");
-            while( m_avra.startsWith(" ") )
-                m_avra.remove( 0, 1 );
-                
-            while( m_avra.endsWith(" ") )
-                m_avra.remove( m_avra.length()-1, 1 );
-            
-            m_avra = m_avra+"/";
-            break;
-        }
-    }*/
     m_typesList["byte"]    = "uint8";
 }
 AvrAsmDebugger::~AvrAsmDebugger()
@@ -153,22 +145,26 @@ int AvrAsmDebugger::compile()
 {
     //getProcType();
     QString file = m_fileDir+m_fileName+m_fileExt;
+    QString avraIncPath = m_avraIncPath;
     
     m_outPane->writeText( "-------------------------------------------------------\n" );
     
     QString listFile = m_fileDir+m_fileName+".lst";
-    QString command  = m_avra+"avra";
+    QString command  = m_compilerPath+"avra";
     
     #ifndef Q_OS_UNIX
     command  = addQuotes( command );
     listFile = addQuotes( listFile );
     file     = addQuotes( file );
+    avraIncPath = addQuotes( avraIncPath );
     #endif
+
     
     command.append(" -W NoRegDef");             // supress some warnings
     command.append(" -l "+ listFile );               // output list file
-    command.append(" -I "+ m_avraInc+" ");                // include dir
-    command.append( file );                          // File to assemble
+    if( m_avraIncPath != "" )
+        command.append(" -I "+ avraIncPath);                // include dir
+    command.append(" "+file );                       // File to assemble
 
     m_outPane->appendText( "Exec: ");
     m_outPane->appendText( command );
@@ -194,10 +190,22 @@ int AvrAsmDebugger::compile()
             error = words.first().remove(filePath).remove("(").remove(")").toInt();
             break;
         }
+        if( error == 0 ) error = 1;
     }
     m_firmware = m_fileDir+m_fileName+".hex";
 
     return error;
+}
+
+QString AvrAsmDebugger::avraIncPath()
+{
+    return m_avraIncPath;
+}
+
+void AvrAsmDebugger::setAvraIncPath( QString path )
+{
+    m_avraIncPath = path;
+    MainWindow::self()->settings()->setValue( "avra_Inc_Path", m_avraIncPath );
 }
 
 /*void AvrAsmDebugger::setRegisters()  // get register addresses from lst file

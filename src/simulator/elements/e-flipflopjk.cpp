@@ -22,7 +22,7 @@
 #include "e-flipflopjk.h"
 
 eFlipFlopJK::eFlipFlopJK( std::string id )
-    : eLogicDevice( id )
+           : eLogicDevice( id )
 {
 }
 eFlipFlopJK::~eFlipFlopJK()
@@ -42,8 +42,6 @@ void eFlipFlopJK::createPins()
     
     // Output 1 - Q
     // Output 2 - !Q
-    m_input[2]->setInverted( true );  // Set
-    m_input[3]->setInverted( true );  // Reset
 }
 
 void eFlipFlopJK::initialize()
@@ -68,11 +66,13 @@ void eFlipFlopJK::setVChanged()
     {
         eLogicDevice::setOut( 0, true );                           // Q
         eLogicDevice::setOut( 1, false );                          // Q'
+        //qDebug() << "eFlipFlopJK::setVChanged() set";
     }
     else if( eLogicDevice::getInputState( 3 )==true )   // Master Reset
     {
         eLogicDevice::setOut( 0, false );                          // Q
         eLogicDevice::setOut( 1, true );                           // Q'
+        //qDebug() << "eFlipFlopJK::setVChanged() Reset";
     }
     else if( clkRising )                             // Clk Rising edge
     {
@@ -81,6 +81,7 @@ void eFlipFlopJK::setVChanged()
         bool Q = m_output[0]->out();
         
         bool state = (J && !Q) || (!K && Q) ;
+        //qDebug() << "eFlipFlopJK::setVChanged() clk"<<J<<K<<state;
 
         eLogicDevice::setOut( 0, state );                          // Q
         eLogicDevice::setOut( 1, !state );                         // Q'
