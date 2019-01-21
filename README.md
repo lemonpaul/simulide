@@ -8,5 +8,4 @@ PIC and AVR simulation are provided by gpsim and simavr.
 
 ## Support project
 
-If you wish, you could became a patron.
-https://www.patreon.com/simulide
+If you wish, you could became a patron: https://www.patreon.com/simulide
