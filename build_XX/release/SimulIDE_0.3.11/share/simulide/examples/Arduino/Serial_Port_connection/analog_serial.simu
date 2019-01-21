@@ -1,0 +1,51 @@
+<circuit type="simulide_0.1" reactStep="50" noLinStep="10" speed="1000000" animate="0" noLinAcc="5">
+ 
+Node-7: 
+<item itemtype="Node" labelx="-16" valLabely="0" hflip="1" vflip="1" objectName="Node-7" rotation="0" y="-324" x="-196" valLabRot="0" labely="-24" labelrot="0" valLabelx="0" Show_id="false" id="Node-7"/>
+ 
+Potentiometer-6: 
+<item itemtype="Potentiometer" labely="-24" id="Potentiometer-6" hflip="1" x="-228" labelx="-16" Show_res="true" Show_id="false" valLabelx="7" labelrot="0" Value_Ohm="0" valLabely="9" valLabRot="0" rotation="0" y="-372" Resistance="5" vflip="1" objectName="Potentiometer-6" Unit=" kΩ"/>
+ 
+Capacitor-5: 
+<item itemtype="Capacitor" labely="-24" Capacitance="9.9999999999999929" id="Capacitor-5" hflip="1" x="-180" labelx="-16" Show_id="false" valLabelx="-18" labelrot="0" Show_Cap="true" valLabely="-19" valLabRot="0" rotation="-270" y="-292" vflip="1" objectName="Capacitor-5" Unit=" uF"/>
+ 
+Arduino Uno-4: 
+<item itemtype="Arduino" labely="-27" Ser_Port="true" id="Arduino Uno - Sender" Mhz="16" hflip="1" x="-364" labelx="-7" Show_id="true" valLabelx="0" labelrot="0" Program="analog_serial.ino.hex" valLabely="0" valLabRot="0" Ser_Monitor="false" rotation="0" y="-284" vflip="1" objectName="Arduino Uno-4"/>
+ 
+Volt. Source-3: 
+<item itemtype="Voltage Source" labely="-24" id="Volt. Source-3" hflip="1" x="-124" labelx="-16" Show_Volt="true" Show_id="false" valLabelx="-26" Voltage="5" labelrot="0" valLabely="10" valLabRot="0" rotation="0" y="-340" vflip="1" objectName="Volt. Source-3" Unit=" V"/>
+ 
+Volt. Source-2: 
+<item itemtype="Voltage Source" labely="-24" id="Volt. Source-2" hflip="1" x="-52" labelx="-16" Show_Volt="true" Show_id="false" valLabelx="-26" Voltage="5" labelrot="0" valLabely="10" valLabRot="0" rotation="0" y="-340" vflip="1" objectName="Volt. Source-2" Unit=" V"/>
+ 
+Clock-1: 
+<item itemtype="Clock" labely="-24" id="Clock-1" hflip="1" Freq="1" x="-292" labelx="-64" Show_Volt="true" Show_id="false" valLabelx="-16" Voltage="5" labelrot="0" valLabely="8" valLabRot="0" rotation="0" y="-340" vflip="1" objectName="Clock-1" Unit=" V" Running="false"/>
+ 
+Connector-8: 
+<item pointList="-180,-276,-180,-204,-212,-204" itemtype="Connector" labely="-24" id="Connector-8" hflip="1" x="-180" labelx="-16" enodeid="Circ_eNode-9" Show_id="false" valLabelx="0" labelrot="0" startpinid="Capacitor-5-rPin" endpinid="Arduino Uno-4-GND1" valLabely="0" valLabRot="0" rotation="0" y="-276" vflip="1" objectName="Connector-8"/>
+ 
+Connector-10: 
+<item pointList="-212,-244,-196,-244,-196,-324" itemtype="Connector" labely="-24" id="Connector-10" hflip="1" x="-212" labelx="-16" enodeid="Circ_eNode-11" Show_id="false" valLabelx="0" labelrot="0" startpinid="Arduino Uno-4-PC2" endpinid="Node-7-0" valLabely="0" valLabRot="0" rotation="0" y="-244" vflip="1" objectName="Connector-10"/>
+ 
+Connector-12: 
+<item pointList="-276,-340,-244,-340,-244,-372" itemtype="Connector" labely="-24" id="Connector-12" hflip="1" x="-276" labelx="-16" enodeid="Circ_eNode-13" Show_id="false" valLabelx="0" labelrot="0" startpinid="Clock-1-outnod" endpinid="Potentiometer-6-PinA" valLabely="0" valLabRot="0" rotation="0" y="-340" vflip="1" objectName="Connector-12"/>
+ 
+Connector-14: 
+<item pointList="-228,-356,-228,-324,-196,-324" itemtype="Connector" labely="-24" id="Connector-14" hflip="1" x="-228" labelx="-16" enodeid="Circ_eNode-11" Show_id="false" valLabelx="0" labelrot="0" startpinid="Potentiometer-6-PinM" endpinid="Node-7-1" valLabely="0" valLabRot="0" rotation="0" y="-356" vflip="1" objectName="Connector-14"/>
+ 
+Connector-15: 
+<item pointList="-196,-324,-180,-324,-180,-308" itemtype="Connector" labely="-24" id="Connector-15" hflip="1" x="-196" labelx="-16" enodeid="Circ_eNode-11" Show_id="false" valLabelx="0" labelrot="0" startpinid="Node-7-2" endpinid="Capacitor-5-lPin" valLabely="0" valLabRot="0" rotation="0" y="-324" vflip="1" objectName="Connector-15"/>
+ 
+Connector-16: 
+<item pointList="-36,-340,-28,-340,-28,-228,-212,-228" itemtype="Connector" labely="-24" id="Connector-16" hflip="1" x="-36" labelx="-16" enodeid="Circ_eNode-17" Show_id="false" valLabelx="0" labelrot="0" startpinid="Volt. Source-2-outPin" endpinid="Arduino Uno-4-PC0" valLabely="0" valLabRot="0" rotation="0" y="-340" vflip="1" objectName="Connector-16"/>
+ 
+Connector-18: 
+<item pointList="-212,-236,-100,-236,-100,-340,-108,-340" itemtype="Connector" labely="-24" id="Connector-18" hflip="1" x="-212" labelx="-16" enodeid="Circ_eNode-19" Show_id="false" valLabelx="0" labelrot="0" startpinid="Arduino Uno-4-PC1" endpinid="Volt. Source-3-outPin" valLabely="0" valLabRot="0" rotation="0" y="-236" vflip="1" objectName="Connector-18"/>
+ 
+PlotterWidget: 
+<item enabled="true" whatsThis="" focusPolicy="0" modal="false" maximumHeight="200" focus="false" windowModified="false" maximumSize="" windowOpacity="1" minimized="false" updatesEnabled="true" locale="" windowModality="0" sizePolicy="" geometry="" rect="" minimumSize="" itemtype="Plotter" width="200" visible="false" toolTip="" styleSheet="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumSizeHint="" isActiveWindow="true" windowFilePath="" acceptDrops="false" statusTip="" inputMethodHints="0" frameSize="" windowIcon="" childrenRect="" palette="" minimumHeight="200" contextMenuPolicy="1" MinVolt="-500" MaxVolt="500" windowTitle="" cursor="" frameGeometry="" toolTipDuration="-1" normalGeometry="" minimumWidth="200" sizeHint="" y="0" fullScreen="false" mouseTracking="false" childrenRegion="" accessibleDescription="" pos="" height="200" sizeIncrement="" objectName="PlotterWidget" size="" accessibleName="" maximized="false" x="0" layoutDirection="0" autoFillBackground="false" maximumWidth="1000" windowIconText="" baseSize=""/>
+ 
+SerialPortWidget: 
+<item enabled="true" whatsThis="" focusPolicy="0" modal="false" maximumHeight="170" focus="false" windowModified="false" maximumSize="" windowOpacity="1" minimized="false" updatesEnabled="true" locale="" windowModality="0" sizePolicy="" geometry="" rect="" minimumSize="" itemtype="SerialPort" width="450" visible="true" toolTip="" styleSheet="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumSizeHint="" isActiveWindow="true" windowFilePath="" acceptDrops="false" statusTip="" inputMethodHints="0" frameSize="" SettingsProp="ttyS0,0,3,0,0,0" windowIcon="" childrenRect="" palette="" minimumHeight="0" contextMenuPolicy="1" windowTitle="Configuracion" cursor="" frameGeometry="" toolTipDuration="-1" normalGeometry="" minimumWidth="0" sizeHint="" y="596" fullScreen="false" mouseTracking="false" childrenRegion="" accessibleDescription="" pos="" height="144" sizeIncrement="" objectName="SerialPortWidget" size="" accessibleName="" maximized="false" x="138" layoutDirection="0" autoFillBackground="false" maximumWidth="450" windowIconText="" baseSize=""/>
+ 
+</circuit>

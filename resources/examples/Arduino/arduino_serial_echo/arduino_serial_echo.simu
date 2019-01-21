@@ -1,0 +1,12 @@
+<circuit type="simulide_0.1" speed="1000000" animate="0" reactStep="50" noLinStep="10" noLinAcc="5">
+ 
+Arduino Uno-1: 
+<item labelx="0" y="-748" id="Arduino Uno-1" Ser_Port="false" hflip="1" valLabely="0" Ser_Monitor="true" objectName="Arduino Uno-1" itemtype="Arduino" Program="arduino_serial_echo.ino.hex" labelrot="0" valLabelx="0" vflip="1" x="-988" Show_id="true" valLabRot="0" labely="-20" rotation="0" Mhz="16"/>
+ 
+PlotterWidget-2: 
+<item focusPolicy="0" statusTip="" windowFilePath="" y="0" font="Sans Serif,9,-1,5,50,0,0,0,0,0" frameSize="" isActiveWindow="true" minimumWidth="200" x="0" acceptDrops="false" rect="" MaxVolt="500" modal="false" sizeIncrement="" cursor="" frameGeometry="" size="" geometry="" windowIcon="" accessibleName="" maximumHeight="200" fullScreen="false" minimized="false" minimumSizeHint="" windowOpacity="1" width="200" updatesEnabled="true" maximumSize="" maximized="false" pos="" autoFillBackground="false" windowIconText="" baseSize="" height="200" toolTipDuration="-1" windowModality="0" whatsThis="" childrenRect="" styleSheet="" enabled="true" maximumWidth="1000" mouseTracking="false" layoutDirection="0" minimumSize="" inputMethodHints="0" sizePolicy="" objectName="PlotterWidget-2" accessibleDescription="" focus="false" contextMenuPolicy="1" windowModified="false" visible="false" minimumHeight="200" itemtype="Plotter" MinVolt="-500" palette="" sizeHint="" childrenRegion="" windowTitle="" locale="" normalGeometry="" toolTip=""/>
+ 
+SerialPortWidget-3: 
+<item focusPolicy="0" statusTip="" windowFilePath="" y="605" font="Sans Serif,9,-1,5,50,0,0,0,0,0" frameSize="" isActiveWindow="true" minimumWidth="0" x="200" acceptDrops="false" rect="" modal="false" sizeIncrement="" cursor="" frameGeometry="" size="" geometry="" windowIcon="" accessibleName="" maximumHeight="170" fullScreen="false" minimized="false" minimumSizeHint="" windowOpacity="1" width="341" updatesEnabled="true" maximumSize="" maximized="false" pos="" autoFillBackground="false" windowIconText="" baseSize="" height="170" toolTipDuration="-1" windowModality="0" whatsThis="" childrenRect="" styleSheet="" enabled="true" maximumWidth="450" mouseTracking="false" layoutDirection="0" minimumSize="" inputMethodHints="0" SettingsProp="ttyS0,0,3,0,0,0" sizePolicy="" objectName="SerialPortWidget-3" accessibleDescription="" focus="false" contextMenuPolicy="1" windowModified="false" visible="false" minimumHeight="0" itemtype="SerialPort" palette="" sizeHint="" childrenRegion="" windowTitle="Configuracion" locale="" normalGeometry="" toolTip=""/>
+ 
+</circuit>

@@ -20,7 +20,13 @@
 #include "bjt.h"
 #include "itemlibrary.h"
 #include "connector.h"
+#include "circuit.h"
 #include "pin.h"
+
+static const char* BJT_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Gain"),
+    QT_TRANSLATE_NOOP("App::Property","PNP")
+};
 
 
 Component* BJT::construct( QObject* parent, QString type, QString id )
@@ -39,8 +45,11 @@ LibraryItem* BJT::libraryItem()
 }
 
 BJT::BJT( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eBJT( id.toStdString() )
+   : Component( parent, type, id )
+   , eBJT( id.toStdString() )
 {
+    Q_UNUSED( BJT_properties );
+    
     m_area =  QRectF( -12, -14, 28, 28 );
     
     m_PNP = false;
@@ -71,16 +80,25 @@ BJT::BJT( QObject* parent, QString type, QString id )
     m_pin[2]->setLabelColor( QColor( 0, 0, 0 ) );
     m_ePin[2] = m_pin[2];
 }
-BJT::~BJT()
+BJT::~BJT(){}
+
+void BJT::updateStep()
 {
+    update();
+}
+
+void BJT::setPnp( double pnp ) 
+{
+    m_PNP = pnp;
+    update();
 }
 
 void BJT::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
     Component::paint( p, option, widget );
     
-    //if( m_baseCurr > 1e-4 )  p->setBrush( Qt::yellow );
-    //else                     p->setBrush( Qt::white );
+    if( Circuit::self()->animate() && m_baseCurr > 1e-4 )  p->setBrush( Qt::yellow );
+    else                                                   p->setBrush( Qt::white );
 
     p->drawEllipse( m_area );
     

@@ -21,12 +21,16 @@
 #define SWITCH_H
 
 #include "switch_base.h"
+#include "e-resistor.h"
 
 class LibraryItem;
 
 class MAINMODULE_EXPORT Switch : public SwitchBase
 {
     Q_OBJECT
+    Q_PROPERTY( int    Poles READ poles    WRITE setPoles    DESIGNABLE true USER true )
+    Q_PROPERTY( bool   DT    READ dt       WRITE setDt       DESIGNABLE true USER true )
+    Q_PROPERTY( bool Norm_Close READ nClose WRITE setNClose  DESIGNABLE true USER true )
     
     public:
 
@@ -35,11 +39,36 @@ class MAINMODULE_EXPORT Switch : public SwitchBase
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
+        
+        int poles() const;
+        void setPoles( int poles );
+
+        bool dt() const;
+        void setDt( bool dt );
+        
+        bool nClose() const;
+        void setNClose( bool nc );
+        
+        virtual void initialize();
+        
+        void updateStep();
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
         void onbuttonclicked();
+        
+    protected:
+        virtual void setSwitch( bool on );
+        void  SetupSwitches( int poles, int throws );
+        
+        std::vector<eResistor*> m_switches;
+
+        bool m_closed;
+        bool m_nClose;
+
+        int m_numPoles;
+        int m_numthrows;
 };
 
 #endif

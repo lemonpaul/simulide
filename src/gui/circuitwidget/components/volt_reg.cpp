@@ -21,6 +21,9 @@
 #include "connector.h"
 #include "pin.h"
 
+static const char* VoltReg_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Volts")
+};
 
 Component* VoltReg::construct( QObject* parent, QString type, QString id )
 {
@@ -38,8 +41,11 @@ LibraryItem* VoltReg::libraryItem()
 }
 
 VoltReg::VoltReg( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eVoltReg( id.toStdString() )
+       : Component( parent, type, id )
+       , eVoltReg( id.toStdString() )
 {
+    Q_UNUSED( VoltReg_properties );
+    
     m_area = QRect( -8, -8, 16, 16 );
     
     setVRef( 1.2 );

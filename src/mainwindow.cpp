@@ -20,7 +20,11 @@
 #include "mainwindow.h"
 #include "appiface.h"
 #include "circuit.h"
+#include "propertieswidget.h"
+#include "componentselector.h"
 #include "editorwindow.h"
+#include "circuitwidget.h"
+#include "filewidget.h"
 #include "utils.h"
 #include "simuapi_apppath.h"
 
@@ -29,7 +33,7 @@ MainWindow* MainWindow::m_pSelf = 0l;
 
 MainWindow::MainWindow()
           : QMainWindow()
-          , m_settings( "SimulIDE", "SimulIDE-"+QString(APP_VERSION) )
+          , m_settings( "SimulIDE", "SimulIDE" )
 {
     setWindowIcon( QIcon(":/simulide.png") );
     m_pSelf   = this;
@@ -53,19 +57,9 @@ MainWindow::~MainWindow(){ }
 
 void MainWindow::closeEvent( QCloseEvent *event )
 {
-    if( windowTitle().endsWith('*') )
-    {
-        const QMessageBox::StandardButton ret
-        = QMessageBox::warning(this, tr("Application"),
-                               tr("\nCircuit has been modified.\n"
-                                  "Do you want to save your changes?\n"),
-                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-                               
-        if(ret == QMessageBox::Save ) m_circuit->saveCirc();
-        else if(ret == QMessageBox::Cancel ) { event->ignore(); return; }
-    }
-    if( !m_editor->close() ) { event->ignore(); return; }
-    m_circuit->newCircuit();
+    if( !m_editor->close() )      { event->ignore(); return; }
+    if( !m_circuit->newCircuit()) { event->ignore(); return; }
+    
     writeSettings();
     
     event->accept();
@@ -83,15 +77,12 @@ void MainWindow::writeSettings()
     m_settings.setValue( "geometry", saveGeometry() );
     m_settings.setValue( "windowState", saveState() );
     m_settings.setValue( "Centralsplitter/geometry", m_Centralsplitter->saveState() );
+    
+    QList<QTreeWidgetItem*> list = m_components->findItems( "", Qt::MatchStartsWith | Qt::MatchRecursive );
 
-    foreach( QTreeWidgetItem* item, m_components->findItems("",Qt::MatchStartsWith)  )
-    {
+    foreach( QTreeWidgetItem* item, list  )
         m_settings.setValue( item->text(0)+"/collapsed", !item->isExpanded() );
-        for( int j=0; j<item->childCount(); j++ )
-        {
-            m_settings.setValue( item->child(j)->text(0)+"/collapsed", !item->child(j)->isExpanded() );
-        }
-    }
+
     FileWidget::self()->writeSettings();
 }
 
@@ -102,9 +93,9 @@ void MainWindow::setTitle( QString title )
 
 void MainWindow::about()
 {
-   QMessageBox::about(this, tr("About Application"),
+   /*QMessageBox::about(this, tr("About Application"),
             tr("Circuit simulation"
-               "and IDE for mcu development"));
+               "and IDE for mcu development"));*/
 }
 
 void MainWindow::createWidgets()
@@ -128,27 +119,27 @@ void MainWindow::createWidgets()
     m_Centralsplitter->addWidget( m_sidepanel );
 
     m_components = new ComponentSelector( m_sidepanel );
-    m_components->setObjectName(QString::fromUtf8("components"));
-    m_sidepanel->addTab( m_components, QString::fromUtf8("Components") );
+    m_components->setObjectName( "components" );
+    m_sidepanel->addTab( m_components, tr("Components") );
 
     m_ramTabWidget = new QWidget( this );
-    m_ramTabWidget->setObjectName("ramTabWidget");
+    m_ramTabWidget->setObjectName( "ramTabWidget" );
     m_ramTabWidgetLayout = new QGridLayout( m_ramTabWidget );
     m_ramTabWidgetLayout->setSpacing(0);
     m_ramTabWidgetLayout->setContentsMargins(0, 0, 0, 0);
-    m_ramTabWidgetLayout->setObjectName("ramTabWidgetLayout");
-    m_sidepanel->addTab( m_ramTabWidget, tr("RamTable")  );
+    m_ramTabWidgetLayout->setObjectName( "ramTabWidgetLayout" );
+    m_sidepanel->addTab( m_ramTabWidget, tr( "RamTable" ));
 
     m_itemprop = new PropertiesWidget( this );
-    m_itemprop->setObjectName(QString::fromUtf8("properties"));
-    m_sidepanel->addTab( m_itemprop, QString::fromUtf8("Properties") );
+    m_itemprop->setObjectName( "properties" );
+    m_sidepanel->addTab( m_itemprop,  tr( "Properties" ));
     
     m_fileSystemTree = new FileWidget( this );
-    m_fileSystemTree->setObjectName(QString::fromUtf8("fileExplorer"));
-    m_sidepanel->addTab( m_fileSystemTree, QString::fromUtf8("File explorer") );
+    m_fileSystemTree->setObjectName( "fileExplorer" );
+    m_sidepanel->addTab( m_fileSystemTree, tr( "File explorer" ) );
 
     m_circuit = new CircuitWidget( this );
-    m_circuit->setObjectName(QString::fromUtf8("circuit"));
+    m_circuit->setObjectName( "circuit" );
     m_Centralsplitter->addWidget( m_circuit );
     
     m_editor = new EditorWindow( this );
@@ -252,9 +243,9 @@ void MainWindow::loadPluginsAt( QDir pluginsDir )
             qDebug()<< "        " << pluginName << "\tplugin FAILED: " << errorMsg;
 
             if( errorMsg.contains( "libQt5SerialPort" ) )
-                errorMsg = " Qt5SerialPort is not installed in your system\n\n    Mcu SerialPort will not work\n    Just Install libQt5SerialPort package\n    To have Mcu Serial Port Working";
+                errorMsg = tr( " Qt5SerialPort is not installed in your system\n\n    Mcu SerialPort will not work\n    Just Install libQt5SerialPort package\n    To have Mcu Serial Port Working" );
 
-            QMessageBox::warning( 0,"App Plugin Error:", errorMsg );
+            QMessageBox::warning( 0,tr( "Plugin Error:" ), errorMsg );
         }
     }
     qDebug() << "\n";

@@ -1,8 +1,7 @@
-# SimulIDE
+# SimulIDE 0.3.10
 
 Electronic Circuit Simulator
 
-![SimulIDE screenshot](resources/data/images/simulide-screenshot.png)
 
 SimulIDE is a simple real time electronic circuit simulator.
 
@@ -32,10 +31,9 @@ Build dependencies:
  - Qt5svg dev
  - Qt5 Multimedia dev
  - Qt5 Serialport dev
+ - Qt5 Script
  - Qt5 qmake
  - libelf dev
- - gpsim dev
- - glib-2.0 dev
  - gcc-avr
  - avr-libc
 
@@ -47,7 +45,7 @@ $ qmake
 $ make
 ```
 
-In folder build_XX/release/SimulIDE_x.x.x you will find executable and all needed to run SimulIDE.
+In folder build_XX/release/SimulIDE_x.x.x you will find executable and all files needed to run SimulIDE.
 
 
 
@@ -64,9 +62,8 @@ Run time dependencies:
  - Qt5 Multimedia
  - Qt5 Multimedia Plugins
  - Qt5 Serialport
+ - Qt5 Script
  - libelf
- - gpsim
- - glib-2.0
 
 
 SimuliDE executable is in bin folder.

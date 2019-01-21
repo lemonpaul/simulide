@@ -26,18 +26,23 @@
 class MAINMODULE_EXPORT ClockBase : public LogicInput
 {
     Q_OBJECT
-    Q_PROPERTY( int Freq  READ freq   WRITE setFreq   DESIGNABLE true USER true )
+    Q_PROPERTY( int  Freq    READ freq    WRITE setFreq   DESIGNABLE true USER true )
+    Q_PROPERTY( bool Running READ running WRITE setRunning )
 
     public:
-        QRectF boundingRect() const { return QRect( -14, -8, 22, 16 ); }
+    
+        QRectF boundingRect() const { return QRectF( m_area.x()-2, m_area.y()-2, m_area.width()+4 ,m_area.height()+4 ); }
 
         ClockBase( QObject* parent, QString type, QString id );
         ~ClockBase();
 
         virtual void updateStep();
         
-        int freq() { return m_freq; }
+        int freq();
         virtual void setFreq( int freq );
+        
+        bool running();
+        virtual void setRunning( bool running );
         
     signals:
         void freqChanged();
@@ -48,7 +53,6 @@ class MAINMODULE_EXPORT ClockBase : public LogicInput
 
     protected:
         bool m_isRunning;
-        bool m_changed;
         
         int m_freq;
         int m_step;

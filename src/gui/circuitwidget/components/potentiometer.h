@@ -77,6 +77,8 @@ class MAINMODULE_EXPORT Potentiometer : public Component, public eElement
         eResistor m_resA;
         eResistor m_resB;
         
+        eNode* m_midEnode;
+        
         DialWidget m_dialW;
 
         QDial* m_dial;

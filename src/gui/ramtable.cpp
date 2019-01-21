@@ -38,7 +38,7 @@ RamTable::RamTable( BaseProcessor *processor )
     for( int row=0; row<m_numRegs; row++ )
     {
         it = new QTableWidgetItem(0);
-        it->setText( tr("---") );
+        it->setText( "---" );
         setVerticalHeaderItem( row, it );
         for( int col=0; col<4; col++ )
         {
@@ -48,7 +48,7 @@ RamTable::RamTable( BaseProcessor *processor )
         }
         QFont font = item( 0, 0 )->font();
         font.setBold(true);
-        font.setPointSize( 10 );
+        font.setPixelSize(12);
         for( int col=0; col<3; col++ ) item( row, col )->setFont( font );
         
         item( row, 1 )->setText("---");
@@ -69,10 +69,10 @@ RamTable::RamTable( BaseProcessor *processor )
     it->setText( tr("Binary") );
     setHorizontalHeaderItem( 2, it );
     
-    QAction *loadVarSet = new QAction( QIcon(":/fileopen.png"),"loadVarSet", this);
+    QAction *loadVarSet = new QAction( QIcon(":/open.png"),tr("Load VarSet"), this);
     connect( loadVarSet, SIGNAL(triggered()), this, SLOT(loadVarSet()) );
     
-    QAction *saveVarSet = new QAction( QIcon(":/remove.png"),"saveVarSet", this);
+    QAction *saveVarSet = new QAction( QIcon(":/save.png"),tr("Save VarSet"), this);
     connect( saveVarSet, SIGNAL(triggered()), this, SLOT(saveVarSet()) );
     
     horizontalHeader()->addAction( loadVarSet );
@@ -134,7 +134,7 @@ void RamTable::saveVarSet()
 
         if( !file.open(QFile::WriteOnly | QFile::Text) )
         {
-              QMessageBox::warning(0l, tr("RamTable::saveVarSet"),
+              QMessageBox::warning(0l, "RamTable::saveVarSet",
               tr("Cannot write file %1:\n%2.").arg(fileName).arg(file.errorString()));
               return;
         }
@@ -161,15 +161,20 @@ void RamTable::updateValues()
             m_currentRow = _row;
             QString name = watchList[_row];
             
-            m_processor->updateRamValue( name );
-
-            //int value = m_processor->getRamValue( name );
-
-            /*if( value >= 0 )
+            bool ok;
+            int addr = name.toInt(&ok, 10); 
+            if( !ok ) addr = name.toInt(&ok, 16);  
+            if( !ok ) m_processor->updateRamValue( name );
+            else
             {
-                item( _row, 1 )->setData( 0, value );
-                item( _row, 2 )->setData( 0, decToBase(value, 2, 8) );
-            }*/
+                int value = m_processor->getRamValue( addr );
+
+                if( value >= 0 )
+                {
+                    item( _row, 1 )->setData( 0, value );
+                    item( _row, 2 )->setData( 0, decToBase(value, 2, 8) );
+                }
+            }
         }
     }
 }
@@ -205,7 +210,11 @@ void RamTable::addToWatch( QTableWidgetItem* it )
     }
     else
     {
-        int value = m_processor->getRegAddress(name);
+        bool ok;
+        int value = name.toInt(&ok, 10); 
+        if( !ok ) value = name.toInt(&ok, 16);  
+        if( !ok ) value = m_processor->getRegAddress(name);
+        
         if( value >= 0 )
         {
             watchList[_row] = name;

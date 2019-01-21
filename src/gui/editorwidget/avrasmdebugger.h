@@ -37,22 +37,10 @@ class AvrAsmDebugger : public BaseDebugger
         QString avraIncPath();
         void    setAvraIncPath( QString path );
 
-        virtual bool loadFirmware();
-
-        int  step();     // Run 1 step and returns actual source line number
-        int  stepOver();
-        int  getValidLine( int line );
-        int  getProgramStart();
-
         int  compile();
+        void mapFlashToSource();
         
     private:
-        void mapLstToAsm();
-
-        QHash<int, int> m_asmToFlash; // Map .asm code line to flash adress
-        QHash<int, int> m_flashToAsm; // Map flash adress to .asm code line
-        
-        //QString m_avra;                     // path to avra executable
         QString m_avraIncPath;                  // path to avra includes
 };
 

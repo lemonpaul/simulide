@@ -402,7 +402,7 @@ avr_set_console_register(
 		avr_io_addr_t addr);
 
 // load code in the "flash"
-void
+int
 avr_loadcode(
 		avr_t * avr,
 		uint8_t * code,

@@ -22,11 +22,14 @@
 #include "stepper.h"
 #include "simulator.h"
 
+static const char* Stepper_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Steps")
+};
+
 Component*  Stepper::construct( QObject* parent, QString type, QString id )
 {
     return new Stepper( parent, type, id );
 }
-
 
 LibraryItem* Stepper::libraryItem()
 {
@@ -55,6 +58,8 @@ Stepper::Stepper( QObject* parent, QString type, QString id )
         , m_ePinB1Co( (id+"-ePinB1Co").toStdString(), 0 )
         , m_ePinB2Co( (id+"-ePinB2Co").toStdString(), 0 )
 {
+    Q_UNUSED( Stepper_properties );
+    
     m_area = QRectF( -72, -50, 122, 100 );
     m_color = QColor( 50, 50, 70 );
     m_unit = "Ω";

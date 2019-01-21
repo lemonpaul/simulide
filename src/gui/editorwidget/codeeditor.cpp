@@ -30,17 +30,34 @@
 #include "picasmdebugger.h"
 #include "mcucomponent.h"
 #include "mainwindow.h"
+#include "simulator.h"
+#include "circuitwidget.h"
+#include "editorwindow.h"
 #include "simuapi_apppath.h"
 
+static const char* CodeEditor_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Font Size"),
+    QT_TRANSLATE_NOOP("App::Property","Tab Size"),
+    QT_TRANSLATE_NOOP("App::Property","Spaces Tabs"),
+    QT_TRANSLATE_NOOP("App::Property","Show Spaces")
+};
+
+QStringList CodeEditor::m_picInstr = QString("addlw addwf andlw andwf bcf bov bsf btfsc btg btfss clrf clrw clrwdt comf decf decfsz goto incf incfsz iorlw iorwf movf movlw movwf reset retfie retlw return rlf rrfsublw subwf swapf xorlw xorwf")
+                .split(" ");
+QStringList CodeEditor::m_avrInstr = QString("add adc adiw sub subi sbc sbci sbiw andi ori eor com neg sbr cbr dec tst clr ser mul rjmp ijmp jmp rcall icall ret reti cpse cp cpc cpi sbrc sbrs sbic sbis brbs brbc breq brne brcs brcc brsh brlo brmi brpl brge brlt brhs brhc brts brtc brvs brvc brie brid mov movw ldi lds ld ldd sts st std lpm in out push pop lsl lsr rol ror asr swap bset bclr sbi cbi bst bld sec clc sen cln sez clz sei cli ses cls sev clv set clt seh clh wdr")
+                .split(" ");
+ 
 bool  CodeEditor::m_showSpaces = false;
 bool  CodeEditor::m_spaceTabs  = false;
-int   CodeEditor::m_fontSize = 9;
+int   CodeEditor::m_fontSize = 13;
 int   CodeEditor::m_tabSize = 4;
 QFont CodeEditor::m_font;
 
 CodeEditor::CodeEditor( QWidget* parent, OutPanelText *outPane, RamTable *ramTable ) 
           : QPlainTextEdit( parent )
 {
+    Q_UNUSED( CodeEditor_properties );
+    
     setObjectName( "Editor" );
     
     m_outPane   = outPane;
@@ -58,26 +75,29 @@ CodeEditor::CodeEditor( QWidget* parent, OutPanelText *outPane, RamTable *ramTab
     
     m_font.setFamily("Monospace");
     m_font.setFixedPitch( true );
-    m_font.setPointSize( m_fontSize );
+    m_font.setPixelSize( m_fontSize );
     setFont( m_font );
     
     QSettings* settings = MainWindow::self()->settings();
     
     if( settings->contains( "Editor_show_spaces" ) )
         setShowSpaces( settings->value( "Editor_show_spaces" ).toBool() );
-
-    if( settings->contains( "Editor_spaces_tabs" ) )
-        setSpaceTabs( settings->value( "Editor_spaces_tabs" ).toBool() );
-
+        
     if( settings->contains( "Editor_tab_size" ) )
         setTabSize( settings->value( "Editor_tab_size" ).toInt() );
+    else setTabSize( 4 );
 
     if( settings->contains( "Editor_font_size" ) )
         setFontSize( settings->value( "Editor_font_size" ).toInt() );
 
-    
+    bool spacesTab = false;
+    if( settings->contains( "Editor_spaces_tabs" ) )
+        spacesTab = settings->value( "Editor_spaces_tabs" ).toBool();
+        
+    setSpaceTabs( spacesTab );
+
     QPalette p = palette();
-    p.setColor( QPalette::Base, QColor( 255, 255, 245) );
+    p.setColor( QPalette::Base, QColor( 255, 255, 249) );
     p.setColor( QPalette::Text, QColor( 0, 0, 0) );
     setPalette( p );
 
@@ -85,19 +105,25 @@ CodeEditor::CodeEditor( QWidget* parent, OutPanelText *outPane, RamTable *ramTab
     connect( this, SIGNAL( updateRequest( QRect,int )), this, SLOT( updateLineNumberArea( QRect,int )));
     connect( this, SIGNAL( cursorPositionChanged()),    this, SLOT( highlightCurrentLine()));
 
+    connect( Simulator::self(), SIGNAL( pauseDebug()),  this, SLOT( pause()));
+    connect( Simulator::self(), SIGNAL( resumeDebug()), this, SLOT( resume()));
+    
     setLineWrapMode(QPlainTextEdit::NoWrap);
     updateLineNumberAreaWidth( 0 );
     highlightCurrentLine();
 }
 CodeEditor::~CodeEditor()
-{}
+{
+    QPropertyEditorWidget::self()->removeObject( this );
+    if( m_debugger ) QPropertyEditorWidget::self()->removeObject( m_debugger );
+}
 
 void CodeEditor::setFile( const QString& filePath )
 {
     if( m_debugger ) return;
     
     m_outPane->appendText( "-------------------------------------------------------\n" );
-    m_outPane->appendText( " File: " );
+    m_outPane->appendText( tr(" File: ") );
     m_outPane->appendText( filePath );
     m_outPane->writeText( "\n\n" );
 
@@ -122,46 +148,63 @@ void CodeEditor::setFile( const QString& filePath )
 
         m_debugger = new GcbDebugger( this, m_outPane, filePath );
     }
-    else if( m_file.endsWith(".cpp")|| m_file.endsWith(".ino") || m_file.endsWith(".h") )
+    else if( m_file.endsWith(".cpp")
+          || m_file.endsWith(".c") 
+          || m_file.endsWith(".ino") 
+          || m_file.endsWith(".h") )
     {
         //m_appPath+"/data/codeeditor/cpp.sintax"
         QString path = sintaxPath + "cpp.sintax";
+        m_hlighter->setMultiline( true );
         m_hlighter->readSintaxFile( path );
-
+        
         if( m_file.endsWith(".ino") )
             m_debugger = new InoDebugger( this, m_outPane, filePath );
     }
     else if( m_file.endsWith(".asm") )
     {
         // We should identify if pic or avr asm
-        QStringList picInstr = QString("addlw addwf andlw andwf bcf bov bsf btfsc btg btfss clrf clrw clrwdt comf decf decfsz goto incf incfsz iorlw iorwf movf movlw movwf reset retfie retlw return rlf rrfsublw subwf swapf xorlw xorwf")
-                .split(" ");
-        QStringList avrInstr = QString("add adc adiw sub subi sbc sbci sbiw andi ori eor com neg sbr cbr dec tst clr ser mul rjmp ijmp jmp rcall icall ret reti cpse cp cpc cpi sbrc sbrs sbic sbis brbs brbc breq brne brcs brcc brsh brlo brmi brpl brge brlt brhs brhc brts brtc brvs brvc brie brid mov movw ldi lds ld ldd sts st std lpm in out push pop lsl lsr rol ror asr swap bset bclr sbi cbi bst bld sec clc sen cln sez clz sei cli ses cls sev clv set clt seh clh wdr")
-                .split(" ");
-
-        int isPic = getSintaxCoincidences( m_file, picInstr );
-        int isAvr = getSintaxCoincidences( m_file, avrInstr );
+        int isPic = 0;
+        int isAvr = 0;
+        
+        isPic = getSintaxCoincidences( m_file, m_picInstr );
+        
+        if( isPic<50 ) isAvr = getSintaxCoincidences( m_file, m_avrInstr );
 
         m_outPane->writeText( tr("File recognized as: ") );
 
         if( isPic > isAvr )   // Is Pic
         {
-            m_outPane->writeText( tr("Pic asm\n") );
+            m_outPane->writeText( "Pic asm\n" );
 
             QString path = sintaxPath + "pic14asm.sintax";
             m_hlighter->readSintaxFile( path );
 
             m_debugger = new PicAsmDebugger( this, m_outPane, filePath );
         }
-        else                 // Is Avr
+        else if( isAvr > isPic )  // Is Avr
         {
-            m_outPane->writeText( tr("Avr asm\n") );
+            m_outPane->writeText( "Avr asm\n" );
 
             QString path = sintaxPath + "avrasm.sintax";
             m_hlighter->readSintaxFile( path );
 
             m_debugger = new AvrAsmDebugger( this, m_outPane, filePath );
         }
+        else m_outPane->writeText( "Unknown\n" );
+    }
+    else if( m_file.endsWith(".xml") 
+         ||  m_file.endsWith(".package") 
+         ||  m_file.endsWith(".subcircuit") )
+    {
+        QString path = sintaxPath + "xml.sintax";
+         m_hlighter->readSintaxFile( path );
+    }
+    else if( m_file.endsWith("Makefile") 
+         ||  m_file.endsWith("makefile") )
+    {
+        QString path = sintaxPath + "makef.sintax";
+        m_hlighter->readSintaxFile( path );
     }
 }
 
@@ -173,15 +216,16 @@ int CodeEditor::getSintaxCoincidences( QString& fileName, QStringList& instructi
 
     foreach( QString line, lines )
     {
-        if( line.startsWith(";")) continue;
+        if( line.isEmpty()      ) continue;
         if( line.startsWith("#")) continue;
+        if( line.startsWith(";")) continue;
         if( line.startsWith(".")) continue;
         foreach( QString instruction, instructions )
         {
             if( line.contains( QRegExp( "\\b"+instruction+"\\b" ) ))
-            {
                 coincidences++;
-            }
+            
+            if( coincidences > 50 ) break;
         }
     }
     return coincidences;
@@ -199,6 +243,7 @@ void CodeEditor::setCompilerPath()
 
 void CodeEditor::compile()
 {
+    if( document()->isModified() ) EditorWindow::self()->save();
     m_debugLine  = -1;
     update();
     
@@ -208,7 +253,8 @@ void CodeEditor::compile()
     m_outPane->appendText( "-------------------------------------------------------\n" );
     m_outPane->appendText( "Exec: ");
 
-    if( m_file.endsWith("Makefile") )                          // Is a Makefile, make it
+    if( m_file.endsWith("Makefile") 
+    ||  m_file.endsWith("makefile") )          // Is a Makefile, make it
     {
         m_outPane->writeText( "make "+m_file+"\n" );
 
@@ -234,7 +280,7 @@ void CodeEditor::compile()
     {
         if( !m_debugger )
         {
-            m_outPane->writeText( "File type not supported\n" );
+            m_outPane->writeText( "\n"+tr("File type not supported")+"\n" );
             return;
         }
         error = m_debugger->compile();
@@ -242,13 +288,13 @@ void CodeEditor::compile()
 
     if( error == 0)
     {
-        m_outPane->writeText( tr("     SUCCESS!!! Compilation Ok\n") );
+        m_outPane->writeText( "\n"+tr("     SUCCESS!!! Compilation Ok")+"\n" );
         
         m_isCompiled = true;
     }
     else 
     {
-        m_outPane->writeText( tr("     ERROR!!! Compilation Faliled\n") );
+        m_outPane->writeText( "\n"+tr("     ERROR!!! Compilation Faliled")+"\n" );
         
         if( error > 0 ) // goto error line number
         {
@@ -263,7 +309,7 @@ void CodeEditor::upload()
     if( m_file.endsWith(".hex") )     // is an .hex file, upload to proccessor
     {
         //m_outPane->writeText( "-------------------------------------------------------\n" );
-        m_outPane->appendText( tr("\nUploading: \n") );
+        m_outPane->appendText( "\n"+tr("Uploading: ")+"\n" );
         m_outPane->appendText( m_file );
         m_outPane->writeText( "\n\n" );
 
@@ -290,6 +336,7 @@ void CodeEditor::run()
 {
     if( m_running ) return;
 
+    if( !m_debugger->driveCirc() ) Simulator::self()->stopTimer();
     m_running = true;
     timerTick();
 }
@@ -298,9 +345,10 @@ void CodeEditor::step()
 {
     if( m_running ) return;
     
+    if( !m_debugger->driveCirc() ) Simulator::self()->stopTimer();
     runClockTick();
+    if( !m_debugger->driveCirc() ) Simulator::self()->resumeTimer();
     updateScreen();
-
 }
 
 void CodeEditor::stepOver()
@@ -313,7 +361,22 @@ void CodeEditor::stepOver()
 
 void CodeEditor::pause()
 {
+    //if( !m_running ) return;
+    m_resume = m_running;
     m_running = false;
+    updateScreen();
+}
+
+void CodeEditor::resume()
+{
+    if( !m_debugging )  return;
+    
+    if( !BaseProcessor::self() ) 
+    {
+        m_outPane->writeText( tr("\nError:  Mcu Deleted while Debugging!!\n") );
+        EditorWindow::self()->stop() ;
+    }
+    else m_running = m_resume;
     updateScreen();
 }
 
@@ -322,34 +385,47 @@ void CodeEditor::reset()
     if( m_running ) pause();
     
     McuComponent::self()->reset();
-    m_debugLine = m_debugger->getProgramStart();
+    m_debugLine = 1; //m_debugger->getProgramStart();
     
     updateScreen();
 }
 
 void CodeEditor::runClockTick( bool over )
 {
+    if( !m_debugging )  return;
+    
     m_prevDebugLine = m_debugLine;
 
-    while( m_debugLine == m_prevDebugLine ) // Run to next src line
-    {
-        if( over ) m_debugLine = m_debugger->stepOver();
-        else       m_debugLine = m_debugger->step();
-        //qDebug() <<"m_prevDebugLine "<<m_prevDebugLine<< "  m_debugLine "<<m_debugLine;
-
-        if( m_debugLine <= 0 ) m_debugLine = m_prevDebugLine; // Baksels returns -1
+    do{     
+        m_debugLine = m_debugger->step();
+        if( m_debugLine == m_prevDebugLine ) m_debugLine = m_debugger->step();
+        m_prevDebugLine = m_debugLine;
     }
+    while( m_debugLine <= 0 ); // Run to next src line
+    //qDebug() <<"m_prevDebugLine "<<m_prevDebugLine<< "  m_debugLine "<<m_debugLine;
+    
+    if( m_debugger->driveCirc() ) Simulator::self()->runGraphicStep();
 }
 
 void CodeEditor::timerTick()
 {
     if( !m_running ) return;
     
-    runClockTick();
-    if( m_brkPoints.contains(m_debugLine) ) pause();
-
-    if( m_running ) QTimer::singleShot( 500, this, SLOT( timerTick()) );
-    
+    for( int i=0; i<1000; i++ )
+    {
+        runClockTick();
+        if( m_brkPoints.contains( m_debugLine ) ) 
+        {
+            pause();
+            break;
+        }
+    }
+    if( m_running ) QTimer::singleShot( 10, this, SLOT( timerTick()) );
+    else 
+    {
+        if( !m_debugger->driveCirc() ) Simulator::self()->resumeTimer();
+        EditorWindow::self()->pause();
+    }
     updateScreen();
 }
 
@@ -363,23 +439,23 @@ void CodeEditor::updateScreen()
 bool CodeEditor::initDebbuger()
 {
     m_outPane->writeText( "-------------------------------------------------------\n" );
-    m_outPane->writeText( "Starting Debbuger...\n" );
+    m_outPane->writeText( tr("Starting Debbuger...")+"\n" );
 
     bool error = false;
     
     if( !McuComponent::self() )             // Must be an Mcu in Circuit
     {
-        m_outPane->writeText( "\n    Error: No Mcu in Simulator... \n" );
+        m_outPane->writeText( "\n    "+tr("Error: No Mcu in Simulator... ")+"\n" );
         error = true;
     }
     else if( !m_debugger )             // No debugger for this file type
     {
-        m_outPane->writeText( "\n    Error: No Debugger Suited for this File... \n" );
+        m_outPane->writeText( "\n    "+tr("Error: No Debugger Suited for this File... ")+"\n" );
         error = true;
     }
     else if( m_file == "" )                                   // No File
     {
-        m_outPane->writeText( "\n    Error: No File... \n" );
+        m_outPane->writeText( "\n    "+tr("Error: No File... ")+"\n" );
         error = true;
     }
     else if( !m_isCompiled ) 
@@ -387,7 +463,7 @@ bool CodeEditor::initDebbuger()
         compile();
         if( !m_isCompiled )                           // Error compiling
         { 
-            m_outPane->writeText( "\n    Error Compiling... \n" );
+            m_outPane->writeText( "\n    "+tr("Error Compiling... ")+"\n" );
             error = true; 
         }
     }
@@ -400,15 +476,24 @@ bool CodeEditor::initDebbuger()
     {
         if( !m_debugger->loadFirmware() )      // Error Loading Firmware
         {
-            m_outPane->writeText( "\n    Error Loading Firmware... \n" );
+            m_outPane->writeText( "\n    "+tr("Error Loading Firmware... ")+"\n" );
             stopDebbuger();
         }        
         else 
         {
             m_debugging = true;
             reset();
-            BaseProcessor::self()->setSteps( 0 );
-            m_outPane->writeText( "Debbuger Started \n" );
+
+            if( Simulator::self()->isRunning() ) Simulator::self()->stopSim();
+            
+            if( m_debugger->driveCirc() ) CircuitWidget::self()->powerCircDebug( false );
+            else
+            {
+                BaseProcessor::self()->setSteps( 0 );
+                CircuitWidget::self()->powerCircDebug( true );
+            }
+            m_outPane->writeText( tr("Debbuger Started ")+"\n" );
+            setReadOnly( true );
         }
     }
     return m_debugging;
@@ -421,11 +506,18 @@ void CodeEditor::stopDebbuger()
         m_debugger->stop();
         m_brkPoints.clear();
         m_debugLine = m_prevDebugLine = 0;
-        McuComponent::self()->setFreq( McuComponent::self()->freq() );
+        
+        if( !m_debugger->driveCirc() ) 
+            McuComponent::self()->setFreq( McuComponent::self()->freq() );
+        
+        CircuitWidget::self()->powerCircOff();
+        Simulator::self()->stopDebug();
         pause();
+        
+        setReadOnly( false );
         m_debugging = false;
     }
-    m_outPane->writeText( "Debbuger Stopped \n" );
+    m_outPane->writeText( tr("Debbuger Stopped ")+"\n" );
 }
 
 int CodeEditor::lineNumberAreaWidth()
@@ -529,30 +621,18 @@ void CodeEditor::focusInEvent( QFocusEvent* event)
     QPlainTextEdit::focusInEvent( event );
 }
 
-void CodeEditor::writeSettings()
-{
-    MainWindow::self()->settings()->setValue( "Editor_font_size", QString::number(m_fontSize) );
-    MainWindow::self()->settings()->setValue( "Editor_tab_size", QString::number(m_tabSize) );
-
-    if( m_showSpaces )
-        MainWindow::self()->settings()->setValue( "Editor_show_spaces", "true" );
-    else
-        MainWindow::self()->settings()->setValue( "Editor_show_spaces", "false" );
-        
-    if( m_spaceTabs )
-        MainWindow::self()->settings()->setValue( "Editor_spaces_tabs", "true" );
-    else
-        MainWindow::self()->settings()->setValue( "Editor_spaces_tabs", "false" );
-}
 int CodeEditor::fontSize()
 {
     return m_fontSize;
 }
+
 void CodeEditor::setFontSize( int size )
 {
     m_fontSize = size;
-    m_font.setPointSize( size );
+    m_font.setPixelSize( size );
     setFont( m_font );
+    
+    MainWindow::self()->settings()->setValue( "Editor_font_size", QString::number(m_fontSize) );
     
     setTabSize( m_tabSize );
 }
@@ -561,10 +641,13 @@ int CodeEditor::tabSize()
 {
     return m_tabSize;
 }
+
 void CodeEditor::setTabSize( int size )
 {
     m_tabSize = size;
     setTabStopWidth( m_tabSize*m_fontSize*2/3 );
+    
+    MainWindow::self()->settings()->setValue( "Editor_tab_size", QString::number(m_tabSize) );
     
     if( m_spaceTabs ) setSpaceTabs( true );
 }
@@ -584,12 +667,18 @@ void CodeEditor::setShowSpaces( bool on )
     else option.setFlags(option.flags() & ~QTextOption::ShowTabsAndSpaces);
 
     document()->setDefaultTextOption(option);
+    
+    if( m_showSpaces )
+        MainWindow::self()->settings()->setValue( "Editor_show_spaces", "true" );
+    else
+        MainWindow::self()->settings()->setValue( "Editor_show_spaces", "false" );
 }
 
 bool CodeEditor::spaceTabs()
 {
     return m_spaceTabs;
 }
+
 void CodeEditor::setSpaceTabs( bool on )
 {
     m_spaceTabs = on;
@@ -600,6 +689,11 @@ void CodeEditor::setSpaceTabs( bool on )
         for( int i=0; i<m_tabSize; i++) m_tab += " ";
     }
     else m_tab = "\t";
+    
+    if( m_spaceTabs )
+        MainWindow::self()->settings()->setValue( "Editor_spaces_tabs", "true" );
+    else
+        MainWindow::self()->settings()->setValue( "Editor_spaces_tabs", "false" );
 }
 
 void CodeEditor::keyPressEvent( QKeyEvent* event )
@@ -780,10 +874,10 @@ void LineNumberArea::contextMenuEvent( QContextMenuEvent *event)
     
     QMenu menu;
 
-    QAction *addm_brkAction = menu.addAction( QIcon(":/remove.png"),"Add BreakPoint" );
+    QAction *addm_brkAction = menu.addAction( QIcon(":/breakpoint.png"),tr( "Add BreakPoint" ) );
     connect( addm_brkAction, SIGNAL( triggered()), m_codeEditor, SLOT(slotAddBreak()) );
 
-    QAction *remm_brkAction = menu.addAction( QIcon(":/remove.png"),"Remove BreakPoint" );
+    QAction *remm_brkAction = menu.addAction( QIcon(":/nobreakpoint.png"),tr( "Remove BreakPoint" ) );
     connect( remm_brkAction, SIGNAL( triggered()), m_codeEditor, SLOT(slotRemBreak()) );
 
     if( menu.exec(event->globalPos()) != 0 ) lastPos = event->pos().y();

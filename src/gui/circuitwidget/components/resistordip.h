@@ -28,23 +28,28 @@ class LibraryItem;
 class MAINMODULE_EXPORT ResistorDip : public Component
 {
     Q_OBJECT
+    Q_PROPERTY( int    Size       READ size     WRITE setSize    DESIGNABLE true USER true )
     Q_PROPERTY( double Resistance READ resist   WRITE setResist  DESIGNABLE true USER true )
     Q_PROPERTY( QString  Unit     READ unit     WRITE setUnit    DESIGNABLE true USER true )
     Q_PROPERTY( bool     Show_res READ showVal  WRITE setShowVal DESIGNABLE true USER true )
 
     public:
-        QRectF boundingRect() const { return QRect( -8, -28, 16, 64 ); }
-
         ResistorDip( QObject* parent, QString type, QString id );
         ~ResistorDip();
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
+        int  size();
+        void setSize( int size );
+        
         double resist();
         void setResist( double r );
         
         void setUnit( QString un );
+        
+        void createResistors( int c );
+        void deleteResistors( int d );
         
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
         
@@ -54,6 +59,8 @@ class MAINMODULE_EXPORT ResistorDip : public Component
     private:
         std::vector<eResistor*> m_resistor;
         std::vector<Pin*> m_pin;
+        
+        int m_size;
 };
 
 #endif

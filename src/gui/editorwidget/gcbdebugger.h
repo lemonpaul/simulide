@@ -32,24 +32,18 @@ class GcbDebugger : public BaseDebugger
         GcbDebugger( QObject* parent, OutPanelText* outPane, QString filePath  );
         ~GcbDebugger();
 
-        bool loadFirmware();
-
-        int  step();     // Run 1 step and returns actual source line number
-        int  stepOver();
-        int  getValidLine( int line );
         int  compile();
+        void mapFlashToSource();
 
     private:
         void mapGcbToAsm();
         void mapLstToAsm();
         void getProcType();
 
-        QHash<int, int> m_asmToGcb;
         QHash<int, int> m_gcbToAsm;
         QHash<int, int> m_asmToFlash;               // Map .asm code line to flash adress
         QHash<int, int> m_flashToAsm;               // Map flash adress to .asm code line
         
-        int m_lastGcbLine;
         int m_processorType;
         
         //QString m_gcBasic;                      // path to gcBasic executable

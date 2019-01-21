@@ -32,7 +32,8 @@ class LibraryItem;
 class MAINMODULE_EXPORT OpAmp : public Component, public eOpAmp
 {
     Q_OBJECT
-    Q_PROPERTY( double Gain READ gain  WRITE setGain DESIGNABLE true USER true )
+    Q_PROPERTY( double Gain       READ gain          WRITE setGain      DESIGNABLE true USER true )
+    Q_PROPERTY( bool   Power_Pins READ hasPowerPins  WRITE setPowerPins DESIGNABLE true USER true )
     
     public:
 
@@ -41,11 +42,11 @@ class MAINMODULE_EXPORT OpAmp : public Component, public eOpAmp
         
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
-
-        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
         
-    public slots:
-};
+        void setPowerPins( bool set );
 
+        virtual QPainterPath shape() const;
+        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
+};
 
 #endif

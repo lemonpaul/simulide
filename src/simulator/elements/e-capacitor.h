@@ -28,7 +28,7 @@ class MAINMODULE_EXPORT eCapacitor : public eResistor
         eCapacitor( std::string id );
         ~eCapacitor();
 
-        void initialize();
+        virtual void initialize();
         void setVChanged();
 
         double cap();

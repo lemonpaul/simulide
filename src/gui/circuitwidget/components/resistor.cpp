@@ -21,6 +21,10 @@
 #include "connector.h"
 #include "itemlibrary.h"
 
+static const char* Resistor_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Resistance"),
+    QT_TRANSLATE_NOOP("App::Property","Show res")
+};
 
 Component* Resistor::construct( QObject* parent, QString type, QString id )
 { return new Resistor( parent, type, id ); }
@@ -36,9 +40,11 @@ LibraryItem* Resistor::libraryItem()
 }
 
 Resistor::Resistor( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ),
-      eResistor( id.toStdString() )
+        : Component( parent, type, id )
+        , eResistor( id.toStdString() )
 {
+    Q_UNUSED( Resistor_properties );
+    
     QString pinId = m_id;
     pinId.append(QString("-lPin"));
     QPoint pinPos = QPoint(-8-8,0);
@@ -49,14 +55,13 @@ Resistor::Resistor( QObject* parent, QString type, QString id )
     pinPos = QPoint(8+8,0);
     m_ePin[1] = new Pin( 0, pinPos, pinId, 1, this);
 
-    //m_idLabel->setText( QString("") );
     m_idLabel->setPos(-12,-24);
     setLabelPos(-12,-24, 0);
     
     m_unit = "Ω";
     setResist( m_resist );
+    
     setValLabelPos(-16, 6, 0);
-    //m_valLabel->setPos(-16, 6);
     setShowVal( true );
 }
 Resistor::~Resistor(){}
@@ -65,6 +70,8 @@ double Resistor::resist() { return m_value; }
 
 void Resistor::setResist( double r )
 {
+    if( r < 1e-12 ) r = 1e-12;
+    
     Component::setValue( r );       // Takes care about units multiplier
     eResistor::setResSafe( m_value*m_unitMult );
 }

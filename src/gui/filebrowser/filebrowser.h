@@ -40,9 +40,6 @@ class MAINMODULE_EXPORT FileBrowser : public QTreeView
         void openInEditor();
         void addBookMark();
         
-    signals:
-        void openFileWithEditor( QString path );
-        
     protected:
         void contextMenuEvent( QContextMenuEvent* event );
 

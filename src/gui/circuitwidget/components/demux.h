@@ -27,7 +27,6 @@
 class MAINMODULE_EXPORT Demux : public LogicComponent, public eDemux
 {
     Q_OBJECT
-    Q_PROPERTY( bool   tristate     READ tristate   USER true )
     Q_PROPERTY( double Input_High_V READ inputHighV WRITE setInputHighV DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Low_V  READ inputLowV  WRITE setInputLowV  DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Imped  READ inputImp   WRITE setInputImp   DESIGNABLE true USER true )
@@ -35,6 +34,7 @@ class MAINMODULE_EXPORT Demux : public LogicComponent, public eDemux
     Q_PROPERTY( double Out_Low_V    READ outLowV    WRITE setOutLowV    DESIGNABLE true USER true )
     Q_PROPERTY( double Out_Imped    READ outImp     WRITE setOutImp     DESIGNABLE true USER true )
     Q_PROPERTY( bool   Inverted     READ inverted   WRITE setInverted   DESIGNABLE true USER true )
+    Q_PROPERTY( bool   Tristate     READ tristate   USER true )
 
     public:
         Demux( QObject* parent, QString type, QString id );
@@ -44,6 +44,9 @@ class MAINMODULE_EXPORT Demux : public LogicComponent, public eDemux
         static LibraryItem *libraryItem();
         
         bool tristate() { return true; }
+        
+        virtual QPainterPath shape() const;
+        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 };
 
 #endif

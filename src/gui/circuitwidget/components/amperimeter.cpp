@@ -35,7 +35,7 @@ LibraryItem* Amperimeter::libraryItem()
 }
 
 Amperimeter::Amperimeter( QObject* parent, QString type, QString id )
-    : Meter( parent, type, id )
+           : Meter( parent, type, id )
 {
     m_unit = "A";
     m_dispValue = 0;

@@ -36,7 +36,7 @@ LibraryItem* Ground::libraryItem()
 }
 
 Ground::Ground( QObject* parent, QString type, QString id )
-    : Component( parent, type, id )
+      : Component( parent, type, id )
 {
     QString nodid = id;
     nodid.append(QString("-Gnd"));

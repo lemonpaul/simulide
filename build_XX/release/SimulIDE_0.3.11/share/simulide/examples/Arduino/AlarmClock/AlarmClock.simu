@@ -1,0 +1,93 @@
+<circuit type="simulide_0.1">
+ 
+Node-10: 
+<item id="Node-10" x="-180" y="-252" rotation="0" valLabelx="0" vflip="1" labelx="-16" valLabely="0" itemtype="Node" labelrot="0" labely="-24" valLabRot="0" objectName="Node-10" hflip="1" Show_id="false"/>
+ 
+Arduino Uno-9: 
+<item Program="AlarmClock.ino.hex" x="-348" rotation="0" y="-196" labelx="50" Show_id="true" valLabelx="0" labely="235" id="Arduino Uno-9" valLabRot="0" labelrot="0" Ser_Port="false" hflip="1" Ser_Monitor="false" objectName="Arduino Uno-9" itemtype="Arduino" vflip="1" Mhz="16" valLabely="0"/>
+ 
+Hd44780-8: 
+<item id="Hd44780-8" x="-452" y="-236" rotation="0" valLabelx="0" vflip="1" labelx="70" valLabely="0" itemtype="Hd44780" labelrot="0" labely="-82" valLabRot="0" objectName="Hd44780-8" hflip="1" Cols="16" Show_id="true" Rows="2"/>
+ 
+Pulsador-7: 
+<item id="Mode" x="-156" y="-252" rotation="180" valLabelx="0" vflip="1" labelx="13" valLabely="0" itemtype="Push" labelrot="-180" labely="34" valLabRot="0" objectName="Pulsador-7" hflip="1" Show_id="true"/>
+ 
+Pulsador-6: 
+<item id="Set" x="-204" y="-252" rotation="180" valLabelx="0" vflip="1" labelx="-8" valLabely="0" itemtype="Push" labelrot="-180" labely="36" valLabRot="0" objectName="Pulsador-6" hflip="-1" Show_id="true"/>
+ 
+Reistencia-5: 
+<item x="-148" rotation="90" y="-132" Show_res="false" labelx="-12" Show_id="false" valLabelx="-9" Unit=" kΩ" labely="-24" id="Reistencia-5" valLabRot="0" labelrot="0" hflip="1" objectName="Reistencia-5" itemtype="Resistor" vflip="1" valLabely="-17" Resistance="5"/>
+ 
+Reistencia-4: 
+<item x="-140" rotation="90" y="-132" Show_res="true" labelx="-12" Show_id="false" valLabelx="-8" Unit=" kΩ" labely="-24" id="Reistencia-4" valLabRot="0" labelrot="0" hflip="1" objectName="Reistencia-4" itemtype="Resistor" vflip="1" valLabely="-14" Resistance="5"/>
+ 
+Node-3: 
+<item id="Node-3" x="-140" y="-212" rotation="0" valLabelx="0" vflip="1" labelx="-16" valLabely="0" itemtype="Node" labelrot="0" labely="-24" valLabRot="0" objectName="Node-3" hflip="1" Show_id="false"/>
+ 
+Node-2: 
+<item id="Node-2" x="-148" y="-108" rotation="0" valLabelx="0" vflip="1" labelx="-16" valLabely="0" itemtype="Node" labelrot="0" labely="-24" valLabRot="0" objectName="Node-2" hflip="1" Show_id="false"/>
+ 
+Node-1: 
+<item id="Node-1" x="-220" y="-204" rotation="0" valLabelx="0" vflip="1" labelx="-16" valLabely="0" itemtype="Node" labelrot="0" labely="-24" valLabRot="0" objectName="Node-1" hflip="1" Show_id="false"/>
+ 
+Connector-11: 
+<item startpinid="Arduino Uno-9-PD2" x="-340" endpinid="Hd44780-8-dataPin7" rotation="0" y="-164" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-340,-164,-356,-164,-356,-228" id="Connector-11" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-11" enodeid="Circ_eNode-12" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-13: 
+<item startpinid="Hd44780-8-dataPin6" x="-364" endpinid="Arduino Uno-9-PD3" rotation="0" y="-228" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-364,-228,-364,-156,-340,-156" id="Connector-13" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-13" enodeid="Circ_eNode-14" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-15: 
+<item startpinid="Hd44780-8-dataPin5" x="-372" endpinid="Arduino Uno-9-PD4" rotation="0" y="-228" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-372,-228,-372,-148,-340,-148" id="Connector-15" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-15" enodeid="Circ_eNode-16" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-17: 
+<item startpinid="Hd44780-8-dataPin4" x="-380" endpinid="Arduino Uno-9-PD5" rotation="0" y="-228" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-380,-228,-380,-140,-340,-140" id="Connector-17" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-17" enodeid="Circ_eNode-18" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-19: 
+<item startpinid="Arduino Uno-9-PB3" x="-340" endpinid="Hd44780-8-PinEn" rotation="0" y="-84" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-340,-84,-420,-84,-420,-228" id="Connector-19" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-19" enodeid="Circ_eNode-20" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-21: 
+<item startpinid="Arduino Uno-9-PB4" x="-340" endpinid="Hd44780-8-PinRS" rotation="0" y="-76" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-340,-76,-436,-76,-436,-228" id="Connector-21" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-21" enodeid="Circ_eNode-22" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-23: 
+<item startpinid="Pulsador-7-rnod" x="-172" endpinid="Node-10-0" rotation="0" y="-252" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-172,-252,-180,-252" id="Connector-23" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-23" enodeid="Circ_eNode-24" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-25: 
+<item startpinid="Node-10-2" x="-180" endpinid="Pulsador-6-rnod" rotation="0" y="-252" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-180,-252,-188,-252" id="Connector-25" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-25" enodeid="Circ_eNode-24" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-26: 
+<item startpinid="Node-10-1" x="-180" endpinid="Arduino Uno-9-V5V" rotation="0" y="-252" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-180,-252,-180,-100,-196,-100" id="Connector-26" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-26" enodeid="Circ_eNode-24" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-27: 
+<item startpinid="Pulsador-6-lnod" x="-220" endpinid="Node-1-0" rotation="0" y="-252" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-220,-252,-220,-204" id="Connector-27" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-27" enodeid="Circ_eNode-28" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-29: 
+<item startpinid="Pulsador-7-lnod" x="-140" endpinid="Node-3-0" rotation="0" y="-252" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-140,-252,-140,-212" id="Connector-29" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-29" enodeid="Circ_eNode-30" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-31: 
+<item startpinid="Node-3-2" x="-140" endpinid="Arduino Uno-9-PD6" rotation="0" y="-212" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-140,-212,-412,-212,-412,-132,-340,-132" id="Connector-31" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-31" enodeid="Circ_eNode-30" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-32: 
+<item startpinid="Node-3-1" x="-140" endpinid="Reistencia-4-lPin" rotation="0" y="-212" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-140,-212,-140,-148" id="Connector-32" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-32" enodeid="Circ_eNode-30" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-33: 
+<item startpinid="Reistencia-4-rPin" x="-140" endpinid="Node-2-0" rotation="0" y="-116" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-140,-116,-140,-108,-148,-108" id="Connector-33" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-33" enodeid="Circ_eNode-34" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-35: 
+<item startpinid="Reistencia-5-rPin" x="-148" endpinid="Node-2-1" rotation="0" y="-116" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-148,-116,-148,-108" id="Connector-35" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-35" enodeid="Circ_eNode-34" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-36: 
+<item startpinid="Node-2-2" x="-148" endpinid="Arduino Uno-9-GND2" rotation="0" y="-108" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-148,-108,-196,-108" id="Connector-36" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-36" enodeid="Circ_eNode-34" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-37: 
+<item startpinid="Reistencia-5-lPin" x="-148" endpinid="Node-1-1" rotation="0" y="-148" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-148,-148,-148,-204,-220,-204" id="Connector-37" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-37" enodeid="Circ_eNode-28" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+Connector-38: 
+<item startpinid="Node-1-2" x="-220" endpinid="Arduino Uno-9-PD7" rotation="0" y="-204" labelx="-16" Show_id="false" valLabelx="0" labely="-24" pointList="-220,-204,-404,-204,-404,-124,-340,-124" id="Connector-38" valLabRot="0" labelrot="0" hflip="1" objectName="Connector-38" enodeid="Circ_eNode-28" itemtype="Connector" vflip="1" valLabely="0"/>
+ 
+PlotterWidget-39: 
+<item itemtype="Plotter" maximumWidth="1000" whatsThis="" windowModality="0" sizeHint="" y="0" maximumSize="" baseSize="" layoutDirection="0" palette="" fullScreen="false" locale="" acceptDrops="false" windowIconText="" normalGeometry="" objectName="PlotterWidget-39" MinVolt="-500" sizePolicy="" windowIcon="" enabled="true" styleSheet="" windowTitle="" focusPolicy="0" visible="false" childrenRect="" autoFillBackground="false" childrenRegion="" geometry="" toolTip="" cursor="" updatesEnabled="true" sizeIncrement="" accessibleName="" isActiveWindow="true" maximumHeight="200" width="200" contextMenuPolicy="1" windowOpacity="1" font="Sans Serif,9,-1,5,50,0,0,0,0,0" inputMethodHints="0" toolTipDuration="-1" minimumWidth="200" frameGeometry="" rect="" windowFilePath="" statusTip="" modal="false" x="0" height="200" focus="false" minimumSizeHint="" accessibleDescription="" pos="" MaxVolt="500" minimumHeight="200" windowModified="false" maximized="false" minimized="false" mouseTracking="false" frameSize="" minimumSize="" size=""/>
+ 
+SerialPortWidget-40: 
+<item itemtype="SerialPort" maximumWidth="450" whatsThis="" windowModality="0" sizeHint="" y="0" maximumSize="" baseSize="" layoutDirection="0" palette="" fullScreen="false" locale="" acceptDrops="false" windowIconText="" normalGeometry="" objectName="SerialPortWidget-40" sizePolicy="" windowIcon="" enabled="true" styleSheet="" windowTitle="Configuracion" focusPolicy="0" visible="false" childrenRect="" autoFillBackground="false" childrenRegion="" geometry="" toolTip="" cursor="" updatesEnabled="true" sizeIncrement="" SettingsProp="ttyS0,0,3,0,0,0" accessibleName="" isActiveWindow="true" maximumHeight="170" width="313" contextMenuPolicy="1" windowOpacity="1" font="Sans Serif,9,-1,5,50,0,0,0,0,0" inputMethodHints="0" toolTipDuration="-1" minimumWidth="0" frameGeometry="" rect="" windowFilePath="" statusTip="" modal="false" x="0" height="141" focus="false" minimumSizeHint="" accessibleDescription="" pos="" minimumHeight="0" windowModified="false" maximized="false" minimized="false" mouseTracking="false" frameSize="" minimumSize="" size=""/>
+ 
+</circuit>

@@ -18,7 +18,14 @@
  ***************************************************************************/
 
 #include "basedebugger.h"
+#include "baseprocessor.h"
 #include "mainwindow.h"
+#include "simulator.h"
+
+static const char* BaseDebugger_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Drive Circuit"),
+    QT_TRANSLATE_NOOP("App::Property","Compiler Path")
+};
 
 bool BaseDebugger::m_loadStatus = false;
 
@@ -26,6 +33,8 @@ BaseDebugger::BaseDebugger( QObject* parent, OutPanelText* outPane, QString file
             : QObject( parent )
             , m_compProcess( 0l )
 {
+    Q_UNUSED( BaseDebugger_properties );
+    
     m_outPane = outPane;
     m_appPath   = QCoreApplication::applicationDirPath();
     
@@ -36,6 +45,7 @@ BaseDebugger::BaseDebugger( QObject* parent, OutPanelText* outPane, QString file
     m_fileName = m_fileName.remove( m_fileName.lastIndexOf( m_fileExt ), m_fileExt.size() );
 
     m_processorType = 0;
+    m_driveCirc = false;
     
     connect( &m_compProcess, SIGNAL(readyRead()), SLOT(ProcRead()) );
 }
@@ -50,6 +60,8 @@ bool BaseDebugger::loadFirmware()
     if( m_loadStatus ) return false;
     
     m_loadStatus = true;
+    
+    mapFlashToSource();
 
     return true;
 }
@@ -58,19 +70,19 @@ void BaseDebugger::upload()
 {
     if( m_loadStatus )
     {
-        QMessageBox::warning( 0, tr("BaseDebugger::loadFirmware"),
-                                 tr("Debugger already running\nStop active session") );
+        QMessageBox::warning( 0, "BaseDebugger::loadFirmware",
+                                tr("Debugger already running")+"\n"+tr("Stop active session") );
         return;
     }
     m_outPane->writeText( "-------------------------------------------------------\n" );
-    m_outPane->appendText( tr("\nUploading: \n") );
+    m_outPane->appendText( "\n"+tr("Uploading: ")+"\n" );
     m_outPane->appendText( m_firmware );
     m_outPane->writeText( "\n\n" );
     
     if( McuComponent::self() ) 
     {
         McuComponent::self()->load( m_firmware );
-        m_outPane->appendText( tr("\nFirmWare Uploaded to ")+McuComponent::self()->device()+"\n" );
+        m_outPane->appendText( "\n"+tr("FirmWare Uploaded to ")+McuComponent::self()->device()+"\n" );
         m_outPane->writeText( "\n\n" );
     }
 }
@@ -86,15 +98,20 @@ void BaseDebugger::getProcName()
 
 int BaseDebugger::step()
 {
-    return 0;
+    BaseProcessor::self()->stepOne();
+
+    int pc = BaseProcessor::self()->pc();
+    int line = m_flashToSource[ pc ];
+
+    return line ;
 }
 
 int BaseDebugger::stepOver(){return 0;}
 
 int BaseDebugger::getValidLine( int line )
 {
-    Q_UNUSED( line );
-    return 0;
+    while( !m_sourceToFlash.contains(line) && line<=m_lastLine ) line++;
+    return line;
 }
 
 void BaseDebugger::ProcRead()
@@ -104,11 +121,6 @@ void BaseDebugger::ProcRead()
         m_outPane->appendText( m_compProcess.readLine() );
         m_outPane->writeText( "\n" );
     }
-}
-
-QString BaseDebugger::compilerPath()
-{
-    return m_compilerPath;
 }
 
 void BaseDebugger::readSettings()
@@ -131,14 +143,34 @@ void BaseDebugger::getCompilerPath()
 
         MainWindow::self()->settings()->setValue( m_compSetting, m_compilerPath);
 
-        m_outPane->appendText( "Using Compiler Path: \n" );
+        m_outPane->appendText( "\n"+tr("Using Compiler Path: ")+"\n" );
         m_outPane->writeText( m_compilerPath+"\n\n" );
+}
+
+QString BaseDebugger::compilerPath()
+{
+    return m_compilerPath;
 }
 
 void BaseDebugger::setCompilerPath( QString path )
 {
     m_compilerPath = path;
     MainWindow::self()->settings()->setValue( m_compSetting, m_compilerPath );
+}
+
+bool BaseDebugger::driveCirc()
+{
+    return m_driveCirc;
+}
+void BaseDebugger::setDriveCirc( bool drive )
+{
+    m_driveCirc = drive;
+}
+
+void BaseDebugger::toolChainNotFound()
+{
+    m_outPane->appendText( tr(": ToolChain not found")+"\n" );
+    m_outPane->writeText( "\n"+tr("Right-Click on Document Tab to set Path")+"\n\n" );
 }
 #include "moc_basedebugger.cpp"
 

@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "latchd.h"
+#include "circuit.h"
 #include "pin.h"
 
 
@@ -30,7 +31,7 @@ LibraryItem* LatchD::libraryItem()
 {
     return new LibraryItem(
         tr( "Latch" ),
-        tr( "Logic" ),
+        tr( "Logic/Memory" ),
         "subc.png",
         "LatchD",
         LatchD::construct );
@@ -42,44 +43,119 @@ LatchD::LatchD( QObject* parent, QString type, QString id )
 {
     m_width  = 4;
     m_height = 10;
+    
+    m_tristate = true;
 
-    QStringList pinList;
+    m_inputEnPin = new Pin( 180, QPoint( 0,0 ), m_id+"-Pin-inputEnable", 0, this );
+    m_inputEnPin->setLabelText( " IE" );
+    m_inputEnPin->setLabelColor( QColor( 0, 0, 0 ) );
+    
+    m_outEnPin   = new Pin(   0, QPoint( 0,0 ), m_id+"-Pin-outEnable"  , 0, this );
+    m_outEnPin->setLabelText( "OE " );
+    m_outEnPin->setLabelColor( QColor( 0, 0, 0 ) );
 
-    pinList // Inputs:
-            << "IL01 D0"
-            << "IL02 D1"
-            << "IL03 D2"
-            << "IL04 D3"
-            << "IL05 D4"
-            << "IL06 D5"
-            << "IL07 D6"
-            << "IL08 D7"
+    eLogicDevice::createInEnablePin( m_inputEnPin );     // Input Enable
+    eLogicDevice::createOutEnablePin( m_outEnPin );     // Output Enable
 
-            << "IL09 IE"
-            << "IR09OE"
-
-            // Outputs:
-            << "OR01O0 "
-            << "OR02O1 "
-            << "OR03O2 "
-            << "OR04O3 "
-            << "OR05O4 "
-            << "OR06O5 "
-            << "OR07O6 "
-            << "OR08O7 "
-            ;
-    init( pinList );
-
-    eLogicDevice::createInEnablePin( m_inPin[8] );       // Input Enable
-
-    eLogicDevice::createOutEnablePin( m_inPin[9] );    // IOutput Enable
-
-    for( int i=0; i<8; i++ )
-    {
-        eLogicDevice::createInput( m_inPin[i] );
-        eLogicDevice::createOutput( m_outPin[i] );
-    }
+    m_channels = 0;
+    setChannels( 8 );
 }
 LatchD::~LatchD(){}
 
+void LatchD::createLatches( int n )
+{
+    int chans = m_channels + n;
+    
+    int origY = -(m_height/2)*8;
+    
+    m_outPin.resize( chans );
+    m_numOutPins = chans;
+    m_inPin.resize( chans );
+    m_numInPins = chans;
+    
+    for( int i=m_channels; i<chans; i++ )
+    {
+        QString number = QString::number(i);
+
+        m_inPin[i] = new Pin( 180, QPoint(-24,origY+8+i*8 ), m_id+"-in"+number, i, this );
+        m_inPin[i]->setLabelText( " D"+number );
+        m_inPin[i]->setLabelColor( QColor( 0, 0, 0 ) );
+        eLogicDevice::createInput( m_inPin[i] );
+
+        m_outPin[i] = new Pin( 0, QPoint(24,origY+8+i*8 ), m_id+"-out"+number, i, this );
+        m_outPin[i]->setLabelText( "O"+number+" " );
+        m_outPin[i]->setLabelColor( QColor( 0, 0, 0 ) );
+        eLogicDevice::createOutput( m_outPin[i] );
+    }
+}
+
+void LatchD::deleteLatches( int n )
+{
+    eLogicDevice::deleteOutputs( n );
+    eLogicDevice::deleteInputs( n );
+    LogicComponent::deleteOutputs( n );
+    LogicComponent::deleteInputs( n );
+}
+
+void LatchD::setChannels( int channels )
+{
+    if( channels == m_channels ) return;
+    if( channels < 1 ) return;
+    
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->pauseSim();
+    
+    m_height = channels+2;
+    int origY = -(m_height/2)*8;
+
+    if     ( channels < m_channels ) deleteLatches( m_channels-channels );
+    else if( channels > m_channels ) createLatches( channels-m_channels );
+    
+    for( int i=0; i<channels; i++ )
+    {
+        m_inPin[i]->setPos( QPoint(-24,origY+8+i*8 ) );
+        m_inPin[i]->setLabelPos();
+        m_inPin[i]->isMoved();
+        m_outPin[i]->setPos( QPoint(24,origY+8+i*8 ) ); 
+        m_outPin[i]->setLabelPos();
+        m_outPin[i]->isMoved();
+    }
+    
+    m_inputEnPin->setPos( QPoint(-24,origY+8+channels*8 ) );
+    m_inputEnPin->isMoved();
+    m_inputEnPin->setLabelPos();
+    
+    m_outEnPin->setPos( QPoint(24,origY+8+channels*8) );
+    m_outEnPin->isMoved();
+    m_outEnPin->setLabelPos();
+    
+    m_channels = channels;
+
+    m_area   = QRect( -(m_width/2)*8, origY, m_width*8, m_height*8 );
+    
+    if( pauseSim ) Simulator::self()->runContinuous();
+    Circuit::self()->update();
+}
+
+void LatchD::setTristate( bool t )
+{
+    if( !t ) 
+    {
+        if( m_outEnPin->isConnected() ) m_outEnPin->connector()->remove();
+        m_outEnPin->reset();
+        m_outEnPin->setLabelText( "" );
+    }
+    else m_outEnPin->setLabelText( "OE " );
+    m_outEnPin->setVisible( t );
+    m_tristate = t;
+    eLogicDevice::updateOutEnabled();
+}
+
+void LatchD::remove()
+{
+    if( m_inputEnPin->isConnected() ) m_inputEnPin->connector()->remove();
+    if( m_outEnPin->isConnected() ) m_outEnPin->connector()->remove();
+    
+    LogicComponent::remove();
+}
 #include "moc_latchd.cpp"

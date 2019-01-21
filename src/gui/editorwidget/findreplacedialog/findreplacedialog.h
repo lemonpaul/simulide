@@ -67,6 +67,8 @@ public:
       * @param prefix the prefix to look for in the settings
       */
     virtual void readSettings(QSettings &settings, const QString &prefix = "FindReplaceDialog");
+    
+    void setTextToFind( QString text);
 
 public slots:
     /**

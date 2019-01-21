@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009  Lorenzo Bettini <http://www.lorenzobettini.it>
+ * Copyright ( C ) 2009  Lorenzo Bettini <http://www.lorenzobettini.it>
  * See COPYING file that comes with this distribution
  */
  
@@ -10,7 +10,7 @@
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 3 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   ( at your option ) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
@@ -73,177 +73,166 @@ public:
     QPushButton *replaceAllButton;
     QSpacerItem *verticalSpacer;
 
-    void setupUi(QWidget *FindReplaceForm)
+    void setupUi( QWidget *FindReplaceForm )
     {
-        if (FindReplaceForm->objectName().isEmpty())
-            FindReplaceForm->setObjectName(QStringLiteral("FindReplaceForm"));
-        FindReplaceForm->resize(483, 288);
-        gridLayout = new QGridLayout(FindReplaceForm);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        verticalLayout_5 = new QVBoxLayout();
-        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
-        verticalLayout_2 = new QVBoxLayout();
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        gridLayout_3 = new QGridLayout();
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
-        label = new QLabel(FindReplaceForm);
-        label->setObjectName(QStringLiteral("label"));
+        if ( FindReplaceForm->objectName(  ).isEmpty(  ) )
+            FindReplaceForm->setObjectName( QStringLiteral( "FindReplaceForm" ) );
+        FindReplaceForm->resize( 483, 288 );
+        gridLayout = new QGridLayout( FindReplaceForm );
+        gridLayout->setObjectName( QStringLiteral( "gridLayout" ) );
+        verticalLayout_5 = new QVBoxLayout(  );
+        verticalLayout_5->setObjectName( QStringLiteral( "verticalLayout_5" ) );
+        verticalLayout_2 = new QVBoxLayout(  );
+        verticalLayout_2->setObjectName( QStringLiteral( "verticalLayout_2" ) );
+        gridLayout_3 = new QGridLayout(  );
+        gridLayout_3->setObjectName( QStringLiteral( "gridLayout_3" ) );
+        label = new QLabel( FindReplaceForm );
+        label->setObjectName( QStringLiteral( "label" ) );
 
-        gridLayout_3->addWidget(label, 0, 0, 1, 1);
+        gridLayout_3->addWidget( label, 0, 0, 1, 1 );
 
-        textToFind = new QLineEdit(FindReplaceForm);
-        textToFind->setObjectName(QStringLiteral("textToFind"));
+        textToFind = new QLineEdit( FindReplaceForm );
+        textToFind->setObjectName( QStringLiteral( "textToFind" ) );
 
-        gridLayout_3->addWidget(textToFind, 0, 1, 1, 1);
+        gridLayout_3->addWidget( textToFind, 0, 1, 1, 1 );
 
-        replaceLabel = new QLabel(FindReplaceForm);
-        replaceLabel->setObjectName(QStringLiteral("replaceLabel"));
+        replaceLabel = new QLabel( FindReplaceForm );
+        replaceLabel->setObjectName( QStringLiteral( "replaceLabel" ) );
 
-        gridLayout_3->addWidget(replaceLabel, 1, 0, 1, 1);
+        gridLayout_3->addWidget( replaceLabel, 1, 0, 1, 1 );
 
-        textToReplace = new QLineEdit(FindReplaceForm);
-        textToReplace->setObjectName(QStringLiteral("textToReplace"));
+        textToReplace = new QLineEdit( FindReplaceForm );
+        textToReplace->setObjectName( QStringLiteral( "textToReplace" ) );
 
-        gridLayout_3->addWidget(textToReplace, 1, 1, 1, 1);
-
-
-        verticalLayout_2->addLayout(gridLayout_3);
+        gridLayout_3->addWidget( textToReplace, 1, 1, 1, 1 );
 
 
-        verticalLayout_5->addLayout(verticalLayout_2);
-
-        errorLabel = new QLabel(FindReplaceForm);
-        errorLabel->setObjectName(QStringLiteral("errorLabel"));
-
-        verticalLayout_5->addWidget(errorLabel);
-
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        groupBox = new QGroupBox(FindReplaceForm);
-        groupBox->setObjectName(QStringLiteral("groupBox"));
-        verticalLayout_3 = new QVBoxLayout(groupBox);
-        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
-        downRadioButton = new QRadioButton(groupBox);
-        downRadioButton->setObjectName(QStringLiteral("downRadioButton"));
-        downRadioButton->setChecked(true);
-
-        verticalLayout_3->addWidget(downRadioButton);
-
-        upRadioButton = new QRadioButton(groupBox);
-        upRadioButton->setObjectName(QStringLiteral("upRadioButton"));
-
-        verticalLayout_3->addWidget(upRadioButton);
+        verticalLayout_2->addLayout( gridLayout_3 );
 
 
-        horizontalLayout->addWidget(groupBox);
+        verticalLayout_5->addLayout( verticalLayout_2 );
 
-        groupBox_2 = new QGroupBox(FindReplaceForm);
-        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        verticalLayout_4 = new QVBoxLayout(groupBox_2);
-        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
-        caseCheckBox = new QCheckBox(groupBox_2);
-        caseCheckBox->setObjectName(QStringLiteral("caseCheckBox"));
+        errorLabel = new QLabel( FindReplaceForm );
+        errorLabel->setObjectName( QStringLiteral( "errorLabel" ) );
 
-        verticalLayout_4->addWidget(caseCheckBox);
+        verticalLayout_5->addWidget( errorLabel );
 
-        wholeCheckBox = new QCheckBox(groupBox_2);
-        wholeCheckBox->setObjectName(QStringLiteral("wholeCheckBox"));
+        horizontalLayout = new QHBoxLayout(  );
+        horizontalLayout->setObjectName( QStringLiteral( "horizontalLayout" ) );
+        groupBox = new QGroupBox( FindReplaceForm );
+        groupBox->setObjectName( QStringLiteral( "groupBox" ) );
+        verticalLayout_3 = new QVBoxLayout( groupBox );
+        verticalLayout_3->setObjectName( QStringLiteral( "verticalLayout_3" ) );
+        downRadioButton = new QRadioButton( groupBox );
+        downRadioButton->setObjectName( QStringLiteral( "downRadioButton" ) );
+        downRadioButton->setChecked( true );
 
-        verticalLayout_4->addWidget(wholeCheckBox);
+        verticalLayout_3->addWidget( downRadioButton );
 
-        regexCheckBox = new QCheckBox(groupBox_2);
-        regexCheckBox->setObjectName(QStringLiteral("regexCheckBox"));
+        upRadioButton = new QRadioButton( groupBox );
+        upRadioButton->setObjectName( QStringLiteral( "upRadioButton" ) );
 
-        verticalLayout_4->addWidget(regexCheckBox);
-
-
-        horizontalLayout->addWidget(groupBox_2);
-
-
-        verticalLayout_5->addLayout(horizontalLayout);
+        verticalLayout_3->addWidget( upRadioButton );
 
 
-        gridLayout->addLayout(verticalLayout_5, 0, 0, 1, 1);
+        horizontalLayout->addWidget( groupBox );
 
-        verticalLayout = new QVBoxLayout();
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setContentsMargins(10, -1, -1, -1);
-        findButton = new QPushButton(FindReplaceForm);
-        findButton->setObjectName(QStringLiteral("findButton"));
-        findButton->setEnabled(false);
+        groupBox_2 = new QGroupBox( FindReplaceForm );
+        groupBox_2->setObjectName( QStringLiteral( "groupBox_2" ) );
+        verticalLayout_4 = new QVBoxLayout( groupBox_2 );
+        verticalLayout_4->setObjectName( QStringLiteral( "verticalLayout_4" ) );
+        caseCheckBox = new QCheckBox( groupBox_2 );
+        caseCheckBox->setObjectName( QStringLiteral( "caseCheckBox" ) );
 
-        verticalLayout->addWidget(findButton);
+        verticalLayout_4->addWidget( caseCheckBox );
 
-        closeButton = new QPushButton(FindReplaceForm);
-        closeButton->setObjectName(QStringLiteral("closeButton"));
+        wholeCheckBox = new QCheckBox( groupBox_2 );
+        wholeCheckBox->setObjectName( QStringLiteral( "wholeCheckBox" ) );
 
-        verticalLayout->addWidget(closeButton);
+        verticalLayout_4->addWidget( wholeCheckBox );
 
-        replaceButton = new QPushButton(FindReplaceForm);
-        replaceButton->setObjectName(QStringLiteral("replaceButton"));
-        replaceButton->setEnabled(false);
+        regexCheckBox = new QCheckBox( groupBox_2 );
+        regexCheckBox->setObjectName( QStringLiteral( "regexCheckBox" ) );
 
-        verticalLayout->addWidget(replaceButton);
-
-        replaceAllButton = new QPushButton(FindReplaceForm);
-        replaceAllButton->setObjectName(QStringLiteral("replaceAllButton"));
-        replaceAllButton->setEnabled(false);
-
-        verticalLayout->addWidget(replaceAllButton);
-
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout->addItem(verticalSpacer);
+        verticalLayout_4->addWidget( regexCheckBox );
 
 
-        gridLayout->addLayout(verticalLayout, 0, 1, 1, 1);
+        horizontalLayout->addWidget( groupBox_2 );
+
+
+        verticalLayout_5->addLayout( horizontalLayout );
+
+
+        gridLayout->addLayout( verticalLayout_5, 0, 0, 1, 1 );
+
+        verticalLayout = new QVBoxLayout(  );
+        verticalLayout->setObjectName( QStringLiteral( "verticalLayout" ) );
+        verticalLayout->setContentsMargins( 10, -1, -1, -1 );
+        findButton = new QPushButton( FindReplaceForm );
+        findButton->setObjectName( QStringLiteral( "findButton" ) );
+        findButton->setEnabled( false );
+
+        verticalLayout->addWidget( findButton );
+
+        closeButton = new QPushButton( FindReplaceForm );
+        closeButton->setObjectName( QStringLiteral( "closeButton" ) );
+
+        verticalLayout->addWidget( closeButton );
+
+        replaceButton = new QPushButton( FindReplaceForm );
+        replaceButton->setObjectName( QStringLiteral( "replaceButton" ) );
+        replaceButton->setEnabled( false );
+
+        verticalLayout->addWidget( replaceButton );
+
+        replaceAllButton = new QPushButton( FindReplaceForm );
+        replaceAllButton->setObjectName( QStringLiteral( "replaceAllButton" ) );
+        replaceAllButton->setEnabled( false );
+
+        verticalLayout->addWidget( replaceAllButton );
+
+        verticalSpacer = new QSpacerItem( 20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding );
+
+        verticalLayout->addItem( verticalSpacer );
+
+
+        gridLayout->addLayout( verticalLayout, 0, 1, 1, 1 );
 
 #ifndef QT_NO_SHORTCUT
-        label->setBuddy(textToFind);
-        replaceLabel->setBuddy(textToReplace);
+        label->setBuddy( textToFind );
+        replaceLabel->setBuddy( textToReplace );
 #endif // QT_NO_SHORTCUT
-        QWidget::setTabOrder(textToFind, textToReplace);
-        QWidget::setTabOrder(textToReplace, downRadioButton);
-        QWidget::setTabOrder(downRadioButton, upRadioButton);
-        QWidget::setTabOrder(upRadioButton, caseCheckBox);
-        QWidget::setTabOrder(caseCheckBox, wholeCheckBox);
-        QWidget::setTabOrder(wholeCheckBox, regexCheckBox);
-        QWidget::setTabOrder(regexCheckBox, findButton);
-        QWidget::setTabOrder(findButton, closeButton);
+        QWidget::setTabOrder( textToFind, textToReplace );
+        QWidget::setTabOrder( textToReplace, downRadioButton );
+        QWidget::setTabOrder( downRadioButton, upRadioButton );
+        QWidget::setTabOrder( upRadioButton, caseCheckBox );
+        QWidget::setTabOrder( caseCheckBox, wholeCheckBox );
+        QWidget::setTabOrder( wholeCheckBox, regexCheckBox );
+        QWidget::setTabOrder( regexCheckBox, findButton );
+        QWidget::setTabOrder( findButton, closeButton );
 
-        retranslateUi(FindReplaceForm);
+        retranslateUi( FindReplaceForm );
 
-        QMetaObject::connectSlotsByName(FindReplaceForm);
+        QMetaObject::connectSlotsByName( FindReplaceForm );
     } // setupUi
 
-    void retranslateUi(QWidget *FindReplaceForm)
+    void retranslateUi( QWidget *FindReplaceForm )
     {
-        FindReplaceForm->setWindowTitle(QApplication::translate("FindReplaceForm", "Form", 0));
-        label->setText(QApplication::translate("FindReplaceForm", "&Find:", 0));
-        replaceLabel->setText(QApplication::translate("FindReplaceForm", "R&eplace with:", 0));
-        errorLabel->setText(QApplication::translate("FindReplaceForm", "errorLabel", 0));
-        groupBox->setTitle(QApplication::translate("FindReplaceForm", "D&irection", 0));
-        downRadioButton->setText(QApplication::translate("FindReplaceForm", "&Down", 0));
-        upRadioButton->setText(QApplication::translate("FindReplaceForm", "&Up", 0));
-        groupBox_2->setTitle(QApplication::translate("FindReplaceForm", "&Options", 0));
-        caseCheckBox->setText(QApplication::translate("FindReplaceForm", "&Case sensitive", 0));
-        wholeCheckBox->setText(QApplication::translate("FindReplaceForm", "&Whole words only", 0));
-#ifndef QT_NO_TOOLTIP
-        regexCheckBox->setToolTip(QApplication::translate("FindReplaceForm", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">whether the text to search should be interpreted as a regular expression.</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">You may want to take a look at the syntax of regular expressions:</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"http://do"
-                        "c.trolltech.com/qregexp.html\"><span style=\" text-decoration: underline; color:#0000ff;\">http://doc.trolltech.com/qregexp.html</span></a></p></body></html>", 0));
-#endif // QT_NO_TOOLTIP
-        regexCheckBox->setText(QApplication::translate("FindReplaceForm", "R&egular Expression", 0));
-        findButton->setText(QApplication::translate("FindReplaceForm", "&Find", 0));
-        closeButton->setText(QApplication::translate("FindReplaceForm", "&Close", 0));
-        replaceButton->setText(QApplication::translate("FindReplaceForm", "&Replace", 0));
-        replaceAllButton->setText(QApplication::translate("FindReplaceForm", "Replace &All", 0));
+        FindReplaceForm->setWindowTitle( QApplication::translate( "FindReplaceForm", "Find/Replace", 0 ) );
+        label->setText( QApplication::translate( "FindReplaceForm", "&Find:", 0 ) );
+        replaceLabel->setText( QApplication::translate( "FindReplaceForm", "R&eplace with:", 0 ) );
+        errorLabel->setText( QApplication::translate( "FindReplaceForm", "Error", 0 ) );
+        groupBox->setTitle( QApplication::translate( "FindReplaceForm", "D&irection", 0 ) );
+        downRadioButton->setText( QApplication::translate( "FindReplaceForm", "&Down", 0 ) );
+        upRadioButton->setText( QApplication::translate( "FindReplaceForm", "&Up", 0 ) );
+        groupBox_2->setTitle( QApplication::translate( "FindReplaceForm", "&Options", 0 ) );
+        caseCheckBox->setText( QApplication::translate( "FindReplaceForm", "&Case sensitive", 0 ) );
+        wholeCheckBox->setText( QApplication::translate( "FindReplaceForm", "&Whole words only", 0 ) );
+        regexCheckBox->setText( QApplication::translate( "FindReplaceForm", "R&egular Expression", 0 ) );
+        findButton->setText( QApplication::translate( "FindReplaceForm", "&Find", 0 ) );
+        closeButton->setText( QApplication::translate( "FindReplaceForm", "&Close", 0 ) );
+        replaceButton->setText( QApplication::translate( "FindReplaceForm", "&Replace", 0 ) );
+        replaceAllButton->setText( QApplication::translate( "FindReplaceForm", "Replace &All", 0 ) );
     } // retranslateUi
 
 };

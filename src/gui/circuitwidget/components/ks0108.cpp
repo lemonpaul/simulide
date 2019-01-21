@@ -22,6 +22,10 @@
 #include "simulator.h"
 #include "ks0108.h"
 
+static const char* Ks0108_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","CS Active Low")
+};
+
 
 Component* Ks0108::construct( QObject* parent, QString type, QString id )
 {
@@ -39,15 +43,17 @@ LibraryItem* Ks0108::libraryItem()
 }
 
 Ks0108::Ks0108( QObject* parent, QString type, QString id )
-       : Component( parent, type, id )
-       , eElement( (id+"-eElement").toStdString() )
-       , m_pinRst( 270, QPoint(-56, 56), id+"-PinRst" , 0, this )
-       , m_pinCs2( 270, QPoint(-48, 56), id+"-PinCs2" , 0, this )
-       , m_pinCs1( 270, QPoint(-40, 56), id+"-PinCs1" , 0, this )
-       , m_pinEn ( 270, QPoint( 32, 56), id+"-PinEn"  , 0, this )
-       , m_pinRW ( 270, QPoint( 40, 56), id+"-PinRW"  , 0, this )
-       , m_pinDC ( 270, QPoint( 48, 56), id+"-PinDC"  , 0, this )
+      : Component( parent, type, id )
+      , eElement( (id+"-eElement").toStdString() )
+      , m_pinRst( 270, QPoint(-56, 56), id+"-PinRst" , 0, this )
+      , m_pinCs2( 270, QPoint(-48, 56), id+"-PinCs2" , 0, this )
+      , m_pinCs1( 270, QPoint(-40, 56), id+"-PinCs1" , 0, this )
+      , m_pinEn ( 270, QPoint( 32, 56), id+"-PinEn"  , 0, this )
+      , m_pinRW ( 270, QPoint( 40, 56), id+"-PinRW"  , 0, this )
+      , m_pinDC ( 270, QPoint( 48, 56), id+"-PinDC"  , 0, this )
 {
+    Q_UNUSED( Ks0108_properties );
+    
     m_area = QRectF( -74, -52, 148, 100 );
     m_csActLow = false;
     

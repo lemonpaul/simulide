@@ -96,7 +96,7 @@ void RenderOscope::paintEvent( QPaintEvent* /* event */ )
     p.setPen( pen3 );
     
     QFont font = p.font();
-    font.setPointSize(7);
+    font.setPixelSize(9);
     font.setBold(true);
     p.setFont( font );
     

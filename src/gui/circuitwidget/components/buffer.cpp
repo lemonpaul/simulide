@@ -30,7 +30,7 @@ LibraryItem* Buffer::libraryItem()
 {
     return new LibraryItem(
         tr( "Buffer" ),
-        tr( "Logic" ),
+        tr( "Logic/Gates" ),
         "buffer.png",
         "Buffer",
         Buffer::construct );
@@ -40,6 +40,7 @@ Buffer::Buffer( QObject* parent, QString type, QString id )
       : Gate( parent, type, id, 1 )
 {
     m_area = QRect( -19, -17, 38, 34 ); 
+    
     m_outEnPin = new Pin( 90, QPoint( 0,-16 ), m_id+"-ePin-outEnable", 0, this );
     eLogicDevice::createOutEnablePin( m_outEnPin );
     
@@ -73,17 +74,17 @@ QPainterPath Buffer::shape() const
     
     QVector<QPointF> points;
     
-    points << QPointF(-16,-16 )
-           << QPointF(-16, 16 )
-           << QPointF( 16,  1 )
-           << QPointF( 16, -1 );
+    points << QPointF(-17,-17 )
+           << QPointF(-17, 17 )
+           << QPointF( 17,  1 )
+           << QPointF( 17, -1 );
         
     path.addPolygon( QPolygonF(points) );
     path.closeSubpath();
     return path;
 }
 
-void Buffer::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
+void Buffer::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Component::paint( p, option, widget );
 
@@ -97,9 +98,7 @@ void Buffer::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
         QPointF( 16,  1 ),
         QPointF( 16, -1 )             };
 
-    p->drawPolygon(points, 4);
-
-    //Gate::paint( p, option, widget );            // draw inverted circle
+    p->drawPolygon( points, 4 );
 }
 
 #include "moc_buffer.cpp"

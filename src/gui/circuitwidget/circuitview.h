@@ -22,8 +22,9 @@
 
 #include <QtWidgets>
 
-#include "component.h"
-#include "circuit.h"
+
+class Component;
+class Circuit;
 
 class CircuitView : public QGraphicsView
 {
@@ -33,7 +34,19 @@ class CircuitView : public QGraphicsView
         CircuitView( QWidget *parent );
         ~CircuitView();
 
+ static CircuitView* self() { return m_pSelf; }
+ 
         void clear();
+        
+        void wheelEvent( QWheelEvent *event );
+        void dragMoveEvent( QDragMoveEvent* event );
+        void dragEnterEvent( QDragEnterEvent* event );
+        void dragLeaveEvent( QDragLeaveEvent* event );
+
+        void mousePressEvent( QMouseEvent* event );
+        void mouseReleaseEvent( QMouseEvent* event );
+
+        void resizeEvent( QResizeEvent* event );
 
     public slots:
         void saveImage();
@@ -41,22 +54,11 @@ class CircuitView : public QGraphicsView
         void importCirc();
         
     protected:
-        void contextMenuEvent(QContextMenuEvent* event);
+        void contextMenuEvent( QContextMenuEvent* event );
 
     private:
-        void wheelEvent(QWheelEvent *event);
-        void dragMoveEvent(QDragMoveEvent *event);
-        void dragEnterEvent(QDragEnterEvent *event);
-        void dragLeaveEvent(QDragLeaveEvent *event);
-
-        void keyPressEvent( QKeyEvent *event );
-        void keyReleaseEvent( QKeyEvent *event );
-        
-        void mousePressEvent( QMouseEvent *event );
-        void mouseReleaseEvent(QMouseEvent *event );
-
-        void resizeEvent(QResizeEvent *event);
-
+ static CircuitView*  m_pSelf;
+ 
         Component*  m_enterItem;
         Circuit*    m_circuit;
 

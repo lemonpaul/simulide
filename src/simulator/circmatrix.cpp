@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include <iostream>
-#include <cmath>
+#include <math.h>
 
 #include "circmatrix.h"
 #include "simulator.h"
@@ -56,7 +56,7 @@ void CircMatrix::createMatrix( QList<eNode*> &eNodeList, QList<eElement*> &eleme
         enode->setNodeNumber( i+1 );
         enode->initialize();
     }
-    
+    std::cout <<"\nInitializing "<< m_elementList.size() << " eElements"<< std::endl;
     foreach( eElement* el, m_elementList ) el->initialize();
     foreach( eElement* el, m_elementList ) el->stamp();
     for( int i=0; i<m_numEnodes; i++ ) m_eNodeList->at(i)->stampMatrix();

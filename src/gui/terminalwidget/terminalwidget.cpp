@@ -41,22 +41,22 @@ TerminalWidget::TerminalWidget( QWidget *parent )
     
     setMinimumSize(QSize(200, 200));
     
-    m_verticalLayout.setObjectName(tr("verticalLayout"));
+    m_verticalLayout.setObjectName( "verticalLayout" );
     m_verticalLayout.setContentsMargins(0, 0, 0, 0);
-    m_verticalLayout.setSpacing(0);
+    m_verticalLayout.setSpacing(4);
 
     QLabel* sendTextLabel = new QLabel(this);
-    sendTextLabel->setText("Send Text:");
+    sendTextLabel->setText(tr("Send Text:"));
     m_sendText.setMaxLength( 50 );
     
     QLabel* sendValueLabel = new QLabel(this);
-    sendValueLabel->setText("    Send Value:");
+    sendValueLabel->setText(tr("    Send Value:"));
     m_sendValue.setMaxLength( 3 );
     m_sendValue.setMaximumWidth(40);
     m_sendValue.setValidator( new QIntValidator(0, 255, this) );
 
     QLabel* printLabel = new QLabel(this);
-    printLabel->setText("    Print:");
+    printLabel->setText(tr("    Print:"));
 
     m_ascciButton.setCheckable(true);
     m_ascciButton.setForegroundRole( QPalette::BrightText );
@@ -67,7 +67,7 @@ TerminalWidget::TerminalWidget( QWidget *parent )
     m_valueButton.setCheckable(true);
     m_valueButton.setForegroundRole( QPalette::BrightText );
     m_valueButton.setFixedSize( 50, 20 );
-    m_valueButton.setText( " Value " );
+    m_valueButton.setText( tr(" Value ") );
     m_valueButton.setChecked( !m_printASCII );
     
     m_sendLayout.setSpacing(4);
@@ -80,6 +80,19 @@ TerminalWidget::TerminalWidget( QWidget *parent )
     m_sendLayout.addWidget( &m_ascciButton );
     m_sendLayout.addWidget( &m_valueButton );
     m_verticalLayout.addLayout( &m_sendLayout );
+    
+    /*QFrame* myFrame = new QFrame();
+    myFrame->setFrameShape(QFrame::HLine);
+    m_verticalLayout.addWidget( myFrame );*/
+    
+    QHBoxLayout* textLabelsLayout = new QHBoxLayout();
+    QLabel* sentLabel = new QLabel(this);
+    sentLabel->setText(tr("Received From Micro:"));
+    textLabelsLayout->addWidget( sentLabel );
+    QLabel* recvLabel = new QLabel(this);
+    recvLabel->setText(tr("Sent to Micro:"));
+    textLabelsLayout->addWidget( recvLabel );
+    m_verticalLayout.addLayout( textLabelsLayout );
     
     m_textLayout.addWidget( &m_uartOutPanel );
     m_textLayout.addWidget( &m_uartInPanel );
@@ -107,11 +120,7 @@ void TerminalWidget::onTextChanged()
     
     QByteArray array = text.toLatin1();
     
-    for( int i=0; i<array.size(); i++ )
-        BaseProcessor::self()->uartIn( array.at(i) );
-
-    //m_sendText.clear();
-   // m_outPanel.appendText( "Sent: \""+text+"\"\n" );
+    for( int i=0; i<array.size(); i++ ) BaseProcessor::self()->uartIn( array.at(i) );
 }
 
 void TerminalWidget::onValueChanged()
@@ -119,10 +128,6 @@ void TerminalWidget::onValueChanged()
     QString text = m_sendValue.text();
 
     BaseProcessor::self()->uartIn( text.toInt() );
-
-    //m_sendText.clear();
-    
-   // m_outPanel.appendText( "Sent: "+text+"\n" );
 }
 
 void TerminalWidget::valueButtonClicked()
@@ -151,8 +156,7 @@ void TerminalWidget::uartIn( uint32_t value ) // Receive one byte on Uart
         if( value == 0 ) return;
         text.append( value );
     }
-    else
-        text = QString::number( value )+" ";
+    else text = QString::number( value )+" ";
 
     m_uartInPanel.appendText( text );
 }
@@ -165,8 +169,7 @@ void TerminalWidget::uartOut( uint32_t value ) // Send value to OutPanelText
         if( value == 0 ) return;
         text.append( value );
     }
-    else
-        text = QString::number( value )+" ";
+    else text = QString::number( value )+" ";
 
     m_uartOutPanel.appendText( text );
 }

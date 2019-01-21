@@ -1,0 +1,12 @@
+<circuit speed="1000000" type="simulide_0.1" reactStep="50" noLinStep="10" noLinAcc="5" animate="0">
+ 
+pic16f886-1: 
+<item hflip="1" objectName="pic16f886-1" Ser_Monitor="true" itemtype="PIC" valLabRot="0" x="-684" id="pic16f886-1" Show_id="true" Program="serial_echo-16F886.hex" valLabelx="0" Ser_Port="false" rotation="0" vflip="1" valLabely="0" y="-380" labely="-20" labelrot="0" Mhz="16" labelx="0"/>
+ 
+PlotterWidget-5: 
+<item windowModality="0" windowTitle="" maximumSize="" x="0" y="396" minimumWidth="200" windowModified="false" frameSize="" statusTip="" frameGeometry="" sizePolicy="" windowFilePath="" isActiveWindow="true" pos="" maximized="false" childrenRegion="" mouseTracking="false" objectName="PlotterWidget-5" accessibleDescription="" sizeIncrement="" toolTipDuration="-1" minimumHeight="200" toolTip="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumSize="" inputMethodHints="0" itemtype="Plotter" baseSize="" normalGeometry="" layoutDirection="0" sizeHint="" MinVolt="0" width="990" whatsThis="" size="" cursor="" modal="false" minimumSizeHint="" height="200" windowIcon="" windowIconText="" palette="" minimized="false" rect="" focusPolicy="0" styleSheet="" maximumWidth="1000" contextMenuPolicy="1" childrenRect="" updatesEnabled="true" maximumHeight="200" locale="" geometry="" autoFillBackground="false" visible="false" windowOpacity="1" MaxVolt="500" acceptDrops="false" fullScreen="false" accessibleName="" enabled="true" focus="false"/>
+ 
+SerialPortWidget-6: 
+<item windowModality="0" windowTitle="Configuracion" maximumSize="" x="0" y="0" SettingsProp="ttyS0,0,3,0,0,0" minimumWidth="0" windowModified="false" frameSize="" statusTip="" frameGeometry="" sizePolicy="" windowFilePath="" isActiveWindow="true" pos="" maximized="false" childrenRegion="" mouseTracking="false" objectName="SerialPortWidget-6" accessibleDescription="" sizeIncrement="" toolTipDuration="-1" minimumHeight="0" toolTip="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumSize="" inputMethodHints="0" itemtype="SerialPort" baseSize="" normalGeometry="" layoutDirection="0" sizeHint="" width="313" whatsThis="" size="" cursor="" modal="false" minimumSizeHint="" height="141" windowIcon="" windowIconText="" palette="" minimized="false" rect="" focusPolicy="0" styleSheet="" maximumWidth="450" contextMenuPolicy="1" childrenRect="" updatesEnabled="true" maximumHeight="170" locale="" geometry="" autoFillBackground="false" visible="false" windowOpacity="1" acceptDrops="false" fullScreen="false" accessibleName="" enabled="true" focus="false"/>
+ 
+</circuit>

@@ -20,6 +20,7 @@
 #include <QDebug>
 
 #include "e-flipflopd.h"
+#include "circuit.h"
 
 eFlipFlopD::eFlipFlopD( std::string id )
           : eLogicDevice( id )
@@ -95,4 +96,6 @@ void eFlipFlopD::setSrInv( bool inv )
     m_srInv = inv;
     m_input[1]->setInverted( inv );                           // Set
     m_input[2]->setInverted( inv );                           // Reset
+    
+    Circuit::self()->update();
 }

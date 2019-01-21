@@ -19,9 +19,17 @@
 
 #include "mosfet.h"
 #include "connector.h"
+#include "simulator.h"
+#include "circuit.h"
 #include "itemlibrary.h"
 #include "e-source.h"
 #include "pin.h"
+
+static const char* Mosfet_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","RDSon"),
+    QT_TRANSLATE_NOOP("App::Property","P Channel"),
+    QT_TRANSLATE_NOOP("App::Property","Depletion")
+};
 
 Component* Mosfet::construct( QObject* parent, QString type, QString id )
 { return new Mosfet( parent, type, id ); }
@@ -37,8 +45,11 @@ LibraryItem* Mosfet::libraryItem()
 }
 
 Mosfet::Mosfet( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eMosfet( id.toStdString() )
+      : Component( parent, type, id )
+      , eMosfet( id.toStdString() )
 {
+    Q_UNUSED( Mosfet_properties );
+    
     m_area =  QRectF( -12, -14, 28, 28 );
     
     QString newId = id;
@@ -47,11 +58,8 @@ Mosfet::Mosfet( QObject* parent, QString type, QString id )
     newPin->setLabelText( "" );
     newPin->setLabelColor( QColor( 0, 0, 0 ) );
     m_ePin[2] = newPin;
-    newId.append(QString("-eSource"));
-    m_gate = new eSource( newId.toStdString(), m_ePin[2] );
-    m_gate->setImp( 1e5 );
 
-    // D,S pins to eResistor m_ePin[0] m_ePin[1] 
+    // D,S pins m_ePin[0] m_ePin[1] 
     newId = id;
     newId.append(QString("-Dren"));
     newPin = new Pin( 90, QPoint(8,-16), newId, 0, this );
@@ -65,14 +73,36 @@ Mosfet::Mosfet( QObject* parent, QString type, QString id )
     newPin->setLabelText( "" );
     newPin->setLabelColor( QColor( 0, 0, 0 ) );
     m_ePin[1] = newPin;
+    
+    Simulator::self()->addToUpdateList( this );
 }
 Mosfet::~Mosfet(){}
 
+void Mosfet::updateStep()
+{
+    update();
+}
+
+void Mosfet::setPchannel( bool pc )
+{ 
+    m_Pchannel = pc;
+    update();
+}
+
+void Mosfet::setDepletion( bool dep )
+{
+    m_depletion = dep;
+    update();
+}
+
 void Mosfet::remove()
 {
+    Simulator::self()->remFromUpdateList( this );
+    
     if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
     if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
     if( m_ePin[2]->isConnected() ) (static_cast<Pin*>(m_ePin[2]))->connector()->remove();
+    
     Component::remove();
 }
 
@@ -80,17 +110,13 @@ void Mosfet::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
 {
     Component::paint( p, option, widget );
     
-    if( m_gateV > 0 )  p->setBrush( Qt::yellow );
-    else               p->setBrush( Qt::white );
+    if( Circuit::self()->animate() && m_gateV > 0 )  p->setBrush( Qt::yellow );
+    else                                             p->setBrush( Qt::white );
 
     p->drawEllipse( m_area );
     
     p->drawLine( -12, 0,-4, 0 );
     p->drawLine(  -4,-8,-4, 8 );
-    
-    p->drawLine( 0,-9, 0, -5 );
-    p->drawLine( 0,-2, 0, 2 );
-    p->drawLine( 0, 5, 0, 9 );
     
     p->drawLine( 0,-7.5, 8,-7.5 );
     p->drawLine( 0,   0, 8, 0 );
@@ -98,7 +124,7 @@ void Mosfet::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
     
     p->drawLine( 8,-12, 8,-7.5 );
     p->drawLine( 8, 12, 8, 0 );
-
+    
     p->setBrush( Qt::black );
     if( m_Pchannel )
     {
@@ -115,6 +141,18 @@ void Mosfet::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget
         QPointF( 5,-2 ),
         QPointF( 5, 2 )     };
         p->drawPolygon(points, 3);
+    }
+    if( m_depletion )
+    {
+        QPen pen(Qt::black, 2.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        p->setPen( pen );
+        p->drawLine( 0,-9, 0, 9 );
+    }
+    else
+    {
+        p->drawLine( 0,-9, 0, -5 );
+        p->drawLine( 0,-2, 0, 2 );
+        p->drawLine( 0, 5, 0, 9 );
     }
 }
 

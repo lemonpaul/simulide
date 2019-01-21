@@ -36,7 +36,7 @@ CircuitWidget::CircuitWidget( QWidget *parent  )
 {
     m_pSelf = this;
 
-    m_verticalLayout.setObjectName(tr("verticalLayout"));
+    m_verticalLayout.setObjectName( "verticalLayout" );
     m_verticalLayout.setContentsMargins(0, 0, 0, 0);
     m_verticalLayout.setSpacing(0);
 
@@ -52,7 +52,6 @@ CircuitWidget::CircuitWidget( QWidget *parent  )
              &m_serial, &SerialPortWidget::slotWriteData );
     
     m_rateLabel = new QLabel( this );
-    m_rateLabel->setText( "Real Speed: 0 %" );
     
     createActions();
     createToolBars();
@@ -63,6 +62,7 @@ CircuitWidget::CircuitWidget( QWidget *parent  )
     if( m_lastCircDir.isEmpty() )  m_lastCircDir = appPath + "..share/simulide/examples";
     
     newCircuit();
+    setRate(0);
 }
 CircuitWidget::~CircuitWidget() { }
 
@@ -73,36 +73,42 @@ void CircuitWidget::clear()
 
 void CircuitWidget::createActions()
 {
-    newCircAct = new QAction(QIcon(":/newcirc.png"), tr("New C&ircuit\tCtrl+N"), this);
-    newCircAct->setStatusTip(tr("Create a new Circuit"));
-    connect( newCircAct, SIGNAL(triggered()), this, SLOT(newCircuit()));
+    newCircAct = new QAction( QIcon(":/newcirc.png"), tr("New C&ircuit\tCtrl+N"), this);
+    newCircAct->setStatusTip( tr("Create a new Circuit"));
+    connect( newCircAct, SIGNAL( triggered()), this, SLOT( newCircuit()));
 
-    openCircAct = new QAction(QIcon(":/opencirc.png"), tr("&Open Circuit\tCtrl+O"), this);
-    openCircAct->setStatusTip(tr("Open an existing Circuit"));
-    connect(openCircAct, SIGNAL(triggered()), this, SLOT(openCirc()));
+    openCircAct = new QAction( QIcon(":/opencirc.png"), tr("&Open Circuit\tCtrl+O"), this);
+    openCircAct->setStatusTip( tr("Open an existing Circuit"));
+    connect( openCircAct, SIGNAL( triggered()), this, SLOT(openCirc()));
 
-    saveCircAct = new QAction(QIcon(":/savecirc.png"), tr("&Save Circuit\tCtrl+S"), this);
-    saveCircAct->setStatusTip(tr("Save the Circuit to disk"));
-    connect(saveCircAct, SIGNAL(triggered()), this, SLOT(saveCirc()));
+    saveCircAct = new QAction( QIcon(":/savecirc.png"), tr("&Save Circuit\tCtrl+S"), this);
+    saveCircAct->setStatusTip( tr("Save the Circuit to disk"));
+    connect( saveCircAct, SIGNAL( triggered()), this, SLOT(saveCirc()));
 
-    saveCircAsAct = new QAction(QIcon(":/savecircas.png"),tr("Save Circuit &As...\tCtrl+Shift+S"), this);
-    saveCircAsAct->setStatusTip(tr("Save the Circuit under a new name"));
-    connect(saveCircAsAct, SIGNAL(triggered()), this, SLOT(saveCircAs()));
+    saveCircAsAct = new QAction( QIcon(":/savecircas.png"),tr("Save Circuit &As...\tCtrl+Shift+S"), this);
+    saveCircAsAct->setStatusTip( tr("Save the Circuit under a new name"));
+    connect( saveCircAsAct, SIGNAL( triggered()), this, SLOT(saveCircAs()));
 
-    powerCircAct = new QAction(QIcon(":/poweroff.png"),tr("Power Circuit"), this);
+    powerCircAct = new QAction( QIcon(":/poweroff.png"),tr("Power Circuit"), this);
     powerCircAct->setStatusTip(tr("Power the Circuit"));
-    powerCircAct->setIconText("Off");
-    connect(powerCircAct, SIGNAL(triggered()), this, SLOT(powerCirc()));
+    connect( powerCircAct, SIGNAL( triggered()), this, SLOT(powerCirc()));
     
-    infoAct = new QAction(QIcon(":/help.png"),tr("Online Help"), this);
+    infoAct = new QAction( QIcon(":/help.png"),tr("Online Help"), this);
     infoAct->setStatusTip(tr("Online Help"));
-    infoAct->setIconText("Off");
-    connect(infoAct, SIGNAL(triggered()), this, SLOT(openInfo()));
+    connect( infoAct, SIGNAL( triggered()), this, SLOT(openInfo()));
+    
+    aboutAct = new QAction( QIcon(":/about.png"),tr("About SimulIDE"), this);
+    aboutAct->setStatusTip(tr("About SimulIDE"));
+    connect( aboutAct, SIGNAL( triggered()), this, SLOT(about()));
+    
+    aboutQtAct = new QAction( QIcon(":/about.png"),tr("About Qt"), this);
+    aboutQtAct->setStatusTip(tr("About Qt"));
+    connect( aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()) );
 }
 
 void CircuitWidget::createToolBars()
 {
-    m_circToolBar.setObjectName("m_circToolBar");
+    m_circToolBar.setObjectName( "m_circToolBar" );
     m_circToolBar.addAction(newCircAct);
     m_circToolBar.addAction(openCircAct);
     m_circToolBar.addAction(saveCircAct);
@@ -116,19 +122,43 @@ void CircuitWidget::createToolBars()
     spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     spacerWidget->setVisible(true);
     m_circToolBar.addWidget(spacerWidget);
-    m_circToolBar.addAction(infoAct);
+    
+    infoMenu = new QMenu("I");
+    infoMenu->addAction( infoAct );
+    infoMenu->addAction( aboutAct );
+    infoMenu->addAction( aboutQtAct );
+    QToolButton* toolButton = new QToolButton();
+    toolButton->setMenu( infoMenu );
+    toolButton->setIcon( QIcon(":/help.png") );
+    toolButton->setPopupMode( QToolButton::InstantPopup );
+    m_circToolBar.addWidget( toolButton );
+    
     m_circToolBar.addSeparator();//..........................
 }
 
-void CircuitWidget::newCircuit()
+bool CircuitWidget::newCircuit()
 {
     powerCircOff();
+    
+    if( MainWindow::self()->windowTitle().endsWith('*') )
+    {
+        const QMessageBox::StandardButton ret
+        = QMessageBox::warning(this, "MainWindow::closeEvent",
+                               tr("\nCircuit has been modified.\n"
+                                  "Do you want to save your changes?\n"),
+                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+                               
+        if( ret == QMessageBox::Save ) saveCirc();
+        else if( ret == QMessageBox::Cancel ) return false;
+    }
     
     clear();
     m_curCirc = "";
 
-    MainWindow::self()->setTitle("New Circuit");
+    MainWindow::self()->setTitle( tr("New Circuit"));
     MainWindow::self()->settings()->setValue( "lastCircDir", m_lastCircDir );
+    
+    return true;
 }
 
 void CircuitWidget::openCirc()
@@ -191,8 +221,8 @@ bool CircuitWidget::saveCircAs()
 
 void CircuitWidget::powerCirc()
 {
-    if( powerCircAct->iconText() == "Off" ) powerCircOn();
-    else                                    powerCircOff();
+    if     ( powerCircAct->iconText() == "Off" ) powerCircOn();
+    else if( powerCircAct->iconText() == "On" )  powerCircOff();
 }
 
 void CircuitWidget::powerCircOn()
@@ -201,6 +231,7 @@ void CircuitWidget::powerCircOn()
     powerCircAct->setIconText("On");
     Simulator::self()->runContinuous();
 }
+
 void CircuitWidget::powerCircOff()
 {
         powerCircAct->setIcon(QIcon(":/poweroff.png"));
@@ -208,17 +239,55 @@ void CircuitWidget::powerCircOff()
         Simulator::self()->stopSim();
 }
 
+void CircuitWidget::powerCircDebug( bool run )
+{
+        powerCircAct->setIcon(QIcon(":/powerdeb.png"));
+        powerCircAct->setIconText("Debug");
+        if( run ) Simulator::self()->runContinuous();
+        else      
+        {
+            Simulator::self()->debug();
+            m_rateLabel->setText( tr("Real Speed: Debugger") );
+        }
+}
+
 void CircuitWidget::openInfo()
 {
     QDesktopServices::openUrl(QUrl("http://simulide.blogspot.com"));
 }
 
+void CircuitWidget::about()
+{
+    QString t ="&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;";
+    QMessageBox::about( this, tr("About SimulIDE"),
+    "<b>Web site:</b> <a href=\"https://simulide.blogspot.com/\"> https://simulide.blogspot.com/ </a><br><br>"
+    "<b>Project:</b> <a href=\"https://sourceforge.net/projects/simulide/\"> https://sourceforge.net/projects/simulide/ </a><br><br>"
+    "<b>Report Bugs:</b> <a href=\"https://sourceforge.net/p/simulide/discussion/bugs/\"> https://sourceforge.net/p/simulide/discussion/bugs/ </a><br><br>"
+    "<b>Become a Patron:</b> <a href=\"https://www.patreon.com/simulide\"> https://www.patreon.com/simulide </a><br><br>"
+    "<br><br>"
+               "<b>Creator:</b> Santiago Gonzalez. <br>"
+               "<br>"
+               "<b>Developers:</b> <br>"
+               +t+"Santiago Gonzalez. <br>"
+               +t+"Popov Alexey <br>"
+               +t+"Pavel Lamonov <br>"
+               "<br>"
+               "<b>Contributors:</b> <br>"
+               +t+"Chris Roper <br>"
+               +t+"Sergei Chiyanov <br>"
+               +t+"Sergey Roenko <br>"
+               "<br>"
+               "<b>Translations:</b> <br>"
+               +t+"Spanish: Santiago Gonzalez. <br>"
+               +t+"Russian: Ronomir <br>"
+               );
+}
+
 void CircuitWidget::setRate( int rate )
 {
-    if( rate < 0 )
-        m_rateLabel->setText( "Circuit ERROR!!!" );
+    if( rate < 0 ) m_rateLabel->setText( tr("Circuit ERROR!!!") );
     else 
-        m_rateLabel->setText( "Real Speed: "+QString::number(rate) +" %" );
+        m_rateLabel->setText( tr("Real Speed: ")+QString::number(rate) +" %" );
 }
 
 /*void CircuitWidget::setSerialPortWidget( QWidget* serialPortWidget )

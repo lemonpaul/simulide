@@ -34,19 +34,20 @@ class MAINMODULE_EXPORT eMosfet : public eResistor
         void initialize();
         virtual void setVChanged();
         
-        virtual bool pChannel()               { return m_Pchannel; }
-        virtual void setPchannel( bool pc )   { m_Pchannel = pc; }
+        virtual bool pChannel();
+        virtual void setPchannel( bool pc );
         
-        virtual double RDSon()                { return m_RDSon; }
+        virtual bool depletion();
+        virtual void setDepletion( bool dep );
+        
+        virtual double RDSon();
         virtual void  setRDSon( double rdson );
         
-        virtual double threshold()            { return m_threshold; }
-        virtual void  setThreshold( double th )
-        { 
-            m_threshold = th; 
-            m_kRDSon = m_RDSon*(10-m_threshold);
-            m_Gth = m_threshold-m_threshold/4;
-        }
+        virtual double threshold();
+        virtual void  setThreshold( double th );
+        
+        virtual ePin* getEpin( QString pinName );
+        virtual void initEpins();
         
     protected:
         double m_accuracy;
@@ -59,9 +60,9 @@ class MAINMODULE_EXPORT eMosfet : public eResistor
         double m_Vs;
 
         bool m_Pchannel;
+        bool m_depletion;
         bool m_Sfollow;
-        
-        eSource* m_gate;
+        bool m_converged;
 };
 
 #endif

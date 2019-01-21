@@ -30,7 +30,7 @@ class MAINMODULE_EXPORT LedBase : public Component, public eLed
 {
     Q_OBJECT
     Q_PROPERTY( LedColor Color    READ color      WRITE setColor      DESIGNABLE true USER true )
-    Q_PROPERTY( double threshold  READ threshold  WRITE setThreshold  DESIGNABLE true USER true )
+    Q_PROPERTY( double Threshold  READ threshold  WRITE setThreshold  DESIGNABLE true USER true )
     Q_PROPERTY( double MaxCurrent READ maxCurrent WRITE setMaxCurrent DESIGNABLE true USER true )
     Q_PROPERTY( double Resistance READ res        WRITE setRes        DESIGNABLE true USER true )
     Q_PROPERTY( bool   Grounded   READ grounded   WRITE setGrounded   DESIGNABLE true USER true )
@@ -71,6 +71,9 @@ class MAINMODULE_EXPORT LedBase : public Component, public eLed
         eNode*   m_scrEnode;
         
         LedColor m_ledColor;
+        
+        bool m_overCurrent;
+        int  m_counter;
         
 };
 

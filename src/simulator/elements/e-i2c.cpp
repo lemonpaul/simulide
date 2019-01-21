@@ -16,125 +16,177 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
  *                                                                         *
  ***************************************************************************/
-//modified test
+
 #include "e-i2c.h"
-#include <cstdio>
+//#include <cstdio>
+//#include <QDebug>
 
 eI2C::eI2C( std::string id )
     : eLogicDevice( id )
 {
-
+    m_address = 0x00;
 }
 eI2C::~eI2C() { }
 
 void eI2C::initialize()                    // Called at Simulation Start
 {
-       // Initialize Base Class ( Clock pin is managed in eLogicDevice )
-    eLogicDevice::initialize();
+    eLogicDevice::initialize();   // Initialize Base Class ( Clock pin is managed in eLogicDevice )
 
-        // Register for Pin Changes CallBack ( CallBack: setVChanged() )
     eNode* enode = m_input[0]->getEpin()->getEnode();
-    if( enode ) enode->addToChangedFast(this);
+    if( enode ) enode->addToChangedFast( this );
 
-                                                 // Initialize Variables
-    txReg = 0;
-    rxReg = 0;
-    bitsRcv = 0;
+    m_txReg = 0;
+    m_rxReg = 0;
+    m_bitPtr = 0;
     m_lastSDA = false;
-    state = I2C_IDLE;
-    addressBits = 7;
-    address = 0x08;
-    m_inputAvailable = false;
+    m_state = I2C_STOPPED;
+    m_addressBits = 7;
+    
+    m_input[0]->setVoltHigh( 5 );
+    m_input[0]->setOut( false );
+    m_input[0]->setImp( high_imp );
 }
 
 void eI2C::setVChanged()            // Some Pin Changed State, Manage it
 {
-    // Get Clk to don't miss any clock changes
-    int sclState = eLogicDevice::getClockState();
+    int sclState = eLogicDevice::getClockState(); // Get Clk to don't miss any clock changes
+    
+    m_SDA = eLogicDevice::getInputState( 0 );        // State of SDA pin
 
-
-
-    // e-logic_device.h:
-    //
-    // #define CLow    0
-    // #define Rising  1
-    // #define CHigh   2
-    // #define Falling 3
-
-    bool sda = eLogicDevice::getInputState( 0 );     // State of SDA pin
-
-    if (sclState == CHigh){
-      switch (state) {
-        case I2C_IDLE:
-           if (m_lastSDA && !sda)              // We are in a Start Condition
-          {
-            state = I2C_STARTED;
-            printf("I²C Start conditcion recieved\n");
-          }
-        break;
-        case I2C_STARTED:
-          if ( bitsRcv <= addressBits + 1){         //TODO add support for 10 bits
-            rxReg += sda;                       //Read one bit from sda
-            rxReg = rxReg << 1;
-            bitsRcv++;
-          }
-          else
-          {
-            m_rw = rxReg % 2; //Last bit is R/W
-            if ((rxReg >> 1) == address){ //not considering R/W bit for address
-
-              m_input[0]->setImp(40);
-              m_out = 1;
-              m_input[0]->setOut(true);
-
-
-              //pull sda low for ACK
-              if (m_rw)
-                state = I2C_READING;
-              else
-                state = I2C_WRITTING;
-            }
-            else
-              state = I2C_NOTME;
-            bitsRcv = 0;
-          }
-        break;
-        case I2C_NOTME:
-          if (!m_lastSDA && sda)
-            state = I2C_IDLE;
-        break;
-        case I2C_READING:
-          if (bitsRcv < 8){
-            rxReg += sda;                       //Read one bit from sda
-            rxReg = rxReg << 1;
-            bitsRcv++;
-          }
-          else{
-            // pull sda low for ACK
-            dataByteRecieved();
-            state = I2C_IDLE;
-          }
-        break;
-      }
-    }
-    if( sclState == Rising )             // We are in a SCL Rissing edge
+    if(( sclState == CHigh )&&( m_state != I2C_ACK ))
     {
-        ;
+        if( !m_SDA  && m_lastSDA )       // We are in a Start Condition
+        {
+            m_bitPtr = 0;
+            m_rxReg = 0;
+            m_state = I2C_STARTED;
+            //printf("I²C Start conditcion recieved\n");
+            
+        }
+        else if( m_SDA && !m_lastSDA )     // We are in a Stop Condition
+        {
+            m_state = I2C_STOPPED;
+            //printf("I²C Stop conditcion recieved\n");
+        }
     }
+    else if( sclState == Rising )        // We are in a SCL Rissing edge
+    {
+        if( m_state == I2C_STARTED )             // Get Transaction Info
+        {                                // TODO add support for 10 bits
+            readBit();
+            if( m_bitPtr > m_addressBits )
+            {
+                bool rw = m_rxReg % 2;                 //Last bit is R/W
+                m_rxReg >>= 1;
 
-
-
-    m_lastSDA = sda;
+                if( m_rxReg == m_address )              // Address match
+                {
+                    if( rw ) 
+                    {
+                        m_state = I2C_READING;
+                        writeByte();
+                    }
+                    else
+                    {
+                        m_state = I2C_WRITTING;
+                        m_bitPtr = 0;
+                    }
+                    ACK();
+                }
+                else
+                {
+                    m_state = I2C_STOPPED;
+                    m_rxReg = 0;
+                }
+            }
+        }
+        else if( m_state == I2C_WRITTING )
+        {
+            readBit();
+            if( m_bitPtr == 8 ) readByte();
+        }
+        else if( m_state == I2C_WAITACK )      // We wait for Master ACK
+        {
+            if( !m_SDA )                        // ACK: Continue Sending
+            {
+                m_state = m_lastState;
+                writeByte();
+            }
+            else m_state = I2C_IDLE;
+        }
+    }
+    else if( sclState == Falling )
+    {
+        if( m_state == I2C_ACK )
+        {
+            m_input[0]->setOut( false );
+            m_input[0]->setImp( 40 );
+            m_state = I2C_ENDACK;
+        }
+        else if( m_state == I2C_ENDACK )     // We just sent ACK, release SDA
+        {
+            m_input[0]->setImp( high_imp );
+            m_state = m_lastState;
+            m_rxReg = 0;
+        }
+        if( m_state == I2C_READING ) writeBit();
+    }
+    m_lastSDA = m_SDA;
 }
 
-void eI2C::sendBite( char byte )
+void eI2C::readBit()
 {
-    txReg = byte;
-    m_outputAvailable = true;
+    if( m_bitPtr > 0 ) m_rxReg <<= 1;
+    m_rxReg += m_SDA;                            //Read one bit from sda
+    m_bitPtr++;
 }
-void eI2C::dataByteRecieved(){
-  printf("Se recibió el caracter: %c\n",rxReg);
+
+void eI2C::writeBit()
+{
+    if( m_bitPtr < 0 ) 
+    {
+        waitACK();
+        return;
+    }
+    bool bit = m_txReg>>m_bitPtr & 1;
+    
+    m_input[0]->setOut( bit );
+    m_input[0]->setImp( 40 );
+    //qDebug() << "eI2C::writeBit()"<<m_bitPtr<<bit;
+    m_bitPtr--;
 }
+
+void eI2C::readByte()
+{
+    m_bitPtr = 0;
+    ACK();
+}
+
+void eI2C::writeByte()
+{
+    m_bitPtr = 7;
+}
+
+void eI2C::ACK()
+{
+    m_lastState = m_state;
+    m_state = I2C_ACK;
+}
+
+void eI2C::waitACK()
+{
+    m_input[0]->setOut( false );
+    m_input[0]->setImp( high_imp );
+    
+    m_lastState = m_state;
+    m_state = I2C_WAITACK;
+}
+
+void eI2C::setAddress( int address )
+{
+    m_address = address;
+}
+
 void eI2C::createPins()  // Usually Called by Subcircuit to create ePins
 {
     createClockPin();            // Clock pin is managed in eLogicDevice

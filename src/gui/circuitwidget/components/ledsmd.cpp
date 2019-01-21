@@ -22,7 +22,7 @@
 
 
 LedSmd::LedSmd( QObject* parent, QString type, QString id, QRectF area )
-    : LedBase( parent, type, id )
+      : LedBase( parent, type, id )
 {
     m_area = area;
 }

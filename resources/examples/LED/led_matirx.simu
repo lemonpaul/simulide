@@ -1,0 +1,102 @@
+<circuit type="simulide_0.1">
+ 
+Voltage Fijo.-25: 
+<item labely="-24" id="Voltage Fijo.-25" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="-90" objectName="Voltage Fijo.-25" Voltage="5" hflip="1" labelrot="0" y="-188" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-260" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-24: 
+<item labely="-24" id="Voltage Fijo.-24" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="-90" objectName="Voltage Fijo.-24" Voltage="5" hflip="1" labelrot="0" y="-188" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-276" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-23: 
+<item labely="-24" id="Voltage Fijo.-23" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="-90" objectName="Voltage Fijo.-23" Voltage="5" hflip="1" labelrot="0" y="-188" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-292" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-22: 
+<item labely="-24" id="Voltage Fijo.-22" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="-90" objectName="Voltage Fijo.-22" Voltage="5" hflip="1" labelrot="0" y="-188" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-308" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-21: 
+<item labely="-24" id="Voltage Fijo.-21" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="-90" objectName="Voltage Fijo.-21" Voltage="5" hflip="1" labelrot="0" y="-188" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-324" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-20: 
+<item labely="-24" id="Voltage Fijo.-20" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="-90" objectName="Voltage Fijo.-20" Voltage="5" hflip="1" labelrot="0" y="-188" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-340" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-19: 
+<item labely="-24" id="Voltage Fijo.-19" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="-90" objectName="Voltage Fijo.-19" Voltage="5" hflip="1" labelrot="0" y="-188" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-356" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-18: 
+<item labely="-24" id="Voltage Fijo.-18" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="-90" objectName="Voltage Fijo.-18" Voltage="5" hflip="1" labelrot="0" y="-188" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-372" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-9: 
+<item labely="-24" id="Voltage Fijo.-9" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="0" objectName="Voltage Fijo.-9" Voltage="5" hflip="1" labelrot="0" y="-372" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-436" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-8: 
+<item labely="-24" id="Voltage Fijo.-8" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="0" objectName="Voltage Fijo.-8" Voltage="5" hflip="1" labelrot="0" y="-260" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-436" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-7: 
+<item labely="-24" id="Voltage Fijo.-7" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="0" objectName="Voltage Fijo.-7" Voltage="5" hflip="1" labelrot="0" y="-356" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-436" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-6: 
+<item labely="-24" id="Voltage Fijo.-6" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="0" objectName="Voltage Fijo.-6" Voltage="5" hflip="1" labelrot="0" y="-276" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-436" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-5: 
+<item labely="-24" id="Voltage Fijo.-5" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="0" objectName="Voltage Fijo.-5" Voltage="5" hflip="1" labelrot="0" y="-292" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-436" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-4: 
+<item labely="-24" id="Voltage Fijo.-4" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="0" objectName="Voltage Fijo.-4" Voltage="5" hflip="1" labelrot="0" y="-308" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-436" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-3: 
+<item labely="-24" id="Voltage Fijo.-3" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="0" objectName="Voltage Fijo.-3" Voltage="5" hflip="1" labelrot="0" y="-324" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-436" labelx="-64" valLabRot="0"/>
+ 
+Voltage Fijo.-2: 
+<item labely="-24" id="Voltage Fijo.-2" vflip="1" Show_Volt="false" itemtype="Fixed Voltage" rotation="0" objectName="Voltage Fijo.-2" Voltage="5" hflip="1" labelrot="0" y="-340" Show_id="false" valLabely="8" valLabelx="-16" Unit=" V" x="-436" labelx="-64" valLabRot="0"/>
+ 
+Matriz Led-1: 
+<item labely="-24" id="Matriz Led-1" Resistance="100" vflip="1" itemtype="LedMatrix" rotation="0" threshold="2.3999999999999999" MaxCurrent="0.029999999999999999" objectName="Matriz Led-1" Color="0" hflip="1" labelrot="0" Rows="8" y="-340" Show_id="false" valLabely="0" valLabelx="0" Cols="8" x="-340" labelx="-16" valLabRot="0"/>
+ 
+Connector-11: 
+<item labely="-24" id="Connector-11" vflip="1" enodeid="enode-11" itemtype="Connector" endpinid="Matriz Led-1-pinRow1" rotation="0" objectName="Connector-11" pointList="-420,-356,-380,-356,-380,-332,-356,-332" hflip="1" labelrot="0" y="-356" Show_id="false" valLabely="0" valLabelx="0" x="-420" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-7-outnod"/>
+ 
+Connector-12: 
+<item labely="-24" id="Connector-12" vflip="1" enodeid="enode-12" itemtype="Connector" endpinid="Matriz Led-1-pinRow2" rotation="0" objectName="Connector-12" pointList="-420,-340,-388,-340,-388,-324,-356,-324" hflip="1" labelrot="0" y="-340" Show_id="false" valLabely="0" valLabelx="0" x="-420" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-2-outnod"/>
+ 
+Connector-13: 
+<item labely="-24" id="Connector-13" vflip="1" enodeid="enode-13" itemtype="Connector" endpinid="Matriz Led-1-pinRow3" rotation="0" objectName="Connector-13" pointList="-420,-324,-396,-324,-396,-316,-356,-316" hflip="1" labelrot="0" y="-324" Show_id="false" valLabely="0" valLabelx="0" x="-420" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-3-outnod"/>
+ 
+Connector-14: 
+<item labely="-24" id="Connector-14" vflip="1" enodeid="enode-14" itemtype="Connector" endpinid="Matriz Led-1-pinRow4" rotation="0" objectName="Connector-14" pointList="-420,-308,-356,-308" hflip="1" labelrot="0" y="-308" Show_id="false" valLabely="0" valLabelx="0" x="-420" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-4-outnod"/>
+ 
+Connector-15: 
+<item labely="-24" id="Connector-15" vflip="1" enodeid="enode-15" itemtype="Connector" endpinid="Matriz Led-1-pinRow5" rotation="0" objectName="Connector-15" pointList="-420,-292,-396,-292,-396,-300,-356,-300" hflip="1" labelrot="0" y="-292" Show_id="false" valLabely="0" valLabelx="0" x="-420" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-5-outnod"/>
+ 
+Connector-16: 
+<item labely="-24" id="Connector-16" vflip="1" enodeid="enode-16" itemtype="Connector" endpinid="Matriz Led-1-pinRow6" rotation="0" objectName="Connector-16" pointList="-420,-276,-388,-276,-388,-292,-356,-292" hflip="1" labelrot="0" y="-276" Show_id="false" valLabely="0" valLabelx="0" x="-420" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-6-outnod"/>
+ 
+Connector-17: 
+<item labely="-24" id="Connector-17" vflip="1" enodeid="enode-17" itemtype="Connector" endpinid="Matriz Led-1-pinRow7" rotation="0" objectName="Connector-17" pointList="-420,-260,-380,-260,-380,-284,-356,-284" hflip="1" labelrot="0" y="-260" Show_id="false" valLabely="0" valLabelx="0" x="-420" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-8-outnod"/>
+ 
+Connector-26: 
+<item labely="-24" id="Connector-26" vflip="1" enodeid="enode-26" itemtype="Connector" endpinid="Matriz Led-1-pinCol0" rotation="0" objectName="Connector-26" pointList="-372,-204,-372,-252,-340,-252,-340,-268" hflip="1" labelrot="0" y="-204" Show_id="false" valLabely="0" valLabelx="0" x="-372" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-18-outnod"/>
+ 
+Connector-27: 
+<item labely="-24" id="Connector-27" vflip="1" enodeid="enode-27" itemtype="Connector" endpinid="Matriz Led-1-pinCol1" rotation="0" objectName="Connector-27" pointList="-356,-204,-356,-244,-332,-244,-332,-268" hflip="1" labelrot="0" y="-204" Show_id="false" valLabely="0" valLabelx="0" x="-356" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-19-outnod"/>
+ 
+Connector-28: 
+<item labely="-24" id="Connector-28" vflip="1" enodeid="enode-28" itemtype="Connector" endpinid="Matriz Led-1-pinCol2" rotation="0" objectName="Connector-28" pointList="-340,-204,-340,-236,-324,-236,-324,-268" hflip="1" labelrot="0" y="-204" Show_id="false" valLabely="0" valLabelx="0" x="-340" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-20-outnod"/>
+ 
+Connector-29: 
+<item labely="-24" id="Connector-29" vflip="1" enodeid="enode-29" itemtype="Connector" endpinid="Matriz Led-1-pinCol3" rotation="0" objectName="Connector-29" pointList="-324,-204,-324,-228,-316,-228,-316,-268" hflip="1" labelrot="0" y="-204" Show_id="false" valLabely="0" valLabelx="0" x="-324" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-21-outnod"/>
+ 
+Connector-30: 
+<item labely="-24" id="Connector-30" vflip="1" enodeid="enode-30" itemtype="Connector" endpinid="Matriz Led-1-pinCol4" rotation="0" objectName="Connector-30" pointList="-308,-204,-308,-268" hflip="1" labelrot="0" y="-204" Show_id="false" valLabely="0" valLabelx="0" x="-308" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-22-outnod"/>
+ 
+Connector-34: 
+<item labely="-24" id="Connector-34" vflip="1" enodeid="enode-34" itemtype="Connector" endpinid="Matriz Led-1-pinCol5" rotation="0" objectName="Connector-34" pointList="-292,-204,-292,-228,-300,-228,-300,-268" hflip="1" labelrot="0" y="-204" Show_id="false" valLabely="0" valLabelx="0" x="-292" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-23-outnod"/>
+ 
+Connector-35: 
+<item labely="-24" id="Connector-35" vflip="1" enodeid="enode-35" itemtype="Connector" endpinid="Matriz Led-1-pinCol6" rotation="0" objectName="Connector-35" pointList="-276,-204,-276,-236,-292,-236,-292,-268" hflip="1" labelrot="0" y="-204" Show_id="false" valLabely="0" valLabelx="0" x="-276" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-24-outnod"/>
+ 
+Connector-36: 
+<item labely="-24" id="Connector-36" vflip="1" enodeid="enode-36" itemtype="Connector" endpinid="Matriz Led-1-pinCol7" rotation="0" objectName="Connector-36" pointList="-260,-204,-260,-244,-284,-244,-284,-268" hflip="1" labelrot="0" y="-204" Show_id="false" valLabely="0" valLabelx="0" x="-260" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-25-outnod"/>
+ 
+Connector-10: 
+<item labely="-24" id="Connector-10" vflip="1" enodeid="enode-10" itemtype="Connector" endpinid="Matriz Led-1-pinRow0" rotation="0" objectName="Connector-10" pointList="-420,-372,-372,-372,-372,-340,-356,-340" hflip="1" labelrot="0" y="-372" Show_id="false" valLabely="0" valLabelx="0" x="-420" labelx="-16" valLabRot="0" startpinid="Voltage Fijo.-9-outnod"/>
+ 
+</circuit>

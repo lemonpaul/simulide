@@ -1,0 +1,48 @@
+<!DOCTYPE SimulIDE>
+
+<!-- *************************************************************************** -->
+<!-- *   Copyright (C) 2017 by santiago González                               * -->
+<!-- *   santigoro@gmail.com                                                   * -->
+<!-- *                                                                         * -->
+<!-- *   This program is free software; you can redistribute it and/or modify  * -->
+<!-- *   it under the terms of the GNU General Public License as published by  * -->
+<!-- *   the Free Software Foundation; either version 3 of the License, or     * -->
+<!-- *   (at your option) any later version.                                   * -->
+<!-- *                                                                         * -->
+<!-- *   This program is distributed in the hope that it will be useful,       * -->
+<!-- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * -->
+<!-- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * -->
+<!-- *   GNU General Public License for more details.                          * -->
+<!-- *                                                                         * -->
+<!-- *   You should have received a copy of the GNU General Public License     * -->
+<!-- *   along with this program; if not, see <http://www.gnu.org/licenses/>.  * -->
+<!-- *                                                                         * -->
+<!-- *************************************************************************** -->
+
+<subcircuit enodes="1">
+
+    <item itemtype="eShiftReg" 
+    connections="
+    output0-packagePin3 
+    output1-packagePin4 
+    output2-packagePin5 
+    output3-packagePin6 
+    output4-packagePin12 
+    output5-packagePin11 
+    output6-packagePin10 
+    output7-packagePin9
+    input0-eNode0 
+    input1-packagePin13 
+    clock-packagePin14" >
+    </item>
+    
+    <item itemtype="eAndGate"
+    numInputs="2"
+    connections="
+    input0-packagePin1 
+    input1-packagePin2 
+    output0-eNode0" >
+    </item>
+    
+</subcircuit>
+

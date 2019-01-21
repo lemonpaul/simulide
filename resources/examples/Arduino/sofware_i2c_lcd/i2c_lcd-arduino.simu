@@ -1,0 +1,45 @@
+<circuit type="simulide_0.1">
+ 
+I2C to Parallel-3: 
+<item Show_id="false" hflip="1" id="I2C to Parallel-3" rotation="0" valLabelx="0" valLabely="0" vflip="1" itemtype="I2CToParallel" x="-292" y="-268" valLabRot="0" Control_Code="80" labelrot="0" labely="-24" labelx="-16" objectName="I2C to Parallel-3"/>
+ 
+Arduino Uno-2: 
+<item hflip="1" rotation="0" Show_id="true" id="Arduino Uno" Program="i2c_lcd-arduino.ino.hex" valLabelx="0" Ser_Port="false" objectName="Arduino Uno-2" x="-260" Mhz="16" valLabely="0" labelrot="0" Ser_Monitor="false" y="-196" itemtype="Arduino" labely="-22" valLabRot="0" labelx="52" vflip="1"/>
+ 
+Hd44780-1: 
+<item Show_id="true" hflip="1" id="Hd44780" rotation="0" valLabelx="0" valLabely="0" vflip="1" Cols="16" itemtype="Hd44780" x="-276" y="-340" valLabRot="0" labelrot="0" labely="-89" Rows="2" labelx="62" objectName="Hd44780-1"/>
+ 
+Connector-4: 
+<item pointList="-316,-284,-340,-284,-340,-148,-252,-148" startpinid="I2C to Parallel-3-in0" hflip="1" endpinid="Arduino Uno-2-PD4" rotation="0" Show_id="false" id="Connector-4" enodeid="Circ_eNode-5" valLabelx="0" objectName="Connector-4" x="-316" valLabely="0" labelrot="0" y="-284" itemtype="Connector" labely="-24" valLabRot="0" labelx="-16" vflip="1"/>
+ 
+Connector-6: 
+<item pointList="-316,-276,-332,-276,-332,-156,-252,-156" startpinid="I2C to Parallel-3-in1" hflip="1" endpinid="Arduino Uno-2-PD3" rotation="0" Show_id="false" id="Connector-6" enodeid="Circ_eNode-7" valLabelx="0" objectName="Connector-6" x="-316" valLabely="0" labelrot="0" y="-276" itemtype="Connector" labely="-24" valLabRot="0" labelx="-16" vflip="1"/>
+ 
+Connector-8: 
+<item pointList="-268,-292,-260,-292,-260,-332" startpinid="I2C to Parallel-3-out0" hflip="1" endpinid="Hd44780-1-PinRS" rotation="0" Show_id="false" id="Connector-8" enodeid="Circ_eNode-9" valLabelx="0" objectName="Connector-8" x="-268" valLabely="0" labelrot="0" y="-292" itemtype="Connector" labely="-24" valLabRot="0" labelx="-16" vflip="1"/>
+ 
+Connector-10: 
+<item pointList="-268,-284,-252,-284,-252,-332" startpinid="I2C to Parallel-3-out1" hflip="1" endpinid="Hd44780-1-PinRW" rotation="0" Show_id="false" id="Connector-10" enodeid="Circ_eNode-11" valLabelx="0" objectName="Connector-10" x="-268" valLabely="0" labelrot="0" y="-284" itemtype="Connector" labely="-24" valLabRot="0" labelx="-16" vflip="1"/>
+ 
+Connector-12: 
+<item pointList="-268,-276,-244,-276,-244,-332" startpinid="I2C to Parallel-3-out2" hflip="1" endpinid="Hd44780-1-PinEn" rotation="0" Show_id="false" id="Connector-12" enodeid="Circ_eNode-13" valLabelx="0" objectName="Connector-12" x="-268" valLabely="0" labelrot="0" y="-276" itemtype="Connector" labely="-24" valLabRot="0" labelx="-16" vflip="1"/>
+ 
+Connector-14: 
+<item pointList="-268,-260,-204,-260,-204,-332" startpinid="I2C to Parallel-3-out4" hflip="1" endpinid="Hd44780-1-dataPin4" rotation="0" Show_id="false" id="Connector-14" enodeid="Circ_eNode-15" valLabelx="0" objectName="Connector-14" x="-268" valLabely="0" labelrot="0" y="-260" itemtype="Connector" labely="-24" valLabRot="0" labelx="-16" vflip="1"/>
+ 
+Connector-16: 
+<item pointList="-268,-252,-196,-252,-196,-332" startpinid="I2C to Parallel-3-out5" hflip="1" endpinid="Hd44780-1-dataPin5" rotation="0" Show_id="false" id="Connector-16" enodeid="Circ_eNode-17" valLabelx="0" objectName="Connector-16" x="-268" valLabely="0" labelrot="0" y="-252" itemtype="Connector" labely="-24" valLabRot="0" labelx="-16" vflip="1"/>
+ 
+Connector-18: 
+<item pointList="-268,-244,-188,-244,-188,-332" startpinid="I2C to Parallel-3-out6" hflip="1" endpinid="Hd44780-1-dataPin6" rotation="0" Show_id="false" id="Connector-18" enodeid="Circ_eNode-19" valLabelx="0" objectName="Connector-18" x="-268" valLabely="0" labelrot="0" y="-244" itemtype="Connector" labely="-24" valLabRot="0" labelx="-16" vflip="1"/>
+ 
+Connector-20: 
+<item pointList="-268,-236,-180,-236,-180,-332" startpinid="I2C to Parallel-3-out7" hflip="1" endpinid="Hd44780-1-dataPin7" rotation="0" Show_id="false" id="Connector-20" enodeid="Circ_eNode-21" valLabelx="0" objectName="Connector-20" x="-268" valLabely="0" labelrot="0" y="-236" itemtype="Connector" labely="-24" valLabRot="0" labelx="-16" vflip="1"/>
+ 
+PlotterWidget-20: 
+<item windowIconText="" fullScreen="false" acceptDrops="false" toolTipDuration="-1" focus="false" minimumSize="" visible="false" cursor="" geometry="" windowModified="false" mouseTracking="false" isActiveWindow="true" windowFilePath="" frameSize="" MinVolt="0" statusTip="" locale="" inputMethodHints="0" childrenRect="" maximumWidth="1000" objectName="PlotterWidget-20" autoFillBackground="false" baseSize="" frameGeometry="" size="" modal="false" styleSheet="" windowIcon="" maximumSize="" MaxVolt="500" enabled="true" layoutDirection="0" focusPolicy="0" palette="" windowOpacity="1" windowModality="0" minimumSizeHint="" x="0" y="701" normalGeometry="" sizeHint="" sizeIncrement="" minimized="false" updatesEnabled="true" height="200" itemtype="Plotter" minimumWidth="200" childrenRegion="" contextMenuPolicy="1" pos="" sizePolicy="" accessibleDescription="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumHeight="200" maximized="false" whatsThis="" rect="" maximumHeight="200" toolTip="" width="937" accessibleName="" windowTitle=""/>
+ 
+SerialPortWidget-21: 
+<item windowIconText="" fullScreen="false" acceptDrops="false" toolTipDuration="-1" focus="false" minimumSize="" visible="false" cursor="" geometry="" windowModified="false" mouseTracking="false" isActiveWindow="true" windowFilePath="" frameSize="" statusTip="" locale="" inputMethodHints="0" childrenRect="" maximumWidth="450" objectName="SerialPortWidget-21" autoFillBackground="false" baseSize="" frameGeometry="" size="" modal="false" styleSheet="" windowIcon="" maximumSize="" enabled="true" layoutDirection="0" focusPolicy="0" palette="" windowOpacity="1" windowModality="0" minimumSizeHint="" x="0" y="0" normalGeometry="" sizeHint="" sizeIncrement="" minimized="false" updatesEnabled="true" height="141" itemtype="SerialPort" minimumWidth="0" childrenRegion="" contextMenuPolicy="1" pos="" sizePolicy="" accessibleDescription="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumHeight="0" maximized="false" whatsThis="" rect="" maximumHeight="170" toolTip="" width="313" accessibleName="" SettingsProp="ttyS0,0,3,0,0,0" windowTitle="Configuracion"/>
+ 
+</circuit>

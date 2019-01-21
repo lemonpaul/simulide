@@ -53,6 +53,8 @@ Push::Push( QObject* parent, QString type, QString id )
     pinpos = QPoint(8+8,0);
     m_pin[1] = new Pin( 0, pinpos, pinid, 1, this);
     m_ePin[1] = m_pin[1];
+    
+    m_proxy->setPos( QPoint(-8, 4) );
 }
 Push::~Push()
 {

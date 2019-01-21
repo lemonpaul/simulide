@@ -28,14 +28,15 @@ LibraryItem* DAC::libraryItem()
 {
     return new LibraryItem(
         tr( "DAC" ),
-        tr( "Logic" ),
-        "subc.png",
+        tr( "Logic/Other Logic" ),
+        "3to1.png",
         "DAC",
         DAC::construct );
 }
 
 DAC::DAC( QObject* parent, QString type, QString id )
-       : LogicComponent( parent, type, id ), eOutBus( id.toStdString() )
+   : LogicComponent( parent, type, id )
+   , eOutBus( id.toStdString() )
 {    
     m_width  = 4;
     m_height = 9;
@@ -64,7 +65,7 @@ void DAC::setNumInps( int inputs )
 
     for( int i=0; i<inputs; i++ )
     {
-        QString num = QString::number(i);
+        QString num = QString::number( inputs-i-1 );
         m_inPin[i] = new Pin( 180, QPoint(-24,-8*inputs+i*8+8 ), m_id+"-in"+num, i, this );
 
         m_inPin[i]->setLabelText( "D"+num+" " );

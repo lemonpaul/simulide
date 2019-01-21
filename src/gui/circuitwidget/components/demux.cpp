@@ -29,8 +29,8 @@ LibraryItem* Demux::libraryItem()
 {
     return new LibraryItem(
         tr( "Demux" ),
-        tr( "Logic" ),
-        "subc.png",
+        tr( "Logic/Converters" ),
+        "demux.png",
         "Demux",
         Demux::construct );
 }
@@ -45,9 +45,9 @@ Demux::Demux( QObject* parent, QString type, QString id )
 
     pinList // Inputs:
             
-            << "ID03 S0"
+            << "ID03S0"
             << "ID02 S1"
-            << "ID01 S2"
+            << "ID01  S2"
             
             << "IL05 DI"
             
@@ -64,7 +64,7 @@ Demux::Demux( QObject* parent, QString type, QString id )
             << "OR08O7 "
             ;
     init( pinList );
-    
+    m_area = QRect( -(m_width/2)*8-1, -(m_height/2)*8-8-1, m_width*8+2, m_height*8+16+2 );
     
     eLogicDevice::createOutEnablePin( m_inPin[4] );    // IOutput Enable
     
@@ -75,5 +75,34 @@ Demux::Demux( QObject* parent, QString type, QString id )
         eLogicDevice::createOutput( m_outPin[i] );
 }
 Demux::~Demux(){}
+
+QPainterPath Demux::shape() const
+{
+    QPainterPath path;
+    
+    QVector<QPointF> points;
+    
+    points << QPointF(-(m_width/2)*8,-(m_height/2)*8+2 )
+           << QPointF(-(m_width/2)*8, (m_height/2)*8-2 )
+           << QPointF( (m_width/2)*8, (m_height/2)*8+6 )
+           << QPointF( (m_width/2)*8,-(m_height/2)*8-6 );
+        
+    path.addPolygon( QPolygonF(points) );
+    path.closeSubpath();
+    return path;
+}
+
+void Demux::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
+{
+    Component::paint( p, option, widget );
+
+    static const QPointF points[4] = {
+        QPointF(-(m_width/2)*8,-(m_height/2)*8+2 ),
+        QPointF(-(m_width/2)*8, (m_height/2)*8-2 ),
+        QPointF( (m_width/2)*8, (m_height/2)*8+6 ),
+        QPointF( (m_width/2)*8,-(m_height/2)*8-6 )};
+
+    p->drawPolygon(points, 4);
+}
 
 #include "moc_demux.cpp"

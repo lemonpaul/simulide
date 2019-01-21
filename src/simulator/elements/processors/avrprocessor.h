@@ -40,8 +40,9 @@ class AvrProcessor : public BaseProcessor
         void terminate();
 
         void reset();
-        void stepOne();
         void step();
+        void stepOne();
+        void stepCpu();
         int pc();
 
         int getRamValue( int address );

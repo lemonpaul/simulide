@@ -38,6 +38,8 @@ class MAINMODULE_EXPORT Mux : public LogicComponent, public eMux
 
 
     public:
+        QRectF boundingRect() const { return m_area; }
+    
         Mux( QObject* parent, QString type, QString id );
         ~Mux();
 
@@ -48,6 +50,8 @@ class MAINMODULE_EXPORT Mux : public LogicComponent, public eMux
 
         void setInvertInps( bool invert );
         
+        virtual QPainterPath shape() const;
+        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 };
 
 #endif

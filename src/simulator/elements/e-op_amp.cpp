@@ -18,19 +18,23 @@
  ***************************************************************************/
 
 #include <math.h>   // fabs(x,y)
+#include <sstream>
+
 #include "e-op_amp.h"
+#include "e-source.h"
 #include "simulator.h"
 
 eOpAmp::eOpAmp( std::string id )
       : eElement( id )
 {
-    m_ePin.resize(3);
+    m_ePin.resize(5);
     m_gain = 1000;
     
     //m_connected = false;
 }
 eOpAmp::~eOpAmp()
-{ 
+{
+    delete m_output;
 }
 
 void eOpAmp::initialize()
@@ -50,6 +54,16 @@ void eOpAmp::initialize()
 
 void eOpAmp::setVChanged() // Called when input pins nodes change volt
 {
+    if( m_powerPins )
+    {
+        m_voltPos = m_ePin[3]->getVolt();
+        m_voltNeg = m_ePin[4]->getVolt();
+    }
+    else
+    {
+        m_voltPos = 5;
+        m_voltNeg = 0;
+    }
     double vd = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
 
     //qDebug() << "lastIn " << m_lastIn << "vd " << vd ;
@@ -99,3 +113,30 @@ void eOpAmp::setVChanged() // Called when input pins nodes change volt
     m_ePin[2]->stampCurrent( out/cero_doub );
 }
 
+double eOpAmp::gain()                {return m_gain;}
+void   eOpAmp::setGain( double gain ){m_gain = gain;}
+
+bool eOpAmp::hasPowerPins()          {return m_powerPins;}
+void eOpAmp::setPowerPins( bool set ){m_powerPins = set;}
+
+ePin* eOpAmp::getEpin( QString pinName )
+{
+    ePin* pin = 0l;
+    if     ( pinName == "inputInv")  pin = m_ePin[0];
+    else if( pinName == "inputNinv") pin = m_ePin[1];
+    else if( pinName == "output")    pin = m_ePin[2];
+    else if( pinName == "powerPos")  pin = m_ePin[3];
+    else if( pinName == "powerNeg")  pin = m_ePin[4];
+    return pin;
+}
+
+void eOpAmp::initEpins()
+{
+    setNumEpins(5); 
+    
+    std::stringstream ss;
+    ss << m_elmId << "-eSource";
+    m_output = new eSource( ss.str(), m_ePin[2] );
+    //m_output->setImp( 40 );
+    m_output->setOut( true );
+}

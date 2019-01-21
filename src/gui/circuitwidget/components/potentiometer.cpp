@@ -22,6 +22,9 @@
 #include "circuit.h"
 #include "itemlibrary.h"
 
+static const char* Potentiometer_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Value Ohm")
+};
 
 Component* Potentiometer::construct( QObject* parent, QString type, QString id )
 {
@@ -44,12 +47,16 @@ Potentiometer::Potentiometer( QObject* parent, QString type, QString id )
              , m_pinA( 180, QPoint(-16,0 ), id+"-PinA", 0, this )
              , m_pinM( 270, QPoint( 0,16), id+"-PinM", 0, this )
              , m_pinB(   0, QPoint( 16,0 ), id+"-PinB", 0, this )
-             , m_ePinA( (id+"-ePinA").toStdString(), 0 )
+             , m_ePinA( (id+"-ePinA").toStdString(), 1 )
              , m_ePinB( (id+"-ePinB").toStdString(), 1 )
              , m_resA(  (id+"-resA").toStdString() )
              , m_resB(  (id+"-resB").toStdString() )
 {
+    Q_UNUSED( Potentiometer_properties );
+    
     m_area = QRectF( -12, -4.5, 24, 12.5 );
+    
+    m_midEnode = 0l;
     
     m_dialW.setupWidget();
     m_dialW.setFixedSize( 24, 24 );
@@ -68,8 +75,8 @@ Potentiometer::Potentiometer( QObject* parent, QString type, QString id )
     m_resA.setEpin( 0, &m_pinA );
     m_resA.setEpin( 1, &m_ePinA );
     
-    m_resB.setEpin( 0, &m_pinB );
-    m_resB.setEpin( 1, &m_ePinB );
+    m_resB.setEpin( 1, &m_pinB );
+    m_resB.setEpin( 0, &m_ePinB );
 
     m_unit = "Ω";
     setRes(1000);
@@ -89,10 +96,23 @@ Potentiometer::~Potentiometer()
 
 void Potentiometer::initialize()
 {
-    eNode* enod = m_pinM.getEnode(); // Get eNode from middle Pin
+    eNode* enod = m_pinM.getEnode();        // Get eNode from middle Pin
+
+    if( !enod )                       // Not connected: Create mid eNode
+    {
+        m_midEnode = new eNode( m_id+"-mideNode" );
+        enod = m_midEnode;
+        m_pinM.setEnode( enod );
+    }
+    else if( enod != m_midEnode ) // Connected to external eNode: Delete mid eNode
+    {
+        m_midEnode = enod;
+    }
+    else return;      // Already connected to boardLed eNode: Do nothing
     
-    m_ePinA.setEnode(enod); // Set eNode to internal eResistors ePins
-    m_ePinB.setEnode(enod);
+    m_ePinA.setEnode( enod );  // Set eNode to internal eResistors ePins
+    m_ePinB.setEnode( enod );
+
     m_changed = true;
     updateStep();
 }
@@ -114,7 +134,7 @@ void Potentiometer::updateStep()
             res2 = 1e-6;
             res1 = m_resist-res2;
         }
-        
+        //qDebug()<<"Potentiometer::updateStep"<<res1<<res2;
         m_resA.setRes( res1 );
         m_resB.setRes( res2 );
         
@@ -158,8 +178,14 @@ int Potentiometer::val()
 void Potentiometer::remove()
 {
     if( m_pinA.isConnected() ) m_pinA.connector()->remove();
-    if( m_pinM.isConnected() ) m_pinM.connector()->remove();
     if( m_pinB.isConnected() ) m_pinB.connector()->remove();
+    if( m_pinM.isConnected() ) 
+    {
+        Connector* con = m_pinM.connector();
+        if( con ) con->remove();
+    }
+    
+    //if( m_midEnode ) Simulator::self()->remFromEnodeList( m_midEnode, true );
     
     Simulator::self()->remFromUpdateList( this );
     

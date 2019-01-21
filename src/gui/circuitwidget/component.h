@@ -51,7 +51,7 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
     Q_PROPERTY( int      vflip     READ vflip     WRITE setVflip )
 
     public:
-        QRectF boundingRect() const { return m_area; }
+        QRectF boundingRect() const { return QRectF( m_area.x()-2, m_area.y()-2, m_area.width()+4 ,m_area.height()+4 ); }
 
         Component( QObject* parent, QString type, QString id );
         ~Component();
@@ -103,7 +103,7 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         
         void updateLabel( Label* label, QString txt );
         
-        QString getHelp( QString file );
+        //QString getHelp( QString file );
         
         void setPrintable( bool p );
         QString print();
@@ -122,14 +122,14 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         void moved();
 
     public slots:
-        void rotateCW();
-        void rotateCCW();
-        void rotateHalf();
-        void H_flip();
-        void V_flip();
-        void slotRemove();
+        virtual void slotProperties();
+        virtual void rotateCW();
+        virtual void rotateCCW();
+        virtual void rotateHalf();
+        virtual void H_flip();
+        virtual void V_flip();
+        virtual void slotRemove();
         void slotCopy();
-        void slotProperties();
 
         virtual void remove();
 
@@ -161,8 +161,8 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         QString m_id;
         QString m_type;
         QString m_category;
+        QString m_BackGround;   // BackGround Image
         
- static QString m_noHelpMsg;
         QString* m_help;
         
         QIcon   m_icon;

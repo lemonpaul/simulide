@@ -24,6 +24,8 @@
 #include "e-inductor.h"
 #include "e-node.h"
 
+#include <math.h>
+
 eInductor::eInductor( std::string id ) : eResistor( id )
 {
     m_ind = 1; // H

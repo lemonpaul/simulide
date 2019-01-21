@@ -30,14 +30,15 @@ LibraryItem* ShiftReg::libraryItem()
 {
     return new LibraryItem(
         tr( "Shift Reg." ),
-        tr( "Logic" ),
-        "subc.png",
+        tr( "Logic/Arithmetic" ),
+        "1to3.png",
         "ShiftReg",
         ShiftReg::construct );
 }
 
 ShiftReg::ShiftReg( QObject* parent, QString type, QString id )
-        : LogicComponent( parent, type, id ), eShiftReg( id.toStdString() )
+        : LogicComponent( parent, type, id )
+        , eShiftReg( id.toStdString() )
 {
     m_width  = 4;
     m_height = 9;

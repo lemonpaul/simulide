@@ -32,21 +32,7 @@ class PicAsmDebugger : public BaseDebugger
         PicAsmDebugger( QObject* parent, OutPanelText* outPane, QString filePath  );
         ~PicAsmDebugger();
 
-        bool loadFirmware();
-
-        int  step();     // Run 1 step and returns actual source line number
-        int  stepOver();
-        int  getValidLine( int line );
-
         int  compile();
-        
-    private:
-        void mapLstToAsm();
-        //void setRegisters();
-
-        QHash<int, int> m_asmToFlash;               // Map .asm code line to flash adress
-        QHash<int, int> m_flashToAsm;               // Map flash adress to .asm code line
-
-        //QString m_gpasm;                         // path to gpasm executable
+        void mapFlashToSource();
 };
 #endif

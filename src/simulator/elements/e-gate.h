@@ -34,12 +34,19 @@ class MAINMODULE_EXPORT eGate : public eLogicDevice
         
         bool tristate();
         void setTristate( bool t );
+        
+        bool openCol();
+        void setOpenCol( bool op );
 
     protected:           
         virtual bool calcOutput( int inputs );
 
         bool m_tristate;
-
+        bool m_openCol;
+ static bool m_oscCtrl;
+        int  m_oscCount;
+        
+        uint64_t m_lastStep;
 };
 
 

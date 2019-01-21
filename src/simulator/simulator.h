@@ -23,10 +23,11 @@
 #include <qtconcurrentrun.h>
 #include <QElapsedTimer>
 
-#include "e-node.h"
-#include "e-element.h"
 #include "circmatrix.h"
-#include "baseprocessor.h"
+
+class BaseProcessor;
+class eElement;
+class eNode;
 
 class MAINMODULE_EXPORT Simulator : public QObject
 {
@@ -39,9 +40,15 @@ class MAINMODULE_EXPORT Simulator : public QObject
 
         void runContinuous();
         void stopTimer();
+        void resumeTimer();
         void pauseSim();
         void resumeSim();
         void stopSim();
+        void stopDebug();
+        void startSim();
+        void debug();
+        void runCircuitStep();
+        void runGraphicStep();
         void runExtraStep();
         
         int simuRate() { return m_simuRate; }
@@ -51,14 +58,14 @@ class MAINMODULE_EXPORT Simulator : public QObject
         void setReaClock( int value );
         int  noLinClock();
         void setNoLinClock( int value );
-        void setMcuClock( int value );
-        int  nlAcc();
-        void setNlAcc( int ac );
+        int  noLinAcc();
+        void setNoLinAcc( int ac );
         double NLaccuracy();
         
         bool isRunning();
+        bool isPaused();
         
-        unsigned long long step();
+        uint64_t step();
 
         QList<eNode*> geteNodes() { return m_eNodeList; }
 
@@ -90,7 +97,13 @@ class MAINMODULE_EXPORT Simulator : public QObject
         void remFromMcuList( BaseProcessor* proc );
 
         void timerEvent( QTimerEvent* e );
+        
+        uint64_t stepsPerSec;
 
+    signals:
+        void pauseDebug();
+        void resumeDebug();
+        
     private:
  static Simulator* m_pSelf;
         
@@ -115,27 +128,28 @@ class MAINMODULE_EXPORT Simulator : public QObject
         QList<BaseProcessor*> m_mcuList;
 
         bool m_isrunning;
+        bool m_debugging;
         bool m_paused;
         bool m_error;
         int  m_timerId;
         
-        int m_nlAcc;
+        int m_noLinAcc;
 
         int m_numEnodes;
         int m_simuRate;
         int m_stepsPrea;
         int m_stepsNolin;
         int m_timerTick;
-        int m_mcuStepsPT;
         
         int m_circuitRate;
         int m_noLinCounter;
         int m_reacCounter;
+        int m_updtCounter;
 
-        unsigned long long m_step;
-        unsigned long long m_lastStep;
+        uint64_t m_step;
+        uint64_t m_lastStep;
         
-        qint64        m_lastRefTime;
+        uint64_t m_lastRefTime;
         QElapsedTimer m_RefTimer;
 };
  #endif

@@ -30,8 +30,8 @@ LibraryItem* FlipFlopD::libraryItem()
 {
     return new LibraryItem(
         tr( "FlipFlop D" ),
-        tr( "Logic" ),
-        "subc.png",
+        tr( "Logic/Memory" ),
+        "2to2.png",
         "FlipFlopD",
         FlipFlopD::construct );
 }
@@ -58,15 +58,12 @@ FlipFlopD::FlipFlopD( QObject* parent, QString type, QString id )
     init( pinList );
     
     eLogicDevice::createInput( m_inPin[0] );                  // Input D
-
     eLogicDevice::createInput( m_inPin[1] );                  // Input S
-
     eLogicDevice::createInput( m_inPin[2] );                  // Input R
     
     eLogicDevice::createClockPin( m_inPin[3] );           // Input Clock
     
     eLogicDevice::createOutput( m_outPin[0] );               // Output Q
-
     eLogicDevice::createOutput( m_outPin[1] );               // Output Q'
 
     setSrInv( true );                           // Inver Set & Reset pins

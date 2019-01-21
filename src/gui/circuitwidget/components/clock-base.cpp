@@ -21,10 +21,17 @@
 #include "pin.h"
 #include "simulator.h"
 
+static const char* ClockBase_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Freq")
+};
 
 ClockBase::ClockBase( QObject* parent, QString type, QString id )
          : LogicInput( parent, type, id )
 {
+    Q_UNUSED( ClockBase_properties );
+    
+    m_area = QRect( -14, -8, 22, 16 );
+    
     m_isRunning = false;
 
     m_stepsPC = 0;
@@ -39,21 +46,20 @@ void ClockBase::updateStep()
 {
     if( m_changed )
     {
-        if( m_isRunning )
-            Simulator::self()->addToSimuClockList( this );
+        if( m_isRunning ) Simulator::self()->addToSimuClockList( this );
         else
         {
             m_out->setOut( false );
-            m_out->stampOutput();
             Simulator::self()->remFromSimuClockList( this );
         }
-        m_changed = false;
+        LogicInput::updateStep();
     }
 }
 
+int ClockBase::freq() { return m_freq; }
+
 void ClockBase::setFreq( int freq )
 {
-    //m_freq = freq;
     m_stepsPC = 1e6/(double)freq;
     
     if (m_stepsPC < 1) m_stepsPC = 1;
@@ -63,18 +69,24 @@ void ClockBase::setFreq( int freq )
     emit freqChanged();
 }
 
+bool ClockBase::running() { return m_isRunning; }
+
+void ClockBase::setRunning( bool running )
+{
+    m_isRunning = running;
+    m_step = 0;
+    m_changed = true;
+    //updateStep();
+    //qDebug() << m_stepsPC << m_isRunning ;
+}
+
 void ClockBase::onbuttonclicked()
 {
-    m_isRunning = !m_isRunning;
-    m_step = 0;
-
-    m_changed = true;
-    //qDebug() << m_stepsPC << m_isRunning ;
+    setRunning( !m_isRunning );
 }
 
 void ClockBase::remove()
 {
-
     Simulator::self()->remFromSimuClockList( this );
 
     LogicInput::remove();

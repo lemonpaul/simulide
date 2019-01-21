@@ -20,11 +20,14 @@
  ***************************************************************************/
 
 #include "op_amp.h"
-
+#include "e-source.h"
 #include "itemlibrary.h"
 #include "connector.h"
 #include "pin.h"
 
+static const char* OpAmp_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Power Pins")
+};
 
 Component* OpAmp::construct( QObject* parent, QString type, QString id )
 {
@@ -42,15 +45,18 @@ LibraryItem* OpAmp::libraryItem()
 }
 
 OpAmp::OpAmp( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eOpAmp( id.toStdString() )
+     : Component( parent, type, id )
+     , eOpAmp( id.toStdString() )
 {
+    Q_UNUSED( OpAmp_properties );
+    
     m_area = QRect( -18, -8*2, 36, 8*2*2 );
     
     setGain( 1000 );
     m_voltPos = 5;
     m_voltNeg = 0;
     
-    m_pin.resize( 3 );
+    m_pin.resize( 5 );
     
     QString newId = id;
     
@@ -66,22 +72,6 @@ OpAmp::OpAmp( QObject* parent, QString type, QString id )
     m_pin[1]->setLabelText( " -" );
     m_pin[1]->setLabelColor( QColor( 0, 0, 0 ) );
     m_ePin[1] = m_pin[1];
-    //m_inResistor->setEpin( 1, m_ePin[1] );
-    //newId.append("-eSource");
-    //m_inputInv = new eSource( newId.toStdString(), m_ePin[1] );
-    //m_inputInv->setImp( high_imp );
-    
-    /*newId = id;
-    newId.append(QString("powerPos"));
-    m_ePin[2] = new Pin( 0, QPoint(0,-16), newId, 0, this );
-    newId.append("-eSource");
-    m_powerPos = new eSource( newId.toStdString(), m_ePin[2] );
-    
-    newId = id;
-    newId.append(QString("powerNeg"));
-    m_ePin[3] = new Pin( 0, QPoint(0,16), newId, 0, this );
-    newId.append("-eSource");
-    m_powerNeg = new eSource( newId.toStdString(), m_ePin[3] );*/
     
     newId = id;
     newId.append(QString("-output"));
@@ -92,14 +82,50 @@ OpAmp::OpAmp( QObject* parent, QString type, QString id )
     //m_output->setImp( 40 );
     m_output->setOut( true );
     
-    //m_inResistor->setRes( high_imp );
+    newId = id;
+    newId.append(QString("powerPos"));
+    m_pin[3] = new Pin( 90, QPoint(0,-16), newId, 3, this );
+    m_ePin[3] = m_pin[3];
+    //newId.append("-eSource");
+    //m_powerPos = new eSource( newId.toStdString(), m_ePin[2] );
+    
+    newId = id;
+    newId.append(QString("powerNeg"));
+    m_pin[4] = new Pin( 270, QPoint(0, 16), newId, 4, this );
+    m_ePin[4] = m_pin[4];
+    //newId.append("-eSource");
+    //m_powerNeg = new eSource( newId.toStdString(), m_ePin[3] );
+    
+    setPowerPins( false );
 }
 OpAmp::~OpAmp()
 {
-    delete m_output;
-    //delete m_inputInv;
-    //delete m_inputNinv;
-    //delete m_inResistor;
+}
+
+void OpAmp::setPowerPins( bool set )
+{
+    m_pin[3]->setEnabled( set );
+    m_pin[3]->setVisible( set );
+    m_pin[4]->setEnabled( set );
+    m_pin[4]->setVisible( set );
+    
+    m_powerPins = set;
+}
+
+QPainterPath OpAmp::shape() const
+{
+    QPainterPath path;
+    
+    QVector<QPointF> points;
+    
+    points << QPointF(-16,-16 )
+           << QPointF(-16, 16 )
+           << QPointF( 16,  1 )
+           << QPointF( 16, -1 );
+        
+    path.addPolygon( QPolygonF(points) );
+    path.closeSubpath();
+    return path;
 }
 
 void OpAmp::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

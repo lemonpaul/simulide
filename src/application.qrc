@@ -9,6 +9,7 @@
         <file alias="savecirc.png">../src/icons/mainwindow/save.png</file>
         <file alias="savecircas.png">../src/icons/mainwindow/saveas.png</file>
         <file alias="help.png">../src/icons/mainwindow/help.png</file>
+        <file alias="about.png">../src/icons/mainwindow/about.png</file>
         
         <file alias="new.png">../src/icons/mainwindow/new.png</file>
         <file alias="open.png">../src/icons/mainwindow/open.png</file>
@@ -19,6 +20,7 @@
         <file alias="copy.png">../src/icons/mainwindow/copy.png</file>
         <file alias="paste.png">../src/icons/mainwindow/paste.png</file>
         
+        <file alias="cdup.png">../src/icons/mainwindow/cdup.png</file>
         <file alias="undo.png">../src/icons/mainwindow/rotateCCW.png</file>
         <file alias="redo.png">../src/icons/mainwindow/rotateCW.png</file>
         <file alias="find.png">../src/icons/mainwindow/find.png</file>
@@ -29,11 +31,14 @@
         <file alias="step.png">../src/icons/mainwindow/step.png</file>
         <file alias="stepover.png">../src/icons/mainwindow/stepover.png</file>
         <file alias="play.png">../src/icons/mainwindow/play.png</file>
+        <file alias="runtobk.png">../src/icons/mainwindow/runtobk.png</file>
         <file alias="pause.png">../src/icons/mainwindow/pause.png</file>
         <file alias="reset.png">../src/icons/mainwindow/reset.png</file>
         <file alias="stop.png">../src/icons/mainwindow/stop.png</file>
         
-        <file alias="finish.png">../src/icons/mainwindow/finish.png</file>
+        <file alias="poweroff.png">../src/icons/mainwindow/poweroff.png</file>
+        <file alias="poweron.png">../src/icons/mainwindow/poweron.png</file>
+        <file alias="powerdeb.png">../src/icons/mainwindow/powerdeb.png</file>
         
         <file alias="remove.png">../src/icons/mainwindow/remove.png</file>
         <file alias="rotateCW.png">../src/icons/mainwindow/rotateCW.png</file>
@@ -46,6 +51,9 @@
         <file alias="terminal.png">../src/icons/mainwindow/terminal.png</file>
         <file alias="closeterminal.png">../src/icons/mainwindow/closeterminal.png</file>
         <file alias="saveimage.png">../src/icons/mainwindow/saveimage.png</file>
+        
+        <file alias="breakpoint.png">../src/icons/mainwindow/breakpoint.png</file>
+        <file alias="nobreakpoint.png">../src/icons/mainwindow/nobreakpoint.png</file>
     
         <file alias="led.png">../src/icons/components/led.png</file>
         <file alias="diode.png">../src/icons/components/diode.png</file>
@@ -55,12 +63,12 @@
         <file alias="ic2.png">../src/icons/components/ic2.png</file>
         <file alias="subc.png">../src/icons/components/subc.png</file>
         <file alias="ground.png">../src/icons/components/ground.png</file>
-        <file alias="poweroff.png">../src/icons/mainwindow/poweroff.png</file>
-        <file alias="poweron.png">../src/icons/mainwindow/poweron.png</file>
         <file alias="voltsource.png">../src/icons/components/voltsource.png</file>
         <file alias="capacitor.png">../src/icons/components/capacitor.png</file>
+        <file alias="elcapacitor.png">../src/icons/components/elcapacitor.png</file>
         <file alias="seven_segment.png">../src/icons/components/seven_segment.png</file>
         <file alias="switch.png">../src/icons/components/switch.png</file>
+        <file alias="switchdip.png">../src/icons/components/switchdip.png</file>
         <file alias="inductor.png">../src/icons/components/inductor.png</file>
         <file alias="buffer.png">../src/icons/components/buffer.png</file>
         <file alias="andgate.png">../src/icons/components/andgate.png</file>
@@ -96,11 +104,29 @@
         <file alias="line.png">../src/icons/components/line.png</file>
         <file alias="rectangle.png">../src/icons/components/rectangle.png</file>
         
+        <file alias="inbus.png">../src/icons/components/inbus.png</file>
+        <file alias="outbus.png">../src/icons/components/outbus.png</file>
+        <file alias="1to2.png">../src/icons/components/1to2.png</file>
+        <file alias="1to3.png">../src/icons/components/1to3.png</file>
+        <file alias="2to1.png">../src/icons/components/2to1.png</file>
+        <file alias="2to2.png">../src/icons/components/2to2.png</file>
+        <file alias="2to3.png">../src/icons/components/2to3.png</file>
+        <file alias="2to3g.png">../src/icons/components/2to3g.png</file>
+        <file alias="3to1.png">../src/icons/components/3to1.png</file>
+        <file alias="3to2.png">../src/icons/components/3to2.png</file>
+        <file alias="3to2g.png">../src/icons/components/3to2g.png</file>
+        <file alias="mux.png">../src/icons/components/mux.png</file>
+        <file alias="demux.png">../src/icons/components/demux.png</file>
+        <file alias="gates.png">../src/icons/components/gates.png</file>
+        
+        <file alias="switchbut.png">../src/icons/mainwindow/switchbut.png</file>
+        
         <file alias="arduinoUnoIcon.png">../src/icons/components/arduinoUnoIcon.png</file>
         <file alias="arduinoUno.png">../src/icons/components/arduinoUno.png</file>
         <file alias="arduinoNano.png">../src/icons/components/arduinoNano.png</file>
         <file alias="duemilanove.png">../src/icons/components/duemilanove.png</file>
         <file alias="leonardo.png">../src/icons/components/leonardo.png</file>
+        <file alias="mega.png">../src/icons/components/mega.png</file>
         
         <file alias="blanc.png">../src/icons/components/blanc.png</file>
         <file alias="font2.png">../src/icons/font/font2.png</file>

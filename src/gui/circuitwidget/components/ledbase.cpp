@@ -22,13 +22,22 @@
 #include "simulator.h"
 #include "pin.h"
 
+static const char* LedBase_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","MaxCurrent"),
+    QT_TRANSLATE_NOOP("App::Property","Grounded")
+};
+
 LedBase::LedBase( QObject* parent, QString type, QString id )
        : Component( parent, type, id )
        , eLed( id.toStdString() )
 {
+    Q_UNUSED( LedBase_properties );
+    
+    m_overCurrent = false;
     m_grounded = false;
     m_ground   = 0l;
     m_scrEnode = 0l;
+    m_counter = 0;
     m_bright = 0;
     
     m_color = QColor( Qt::black );
@@ -45,8 +54,28 @@ LedBase::~LedBase()
 
 void LedBase::updateStep()
 {
+    uint bright = m_bright;
     eLed::updateBright();
-    update();
+    
+    if( m_bright > 255+75 )
+    {
+        m_bright = 255+75;
+        m_counter++;
+        
+        if( m_counter > 4 )
+        {
+            m_counter = 0;
+            m_overCurrent = !m_overCurrent;
+            update();
+        }
+    }
+    else if( m_overCurrent )
+    {
+        m_overCurrent = false;
+        m_counter = 0;
+        update();
+    }
+    else if( bright != m_bright ) update();
 }
 
 bool LedBase::grounded()
@@ -56,13 +85,13 @@ bool LedBase::grounded()
 
 void LedBase::setGrounded( bool grounded )
 {
+    if( grounded == m_grounded ) return;
+    
     bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    if( pauseSim )  Simulator::self()->pauseSim();
 
     if( grounded )
     {
-        if( m_grounded ) return;
-        
         Pin* pin1 = (static_cast<Pin*>(m_ePin[1]));
         if( m_ePin[1]->isConnected() ) pin1->connector()->remove();
         pin1->setEnabled( false );
@@ -81,15 +110,12 @@ void LedBase::setGrounded( bool grounded )
     }
     else
     {
-        if( !m_grounded ) return;
-        
         Pin* pin1 = (static_cast<Pin*>(m_ePin[1]));
 
         pin1->setEnabled( true );
         pin1->setVisible( true );
         
         delete m_ground;
-        delete m_scrEnode;
 
         m_ground = 0l;
         m_scrEnode = 0l;
@@ -103,18 +129,6 @@ void LedBase::setGrounded( bool grounded )
 
 void LedBase::remove()
 {
-    /*for( int i=0; i<2; i++ )
-    {
-        if( ( !m_grounded )&&( m_ePin[i]  ) )
-        {
-            Pin* pin = static_cast<Pin*>(m_ePin[i]);
-            if( pin && pin->isConnected())
-            {
-                Connector* con = pin->connector();
-                if( con ) con->remove();
-            }
-        }
-    }*/
     if( m_ground ) delete m_ground;
     
     Simulator::self()->remFromUpdateList( this ); 
@@ -127,36 +141,41 @@ void LedBase::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     Component::paint( p, option, widget );
 
     QPen pen(Qt::black, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-
-    if( m_bright > 255+75 )                               // Max Current
-    {
-        m_bright = 0;
-        p->setBrush( Qt::white );
-        pen.setColor( QColor( Qt::white ));
-    }
-    int overBight = 100;
     
-    if( m_bright > 40 )
+    QColor color;
+
+    if( m_overCurrent )                               // Max Current
     {
-        m_bright += 10;                          // Set a Minimun Bright
+        //m_bright = 0;
+        p->setBrush( Qt::white );
+        color = QColor( Qt::white );
+        pen.setColor( color );
+    }
+    else
+    {
+        int overBight = 100;
         
-        if( m_bright > 255 ) 
+        if( m_bright > 25 )
         {
-            overBight += m_bright-255;
-            m_bright = 255;
+            m_bright += 15;                          // Set a Minimun Bright
+            
+            if( m_bright > 255 ) 
+            {
+                overBight += m_bright-255;
+                m_bright = 255;
+            }
         }
+        
+        color = QColor( m_bright, m_bright, overBight ); // Default = yellow
+        
+        if     ( m_ledColor == red )    color = QColor( m_bright,  m_bright/3, overBight );
+        else if( m_ledColor == green )  color = QColor( overBight, m_bright,   m_bright*2/3 );
+        else if( m_ledColor == blue )   color = QColor( overBight, m_bright/2, m_bright );
+        else if( m_ledColor == orange ) color = QColor( m_bright,  m_bright*2/3, overBight );
+        else if( m_ledColor == purple ) color = QColor( m_bright,  overBight,  m_bright*2/3 );
     }
     p->setPen(pen);
-
     drawBackground( p );
-    
-    QColor color = QColor( m_bright, m_bright, overBight ); // Default = yellow
-    
-    if     ( m_ledColor == red )    color = QColor( m_bright,  m_bright/3, overBight );
-    else if( m_ledColor == green )  color = QColor( overBight, m_bright,   m_bright*2/3 );
-    else if( m_ledColor == blue )   color = QColor( overBight, m_bright/2, m_bright );
-    else if( m_ledColor == orange ) color = QColor( m_bright,  m_bright*2/3, overBight );
-    else if( m_ledColor == purple ) color = QColor( m_bright,  overBight,  m_bright*2/3 );
     
     pen.setColor( color );
     pen.setWidth(2.5);

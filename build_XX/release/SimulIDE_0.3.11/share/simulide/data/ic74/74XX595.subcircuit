@@ -1,0 +1,46 @@
+<!DOCTYPE SimulIDE>
+
+<!-- *************************************************************************** -->
+<!-- *   Copyright (C) 2017 by santiago González                               * -->
+<!-- *   santigoro@gmail.com                                                   * -->
+<!-- *                                                                         * -->
+<!-- *   This program is free software; you can redistribute it and/or modify  * -->
+<!-- *   it under the terms of the GNU General Public License as published by  * -->
+<!-- *   the Free Software Foundation; either version 3 of the License, or     * -->
+<!-- *   (at your option) any later version.                                   * -->
+<!-- *                                                                         * -->
+<!-- *   This program is distributed in the hope that it will be useful,       * -->
+<!-- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * -->
+<!-- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * -->
+<!-- *   GNU General Public License for more details.                          * -->
+<!-- *                                                                         * -->
+<!-- *   You should have received a copy of the GNU General Public License     * -->
+<!-- *   along with this program; if not, see <http://www.gnu.org/licenses/>.  * -->
+<!-- *                                                                         * -->
+<!-- *************************************************************************** -->
+
+<subcircuit enodes="0">
+
+    <item itemtype="eShiftReg" 
+    tristate="true"
+    latchClock="1"
+    serialOut="1"
+    connections="
+    output0-packagePin10 
+    output1-packagePin1 
+    output2-packagePin2 
+    output3-packagePin3 
+    output4-packagePin4 
+    output5-packagePin5 
+    output6-packagePin6 
+    output7-packagePin7 
+    input0-packagePin11 
+    input1-packagePin15 
+    outEnable-packagePin12 
+    latchClock-packagePin13 
+    clock-packagePin14 
+    serialOut-packagePin16" >
+    </item>
+    
+</subcircuit>
+

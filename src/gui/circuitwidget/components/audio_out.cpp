@@ -23,6 +23,10 @@
 #include "itemlibrary.h"
 #include "pin.h"
 
+static const char* AudioOut_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Impedance")
+};
+
 Component* AudioOut::construct( QObject* parent, QString type, QString id )
 { return new AudioOut( parent, type, id ); }
 
@@ -40,6 +44,8 @@ AudioOut::AudioOut( QObject* parent, QString type, QString id )
         : Component( parent, type, id ),
           eResistor( id.toStdString() )
 {
+    Q_UNUSED( AudioOut_properties );
+    
     m_area = QRect( -12, -24, 24, 40 );
     
     m_pin.resize( 2 );

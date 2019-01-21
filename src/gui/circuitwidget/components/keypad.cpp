@@ -21,6 +21,9 @@
 #include "circuit.h"
 #include "itemlibrary.h"
 
+static const char* KeyPad_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Key Labels")
+};
 
 Component* KeyPad::construct( QObject* parent, QString type, QString id )
 { return new KeyPad( parent, type, id ); }
@@ -36,9 +39,11 @@ LibraryItem* KeyPad::libraryItem()
 }
 
 KeyPad::KeyPad( QObject* parent, QString type, QString id )
-    : Component( parent, type, id )
-    , eElement( id.toStdString() )
+      : Component( parent, type, id )
+      , eElement( id.toStdString() )
 {
+    Q_UNUSED( KeyPad_properties );
+    
     m_keyLabels = "123456789*0#";
     m_rows = 4;
     m_cols = 3;
@@ -98,7 +103,8 @@ void KeyPad::setupButtons()
             PushBase* button = new PushBase( this, "PushBase", butId );
             button->initEpins();
             button->setParentItem( this );
-            button->setPos( QPointF(col*16, -4+row*16 ) );
+            button->setPos( QPointF(col*16+12, 16+row*16 ) );
+            button->setFlag( QGraphicsItem::ItemIsSelectable, false );
             m_buttons.append( button );
             
             int pos = row*m_cols+col;
@@ -113,7 +119,6 @@ void KeyPad::setupButtons()
                 QPoint pinPos = QPoint( col*16, m_rows*16+8);
                 m_pin[m_rows+col] = new Pin( 270, pinPos, pinId, 0, this);
             }
-            
         }
     }
 }

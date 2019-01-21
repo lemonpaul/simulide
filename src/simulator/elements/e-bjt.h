@@ -36,6 +36,9 @@ class MAINMODULE_EXPORT eBJT : public eResistor
         virtual double gain()              {return m_gain;}
         virtual void setGain( double gain ){m_gain = gain;}
         
+        virtual double BEthr();
+        virtual void setBEthr( double thr );
+        
         virtual double pnp()              {return m_PNP;}
         virtual void setPnp( double pnp ) {m_PNP = pnp;}
         
@@ -44,6 +47,7 @@ class MAINMODULE_EXPORT eBJT : public eResistor
         double m_lastOut;
         double m_baseCurr;
         double m_voltE;
+        double m_BEthr;
         bool m_Efollow;
         
         int m_gain;

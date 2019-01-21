@@ -47,7 +47,7 @@ void eInBus::setVChanged()
     for( int i=0; i<m_numOutputs; i++ )
     {
         //qDebug() << "eInBus::setVChanged" << i << (address & 1);
-        eLogicDevice::setOut( 7-i, address & 1 );
+        eLogicDevice::setOut( m_numOutputs-1-i, address & 1 );
         address >>= 1;
 
     }

@@ -28,8 +28,9 @@ class LibraryItem;
 class MAINMODULE_EXPORT BJT : public Component, public eBJT
 {
     Q_OBJECT
-    Q_PROPERTY( double Gain READ gain  WRITE setGain DESIGNABLE true USER true )
-    Q_PROPERTY( bool   PNP  READ pnp   WRITE setPnp  DESIGNABLE true USER true )
+    Q_PROPERTY( double Gain      READ gain  WRITE setGain  DESIGNABLE true USER true )
+    Q_PROPERTY( double Threshold READ BEthr WRITE setBEthr DESIGNABLE true USER true )
+    Q_PROPERTY( bool   PNP       READ pnp   WRITE setPnp   DESIGNABLE true USER true )
     
     public:
 
@@ -38,6 +39,10 @@ class MAINMODULE_EXPORT BJT : public Component, public eBJT
         
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
+        
+        void updateStep();
+        
+        void setPnp( double pnp );
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 };

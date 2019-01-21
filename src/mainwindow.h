@@ -20,15 +20,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGui>
-#include <QDomDocument>
+#include <QtWidgets>
 
-#include "propertieswidget.h"
-#include "componentselector.h"
-#include "circuitwidget.h"
-//#include "filebrowser.h"
-#include "editorwindow.h"
-#include "filewidget.h"
+class PropertiesWidget;
+class ComponentSelector;
+class CircuitWidget;
+class EditorWindow;
+class FileWidget;
 
 class MAINMODULE_EXPORT MainWindow : public QMainWindow
 {
@@ -85,7 +83,7 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         PropertiesWidget*   m_itemprop;
         EditorWindow*       m_editor;
         
-        QSplitter*   m_Centralsplitter;
+        QSplitter*  m_Centralsplitter;
         FileWidget* m_fileSystemTree;
 };
 

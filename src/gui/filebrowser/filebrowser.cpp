@@ -21,6 +21,7 @@
 #include "circuitwidget.h"
 #include "circuit.h"
 #include "filewidget.h"
+#include "editorwindow.h"
 
 FileBrowser*  FileBrowser::m_pSelf = 0l;
 
@@ -56,7 +57,7 @@ void FileBrowser::cdUp()
 void FileBrowser::openInEditor()
 {
     QString path = m_fileSystemModel->filePath( currentIndex() );
-    emit openFileWithEditor( path );
+    EditorWindow::self()->loadFile( path );
 }
 
 void FileBrowser::open()
@@ -72,8 +73,7 @@ void FileBrowser::open()
     else  
     {
         if( path.endsWith(".simu") ) CircuitWidget::self()->loadCirc( path );
-        else                         emit openFileWithEditor( path );
-
+        else                         EditorWindow::self()->loadFile( path );
     }
 }
 
@@ -111,7 +111,7 @@ void FileBrowser::contextMenuEvent( QContextMenuEvent* event )
         
         if( m_fileSystemModel->isDir( currentIndex()) )
         {
-            QAction* addBookMarkAction = menu.addAction(QIcon(":/setroot.png"),"Add Bookmark");
+            QAction* addBookMarkAction = menu.addAction(QIcon(":/setroot.png"),tr("Add Bookmark"));
             connect( addBookMarkAction, SIGNAL( triggered()), 
                      this,              SLOT(   addBookMark() ) );
                      
@@ -119,7 +119,7 @@ void FileBrowser::contextMenuEvent( QContextMenuEvent* event )
         }
         else
         {
-            QAction* openWithEditor = menu.addAction(QIcon(":/open.png"),"Open in editor");
+            QAction* openWithEditor = menu.addAction(QIcon(":/open.png"),tr("Open in editor"));
             connect( openWithEditor, SIGNAL( triggered()), 
                      this,           SLOT(   openInEditor()) );
                      

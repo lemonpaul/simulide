@@ -20,11 +20,11 @@
 #ifndef CONNECTOR_H
 #define CONNECTOR_H
 
-#include "connectorline.h"
 #include "component.h"
-#include "e-node.h"
+//#include "e-node.h"
 
 class ConnectorLine;
+class eNode;
 
 class MAINMODULE_EXPORT Connector : public Component
 {
@@ -97,6 +97,8 @@ class MAINMODULE_EXPORT Connector : public Component
         
         void setIsBus( bool bus );
         bool isBus();
+        
+        bool m_freeLine;
 
     signals:
         void selected(bool yes);
@@ -114,20 +116,18 @@ class MAINMODULE_EXPORT Connector : public Component
         * this is: end point of line1 to start point of line2.
         */
         void connectLines( int index1, int index2 );
-
         void disconnectLines( int index1, int index2 );
 
         int m_actLine;
         int m_lastindex;
         
         bool m_isBus;
-
+        
         QString m_startpinid;
         QString m_endpinid;
-        //QString m_enodid;
+
         Pin*    m_startPin;
         Pin*    m_endPin;
-        //eNode*  m_eNode;
 
         QStringList  m_pointList;
 

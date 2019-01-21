@@ -27,7 +27,6 @@
 class MAINMODULE_EXPORT DecToBcd : public LogicComponent, public eDecToBcd
 {
     Q_OBJECT
-    Q_PROPERTY( bool   tristate     READ tristate   USER true )
     Q_PROPERTY( double Input_High_V READ inputHighV WRITE setInputHighV DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Low_V  READ inputLowV  WRITE setInputLowV  DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Imped  READ inputImp   WRITE setInputImp   DESIGNABLE true USER true )
@@ -35,6 +34,7 @@ class MAINMODULE_EXPORT DecToBcd : public LogicComponent, public eDecToBcd
     Q_PROPERTY( double Out_Low_V    READ outLowV    WRITE setOutLowV    DESIGNABLE true USER true )
     Q_PROPERTY( double Out_Imped    READ outImp     WRITE setOutImp     DESIGNABLE true USER true )
     Q_PROPERTY( bool   Invert_Inputs READ invertInps WRITE setInvertInps DESIGNABLE true USER true )
+    Q_PROPERTY( bool   Tristate     READ tristate   USER true )
 
     public:
         DecToBcd( QObject* parent, QString type, QString id );
@@ -44,7 +44,6 @@ class MAINMODULE_EXPORT DecToBcd : public LogicComponent, public eDecToBcd
         static LibraryItem *libraryItem();
 
         bool tristate() { return true; }
-
 };
 
 #endif

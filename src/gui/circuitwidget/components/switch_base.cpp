@@ -21,8 +21,8 @@
 #include "circuit.h"
 
 SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
-    : Component( parent, type, id )
-    , eElement( id.toStdString() )
+          : Component( parent, type, id )
+          , eElement( id.toStdString() )
 {
     m_area =  QRectF( 0,0,0,0 );
 
@@ -40,7 +40,7 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
 
     m_proxy = Circuit::self()->addWidget( m_button );
     m_proxy->setParentItem( this );
-    m_proxy->setPos( QPoint(-8, 4) );
+    //m_proxy->setPos( QPoint(-8, 4) );
 
     Simulator::self()->addToUpdateList( this );
 }
@@ -52,10 +52,10 @@ void SwitchBase::initialize()
 {
     eNode* node0 = m_ePin[0]->getEnode();
     eNode* node1 = m_ePin[1]->getEnode();
-    
+
     if( node0 ) node0->setSwitched( true );
     if( node1 ) node1->setSwitched( true );
-    
+
     m_ePin[0]->setEnodeComp( node1 );
     m_ePin[1]->setEnodeComp( node0 );
 
@@ -75,7 +75,7 @@ void SwitchBase::updateStep()
         m_ePin[1]->stampAdmitance( admit );
 
         m_changed = false;
-        
+
         //update();
     }
 }

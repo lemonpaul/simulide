@@ -1,0 +1,175 @@
+<!DOCTYPE SimulIDE>
+
+<!-- *************************************************************************** -->
+<!-- *   Copyright (C) 2017 by santiago González                               * -->
+<!-- *   santigoro@gmail.com                                                   * -->
+<!-- *                                                                         * -->
+<!-- *   This program is free software; you can redistribute it and/or modify  * -->
+<!-- *   it under the terms of the GNU General Public License as published by  * -->
+<!-- *   the Free Software Foundation; either version 3 of the License, or     * -->
+<!-- *   (at your option) any later version.                                   * -->
+<!-- *                                                                         * -->
+<!-- *   This program is distributed in the hope that it will be useful,       * -->
+<!-- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * -->
+<!-- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * -->
+<!-- *   GNU General Public License for more details.                          * -->
+<!-- *                                                                         * -->
+<!-- *   You should have received a copy of the GNU General Public License     * -->
+<!-- *   along with this program; if not, see <http://www.gnu.org/licenses/>.  * -->
+<!-- *                                                                         * -->
+<!-- *************************************************************************** -->
+
+<subcircuit enodes="7">
+
+    <item itemtype="eAndGate"
+        inverted = "true"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        numInputs = "2"
+        connections="
+        output0-eNode0
+        input0-packagePin6
+        input1-packagePin7" >
+    </item>
+
+    <item itemtype="eFlipFlopJK"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        clockInverted = "true"
+        connections="
+        input2-eNode0
+        clock-packagePin14
+        input3-eNode1
+        output0-packagePin12
+        input1-eNode3
+        input0-eNode3" >
+    </item>
+
+    <item itemtype="eAndGate"
+        inverted = "false"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        numInputs = "2"
+        connections="
+        input0-eNode0
+        input1-eNode1
+        output0-eNode5" >
+    </item>
+
+    <item itemtype="eAndGate"
+        inverted = "false"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        numInputs = "2"
+        connections="
+        input0-eNode0
+        input1-eNode1
+        output0-eNode6" >
+    </item>
+
+    <item itemtype="eFlipFlopJK"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        clockInverted = "true"
+        connections="
+        input2-eNode0
+        clock-packagePin1
+        input3-eNode1
+        output1-eNode2
+        input1-eNode3
+        input0-eNode4
+        output0-packagePin11" >
+    </item>
+
+    <item itemtype="eFlipFlopJK"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        clockInverted = "true"
+        connections="
+        clock-packagePin1
+        input0-eNode2
+        output0-packagePin9
+        input1-eNode3
+        input2-eNode3
+        input3-eNode5" >
+    </item>
+
+    <item itemtype="eAndGate"
+        inverted = "true"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        numInputs = "2"
+        connections="
+        output0-eNode1
+        input0-packagePin2
+        input1-packagePin3" >
+    </item>
+
+    <item itemtype="eAndGate"
+        inverted = "false"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        numInputs = "2"
+        connections="
+        input0-packagePin9
+        input1-packagePin8
+        output0-eNode4" >
+    </item>
+
+    <item itemtype="eFlipFlopJK"
+        inputHighV = "2.5"
+        inputLowV = "2.5"
+        inputImped = "100000000000000"
+        outHighV = "5"
+        outLowV = "0"
+        outImped = "40"
+        clockInverted = "true"
+        connections="
+        clock-packagePin9
+        output0-packagePin8
+        input0-eNode3
+        input1-eNode3
+        input2-eNode3
+        input3-eNode6" >
+    </item>
+
+    <item itemtype="eRail"
+        voltage = "5"
+        unit = " V"
+        connections="
+        outnod-eNode3" >
+    </item>
+
+</subcircuit>

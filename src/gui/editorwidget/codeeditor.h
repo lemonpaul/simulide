@@ -73,8 +73,6 @@ class CodeEditor : public QPlainTextEdit
 
         bool hasDebugger() { return m_debugger!=0l; }
         void setCompilerPath();
-        
-        void writeSettings();
 
     signals:
         void msg( QString text );
@@ -89,6 +87,7 @@ class CodeEditor : public QPlainTextEdit
         void step();
         void stepOver();
         void pause();
+        void resume();
         void reset();
         void run();
 
@@ -137,12 +136,16 @@ class CodeEditor : public QPlainTextEdit
         bool m_isCompiled;
         bool m_debugging;
         bool m_running;
+        bool m_resume;
         
  static bool  m_showSpaces;
  static bool  m_spaceTabs;
  static int   m_fontSize;
  static int   m_tabSize;
  static QFont m_font;
+ 
+ static QStringList m_picInstr;
+ static QStringList m_avrInstr;
 };
 
 
@@ -150,6 +153,8 @@ class CodeEditor : public QPlainTextEdit
 
 class LineNumberArea : public QWidget
 {
+    Q_OBJECT
+    
     public:
         LineNumberArea(CodeEditor *editor);
         ~LineNumberArea();

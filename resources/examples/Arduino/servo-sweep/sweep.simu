@@ -1,0 +1,18 @@
+<circuit type="simulide_0.1">
+ 
+Arduino Uno-2: 
+<item y="-284" Mhz="16" id="Arduino Uno-2" labelrot="0" valLabely="0" labelx="0" x="-268" program="Sweep.ino.hex" itemtype="Arduino" Show_id="true" valLabelx="0" vflip="1" valLabRot="0" objectName="Arduino Uno-2" labely="-20" hflip="1" rotation="0"/>
+ 
+Servo-1: 
+<item y="-244" id="Servo-1" labelrot="0" valLabely="0" labelx="-16" x="-356" itemtype="Servo" Show_id="false" valLabelx="0" vflip="1" valLabRot="0" objectName="Servo-1" labely="-24" hflip="1" rotation="-90" Speed="0.20000000000000001"/>
+ 
+Connector-3: 
+<item hflip="1" labelx="-16" itemtype="Connector" pointList="-340,-196,-340,-188,-260,-188" startpinid="Servo-1-in2" endpinid="Arduino Uno-2-PB1" valLabelx="0" labely="-24" id="Connector-3" y="-196" valLabely="0" vflip="1" objectName="Connector-3" valLabRot="0" enodeid="enode-3" labelrot="0" Show_id="false" x="-340" rotation="0"/>
+ 
+Connector-4: 
+<item hflip="1" labelx="-16" itemtype="Connector" pointList="-356,-196,-356,-148,-260,-148" startpinid="Servo-1-in1" endpinid="Arduino Uno-2-GND0" valLabelx="0" labely="-24" id="Connector-4" y="-196" valLabely="0" vflip="1" objectName="Connector-4" valLabRot="0" enodeid="enode-4" labelrot="0" Show_id="false" x="-356" rotation="0"/>
+ 
+Connector-5: 
+<item hflip="1" labelx="-16" itemtype="Connector" pointList="-372,-196,-372,-52,-68,-52,-68,-188,-116,-188" startpinid="Servo-1-in0" endpinid="Arduino Uno-2-V5V" valLabelx="0" labely="-24" id="Connector-5" y="-196" valLabely="0" vflip="1" objectName="Connector-5" valLabRot="0" enodeid="enode-5" labelrot="0" Show_id="false" x="-372" rotation="0"/>
+ 
+</circuit>

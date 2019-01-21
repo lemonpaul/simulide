@@ -24,6 +24,8 @@
 #include "simulator.h"
 #include "e-node.h"
 
+#include <math.h>
+
 eCapacitor::eCapacitor( std::string id ) : eResistor( id )
 {
     m_cap = 0.00001; // Farads

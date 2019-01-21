@@ -18,10 +18,11 @@
  ***************************************************************************/
 
 #include "avrcomponentpin.h"
+#include "baseprocessor.h"
 #include "simulator.h"
 
 AVRComponentPin::AVRComponentPin( McuComponent* mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
-    : McuComponentPin( mcu, id, type, label, pos, xpos, ypos, angle )
+               : McuComponentPin( mcu, id, type, label, pos, xpos, ypos, angle )
 {
     m_channel = -1;
     m_isInput = true;
@@ -181,7 +182,7 @@ void AVRComponentPin::setPullup( uint32_t value )
     }
     
     m_ePin[0]->stampCurrent( m_voltOut/m_imp );
-    if( m_ePin[0]->getEnode()->needFastUpdate() ) 
+    //if( m_ePin[0]->getEnode()->needFastUpdate() ) 
     {
         Simulator::self()->runExtraStep();
     }
@@ -202,7 +203,7 @@ void AVRComponentPin::set_pinVoltage( uint32_t value )
     //eSource::setOut( value >0 );
     //eSource::stampOutput();
     m_ePin[0]->stampCurrent( m_voltOut/m_imp ); // Save some calls
-    if( m_ePin[0]->getEnode()->needFastUpdate() ) 
+    //if( m_ePin[0]->getEnode()->needFastUpdate() ) 
     {
         Simulator::self()->runExtraStep();
     }

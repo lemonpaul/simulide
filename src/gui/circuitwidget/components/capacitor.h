@@ -20,16 +20,12 @@
 #ifndef CAPACITOR_H
 #define CAPACITOR_H
 
-#include "e-capacitor.h"
+#include "capacitorbase.h"
 #include "itemlibrary.h"
-#include <QObject>
 
-class MAINMODULE_EXPORT Capacitor : public Component, public eCapacitor
+class MAINMODULE_EXPORT Capacitor : public CapacitorBase
 {
     Q_OBJECT
-    Q_PROPERTY( double Capacitance   READ capac    WRITE setCapac   DESIGNABLE true USER true )
-    Q_PROPERTY( QString  Unit        READ unit     WRITE setUnit    DESIGNABLE true USER true )
-    Q_PROPERTY( bool     Show_Cap    READ showVal  WRITE setShowVal DESIGNABLE true USER true )
     
     public:
 
@@ -38,11 +34,6 @@ class MAINMODULE_EXPORT Capacitor : public Component, public eCapacitor
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
-        
-        double capac();
-        void  setCapac( double c );
-        
-        void setUnit( QString un );
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 };

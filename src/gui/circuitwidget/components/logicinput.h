@@ -63,8 +63,8 @@ class MAINMODULE_EXPORT LogicInput : public Component, public eElement
         Pin     *m_outpin;
         eSource *m_out;
 
-        QPushButton          *m_button;
-        QGraphicsProxyWidget *m_proxy;
+        QPushButton* m_button;
+        QGraphicsProxyWidget* m_proxy;
 };
 
 

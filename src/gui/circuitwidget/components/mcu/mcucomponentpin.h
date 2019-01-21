@@ -50,10 +50,12 @@ class MAINMODULE_EXPORT McuComponentPin : public QObject, public eSource
         McuComponent* m_mcuComponent;
         
         bool m_attached;
-
-        double m_Rth;
-        double m_Vth;
+        bool m_isInput;
+        bool m_openColl;
         
+        char m_port;
+        int  m_pinN;
+
         int m_pinType;
         int m_angle;
 

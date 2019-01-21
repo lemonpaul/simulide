@@ -27,7 +27,6 @@
 class MAINMODULE_EXPORT ShiftReg : public LogicComponent, public eShiftReg
 {
     Q_OBJECT
-    Q_PROPERTY( bool   tristate     READ tristate   USER true )
     Q_PROPERTY( double Input_High_V READ inputHighV WRITE setInputHighV DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Low_V  READ inputLowV  WRITE setInputLowV  DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Imped  READ inputImp   WRITE setInputImp   DESIGNABLE true USER true )
@@ -37,6 +36,7 @@ class MAINMODULE_EXPORT ShiftReg : public LogicComponent, public eShiftReg
 
     Q_PROPERTY( bool   Clock_Inverted READ clockInv  WRITE setClockInv  DESIGNABLE true USER true )
     Q_PROPERTY( bool   Reset_Inverted READ resetInv  WRITE setResetInv  DESIGNABLE true USER true )
+    Q_PROPERTY( bool   Tristate       READ tristate                                     USER true )
 
     public:
         ShiftReg( QObject* parent, QString type, QString id );

@@ -39,7 +39,7 @@ class MAINMODULE_EXPORT eLed : public eDiode
         void updateBright();
         virtual void updateVI();
 
-        unsigned long long m_prevStep;
+        uint64_t m_prevStep;
 
         uint  m_bright;
 

@@ -56,11 +56,9 @@ inline QString fileToString( const QString &fileName, const QString &caller )
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        QMessageBox::warning(0l, caller, "Cannot read file "+fileName+":\n"+file.errorString()
-                             /*.arg(fileName).arg(file.errorString())*/);
+        MessageBoxNB( "ERROR", "Cannot read file "+fileName+":\n"+file.errorString() );
         return "";
     }
-
     QTextStream in(&file);
     QString text = in.readAll();
     file.close();
@@ -75,11 +73,9 @@ inline QStringList fileToStringList( const QString &fileName, const QString &cal
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        QMessageBox::warning(0l, caller, "Cannot read file "+fileName+":\n"+file.errorString()
-                             /*.arg(fileName).arg(file.errorString())*/);
+        MessageBoxNB( "ERROR", "Cannot read file "+fileName+":\n"+file.errorString() );
         return text;
     }
-
     QTextStream in(&file);
     while( !in.atEnd() ) text.append( in.readLine() );
     file.close();

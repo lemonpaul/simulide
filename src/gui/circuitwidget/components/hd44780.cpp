@@ -23,6 +23,11 @@
 #include "hd44780.h"
 #include "utils.h"
 
+static const char* Hd44780_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Cols"),
+    QT_TRANSLATE_NOOP("App::Property","Rows")
+};
+
 Component* Hd44780::construct( QObject* parent, QString type, QString id )
 {
     return new Hd44780( parent, type, id );
@@ -43,6 +48,8 @@ Hd44780::Hd44780( QObject* parent, QString type, QString id )
        , eElement( (id+"-eElement").toStdString() )
        , m_fontImg(":font2.png")
 {
+    Q_UNUSED( Hd44780_properties );
+    
     m_rows = 2;
     m_cols = 16;
     
@@ -106,7 +113,7 @@ void Hd44780::resetState()
     m_imgWidth  = (m_cols*6-1)*2;
     m_imgHeight = (m_rows*9-1)*2;
     m_area = QRectF( 0, -(m_imgHeight+33), m_imgWidth+20, m_imgHeight+33 );
-    setTransformOriginPoint( boundingRect().center() );
+    setTransformOriginPoint( togrid( m_area.center() ));
     
     clearLcd();
 }
@@ -340,6 +347,29 @@ void Hd44780::remove()
     Simulator::self()->remFromUpdateList( this );
     
     Component::remove();
+}
+
+ePin* Hd44780::getEpin( QString pinName )
+{
+    if     ( pinName == "RS" ) return m_pinRS;
+    else if( pinName == "RW" ) return m_pinRW;
+    else if( pinName == "En" ) return m_pinEn;
+    else if( pinName.contains( "D" ) )
+    {
+        int pin = pinName.remove("D").toInt();
+        return m_dataPin[pin];
+    }
+
+    return 0l;
+}
+
+void Hd44780::showPins( bool show )
+{
+    m_pinRS->setVisible( show );
+    m_pinRW->setVisible( show );
+    m_pinEn->setVisible( show );
+    
+    for( int i=0; i<8; i++ ) m_dataPin[i]->setVisible( show );
 }
 
 void Hd44780::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

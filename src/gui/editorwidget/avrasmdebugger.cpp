@@ -23,9 +23,15 @@
 #include "utils.h"
 #include "simuapi_apppath.h"
 
+static const char* AvrAsmDebugger_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Avra Inc Path")
+};
+
 AvrAsmDebugger::AvrAsmDebugger( QObject* parent, OutPanelText* outPane, QString filePath )
-            : BaseDebugger( parent,outPane, filePath )
+              : BaseDebugger( parent,outPane, filePath )
 {
+    Q_UNUSED( AvrAsmDebugger_properties );
+    
     setObjectName( "AVR asm Compiler" );
     
     m_compilerPath = "";
@@ -44,105 +50,12 @@ AvrAsmDebugger::AvrAsmDebugger( QObject* parent, OutPanelText* outPane, QString 
 
     m_typesList["byte"]    = "uint8";
 }
-AvrAsmDebugger::~AvrAsmDebugger()
-{}
-
-bool AvrAsmDebugger::loadFirmware()
-{
-    if( BaseDebugger::loadFirmware() )
-    {
-        mapLstToAsm();
-        return true;
-    }
-    return false;
-}
-
-int AvrAsmDebugger::step() // returns source line
-{
-    BaseProcessor::self()->stepOne();
-
-    int pc = BaseProcessor::self()->pc();
-    int line = m_flashToAsm[ pc ];
-    //qDebug() <<"AvrAsmDebugger::step"<<pc << line;
-    return line ;
-}
-
-int AvrAsmDebugger::stepOver(){return 0;}
-
-int AvrAsmDebugger::getValidLine( int line )
-{
-    int addr = 0;
-    while( addr == 0 )
-    {
-        addr = m_asmToFlash.value(line);
-        line++;
-    }
-    return line-1;
-}
-
-int AvrAsmDebugger::getProgramStart()
-{
-    return m_flashToAsm[ 0 ];
-}
-
-void AvrAsmDebugger::mapLstToAsm()
-{
-    m_flashToAsm.clear();
-    m_asmToFlash.clear();
-    QString asmFileName = m_fileDir + m_fileName + ".asm";
-
-    QString lstFileName = m_fileDir + m_fileName + ".lst";
-
-    QStringList asmLines = fileToStringList( asmFileName, "AvrAsmDebugger::mapLstToAsm" );
-    QStringList lstLines = fileToStringList( lstFileName, "AvrAsmDebugger::mapLstToAsm" );
-
-    QString asmLine;
-    int asmLineNumber = 0;
-    int lastAsmLine = asmLines.size();
-
-    foreach( QString lstLine, lstLines )
-    {
-        if( !lstLine.startsWith( "C:") ) continue;            // avra code lines start with C:
-
-        lstLine = lstLine.toUpper().remove(0,2).replace("\t", " ").remove((" "));
-
-        while( true )
-        {
-            if( ++asmLineNumber >= lastAsmLine ) break;                   // End of asm file
-            asmLine = asmLines.at( asmLineNumber ).toUpper();
-            asmLine = asmLine.replace("\t", " ").remove(" ");
-            if( asmLine.isEmpty() ) continue;
-            if( asmLine.startsWith(";")) continue;
-            if( asmLine.startsWith("#")) continue;
-            if( asmLine.startsWith(".")) continue;
-
-            //qDebug() <<"AvrAsmDebugger::mapLstToAsm() "<<asmLine;
-            //qDebug() <<"AvrAsmDebugger::mapLstToAsm() "<<lstLine;
-
-            if( lstLine.contains(asmLine) ) break;                            // Line found
-        }
-        QString numberText = lstLine.left( 6 );    // first 6 digits in lst file is address
-        bool ok = false;
-        int address = numberText.toInt( &ok, 16 )*2;         // adress*2: instruc = 2 bytes
-        if( ok )
-        {
-            m_flashToAsm[address] = asmLineNumber;
-            //qDebug() <<"AvrAsmDebugger::mapLstToAsm() "<<address<<asmLineNumber;
-        }
-    }
-    QHashIterator<int, int> i(m_flashToAsm);
-    while( i.hasNext() )
-    {
-        i.next();
-        int address       = i.key();
-        int asmLineNumber = i.value();
-        m_asmToFlash[asmLineNumber] = address;
-        //qDebug() <<"AvrAsmDebugger::mapLstToAsm() "<<address<<asmLineNumber;
-    }
-}
+AvrAsmDebugger::~AvrAsmDebugger() {}
 
 int AvrAsmDebugger::compile()
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    
     //getProcType();
     QString file = m_fileDir+m_fileName+m_fileExt;
     QString avraIncPath = m_avraIncPath;
@@ -193,8 +106,68 @@ int AvrAsmDebugger::compile()
         if( error == 0 ) error = 1;
     }
     m_firmware = m_fileDir+m_fileName+".hex";
-
+    
+    QApplication::restoreOverrideCursor();
     return error;
+}
+
+void AvrAsmDebugger::mapFlashToSource()
+{
+    m_flashToSource.clear();
+    m_sourceToFlash.clear();
+    QString asmFileName = m_fileDir + m_fileName + ".asm";
+
+    QString lstFileName = m_fileDir + m_fileName + ".lst";
+
+    QStringList asmLines = fileToStringList( asmFileName, "AvrAsmDebugger::mapLstToAsm" );
+    QStringList lstLines = fileToStringList( lstFileName, "AvrAsmDebugger::mapLstToAsm" );
+    
+    m_lastLine = 0;
+
+    QString asmLine;
+    int asmLineNumber = 0;
+    int lastAsmLine = asmLines.size();
+
+    foreach( QString lstLine, lstLines )
+    {
+        if( !lstLine.startsWith( "C:") ) continue;            // avra code lines start with C:
+
+        lstLine = lstLine.toUpper().remove(0,2).replace("\t", " ").remove((" "));
+
+        while( true )
+        {
+            if( ++asmLineNumber >= lastAsmLine ) break;                   // End of asm file
+            asmLine = asmLines.at( asmLineNumber ).toUpper();
+            asmLine = asmLine.replace("\t", " ").remove(" ");
+            if( asmLine.isEmpty() ) continue;
+            if( asmLine.startsWith(";")) continue;
+            if( asmLine.startsWith("#")) continue;
+            if( asmLine.startsWith(".")) continue;
+
+            //qDebug() <<"AvrAsmDebugger::mapLstToAsm() "<<asmLine;
+            //qDebug() <<"AvrAsmDebugger::mapLstToAsm() "<<lstLine;
+
+            if( lstLine.contains(asmLine) ) break;                            // Line found
+        }
+        QString numberText = lstLine.left( 6 );    // first 6 digits in lst file is address
+        bool ok = false;
+        int address = numberText.toInt( &ok, 16 )*2;         // adress*2: instruc = 2 bytes
+        if( ok )
+        {
+            m_flashToSource[address] = asmLineNumber;
+            if( asmLineNumber > m_lastLine ) m_lastLine = asmLineNumber;
+            //qDebug() <<"AvrAsmDebugger::mapLstToAsm() "<<address<<asmLineNumber;
+        }
+    }
+    QHashIterator<int, int> i(m_flashToSource);
+    while( i.hasNext() )
+    {
+        i.next();
+        int address       = i.key();
+        int asmLineNumber = i.value();
+        m_sourceToFlash[asmLineNumber] = address;
+        //qDebug() <<"AvrAsmDebugger::mapLstToAsm() "<<address<<asmLineNumber;
+    }
 }
 
 QString AvrAsmDebugger::avraIncPath()
@@ -207,56 +180,5 @@ void AvrAsmDebugger::setAvraIncPath( QString path )
     m_avraIncPath = path;
     MainWindow::self()->settings()->setValue( "avra_Inc_Path", m_avraIncPath );
 }
-
-/*void AvrAsmDebugger::setRegisters()  // get register addresses from lst file
-{
-    QString lstFileName = m_symbolFile;
-    lstFileName.remove( lstFileName.lastIndexOf( "." ), 4 ).append( ".lst");
-    QStringList lineList = fileToStringList( lstFileName, "AvrAsmDebugger::setRegisters" );
-
-    if( !regsTable.isEmpty() ) regsTable.clear();
-
-    foreach( QString line, lineList )
-    {
-        line = line.toLower().replace("\t"," ").replace("="," ");
-        if( line.contains("equ ") || line.contains("def "))      // This line contains a definition
-        {
-            QString name    = "";
-            QString addrtxt = "";
-            int address   = 0;
-            bool isNumber = false;
-
-            line.remove("equ").remove(".def").remove(".");
-            QStringList wordList = line.split(QRegExp("\\s+")); // Split in words
-            while( name.isEmpty() ) name = wordList.takeFirst();
-            while( addrtxt.isEmpty() ) addrtxt = wordList.takeFirst();
-
-            if( addrtxt.startsWith("H") )                  // IS hexadecimal??
-            {
-                addrtxt.remove("H").remove("'");           // Get the digits
-                address = addrtxt.toInt( &isNumber, 16 );  // Base 16
-            }
-            else if( addrtxt.startsWith("0x") )            // IS hexadecimal??
-            {
-                addrtxt.remove(0, 2);                      // Get the digits
-                address = addrtxt.toInt( &isNumber, 16 );  // Base 16
-            }
-            else
-            {
-                if( addrtxt.startsWith("r"))
-                {
-                    addrtxt.remove("r");
-                    address = addrtxt.toInt( &isNumber );
-                }
-                else
-                {
-                    address = addrtxt.toInt( &isNumber );
-                    if( isNumber && address < 64 ) address += 32;
-                }
-            }
-            if( isNumber ) regsTable.insert(name, address); // If found a valid address add to map
-        }
-    }
-}*/
 
 #include "moc_avrasmdebugger.cpp"

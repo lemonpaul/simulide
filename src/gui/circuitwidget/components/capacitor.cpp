@@ -17,10 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <cmath>
-
 #include "capacitor.h"
-#include "pin.h"
 
 
 Component* Capacitor::construct( QObject* parent, QString type, QString id )
@@ -37,51 +34,10 @@ LibraryItem* Capacitor::libraryItem()
 }
 
 Capacitor::Capacitor( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eCapacitor( id.toStdString() )
+         : CapacitorBase( parent, type, id )
 {
-    m_ePin.resize(2);
-    m_pin.resize(2);
-    
-    m_area = QRectF( -10, -10, 20, 20 );
-
-    QString nodid = m_id;
-    nodid.append(QString("-lPin"));
-    QPoint nodpos = QPoint(-16-8,0);
-    m_pin[0] = new Pin( 180, nodpos, nodid, 0, this);
-    m_pin[0]->setLength(12);
-    m_pin[0]->setPos(-16, 0 );
-    m_ePin[0] = m_pin[0];
-
-    nodid = m_id;
-    nodid.append( QString("-rPin") );
-    nodpos = QPoint(16+8,0);
-    m_pin[1] = new Pin( 0, nodpos, nodid, 1, this );
-    m_pin[1]->setLength(12);
-    m_pin[1]->setPos( 16, 0 );
-    m_ePin[1] = m_pin[1];
-    
-    m_unit = "F";
-    setCapac( m_cap );
-    setValLabelPos(-16, 8, 0);
-    setShowVal( true );
-
-    setLabelPos(-16,-24, 0);
 }
 Capacitor::~Capacitor(){}
-
-double Capacitor::capac() { return m_value; }
-
-void Capacitor::setCapac( double c ) 
-{ 
-    Component::setValue( c );       // Takes care about units multiplier
-    eCapacitor::setCap( m_value*m_unitMult );
-}
-
-void Capacitor::setUnit( QString un ) 
-{
-    Component::setUnit( un );
-    eCapacitor::setCap( m_value*m_unitMult );
-}
 
 void Capacitor::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {

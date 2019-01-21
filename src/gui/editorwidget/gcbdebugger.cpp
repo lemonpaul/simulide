@@ -23,7 +23,7 @@
 #include "simuapi_apppath.h"
 
 GcbDebugger::GcbDebugger( QObject* parent, OutPanelText* outPane, QString filePath ) 
-            : BaseDebugger( parent,outPane, filePath )
+           : BaseDebugger( parent,outPane, filePath )
 {
     setObjectName( "GcBasic Compiler" );
     
@@ -37,36 +37,77 @@ GcbDebugger::GcbDebugger( QObject* parent, OutPanelText* outPane, QString filePa
     m_typesList["word"]    = "uint16";
     m_typesList["long"]    = "uint32";
 }
-GcbDebugger::~GcbDebugger()
-{}
+GcbDebugger::~GcbDebugger(){}
 
-bool GcbDebugger::loadFirmware()
+int GcbDebugger::compile()
 {
-    if( BaseDebugger::loadFirmware() )
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    
+    QDir gcBasicDir( m_compilerPath );
+    if( !gcBasicDir.exists() )
     {
-        getProcType(); // Determine Pic or Avr
-        mapLstToAsm();
-        mapGcbToAsm();
-        return true;
+        m_outPane->appendText( "\nGcBasic" );
+        toolChainNotFound();
+        return -1;
     }
-    return false;
+
+    QString file = m_fileDir+m_fileName+m_fileExt;
+    QString args = " -NP -K:L -A:GCASM  ";
+    QString command = m_compilerPath + "gcbasic";
+    
+    #ifndef Q_OS_UNIX
+    command  = addQuotes( command );
+    file     = addQuotes( file );
+    #endif
+
+    command.append( args + file );
+    
+    m_outPane->appendText( command );
+    m_outPane->writeText( "\n\n" );
+
+    QProcess compGcb( 0l );
+    compGcb.setWorkingDirectory( m_fileDir );
+    compGcb.start( command );
+    compGcb.waitForFinished(-1);
+    QString p_stdout = compGcb.readAllStandardOutput();
+
+    m_outPane->writeText( p_stdout.remove("The message has been logged to the file Errors.txt.\n") );
+
+    int error = -1;
+    if( p_stdout=="" )
+    {
+        m_outPane->appendText( "\nGcBasic" );
+        toolChainNotFound();
+        error = -1;
+    }
+    else if( p_stdout.toUpper().contains("DONE")) 
+    {
+        m_firmware = m_fileDir+m_fileName+".hex";
+        error = 0;
+    }
+    else // some error found
+    {
+        QString line;
+        QStringList lines = p_stdout.split("\n");
+        foreach( line, lines )
+        {
+            if( !(line.contains( "Error:" )) ) continue;
+            QStringList words = line.split(" ");
+            words.removeFirst();
+            error = words.first().remove("(").remove(")").remove(":").toInt();
+            break;
+        }
+    }
+    QApplication::restoreOverrideCursor();
+    return error;
 }
 
-int GcbDebugger::step() // returns source line
+void GcbDebugger::mapFlashToSource()
 {
-    BaseProcessor::self()->stepOne();
-
-    int pc = BaseProcessor::self()->pc();
-    int line = m_flashToAsm[ pc ];
-    //qDebug() <<"GcbDebugger::step"<<pc << line;
-
-    if( !m_asmToGcb.contains( line ) ) line = -1;
-    else line = m_asmToGcb[ line ];
-
-    return line ;
+    getProcType(); // Determine Pic or Avr
+    mapLstToAsm();
+    mapGcbToAsm();
 }
-
-int GcbDebugger::stepOver(){return 0;}
 
 void GcbDebugger::mapGcbToAsm()  // Map asm_source_line <=> gcb_source_line
 {
@@ -92,8 +133,8 @@ void GcbDebugger::mapGcbToAsm()  // Map asm_source_line <=> gcb_source_line
             //qDebug() << "GcbDebugger::mapGcbToAsm  variable "<<type<<varName<<m_typesList[ type ];
         }
     }
-    m_asmToGcb.clear();
-    m_gcbToAsm.clear();
+    m_flashToSource.clear();
+    m_sourceToFlash.clear();
     
     QString asmFileName = m_fileDir + m_fileName + ".asm";
 
@@ -101,7 +142,7 @@ void GcbDebugger::mapGcbToAsm()  // Map asm_source_line <=> gcb_source_line
 
     bool haveVariable = false;
     int asmLineNumber = 0;
-    m_lastGcbLine = 0;
+    m_lastLine = 0;
     QString srcm = ";Source:F1L";           // Gcbasic parses source lines to asm file
 
     foreach( QString asmLine, asmLines ) 
@@ -111,14 +152,14 @@ void GcbDebugger::mapGcbToAsm()  // Map asm_source_line <=> gcb_source_line
             asmLine.remove( srcm );
             int gcbLineNum = asmLine.split("S").first().toInt();
             
-            if( gcbLineNum > m_lastGcbLine ) m_lastGcbLine = gcbLineNum;
+            if( gcbLineNum > m_lastLine ) m_lastLine = gcbLineNum;
             
             int asmLineNum = asmLineNumber+1;
             while( m_asmToFlash.value( asmLineNum ) == 0 ) asmLineNum++; // Avoid banksels and so
             
-            m_asmToGcb[ asmLineNum ] = gcbLineNum;
-            m_gcbToAsm[ gcbLineNum ] = asmLineNum;
-            //qDebug()<<"GcbDebugger::mapGcbToAsm  gcb:" << gcbLineNum <<"  asm:"<< asmLineNum;
+            int flashAddr = m_asmToFlash[asmLineNum];
+            m_flashToSource[ flashAddr ]  = gcbLineNum;
+            //qDebug()<<"GcbDebugger::mapGcbToAsm  gcb:" << gcbLineNum <<"  flashAddr:"<< flashAddr;
         }
         else if( asmLine.contains("locations for variables")) haveVariable = true;
         else if( asmLine.contains(";*"))                      haveVariable = false;
@@ -144,13 +185,15 @@ void GcbDebugger::mapGcbToAsm()  // Map asm_source_line <=> gcb_source_line
         }
         asmLineNumber++;
     }
-}
-
-int GcbDebugger::getValidLine( int line )
-{
-    while( !m_gcbToAsm.contains(line) && line<=m_lastGcbLine ) line++;
-    return line;
-    return -1;
+    QHashIterator<int, int> i(m_flashToSource);
+    while( i.hasNext() )
+    {
+        i.next();
+        int address    = i.key();
+        int gcbLineNum = i.value();
+        m_sourceToFlash[ gcbLineNum ] = address;
+        //qDebug()<<"GcbDebugger::mapGcbToAsm  gcb:" << gcbLineNum <<"  flashAddr:"<< address;
+    }
 }
 
 void GcbDebugger::mapLstToAsm()
@@ -171,14 +214,14 @@ void GcbDebugger::mapLstToAsm()
 
     foreach( asmLine, asmLines ) // Go to the program start in asm file
     {
-        if( asmLine.contains( "ORG	0" )) break;
+        if( asmLine.contains( "BASPROGRAMSTART" )) break;
         asmLineNumber++;
     }
     bool hasCeroAddr = false; // Deal with Banksel addr =0
     foreach( line, lstLines )
     {
         if( !line.startsWith("0") ) continue; // Code lines start with address
-        if( line.isEmpty() )      continue;
+        //if( line.isEmpty() )      continue;
         line = line.replace("\t", " ").toUpper();
         line = line.remove(" ");
         line = line.split(";").first();
@@ -195,8 +238,7 @@ void GcbDebugger::mapLstToAsm()
             if( asmLine.startsWith(".")) continue;
 
             asmLine = asmLine.split(";").first();
-            //qDebug() << "GcbDebugger::mapLstToAsm" << line;
-            //qDebug() << "GcbDebugger::mapLstToAsm" << asmLine;
+            //qDebug() << "GcbDebugger::mapLstToAsm" << line << asmLine;
             if( line.contains(asmLine) ) break;
         }
         if( asmLineNumber >= lastAsmLine )
@@ -226,67 +268,8 @@ void GcbDebugger::mapLstToAsm()
         int address       = i.key();
         int asmLineNumber = i.value();
         m_asmToFlash[asmLineNumber] = address;
+        //qDebug() << "GcbDebugger::mapLstToAsm........." << address << asmLineNumber;
     }
-}
-
-int GcbDebugger::compile()
-{
-    QDir gcBasicDir( m_compilerPath );
-    if( !gcBasicDir.exists() )
-    {
-        m_outPane->appendText( "\nGcBasic ToolChain not found\n" );
-        m_outPane->writeText( "\nRight-Click on Document Tab to set Path\n\n" );
-        return -1;
-    }
-
-    QString file = m_fileDir+m_fileName+m_fileExt;
-    QString args = " -NP -K:L -A:GCASM  ";
-    QString command = m_compilerPath + "gcbasic";
-    
-    #ifndef Q_OS_UNIX
-    command  = addQuotes( command );
-    file     = addQuotes( file );
-    #endif
-
-    command.append( args + file );
-    
-    m_outPane->appendText( command );
-    m_outPane->writeText( "\n\n" );
-
-    QProcess compGcb( 0l );
-    compGcb.setWorkingDirectory( m_fileDir );
-    compGcb.start( command );
-    compGcb.waitForFinished(-1);
-    QString p_stdout = compGcb.readAllStandardOutput();
-
-    m_outPane->writeText( p_stdout.remove("The message has been logged to the file Errors.txt.\n") );
-
-    int error = -1;
-    if( p_stdout=="" )
-    {
-        m_outPane->appendText( "\nGcBasic ToolChain not found\n" );
-        m_outPane->writeText( "\nRight-Click on Document Tab to set Path\n\n" );
-        error = -1;
-    }
-    else if( p_stdout.toUpper().contains("DONE")) 
-    {
-        m_firmware = m_fileDir+m_fileName+".hex";
-        error = 0;
-    }
-    else // some error found
-    {
-        QString line;
-        QStringList lines = p_stdout.split("\n");
-        foreach( line, lines )
-        {
-            if( !(line.contains( "Error:" )) ) continue;
-            QStringList words = line.split(" ");
-            words.removeFirst();
-            error = words.first().remove("(").remove(")").remove(":").toInt();
-            break;
-        }
-    }
-    return error;
 }
 
 void  GcbDebugger::getProcType()

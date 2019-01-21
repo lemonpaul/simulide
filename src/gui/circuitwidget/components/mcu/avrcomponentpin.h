@@ -84,11 +84,7 @@ class AVRComponentPin : public McuComponentPin
     protected:
         void setPullup( uint32_t value );
 
-        char m_port;
-        int  m_pinN;
         int  m_channel;
-
-        bool m_isInput;
 
         //from simavr
         avr_t*     m_AvrProcessor;

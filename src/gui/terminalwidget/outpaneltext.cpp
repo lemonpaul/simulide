@@ -21,13 +21,10 @@
 
 #include "outpaneltext.h"
 
-//OutPanelText* OutPanelText::m_pSelf = 0l;
 
 OutPanelText::OutPanelText( QWidget *parent ) 
             : QPlainTextEdit( parent )
 {
-    //m_pSelf = this;
-    
     m_text = "";
     
     //setStyleSheet("background-color: #150925");
@@ -41,10 +38,10 @@ OutPanelText::OutPanelText( QWidget *parent )
     QFont font;
     font.setFamily("Monospace");
     font.setFixedPitch(true);
-    font.setPointSize( 10 );
+    font.setPixelSize(12);
     setFont(font);
 }
-OutPanelText::~OutPanelText(){ /*m_highlighter->deleteLater();*/ }
+OutPanelText::~OutPanelText(){}
 
 
 void OutPanelText::appendText( const QString &text )
@@ -60,7 +57,6 @@ void OutPanelText::writeText( const QString &text )
     step();
     repaint();
 }
-
 
 void OutPanelText::step()
 {

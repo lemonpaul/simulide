@@ -32,6 +32,7 @@ class MAINMODULE_EXPORT Mosfet : public Component, public eMosfet
     Q_PROPERTY( double RDSon     READ RDSon      WRITE setRDSon     DESIGNABLE true USER true )
     Q_PROPERTY( double Threshold READ threshold  WRITE setThreshold DESIGNABLE true USER true )
     Q_PROPERTY( bool   P_Channel READ pChannel   WRITE setPchannel  DESIGNABLE true USER true )
+    Q_PROPERTY( bool   Depletion READ depletion  WRITE setDepletion DESIGNABLE true USER true )
     
     public:
 
@@ -40,6 +41,11 @@ class MAINMODULE_EXPORT Mosfet : public Component, public eMosfet
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
+        
+        void updateStep();
+        
+        void setPchannel( bool pc );
+        void setDepletion( bool dep );
         
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
         

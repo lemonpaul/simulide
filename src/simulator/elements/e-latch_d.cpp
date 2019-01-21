@@ -20,7 +20,7 @@
 #include "e-latch_d.h"
 
 eLatchD::eLatchD( std::string id, int channels )
-    : eLogicDevice( id )
+       : eLogicDevice( id )
 {
     //setNumChannels( channels );
 }

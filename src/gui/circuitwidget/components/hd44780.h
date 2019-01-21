@@ -48,6 +48,9 @@ class MAINMODULE_EXPORT Hd44780 : public Component, public eElement
         void resetState();
         void setVChanged();
         void updateStep();
+        void showPins( bool show );
+        
+        ePin* getEpin( QString pinName );
         
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 

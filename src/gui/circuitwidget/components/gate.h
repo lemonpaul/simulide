@@ -35,10 +35,11 @@ class MAINMODULE_EXPORT Gate : public Component, public eGate
     Q_PROPERTY( double Out_Low_V    READ outLowV    WRITE setOutLowV    DESIGNABLE true USER true )
     Q_PROPERTY( double Out_Imped    READ outImp     WRITE setOutImp     DESIGNABLE true USER true )
     Q_PROPERTY( bool   Inverted     READ inverted   WRITE setInverted   DESIGNABLE true USER true )
+    Q_PROPERTY( bool Open_Collector READ openCol  WRITE setOpenCol  DESIGNABLE true USER true )
     
 
     public:
-        QRectF boundingRect() const { return QRect( -20, -8*m_numInputs, 40, 8*2*m_numInputs ); }
+        QRectF boundingRect() const { return QRect( -20, -8*m_numInputs-2, 40, 8*2*m_numInputs+4 ); }
         
         Gate( QObject* parent, QString type, QString id, int inputs );
         ~Gate();

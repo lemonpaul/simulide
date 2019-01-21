@@ -27,14 +27,18 @@
 class BaseDebugger : public QObject    // Base Class for all debuggers
 {
     Q_OBJECT
-    Q_PROPERTY( QString  Compiler_Path   READ compilerPath    WRITE setCompilerPath   DESIGNABLE true USER true )
+    Q_PROPERTY( bool    Drive_Circuit READ driveCirc    WRITE setDriveCirc    DESIGNABLE true USER true )
+    Q_PROPERTY( QString Compiler_Path READ compilerPath WRITE setCompilerPath DESIGNABLE true USER true )
+    
     public:
         BaseDebugger( QObject* parent=0, OutPanelText* outPane=0, QString filePath=0 );
         ~BaseDebugger();
-        //QString getFileName() { return m_symbolFile; }  // Returns symbol file
         
         QString compilerPath();
         virtual void setCompilerPath( QString path );
+        
+        bool driveCirc();
+        void setDriveCirc( bool drive );
 
         virtual bool loadFirmware();
         virtual void upload();
@@ -46,9 +50,9 @@ class BaseDebugger : public QObject    // Base Class for all debuggers
         virtual void setProcType( int type ){ m_processorType = type; }
         
         virtual int compile()=0;
+        virtual void mapFlashToSource()=0;
         
-        virtual int getValidLine( int line );       // Returns next asm line with code
-        virtual int getProgramStart(){return 1;}
+        virtual int getValidLine( int line );   
 
         virtual void getCompilerPath();
         
@@ -58,15 +62,16 @@ class BaseDebugger : public QObject    // Base Class for all debuggers
         void ProcRead();
 
     protected:
+        void toolChainNotFound();
     
         OutPanelText*  m_outPane;
 
-        //QHash<QString, int> regsTable;              // Map register names to Ram adress
-
  static bool m_loadStatus;                          // Is symbol file loaded?
         bool m_running;                             // Is processor running?
+        bool m_driveCirc;
 
         int m_processorType;
+        int m_lastLine;
         
         QString m_device;
         QString m_appPath;
@@ -79,6 +84,8 @@ class BaseDebugger : public QObject    // Base Class for all debuggers
         
         QHash<QString, QString> m_typesList;
         QHash<QString, QString> m_varList;
+        QHash<int, int> m_flashToSource;            // Map flash adress to Source code line
+        QHash<int, int> m_sourceToFlash;               // Map .asm code line to flash adress
         
         QProcess m_compProcess;
 };

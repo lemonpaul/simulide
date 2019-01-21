@@ -21,6 +21,8 @@
 #include "avrprocessor.h"
 #include "itemlibrary.h"
 #include "mainwindow.h"
+#include "circuit.h"
+#include "utils.h"
 
 LibraryItem* AVRComponent::libraryItem()
 {
@@ -48,13 +50,8 @@ Component* AVRComponent::construct( QObject* parent, QString type, QString id )
         }
         return avr;
     }
-    QMessageBox* msgBox = new QMessageBox( MainWindow::self() );
-    msgBox->setAttribute( Qt::WA_DeleteOnClose ); //makes sure the msgbox is deleted automatically when closed
-    msgBox->setStandardButtons( QMessageBox::Ok );
-    msgBox->setWindowTitle( tr("Error") );
-    msgBox->setText( tr("Only 1 Mcu allowed\n to be in the Circuit.") );
-    msgBox->setModal( false ); 
-    msgBox->open();
+    MessageBoxNB( tr("Error")
+                , tr("Only 1 Mcu allowed\n to be in the Circuit.") );
 
     return 0l;
 }
@@ -66,7 +63,7 @@ AVRComponent::AVRComponent( QObject* parent, QString type, QString id )
     m_dataFile = "avrs.xml";
     m_processor = AvrProcessor::self();
 
-    initPackage();
+    initChip();
     if( m_error == 0 )
     {
         setFreq( 16 );
@@ -104,7 +101,7 @@ void AVRComponent::addPin( QString id, QString type, QString label, int pos, int
     AVRComponentPin*  newPin = new AVRComponentPin( this, id, type, label, pos, xpos, ypos, angle );
     m_pinList.append( newPin );
     
-    if( type.startsWith("adc") )m_ADCpinList[type.right(1).toInt()] = newPin;
+    if( type.startsWith("adc") ) m_ADCpinList[type.remove("adc").toInt()] = newPin;
 }
 
 void AVRComponent::adcread( int channel )

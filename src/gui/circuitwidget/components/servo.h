@@ -60,8 +60,8 @@ class MAINMODULE_EXPORT Servo : public LogicComponent, public eLogicDevice
         double m_speed;                         // Angular speed sec/60ª
         int    m_minAngle;                 // Angle to move evry repaint
 
-        unsigned long long m_pulseStart;              // Simulation step
-        unsigned long long m_lastUpdate;              // Simulation step
+        uint64_t m_pulseStart;              // Simulation step
+        uint64_t m_lastUpdate;              // Simulation step
 };
 
 

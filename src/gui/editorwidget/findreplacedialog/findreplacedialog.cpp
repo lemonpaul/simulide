@@ -69,5 +69,10 @@ void FindReplaceDialog::findPrev() {
     ui->findReplaceForm->findPrev();
 }
 
+void FindReplaceDialog::setTextToFind( QString text)
+{
+    ui->findReplaceForm->setTextToFind( text );
+}
+
 #include  "moc_findreplacedialog.cpp"
 

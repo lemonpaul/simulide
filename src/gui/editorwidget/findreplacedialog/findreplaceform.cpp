@@ -37,9 +37,10 @@
 #define WHOLE_CHECK "wholeCheck"
 #define REGEXP_CHECK "regexpCheck"
 
-FindReplaceForm::FindReplaceForm(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::FindReplaceFORM), textEdit(0)
+FindReplaceForm::FindReplaceForm(QWidget *parent) 
+               : QWidget(parent)
+               , ui( new Ui::FindReplaceFORM )
+               , m_textEdit(0)
 {
     ui->setupUi(this);
 
@@ -50,10 +51,10 @@ FindReplaceForm::FindReplaceForm(QWidget *parent) :
 
     connect(ui->regexCheckBox, SIGNAL(toggled(bool)), this, SLOT(regexpSelected(bool)));
 
-    connect(ui->findButton, SIGNAL(clicked()), this, SLOT(find()));
+    connect(ui->findButton,  SIGNAL(clicked()), this, SLOT(find()));
     connect(ui->closeButton, SIGNAL(clicked()), parent, SLOT(close()));
 
-    connect(ui->replaceButton, SIGNAL(clicked()), this, SLOT(replace()));
+    connect(ui->replaceButton,    SIGNAL(clicked()), this, SLOT(replace()));
     connect(ui->replaceAllButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
 }
 
@@ -62,88 +63,91 @@ FindReplaceForm::~FindReplaceForm()
     delete ui;
 }
 
-void FindReplaceForm::hideReplaceWidgets() {
+void FindReplaceForm::hideReplaceWidgets() 
+{
     ui->replaceLabel->setVisible(false);
     ui->textToReplace->setVisible(false);
     ui->replaceButton->setVisible(false);
     ui->replaceAllButton->setVisible(false);
 }
 
-void FindReplaceForm::setTextEdit(CodeEditor *textEdit_) {
-    textEdit = textEdit_;
-    connect(textEdit, SIGNAL(copyAvailable(bool)), ui->replaceButton, SLOT(setEnabled(bool)));
-    connect(textEdit, SIGNAL(copyAvailable(bool)), ui->replaceAllButton, SLOT(setEnabled(bool)));
+void FindReplaceForm::setTextEdit( CodeEditor* textEdit_) 
+{
+    m_textEdit = textEdit_;
+    connect( m_textEdit, SIGNAL(copyAvailable(bool)), ui->replaceButton, SLOT(setEnabled(bool)));
+    connect( m_textEdit, SIGNAL(copyAvailable(bool)), ui->replaceAllButton, SLOT(setEnabled(bool)));
 }
 
-void FindReplaceForm::changeEvent(QEvent *e)
+void FindReplaceForm::setTextToFind( QString text)
+{
+    ui->textToFind->setText( text );
+    ui->replaceButton->setEnabled( true );
+    ui->replaceAllButton->setEnabled( true );
+}
+
+void FindReplaceForm::changeEvent( QEvent* e )
 {
     QWidget::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
+    switch( e->type() ) 
+    {
+        case QEvent::LanguageChange:
+            ui->retranslateUi(this);
+            break;
+        default:
+            break;
     }
 }
 
-void FindReplaceForm::textToFindChanged() {
+void FindReplaceForm::textToFindChanged() 
+{
     ui->findButton->setEnabled(ui->textToFind->text().size() > 0);
 }
 
-void FindReplaceForm::regexpSelected(bool sel) {
-    if (sel)
-        validateRegExp(ui->textToFind->text());
-    else
-        validateRegExp("");
+void FindReplaceForm::regexpSelected(bool sel) 
+{
+    if( sel ) validateRegExp(ui->textToFind->text());
+    else      validateRegExp("");
 }
 
-void FindReplaceForm::validateRegExp(const QString &text) {
-    if (!ui->regexCheckBox->isChecked() || text.size() == 0) {
+void FindReplaceForm::validateRegExp(const QString &text) 
+{
+    if( !ui->regexCheckBox->isChecked() || text.size() == 0 ) 
+    {
         ui->errorLabel->setText("");
         return; // nothing to validate
     }
+    QRegExp reg(text, (ui->caseCheckBox->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive));
 
-    QRegExp reg(text,
-                (ui->caseCheckBox->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive));
-
-    if (reg.isValid()) {
-        showError("");
-    } else {
-        showError(reg.errorString());
-    }
+    if( reg.isValid() ) showError("");
+    else                showError(reg.errorString());
 }
 
-void FindReplaceForm::showError(const QString &error) {
-    if (error == "") {
-        ui->errorLabel->setText("");
-    } else {
-        ui->errorLabel->setText("<span style=\" font-weight:600; color:#ff0000;\">" +
-                                error +
-                                "</spam>");
-    }
+void FindReplaceForm::showError(const QString &error) 
+{
+    if (error == "") ui->errorLabel->setText("");
+    else             ui->errorLabel->setText( "<span style=\" font-weight:600; color:#ff0000;\">" 
+                                            + error 
+                                            + "</spam>");
 }
 
-void FindReplaceForm::showMessage(const QString &message) {
-    if (message == "") {
-        ui->errorLabel->setText("");
-    } else {
-        ui->errorLabel->setText("<span style=\" font-weight:600; color:green;\">" +
-                                message +
-                                "</spam>");
-    }
+void FindReplaceForm::showMessage(const QString &message) 
+{
+    if (message == "") ui->errorLabel->setText("");
+    else ui->errorLabel->setText( "<span style=\" font-weight:600; color:green;\">" 
+                                + message 
+                                + "</spam>");
 }
 
-void FindReplaceForm::find() {
-    find(ui->downRadioButton->isChecked());
+void FindReplaceForm::find() 
+{
+    find( ui->downRadioButton->isChecked() );
 }
 
-void FindReplaceForm::find(bool next) {
-    if (!textEdit)
-        return; // TODO: show some warning?
+void FindReplaceForm::find( bool next ) 
+{
+    if( !m_textEdit ) return; 
 
-    // backward search
-    bool back = !next;
+    bool back = !next;                                // backward search
 
     const QString &toSearch = ui->textToFind->text();
 
@@ -151,58 +155,65 @@ void FindReplaceForm::find(bool next) {
 
     QTextDocument::FindFlags flags;
 
-    if (back)
-        flags |= QTextDocument::FindBackward;
-    if (ui->caseCheckBox->isChecked())
-        flags |= QTextDocument::FindCaseSensitively;
-    if (ui->wholeCheckBox->isChecked())
-        flags |= QTextDocument::FindWholeWords;
+    if (back)                           flags |= QTextDocument::FindBackward;
+    if (ui->caseCheckBox->isChecked())  flags |= QTextDocument::FindCaseSensitively;
+    if (ui->wholeCheckBox->isChecked()) flags |= QTextDocument::FindWholeWords;
+    if (ui->regexCheckBox->isChecked()) 
+    {
+        QRegExp reg(toSearch, (ui->caseCheckBox->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive));
 
-    if (ui->regexCheckBox->isChecked()) {
-        QRegExp reg(toSearch,
-                    (ui->caseCheckBox->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive));
+        //qDebug() << "searching for regexp: " << reg.pattern();
 
-        qDebug() << "searching for regexp: " << reg.pattern();
-
-        textCursor = textEdit->document()->find(reg, textCursor, flags);
-        textEdit->setTextCursor(textCursor);
-        result = (!textCursor.isNull());
-    } else {
-        qDebug() << "searching for: " << toSearch;
-
-        result = textEdit->find(toSearch, flags);
+        m_textCursor = m_textEdit->document()->find( reg, m_textCursor, flags );
+        m_textEdit->setTextCursor( m_textCursor );
+        result = (!m_textCursor.isNull());
+    } 
+    else 
+    {                       //qDebug() << "searching for: " << toSearch;
+        result = m_textEdit->find( toSearch, flags );
     }
-
-    if (result) {
-        showError("");
-    } else {
+    if( result ) showError( "" );
+    else 
+    {
         showError(tr("no match found"));
         // move to the beginning of the document for the next find
-        textCursor.setPosition(0);
-        textEdit->setTextCursor(textCursor);
+        //m_textCursor.setPosition(0);
+        //m_textEdit->setTextCursor( m_textCursor );
+        m_textEdit->textCursor().setPosition( 0, QTextCursor::MoveAnchor );
+        
+        
     }
 }
 
-void FindReplaceForm::replace() {
-    if (!textEdit->textCursor().hasSelection()) {
-        find();
-    } else {
-        textEdit->textCursor().insertText(ui->textToReplace->text());
+void FindReplaceForm::replace() 
+{
+    find();
+    if( m_textEdit->textCursor().hasSelection() ) find();
+    {
+        m_textEdit->textCursor().insertText( ui->textToReplace->text() );
         find();
     }
+    m_textEdit->setTextCursor( m_textCursor);
 }
 
-void FindReplaceForm::replaceAll() {
+void FindReplaceForm::replaceAll() 
+{
+    m_textCursor.setPosition(0);
+    m_textEdit->setTextCursor( m_textCursor );
+    find();
     int i=0;
-    while (textEdit->textCursor().hasSelection()){
-        textEdit->textCursor().insertText(ui->textToReplace->text());
+    while( m_textEdit->textCursor().hasSelection() )
+    {
+        m_textEdit->textCursor().insertText( ui->textToReplace->text() );
         find();
         i++;
     }
     showMessage(tr("Replaced %1 occurrence(s)").arg(i));
+    //m_textEdit->textCursor().setPosition( 0, QTextCursor::MoveAnchor );
 }
 
-void FindReplaceForm::writeSettings(QSettings &settings, const QString &prefix) {
+void FindReplaceForm::writeSettings(QSettings &settings, const QString &prefix) 
+{
     settings.beginGroup(prefix);
     settings.setValue(TEXT_TO_FIND, ui->textToFind->text());
     settings.setValue(TEXT_TO_REPLACE, ui->textToReplace->text());
@@ -214,7 +225,8 @@ void FindReplaceForm::writeSettings(QSettings &settings, const QString &prefix) 
     settings.endGroup();
 }
 
-void FindReplaceForm::readSettings(QSettings &settings, const QString &prefix) {
+void FindReplaceForm::readSettings(QSettings &settings, const QString &prefix) 
+{
     settings.beginGroup(prefix);
     ui->textToFind->setText(settings.value(TEXT_TO_FIND, "").toString());
     ui->textToReplace->setText(settings.value(TEXT_TO_REPLACE, "").toString());

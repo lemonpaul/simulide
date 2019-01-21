@@ -17,11 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "arduino.h"
 #include "mainwindow.h"
 #include "circuit.h"
 #include "e-resistor.h"
 #include "itemlibrary.h"
-#include "arduino.h"
+#include "utils.h"
 
 LibraryItem* Arduino::libraryItem()
 {
@@ -29,7 +30,7 @@ LibraryItem* Arduino::libraryItem()
         tr("Arduino"),
         tr("Micro"),   
         "arduinoUnoIcon.png",
-        tr("Arduino"),
+        "Arduino",
         Arduino::construct );
 }
 
@@ -48,13 +49,8 @@ Component* Arduino::construct( QObject* parent, QString type, QString id )
         }
         return ard;
     }
-    QMessageBox* msgBox = new QMessageBox( MainWindow::self() );
-    msgBox->setAttribute( Qt::WA_DeleteOnClose ); //makes sure the msgbox is deleted automatically when closed
-    msgBox->setStandardButtons( QMessageBox::Ok );
-    msgBox->setWindowTitle( tr("Error") );
-    msgBox->setText( tr("Only 1 Mcu allowed\n to be in the Circuit.") );
-    msgBox->setModal( false ); 
-    msgBox->open();
+    MessageBoxNB( tr("Error")
+                , tr("Only 1 Mcu allowed\n to be in the Circuit.") );
 
     return 0l;
 }
@@ -68,9 +64,7 @@ Arduino::Arduino( QObject* parent, QString type, QString id )
     
     setLabelPos( 100,-21, 0); // X, Y, Rot
     
-    setTransformOriginPoint( boundingRect().center() );
-
-    initPackage();
+    initChip();
     if( m_error == 0 )
     {
         initBoard();
@@ -83,6 +77,7 @@ Arduino::Arduino( QObject* parent, QString type, QString id )
     {
         qDebug() <<"     ..."<<m_id<<"Error!!!\n";
     }
+    setTransformOriginPoint( togrid( boundingRect().center()) );
 }
 Arduino::~Arduino() 
 {
@@ -90,7 +85,6 @@ Arduino::~Arduino()
 
 void Arduino::remove()
 {
-    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
     m_pb5Pin->setEnode( 0l );
     
     Circuit::self()->compList()->removeOne( m_boardLed );
@@ -102,72 +96,29 @@ void Arduino::remove()
     
     Simulator::self()->remFromEnodeList( m_groundEnode, true );
     Simulator::self()->remFromEnodeList( m_boardLedEnode, true );
+    Simulator::self()->remFromElementList( this );
 
     McuComponent::remove();
 }
 
-
-void Arduino::initBootloader()
-{
-    
-    /*struct avr_flash flash_data;
-    char boot_path[1024] = "data/arduino/ATmegaBOOT_168_atmega328.hex";
-    uint32_t boot_base, boot_size;
-    
-    avr_t* avr = avr_make_mcu_by_name("atmega328p");
-    AvrProcessor *ap = dynamic_cast<AvrProcessor*>( m_processor );
-    ap->setCpu( avr );
-    
-    uint8_t* boot = read_ihex_file(boot_path, &boot_size, &boot_base);
-    if (!boot)
-        fprintf(stderr, "Unable to load %s\n", boot_path);
-    
-    flash_data.avr_flash_fd = 0;
-    // register our own functions
-    avr->custom.init = avr_special_init;
-    avr->custom.deinit = avr_special_deinit;
-    avr->custom.data = &flash_data;
-    avr_init(avr);
-    avr->frequency = 16000000;
-    
-    memcpy(avr->flash + boot_base, boot, boot_size);
-    free(boot);
-    avr->pc = boot_base;
-    // end of flash, remember we are writing /code/ 
-    avr->codeend = avr->flashend;
-    avr->log = 1;
-    
-    ap->initialized();
-    
-    attachPins();
-    //reset();
-    
-    uart_pty_init(avr, &m_uart_pty);
-    uart_pty_connect(&m_uart_pty, '0');
-    if (!m_uart_pty.run) //thread)
-    {
-        ///TODO: shade connection symbol to indicate it is not active
-    }*/
-}
-
 void Arduino::initialize()
 {
-        eNode* enod = m_pb5Pin->getEnode();
-        
-        if( !enod )                        // Not connected: Create boardLed eNode
-        {
-            m_boardLedEnode = new eNode( m_id+"-boardLedeNode" );
-            enod = m_boardLedEnode;
-            m_pb5Pin->setEnode( m_boardLedEnode );
-        }
-        else if( enod != m_boardLedEnode ) // Connected to external eNode: Delete boardLed eNode
-        {
-            Simulator::self()->remFromEnodeList( m_boardLedEnode, true );
-            m_boardLedEnode = 0l;
-        }
-        else return;                       // Already connected to boardLed eNode: Do nothing
-        
-        m_boardLed->getEpin(0)->setEnode(enod);
+    eNode* enod = m_pb5Pin->getEnode();
+    
+    if( !enod )                        // Not connected: Create boardLed eNode
+    {
+        m_boardLedEnode = new eNode( m_id+"-boardLedeNode" );
+        enod = m_boardLedEnode;
+        m_pb5Pin->setEnode( m_boardLedEnode );
+    }
+    else if( enod != m_boardLedEnode ) // Connected to external eNode: Delete boardLed eNode
+    {
+        //Simulator::self()->remFromEnodeList( m_boardLedEnode, true );
+        m_boardLedEnode = enod;
+    }
+    else return;                       // Already connected to boardLed eNode: Do nothing
+    
+    m_boardLed->getEpin(0)->setEnode(enod);
 }
 
 void Arduino::initBoard()
@@ -182,25 +133,27 @@ void Arduino::initBoard()
     m_boardLed = new LedSmd( this, "LEDSMD", m_id+"boardled", QRectF(0, 0, 4, 3) );
     m_boardLed->setNumEpins(2);
     m_boardLed->setParentItem(this);
-    m_boardLed->setPos( 35, 125 );
     m_boardLed->setEnabled(false);
     m_boardLed->setMaxCurrent( 0.003 );
     m_boardLed->setRes( 1000 );
     
-    //m_boardLedEnode = new eNode( m_id+"-boardLedeNode" );
+    if( objectName().contains("Mega") ) m_boardLed->setPos( 35+12, 125+105 );
+    else                                m_boardLed->setPos( 35, 125 );
+    
     m_boardLedEnode = 0l;
     
     ePin* boardLedEpin1 = m_boardLed->getEpin(1);
 
-    // Connect board led to ground
-    boardLedEpin1->setEnode( m_groundEnode );
+    boardLedEpin1->setEnode( m_groundEnode ); // Connect board led to ground
 
     for( int i=0; i<m_numpins; i++ )                      // Create Pins
     {
         McuComponentPin* mcuPin = m_pinList.at(i);
 
-        if( mcuPin->angle() == 0 ) mcuPin->move(-16, 0 );
-        else                       mcuPin->move( 16, 0 );
+        if     ( mcuPin->angle() == 0   ) mcuPin->move(-16, 0 );
+        else if( mcuPin->angle() == 180 ) mcuPin->move( 16, 0 );
+        else if( mcuPin->angle() == 90  ) mcuPin->move( 0, 32 );
+        else                              mcuPin->move( 0,-320 );
 
         Pin* pin = mcuPin->pin();
         pin->setLength(0);
@@ -260,17 +213,8 @@ void Arduino::attachPins()
     // Registra IRQ para recibir petiones de voltaje de pin ( usado en ADC )
     avr_irq_t* adcIrq = avr_io_getirq( cpu, AVR_IOCTL_ADC_GETIRQ, ADC_IRQ_OUT_TRIGGER );
     avr_irq_register_notify( adcIrq, adc_hook, this );
-
+    
     m_attached = true;
-    
-    //uart_pty_t m_uart_pty;
-    /*uart_pty_init(cpu, &m_uart_pty);
-    uart_pty_connect(&m_uart_pty, 0, '0');
-    
-    if (!m_uart_pty.run) //thread)
-    {
-        qDebug() << "Arduino::attachPins, Failed to run uart_pty";
-    }*/
 }
 
 void Arduino::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )

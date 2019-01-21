@@ -22,6 +22,11 @@
 #include "itemlibrary.h"
 #include "logicinput.h"
 
+static const char* LogicInput_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Voltage"),
+    QT_TRANSLATE_NOOP("App::Property","Show Volt")
+};
+
 
 Component* LogicInput::construct( QObject* parent, QString type, QString id )
 { return new LogicInput( parent, type, id ); }
@@ -40,6 +45,8 @@ LogicInput::LogicInput( QObject* parent, QString type, QString id )
           : Component( parent, type, id )
           , eElement( id.toStdString() )
 {
+    Q_UNUSED( LogicInput_properties );
+    
     setLabelPos(-64,-24 );
     
     m_changed = false;
@@ -82,7 +89,7 @@ void LogicInput::onbuttonclicked()
     m_out->setOut( m_button->isChecked() );
     m_changed = true;
     //qDebug() << "LogicInput::onbuttonclicked" ;
-    update();
+    //update();
 }
 
 void LogicInput::updateStep()
@@ -91,6 +98,7 @@ void LogicInput::updateStep()
     {
         m_out->stampOutput();
         m_changed = false;
+        update();
     }
 }
 

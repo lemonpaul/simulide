@@ -20,6 +20,7 @@
 #include <QDebug>
 
 #include "e-flipflopjk.h"
+#include "circuit.h"
 
 eFlipFlopJK::eFlipFlopJK( std::string id )
            : eLogicDevice( id )
@@ -93,4 +94,6 @@ void eFlipFlopJK::setSrInv( bool inv )
     m_srInv = inv;
     m_input[2]->setInverted( inv );                           // Set
     m_input[3]->setInverted( inv );                           // Reset
+    
+    Circuit::self()->update();
 }

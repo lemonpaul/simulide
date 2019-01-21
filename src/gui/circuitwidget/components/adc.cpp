@@ -17,8 +17,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "connector.h"
 #include "adc.h"
+#include "connector.h"
+#include "itemlibrary.h"
+
+static const char* ADC_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Vref")
+};
 
 Component* ADC::construct( QObject* parent, QString type, QString id )
 {
@@ -29,16 +34,18 @@ LibraryItem* ADC::libraryItem()
 {
     return new LibraryItem(
         tr( "ADC" ),
-        tr( "Logic" ),
-        "subc.png",
+        tr( "Logic/Other Logic" ),
+        "1to3.png",
         "ADC",
         ADC::construct );
 }
 
 ADC::ADC( QObject* parent, QString type, QString id )
-       : LogicComponent( parent, type, id ),
-         eInBus( id.toStdString() )
-{    
+   : LogicComponent( parent, type, id )
+   , eInBus( id.toStdString() )
+{
+    Q_UNUSED( ADC_properties );
+    
     m_width  = 4;
     m_height = 9;
 
@@ -66,7 +73,7 @@ void ADC::setNumOuts( int outs )
 
     for( int i=0; i<outs; i++ )
     {
-        QString num = QString::number(i);
+        QString num = QString::number(outs-i-1);
         m_outPin[i] = new Pin( 0, QPoint(24,-8*outs+i*8+8 ), m_id+"-out"+num, i, this );
 
         m_outPin[i]->setLabelText( "D"+num+" " );

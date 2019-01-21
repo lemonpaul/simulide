@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include <math.h>
-#include <QDebug>
+//#include <QDebug>
 
 #include "e-outbus.h"
 
@@ -52,13 +52,16 @@ void eOutBus::setVChanged()
 {
     int address = 0;
     
-    bool haveInput = true;
+    bool haveInput = false;
     
     for( int i=0; i<m_numInputs; i++ )
     {
         double volt = m_input[i]->getVolt();
-        if( fabs( volt-m_threshold ) < m_threshold/2 ) haveInput = false;
+        
+        if( fabs( volt-m_threshold ) > m_threshold/5 ) haveInput = true;
+        
         //qDebug() << "eOutBus::setVChanged" <<volt<<m_threshold<<haveInput;
+        
         bool  state = m_inputState[i];
 
         if     ( volt > m_inputHighV ) state = true;
@@ -67,7 +70,7 @@ void eOutBus::setVChanged()
         if( m_input[i]->isInverted() ) state = !state;
         m_inputState[i] = state;
         
-        if( state ) address += pow( 2, 7-i );
+        if( state ) address += pow( 2, m_numInputs-1-i );
     }
     double v = m_maxVolt*address/m_maxAddr;
     double imp = m_outImp;

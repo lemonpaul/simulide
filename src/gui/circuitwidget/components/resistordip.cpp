@@ -20,6 +20,7 @@
 #include "resistordip.h"
 #include "itemlibrary.h"
 #include "connector.h"
+#include "circuit.h"
 #include "pin.h"
 
 
@@ -37,14 +38,33 @@ LibraryItem* ResistorDip::libraryItem()
 }
 
 ResistorDip::ResistorDip( QObject* parent, QString type, QString id )
-    : Component( parent, type, id )
+           : Component( parent, type, id )
 {
-    m_resistor.resize( 8 );
-    m_pin.resize( 16 );
+    m_size = 0;
+    setSize( 8 );
     
-    // Create Resistors
-    for( int i=0; i<8; i++ )
+    m_unit = "Ω";
+    setResist( 100 );
+    setValLabelX( 5 );
+    setValLabelY(-28 );
+    setValLabRot( 90 );
+    setValLabelPos();
+    //m_valLabel->setEnabled( false );
+    m_valLabel->setAcceptedMouseButtons(0);
+    setShowVal( true );
+}
+ResistorDip::~ResistorDip(){}
+
+void ResistorDip::createResistors( int c )
+{
+    int start = m_size;
+    m_size = m_size+c;
+    m_resistor.resize( m_size );
+    m_pin.resize( m_size*2 );
+
+    for( int i=start; i<m_size; i++ )
     {
+        int index = i*2;
         QString reid = m_id;
         reid.append(QString("-resistor"+QString::number(i)));
         m_resistor[i] = new eResistor( reid.toStdString() );
@@ -52,25 +72,55 @@ ResistorDip::ResistorDip( QObject* parent, QString type, QString id )
         QPoint pinpos = QPoint(-16,-32+8+i*8 );
         Pin* pin = new Pin( 180, pinpos, reid+"-pinP", 0, this);
         m_resistor[i]->setEpin( 0, pin );
-        m_pin[i] = pin;
+        m_pin[index] = pin;
         
         pinpos = QPoint( 16,-32+8+i*8 );
         pin = new Pin( 0, pinpos, reid+"-pinN", 0, this);
         m_resistor[i]->setEpin( 1, pin );
-        m_pin[8+i] = pin;
+        m_pin[index+1] = pin;
     }
-    
-    m_unit = "Ω";
-    setResist( 100 );
-    setValLabelX( 7 );
-    setValLabelY(-20 );
-    setValLabRot( 90 );
-    setValLabelPos();
-    m_valLabel->setEnabled( false );
-    m_valLabel->setAcceptedMouseButtons(0);
-    setShowVal( true );
+    //update();
 }
-ResistorDip::~ResistorDip(){}
+
+void ResistorDip::deleteResistors( int d )
+{
+    if( d > m_size ) d = m_size;
+    int start = m_size-d;
+
+    for( int i=start*2; i<m_size*2; i++ )
+    {
+        Pin* pin = m_pin[i];
+        if( pin->isConnected() ) pin->connector()->remove();
+        
+        delete pin;
+    }
+    for( int i=start; i<m_size; i++ ) delete m_resistor[i];
+    m_size = m_size-d;
+    m_resistor.resize( m_size );
+    m_pin.resize( m_size*2 );
+    //Circuit::self()->update();
+}
+
+int ResistorDip::size()
+{
+    return m_size;
+}
+
+void ResistorDip::setSize( int size )
+{
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->pauseSim();
+    
+    if( size == 0 ) size = 8;
+    
+    if     ( size < m_size ) deleteResistors( m_size-size );
+    else if( size > m_size ) createResistors( size-m_size );
+    
+    m_area = QRect( -8, -28, 16, m_size*8 ); 
+    
+    if( pauseSim ) Simulator::self()->runContinuous();
+    Circuit::self()->update();
+}
 
 double ResistorDip::resist() { return m_value; }
 
@@ -78,22 +128,18 @@ void ResistorDip::setResist( double r )
 {
     Component::setValue( r );       // Takes care about units multiplier
     
-    for( int i=0; i<8; i++ ) m_resistor[i]->setResSafe( m_value*m_unitMult );
+    foreach( eResistor* res, m_resistor ) res->setResSafe( m_value*m_unitMult );
 }
 
 void ResistorDip::setUnit( QString un ) 
 {
     Component::setUnit( un );
-    for( int i=0; i<8; i++ ) m_resistor[i]->setResSafe( m_value*m_unitMult );
+    foreach( eResistor* res, m_resistor ) res->setResSafe( m_value*m_unitMult );
 }
 
 void ResistorDip::remove()
 {
-    for( int i=0; i<16; i++ )
-        {if( m_pin[i]->isConnected() ) 
-            {(static_cast<Pin*>(m_pin[i]))->connector()->remove();}}
-
-    foreach (eResistor* res, m_resistor ) delete res;
+    deleteResistors( m_size );
 
     Component::remove();
 }

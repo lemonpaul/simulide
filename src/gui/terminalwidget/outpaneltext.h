@@ -35,7 +35,7 @@ class MAINMODULE_EXPORT OutPanelText : public QPlainTextEdit
         
  //static OutPanelText* self() { return m_pSelf; }
 
-        void appendText(  const QString &text );
+        void appendText( const QString &text );
         void writeText( const QString &text );
         
         void step();

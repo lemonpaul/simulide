@@ -20,28 +20,30 @@
 #include <QtGui>
 
 #include "picprocessor.h"
+#include "mcucomponent.h"
 #include "simulator.h"
 #include "utils.h"
 
 // GpSim includes
-#include "gpsim/pic-processor.h"
+#include "pic-processor.h"
+#include "uart.h"
+#include "pir.h"
 
-//void simulation_cleanup();
 
 PicProcessor::PicProcessor( QObject* parent ) 
             : BaseProcessor( parent )
+            , m_hexLoader()
 {
     m_pSelf = this;
     m_pPicProcessor = 0l;
     m_loadStatus    = false;
-    m_DoneGpsimInit = false;
 }
 PicProcessor::~PicProcessor(){}
 
 void PicProcessor::terminate()
 {
-    //qDebug() << "PicProcessor::terminate";
     BaseProcessor::terminate();
+ 
     m_pPicProcessor = 0l;
 }
 
@@ -51,197 +53,147 @@ bool PicProcessor::loadFirmware( QString fileN )
     
     m_symbolFile = fileN; 
     
-    if( !QFile::exists(m_symbolFile) )
+    if( !QFile::exists( m_symbolFile ) )
     {
-        QMessageBox::warning( 0, tr("File Not Found"), tr("The file \"%1\" was not found.").arg(m_symbolFile) );
+        QMessageBox::warning( 0, tr("File Not Found")
+                               , tr("The file \"%1\" was not found.").arg(m_symbolFile) );
         return false;
     }
-    if( !m_DoneGpsimInit )
-    {
-        qDebug() << "\n        Initializing GpSim...\n";
-        int init = initialize_gpsim_core();
-        initialization_is_complete();
-        m_DoneGpsimInit = (init==0);
-
-        if( m_DoneGpsimInit )
-            qDebug() << "    ...GpSim Initialization is complete\n\n";
-        else
-            qDebug() << "    ...Error!!! GpSim Initialization Failed!!!\n\n";
-    }
-    
-    qDebug() << "PicProcessor::loadFirmware hexFile"<<m_symbolFile ;
-    
     QByteArray symbolFile = m_symbolFile.toLocal8Bit();
-    QByteArray device = m_device.toLocal8Bit();
-
+    QByteArray device     = m_device.toLocal8Bit();
+    
+    m_loadStatus = false;
+    
     if( !m_pPicProcessor )
     {
-        gpsimObject* psn = globalSymbolTable().find( device.constData() );
+        qDebug() << "Creating Proccessor:    "<<m_device<<"\n" ;
 
-        if( psn ) m_pPicProcessor = dynamic_cast<pic_processor*>( psn );
-        else
-        {
-            ProcessorConstructor *pc = ProcessorConstructorList::GetList()->findByType(device.constData());
-            Processor* p = pc->ConstructProcessor(device.constData());
-            m_pPicProcessor = dynamic_cast<pic_processor*>( p );
-        }
-        
+        Processor* p = ProcessorConstructor::CreatePic( device.constData() );
+        m_pPicProcessor = dynamic_cast<pic_processor*>( p );
+
         if( !m_pPicProcessor )
         {
             QMessageBox::warning( 0, tr("Unkown Error:")
-                                   , tr("Could not Create Pic Processor for: \"%1\"").arg(m_symbolFile) );
+                                   , tr("Could not Create Pic Processor: \"%1\"").arg(m_device) );
             return false;
         }
     }
+    /*Cycle_Counter_breakpoint_list* l1 = &(get_cycles().active);
 
+    while(l1->next)            // Clear CycleCounter breakpoint list
+    {
+        //qDebug() << "clear_break"<<l1->break_value;
+        l1->clear();
+        Cycle_Counter_breakpoint_list* l2 = l1;
+        l1 = l1->next;
+        l2->next = 0l;
+    }*/
+    qDebug() << "Loading HexFile:\n"<<m_symbolFile<<"\n" ;
+    
     FILE* pFile  = fopen( symbolFile.constData(), "r" );
-    m_loadStatus = m_pPicProcessor->LoadProgramFile( symbolFile.constData(), pFile, device.constData() );
-
+    int load = m_hexLoader.readihex16( m_pPicProcessor, pFile );
+    if( load == IntelHexProgramFileType::SUCCESS ) m_loadStatus = true;
+    
     if( !m_loadStatus )
     {
-        QMessageBox::warning( 0, tr("Unkown Error:"),  tr("Could not Load: \"%1\"").arg(m_symbolFile) );
+        QMessageBox::warning( 0, tr("Unkown Error:")
+                               , tr("Could not Load: \"%1\"").arg(m_symbolFile) );
         return false;
     }
-    m_cpi = m_pPicProcessor->get_ClockCycles_per_Instruction();
-    
-    qDebug() << "\nPicProcessor::loadFirmware      Device: " << m_pPicProcessor->name().c_str();
-    
-    qDebug() << "    frequency=" << m_pPicProcessor->get_frequency();
-    qDebug() << "    Cycles_per_Instruction=" << m_cpi;
-    qDebug() << "    OSCperiod=" << m_pPicProcessor->get_OSCperiod();
-    qDebug() << "    instruction period=" << m_pPicProcessor->get_InstPeriod();
-    qDebug() << "    internal OSC=" << (m_pPicProcessor->get_int_osc() ? "true" : "false");
-    qDebug() << "    use PLLx4=" << (m_pPicProcessor->get_pplx4_osc() ? "true" : "false");
-    
-    QString tmr1Freq = m_device + ".tmr1_freq";
-    device = tmr1Freq.toLocal8Bit();
-    gpsimObject *tmr1 = globalSymbolTable().find( device.constData() );
-    Float *tmr1FreqVal = dynamic_cast<Float*>( tmr1 );
-    if (tmr1FreqVal) {
-        qDebug() << "    tmr1_freq=" << tmr1FreqVal->getVal();
-    }
-    
+    //m_pPicProcessor->set_frequency( (double)McuComponent::self()->freq()*1e6 );
+    qDebug() <<"\nProcessor Ready:\n    Device    ="<<m_pPicProcessor->name().c_str();
+    qDebug() << "    Freq. MHz =" <<  McuComponent::self()->freq();
+    qDebug() << "    Int. OSC  =" << (m_pPicProcessor->get_int_osc() ? "true" : "false");
+    qDebug() << "    Use PLLx4 =" << (m_pPicProcessor->get_pplx4_osc() ? "true" : "false");
 
-    m_lastTrmtBit = 0; // for usart
+    //QString tmr1Freq = m_device + ".tmr1_freq";
+    //device = tmr1Freq.toLocal8Bit();
+    //gpsimObject* tmr1 = globalSymbolTable().find( device.constData() );
+    //Float* tmr1FreqVal = dynamic_cast<Float*>( tmr1 );
+    //if( tmr1FreqVal )  qDebug() << "    Tmr1_freq =" << tmr1FreqVal->getVal();
     
+    int cpi = m_pPicProcessor->get_ClockCycles_per_Instruction();
+    m_ipc = 1/(double)cpi;
+    qDebug() << "    Cycs/Inst =" << cpi;
+
     initialized();
     
-    int address = getRegAddress( "RCREG" );
-    Register* rcreg = m_pPicProcessor->rma.get_register( address );
-    m_rcReg = dynamic_cast<_RCREG*>(rcreg); 
+    m_pendingIpc = 0;
+    m_nextCycle  = m_mcuStepsPT/cpi;
+    if( m_nextCycle == 0 ) m_nextCycle = 1;
     
-    address = getRegAddress( "TXSTA" );
-    Register* txsta = m_pPicProcessor->rma.get_register( address );
-    m_txsta = dynamic_cast<_TXSTA*>(txsta); 
-    
-    address = getRegAddress( "PIR1" );
-    Register* pir1 = m_pPicProcessor->rma.get_register( address );
-    m_pir = dynamic_cast<PIR*>(pir1); 
-    
-    //m_tmrtBitSink = new RegBitSink( this, "TXSTA", 1 );
-    //qDebug() << m_regsTable["TXSTA"];
-    
+    int address = getRegAddress( "RCSTA" );
+    Register* rcsta = m_pPicProcessor->rma.get_register( address );
+    m_rcsta = dynamic_cast<_RCSTA*>(rcsta); 
+
     return true;
 }
 
 void PicProcessor::step()                 // Run 1 step 
 {
-    if( !m_loadStatus || m_resetStatus ) return;
+    if( !m_loadStatus || m_resetStatus || m_mcuStepsPT==0 ) return;
     
-    int cycles = m_mcuStepsPT/m_cpi;
+    double dCycles = (double)m_mcuStepsPT*m_ipc + m_pendingIpc;
+    
+    int cycles = (int)dCycles;
+    
+    m_pendingIpc = dCycles-(double)cycles;
 
     for( int k=0; k<cycles; k++ ) 
     {
         m_pPicProcessor->step_cycle();
     }
-
-    if( m_usartTerm ) readUsart();
 }
 
-void PicProcessor::stepOne() { m_pPicProcessor->step_cycle(); }
+void PicProcessor::stepOne() 
+{
+    if( m_nextCycle > 0 )
+    {
+        m_pPicProcessor->step_cycle();
+        m_nextCycle--;
+    }
+    if( m_nextCycle == 0 )
+    {
+        double stepsPT = (double)McuComponent::self()->freq();
+        double dCycles = stepsPT*m_ipc + m_pendingIpc;
+        int cycles = (int)dCycles;
+        m_pendingIpc = dCycles-(double)cycles;
+        m_nextCycle = cycles;
+        
+        runSimuStep(); // 1 simu step = 1uS
+    }
+}
+
+void PicProcessor::stepCpu()
+{
+    m_pPicProcessor->step_cycle();
+}
 
 int PicProcessor::pc() { return m_pPicProcessor->pc->get_value(); }
 
 void PicProcessor::reset()
 {
     if( !m_loadStatus ) return;
-    
-    m_pPicProcessor->setBreakOnReset(false);
 
     m_pPicProcessor->reset( POR_RESET ); // POR_RESET  MCLR_RESET EXIT_RESET
 }
 
 int PicProcessor::getRamValue( int address )
 { 
-    return m_pPicProcessor->rma[address].get_value(); 
+    return m_pPicProcessor->rma[address].get_value();
 }
 
 int PicProcessor::validate( int address ) { return address; }
 
 void PicProcessor::uartIn( uint32_t value ) // Receive one byte on Uart
 {
-    if( m_usartTerm && m_pPicProcessor)
+    if( m_pPicProcessor)
     {
         BaseProcessor::uartIn( value );
-        m_rcReg->push( value );
-        //qDebug() << "AvrProcessor::uartIn: " << value<<m_pPicProcessor->rma[26].get_value();
+
+        m_rcsta->queueData( value );
+        //qDebug() << "PicProcessor::uartIn: " << value<<m_pPicProcessor->rma[26].get_value();
     }
-}
-
-void PicProcessor::readUsart()
-{
-static int txreg;
-static int txreg0;
-
-    if( !(m_txsta->get_bit(5)) ) return;                           // TXEN bit
-
-    bool trmtBit = m_txsta->get_bit(1); //txstaReg & 2;
-    
-    txreg = getRamValue( m_regsTable["TXREG"] );
-    //qDebug() << "PicProcessor::readUsart:.... " << txreg<<trmtBit;
-//qDebug() << "PicProcessor::readUsart:.... " << txreg<<m_lastTrmtBit<<trmtBit;
-    if( txreg != txreg0  )
-    {
-        if( !m_lastTrmtBit & !trmtBit ) BaseProcessor::uartOut( txreg );
-        txreg0 = txreg;
-        //qDebug() << "PicProcessor::readUsart:.... " << text;
-    }
-    if( m_lastTrmtBit != trmtBit ) 
-    {
-        if(  m_lastTrmtBit & !trmtBit ) BaseProcessor::uartOut( txreg0 );
-        m_lastTrmtBit = trmtBit;
-        //qDebug() << "PicProcessor::readUsart: " << text;
-    }
-}
-
-void PicProcessor::bitChange( QString regName, int bit, bool value )
-{
-    // Implement stuff depending on changing reg.bit
-    qDebug() << "PicProcessor::bitChange" << regName << bit << value;
-}
-
-// RegBitSink inform us about bit changes in a register
-RegBitSink::RegBitSink(PicProcessor* processor, QString name, int bit ) 
-{
-    m_picProcessor = processor;
-    m_regName      = name;
-    m_bit          = bit;
-    
-    unsigned int address = processor->getRegAddress( name );
-    
-    Register* reg = processor->getCpu()->rma.get_register( address );
-    
-    sfr_register* sfrReg = dynamic_cast<sfr_register*>(reg); 
-    
-    if (!sfrReg->assignBitSink( bit, this ) ) // Register for bit changes callback
-        qDebug() << "RegBitSink: Error assingning BitSink" << name << bit<<address<<sfrReg->getAddress();
-}
-RegBitSink::~RegBitSink(){}
-        
-void RegBitSink::setSink(bool b)  // Called by gpsim when bit changes
-{
-    if( m_picProcessor )
-        m_picProcessor->bitChange( m_regName, m_bit, b );
 }
 
 #include "moc_picprocessor.cpp"

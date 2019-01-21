@@ -29,8 +29,8 @@ LibraryItem* InBus::libraryItem()
 {
     return new LibraryItem(
         tr( "In Bus" ),
-        tr( "Logic" ),
-        "subc.png",
+        tr( "Logic/Other Logic" ),
+        "inbus.png",
         "InBus",
         InBus::construct );
 }

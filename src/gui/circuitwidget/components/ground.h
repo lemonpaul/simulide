@@ -33,7 +33,7 @@ class MAINMODULE_EXPORT Ground : public Component
         QRectF boundingRect() const { return QRect( -10, -10, 20, 20 ); }
 
         Ground( QObject* parent, QString type, QString id );
-    	~Ground();
+        ~Ground();
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();

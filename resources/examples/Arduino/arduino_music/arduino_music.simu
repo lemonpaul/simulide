@@ -1,0 +1,15 @@
+<circuit type="simulide_0.1">
+ 
+Arduino Uno-2: 
+<item Show_id="true" x="-340" program="arduino_music.ino.hex" objectName="Arduino Uno-2" Mhz="16" rotation="0" labelx="0" labelrot="0" hflip="1" valLabely="0" itemtype="Arduino" vflip="1" labely="-20" valLabelx="0" id="Arduino Uno-2" y="-252" valLabRot="0"/>
+ 
+Audio Out-1: 
+<item Show_id="false" x="-404" objectName="Audio Out-1" Impedance="8" rotation="0" labelx="-12" labelrot="0" hflip="-1" valLabely="0" itemtype="AudioOut" vflip="1" labely="-24" valLabelx="0" id="Audio Out-1" y="-148" valLabRot="0"/>
+ 
+Connector-3: 
+<item labely="-24" labelx="-16" vflip="1" pointList="-388,-156,-332,-156" enodeid="Circ_eNode-4" valLabelx="0" startpinid="Audio Out-1-lPin" objectName="Connector-3" valLabRot="0" labelrot="0" rotation="0" itemtype="Connector" id="Connector-3" Show_id="false" valLabely="0" y="-156" x="-388" hflip="1" endpinid="Arduino Uno-2-PB1"/>
+ 
+Connector-5: 
+<item labely="-24" labelx="-16" vflip="1" pointList="-388,-148,-364,-148,-364,-116,-332,-116" enodeid="Circ_eNode-6" valLabelx="0" startpinid="Audio Out-1-rPin" objectName="Connector-5" valLabRot="0" labelrot="0" rotation="0" itemtype="Connector" id="Connector-5" Show_id="false" valLabely="0" y="-148" x="-388" hflip="1" endpinid="Arduino Uno-2-GND0"/>
+ 
+</circuit>

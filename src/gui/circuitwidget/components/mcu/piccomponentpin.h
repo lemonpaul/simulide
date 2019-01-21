@@ -17,22 +17,16 @@
  *                                                                         *
  ***************************************************************************/
 
- #ifndef NO_PIC
  
 #ifndef PICCOMPONENTPIN_H
 #define PICCOMPONENTPIN_H
 
-#include <qstring.h>
-#include <stdint.h>
-
 #include "mcucomponentpin.h"
 
-#include "gpsim/stimuli.h"
-#include "gpsim/ioports.h"
-#include "gpsim/pic-processor.h"
-#include "gpsim/stimuli.h"
+class pic_processor;
+class IOPIN;
 
-class PICComponentPin : public McuComponentPin, public stimulus
+class PICComponentPin : public McuComponentPin
 {
     Q_OBJECT
         public:
@@ -42,24 +36,22 @@ class PICComponentPin : public McuComponentPin, public stimulus
         void attach( pic_processor *PicProcessor );
         
         void setVChanged();
-        
         void resetOutput();
         
-        virtual void set_nodeVoltage( double v );
-        virtual double get_Vth();
+        // GpSim Interface
+        void update_direction( bool out );
+        void update_state( bool state );
+        void update_pullup( bool pullup );
 
     protected:
         char m_port;
         int  m_pinN;
-        //int  m_channel;
         int  m_pos;
 
-        //const QString m_esp;
-        
+        bool m_state;
+
         pic_processor *m_PicProcessor;
-        Stimulus_Node *m_pStimulusNode;
         IOPIN         *m_pIOPIN;
 };
 
-#endif
 #endif

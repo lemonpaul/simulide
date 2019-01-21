@@ -1,0 +1,42 @@
+<circuit type="simulide_0.1">
+ 
+Potentiometer-4: 
+<item Unit=" kΩ" itemtype="Potentiometer" Show_id="true" x="764" rotation="0" Value_Ohm="1000" Show_res="true" hflip="1" labely="-44" valLabelx="19" objectName="Potentiometer-4" valLabRot="-360" id="Position" y="-412" valLabely="-15" labelrot="0" vflip="1" Resistance="5" labelx="-21"/>
+ 
+Servo-3: 
+<item rotation="-90" vflip="1" valLabely="0" objectName="Servo-3" Show_id="true" valLabRot="0" id="Servo" labelx="-38" valLabelx="0" Speed="0.20000000000000001" hflip="1" itemtype="Servo" labely="-39" y="-396" labelrot="0" x="484"/>
+ 
+Arduino Uno-2: 
+<item itemtype="Arduino" Ser_Monitor="false" Show_id="true" x="564" Ser_Port="false" Mhz="16" rotation="0" Program="servo.hex" hflip="1" labely="-17" valLabelx="0" objectName="Arduino Uno-2" valLabRot="0" id="Arduino Uno" y="-396" valLabely="0" labelrot="0" vflip="1" labelx="51"/>
+ 
+Node-1: 
+<item rotation="0" vflip="1" valLabely="0" objectName="Node-1" Show_id="false" valLabRot="0" id="Node-1" labelx="-16" valLabelx="0" hflip="1" itemtype="Node" labely="-24" y="-300" labelrot="0" x="836"/>
+ 
+Connector-5: 
+<item itemtype="Connector" endpinid="Arduino Uno-2-GND0" Show_id="false" x="484" rotation="0" startpinid="Servo-3-in1" pointList="484,-348,484,-260,572,-260" hflip="1" labely="-24" enodeid="Circ_eNode-6" valLabelx="0" objectName="Connector-5" valLabRot="0" id="Connector-5" y="-348" valLabely="0" labelrot="0" vflip="1" labelx="-16"/>
+ 
+Connector-7: 
+<item itemtype="Connector" endpinid="Arduino Uno-2-PB0" Show_id="false" x="500" rotation="0" startpinid="Servo-3-in2" pointList="500,-348,500,-308,572,-308" hflip="1" labely="-24" enodeid="Circ_eNode-8" valLabelx="0" objectName="Connector-7" valLabRot="0" id="Connector-7" y="-348" valLabely="0" labelrot="0" vflip="1" labelx="-16"/>
+ 
+Connector-9: 
+<item itemtype="Connector" endpinid="Node-1-0" Show_id="false" x="468" rotation="0" startpinid="Servo-3-in0" pointList="468,-348,468,-172,836,-172,836,-300" hflip="1" labely="-24" enodeid="Circ_eNode-10" valLabelx="0" objectName="Connector-9" valLabRot="0" id="Connector-9" y="-348" valLabely="0" labelrot="0" vflip="1" labelx="-16"/>
+ 
+Connector-11: 
+<item itemtype="Connector" endpinid="Arduino Uno-2-V5V" Show_id="false" x="836" rotation="0" startpinid="Node-1-2" pointList="836,-300,716,-300" hflip="1" labely="-24" enodeid="Circ_eNode-10" valLabelx="0" objectName="Connector-11" valLabRot="0" id="Connector-11" y="-300" valLabely="0" labelrot="0" vflip="1" labelx="-16"/>
+ 
+Connector-12: 
+<item itemtype="Connector" endpinid="Potentiometer-4-PinB" Show_id="false" x="836" rotation="0" startpinid="Node-1-1" pointList="836,-300,836,-412,780,-412" hflip="1" labely="-24" enodeid="Circ_eNode-10" valLabelx="0" objectName="Connector-12" valLabRot="0" id="Connector-12" y="-300" valLabely="0" labelrot="0" vflip="1" labelx="-16"/>
+ 
+Connector-13: 
+<item itemtype="Connector" endpinid="Arduino Uno-2-PC0" Show_id="false" x="764" rotation="0" startpinid="Potentiometer-4-PinM" pointList="764,-396,764,-340,716,-340" hflip="1" labely="-24" enodeid="Circ_eNode-14" valLabelx="0" objectName="Connector-13" valLabRot="0" id="Connector-13" y="-396" valLabely="0" labelrot="0" vflip="1" labelx="-16"/>
+ 
+Connector-15: 
+<item itemtype="Connector" endpinid="Potentiometer-4-PinA" Show_id="false" x="716" rotation="0" startpinid="Arduino Uno-2-GND2" pointList="716,-308,740,-308,740,-412,748,-412" hflip="1" labely="-24" enodeid="Circ_eNode-16" valLabelx="0" objectName="Connector-15" valLabRot="0" id="Connector-15" y="-308" valLabely="0" labelrot="0" vflip="1" labelx="-16"/>
+ 
+PlotterWidget: 
+<item MinVolt="-500" windowOpacity="1" whatsThis="" styleSheet="" maximumHeight="200" locale="" windowModality="0" acceptDrops="false" layoutDirection="0" enabled="true" windowIcon="" size="" autoFillBackground="false" minimized="false" sizeHint="" statusTip="" maximumSize="" fullScreen="false" maximumWidth="1000" minimumSizeHint="" pos="" windowModified="false" accessibleName="" toolTip="" palette="" normalGeometry="" windowIconText="" toolTipDuration="-1" isActiveWindow="true" minimumWidth="200" sizePolicy="" accessibleDescription="" visible="false" minimumSize="" childrenRect="" sizeIncrement="" cursor="" x="0" width="200" maximized="false" contextMenuPolicy="1" font="Sans Serif,9,-1,5,50,0,0,0,0,0" height="200" childrenRegion="" mouseTracking="false" geometry="" frameSize="" rect="" minimumHeight="200" windowTitle="" MaxVolt="500" frameGeometry="" objectName="PlotterWidget" focus="false" inputMethodHints="0" itemtype="Plotter" modal="false" windowFilePath="" baseSize="" updatesEnabled="true" y="0" focusPolicy="0"/>
+ 
+SerialPortWidget: 
+<item windowOpacity="1" whatsThis="" styleSheet="" maximumHeight="170" locale="" windowModality="0" acceptDrops="false" layoutDirection="0" enabled="true" windowIcon="" size="" autoFillBackground="false" minimized="false" sizeHint="" statusTip="" maximumSize="" fullScreen="false" maximumWidth="450" minimumSizeHint="" pos="" windowModified="false" accessibleName="" toolTip="" palette="" normalGeometry="" windowIconText="" toolTipDuration="-1" isActiveWindow="true" minimumWidth="0" sizePolicy="" accessibleDescription="" visible="false" minimumSize="" childrenRect="" sizeIncrement="" cursor="" x="0" width="313" maximized="false" contextMenuPolicy="1" font="Sans Serif,9,-1,5,50,0,0,0,0,0" height="141" childrenRegion="" mouseTracking="false" geometry="" frameSize="" rect="" minimumHeight="0" windowTitle="Configuracion" frameGeometry="" objectName="SerialPortWidget" focus="false" inputMethodHints="0" itemtype="SerialPort" modal="false" SettingsProp="ttyS0,0,3,0,0,0" windowFilePath="" baseSize="" updatesEnabled="true" y="0" focusPolicy="0"/>
+ 
+</circuit>

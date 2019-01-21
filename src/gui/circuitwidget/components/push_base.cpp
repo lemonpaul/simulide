@@ -21,7 +21,7 @@
 
 
 PushBase::PushBase( QObject* parent, QString type, QString id )
-    : SwitchBase( parent, type, id )
+        : SwitchBase( parent, type, id )
 {
     connect( m_button, SIGNAL( pressed() ),
                  this, SLOT  ( onbuttonPressed() ));

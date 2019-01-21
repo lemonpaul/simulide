@@ -29,7 +29,7 @@ LibraryItem* AndGate::libraryItem()
 {
     return new LibraryItem(
         tr( "And Gate" ),
-        tr( "Logic" ),
+        tr( "Logic/Gates" ),
         "andgate.png",
         "And Gate",
         AndGate::construct );
@@ -47,27 +47,29 @@ QPainterPath AndGate::shape() const
     
     QVector<QPointF> points;
     
-    points << QPointF(-16,-18 )
-           << QPointF(-16, 18 )
-           << QPointF(  0, 16 )
-           << QPointF( 16,  8 )
-           << QPointF( 16, -8 )
-           << QPointF(  0,-16 );
+    int size = m_numInputs*8;
+    
+    points << QPointF(-16,-size+2 )
+           << QPointF(-16, size+2 )
+           << QPointF(  0, size )
+           << QPointF( 16, 8 )
+           << QPointF( 16,-8 )
+           << QPointF(  0,-size );
         
     path.addPolygon( QPolygonF(points) );
     path.closeSubpath();
     return path;
 }
 
-void AndGate::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
+void AndGate::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Component::paint( p, option, widget );
 
     QPen pen = p->pen();
-    pen.setWidth(2);
-    p->setPen(pen);
+    pen.setWidth( 2 );
+    p->setPen( pen );
 
-    p->drawChord( -48, boundingRect().y(), 64, boundingRect().height(), -1440/*-16*90*/, 2880/*16*180*/ );
+    p->drawChord( -48, m_area.y(), 64, m_area.height(), -1440/*-16*90*/, 2880/*16*180*/ );
 }
 
 #include "moc_gate_and.cpp"

@@ -22,16 +22,18 @@
 
 #include <QtWidgets>
 
-#include "package.h"
-#include "baseprocessor.h"
+#include "chip.h"
 
+class BaseProcessor;
 class McuComponentPin;
 
-class MAINMODULE_EXPORT McuComponent : public Package
+class MAINMODULE_EXPORT McuComponent : public Chip
 {
     Q_OBJECT
-    Q_PROPERTY( QString  program  READ program WRITE setProgram DESIGNABLE true USER true )
-    Q_PROPERTY( int      Mhz      READ freq    WRITE setFreq    DESIGNABLE true USER true )
+    Q_PROPERTY( QString  Program     READ program WRITE setProgram DESIGNABLE true  USER true )
+    Q_PROPERTY( int      Mhz         READ freq    WRITE setFreq    DESIGNABLE true  USER true )
+    Q_PROPERTY( bool     Ser_Port    READ serPort WRITE setSerPort )
+    Q_PROPERTY( bool     Ser_Monitor READ serMon  WRITE setSerMon )
 
     public:
 
@@ -47,7 +49,15 @@ class MAINMODULE_EXPORT McuComponent : public Package
 
         int  freq();
         virtual void setFreq( int freq );
-        virtual void initPackage();
+        virtual void initChip();
+        
+        bool serPort();
+        void setSerPort( bool set );
+        
+        bool serMon();
+        void setSerMon( bool set );
+        
+        QList<McuComponentPin*> getPinList() { return m_pinList; }
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
   
@@ -63,11 +73,13 @@ class MAINMODULE_EXPORT McuComponent : public Package
         void slotOpenSerial();
         void slotCloseSerial();
         
+        void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
+        
     protected:
  static McuComponent* m_pSelf;
  static bool m_canCreate;
-  
-        void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
+        
+        virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
         virtual void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )=0;
         virtual void attachPins()=0;
@@ -77,11 +89,12 @@ class MAINMODULE_EXPORT McuComponent : public Package
         int m_freq;             // Clock Frequency Mhz
         
         bool m_attached;
+        bool m_serPort;
+        bool m_serMon;
 
         QString m_device;       // Name of device
         QString m_symbolFile;   // firmware file loaded
         QString m_lastFirmDir;  // Last firmware folder used
-        QString m_BackGround;   // BackGround Image
         
         QList<McuComponentPin*> m_pinList;
 };

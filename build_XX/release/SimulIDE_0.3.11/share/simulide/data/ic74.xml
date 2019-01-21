@@ -1,0 +1,98 @@
+<!DOCTYPE SimulIDE>
+
+<!-- *************************************************************************** -->
+<!-- *   Copyright (C) 2017 by santiago González                               * -->
+<!-- *   santigoro@gmail.com                                                   * -->
+<!-- *                                                                         * -->
+<!-- *   This program is free software; you can redistribute it and/or modify  * -->
+<!-- *   it under the terms of the GNU General Public License as published by  * -->
+<!-- *   the Free Software Foundation; either version 3 of the License, or     * -->
+<!-- *   (at your option) any later version.                                   * -->
+<!-- *                                                                         * -->
+<!-- *   This program is distributed in the hope that it will be useful,       * -->
+<!-- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * -->
+<!-- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * -->
+<!-- *   GNU General Public License for more details.                          * -->
+<!-- *                                                                         * -->
+<!-- *   You should have received a copy of the GNU General Public License     * -->
+<!-- *   along with this program; if not, see <http://www.gnu.org/licenses/>.  * -->
+<!-- *                                                                         * -->
+<!-- *************************************************************************** -->
+
+<itemlib>
+    <tag>QT_TRANSLATE_NOOP("xmlfile","Logic")</tag>
+    
+    <itemset category="Logic" type="">
+        <item name="IC 74"  package=""  subcircuit=""  icon="ic2.png" ></item>
+    </itemset>
+    
+    <itemset category="IC 74/7400-7499" type="Subcircuit">
+    <item name="74HC00"  package="ic74/74HC00.package"  subcircuit="ic74/74HC00.subcircuit" ></item>
+    <item name="74HC02"  package="ic74/74HC02.package"  subcircuit="ic74/74HC02.subcircuit" ></item>
+    <item name="74HC04"  package="ic74/74HC04.package"  subcircuit="ic74/74HC04.subcircuit" ></item>
+    <item name="74HC08"  package="ic74/74HC08.package"  subcircuit="ic74/74HC08.subcircuit" ></item>
+    <item name="74HC32"  package="ic74/74HC32.package"  subcircuit="ic74/74HC32.subcircuit" ></item>
+    <item name="74HC42"  package="ic74/74HC42.package"  subcircuit="ic74/74HC42.subcircuit" ></item>
+    <item name="74HC74"  package="ic74/74HC74.package"  subcircuit="ic74/74HC74.subcircuit" ></item>
+    <item name="74HC75"  package="ic74/74HC75.package"  subcircuit="ic74/74HC75.subcircuit" ></item>
+    <item name="74HC85"  package="ic74/74HC85.package"  subcircuit="ic74/74HC85.subcircuit" ></item>
+    <item name="74HC86"  package="ic74/74HC86.package"  subcircuit="ic74/74HC86.subcircuit" ></item>
+    <item name="74XX90"  package="ic74/74XX90.package"  subcircuit="ic74/74XX90.subcircuit" ></item>
+    <item name="74XX92"  package="ic74/74XX92.package"  subcircuit="ic74/74XX92.subcircuit" ></item>
+    <item name="74XX93"  package="ic74/74XX93.package"  subcircuit="ic74/74XX93.subcircuit" ></item>
+    </itemset>
+    
+    <itemset category="IC 74/74100-74199" type="Subcircuit">
+    <item name="74HC137" package="ic74/74HC137.package" subcircuit="ic74/74HC137.subcircuit"></item>
+    <item name="74HC138" package="ic74/74HC138.package" subcircuit="ic74/74HC138.subcircuit"></item>
+    <item name="74HC139" package="ic74/74HC139.package" subcircuit="ic74/74HC139.subcircuit"></item>
+    <item name="74HC147" package="ic74/74HC147.package" subcircuit="ic74/74HC147.subcircuit"></item>
+    <item name="74HC148" package="ic74/74HC148.package" subcircuit="ic74/74HC148.subcircuit"></item>
+    <item name="74HC151" package="ic74/74XX151.package" subcircuit="ic74/74XX151.subcircuit"></item>
+    <item name="74HC154" package="ic74/74HC154.package" subcircuit="ic74/74HC154.subcircuit"></item>
+    <item name="74HC155" package="ic74/74HC155.package" subcircuit="ic74/74HC155.subcircuit"></item>
+    <item name="74HC160" package="ic74/74HC160.package" subcircuit="ic74/74HC160.subcircuit"></item>
+    <item name="74HC161" package="ic74/74HC161.package" subcircuit="ic74/74HC161.subcircuit"></item>
+    <item name="74HC162" package="ic74/74HC162.package" subcircuit="ic74/74HC162.subcircuit"></item>
+    <item name="74HC163" package="ic74/74HC163.package" subcircuit="ic74/74HC163.subcircuit"></item>
+    <item name="74HC164" package="ic74/74XX164.package" subcircuit="ic74/74XX164.subcircuit"></item>
+    <item name="74HC165" package="ic74/74HC165.package" subcircuit="ic74/74HC165.subcircuit"></item>
+    <item name="74HC181" package="ic74/74HC181.package" subcircuit="ic74/74HC181.subcircuit"></item>
+    <item name="74HC190" package="ic74/74HC190.package" subcircuit="ic74/74HC190.subcircuit"></item>
+    <item name="74HC191" package="ic74/74HC191.package" subcircuit="ic74/74HC191.subcircuit"></item>
+    <item name="74HC192" package="ic74/74HC192.package" subcircuit="ic74/74HC192.subcircuit"></item>
+    <item name="74HC193" package="ic74/74HC193.package" subcircuit="ic74/74HC193.subcircuit"></item>
+    <item name="74HC194" package="ic74/74HC194.package" subcircuit="ic74/74HC194.subcircuit"></item>
+    </itemset>
+    
+    <itemset category="IC 74/74200-741999" type="Subcircuit">
+    <item name="74HC238" package="ic74/74HC238.package" subcircuit="ic74/74HC238.subcircuit"></item>
+    <item name="74HC273" package="ic74/74HC273.package" subcircuit="ic74/74HC273.subcircuit"></item>
+    <item name="74HC283" package="ic74/74HC283.package" subcircuit="ic74/74HC283.subcircuit"></item>
+    <item name="74HC390" package="ic74/74HC390.package" subcircuit="ic74/74HC390.subcircuit"></item>
+    <item name="74HC393" package="ic74/74HC393.package" subcircuit="ic74/74HC393.subcircuit"></item>
+    <item name="74HC573" package="ic74/74XX573.package" subcircuit="ic74/74XX573.subcircuit"></item>
+    <item name="74HC574" package="ic74/74XX574.package" subcircuit="ic74/74XX574.subcircuit"></item>
+    <item name="74HC595" package="ic74/74XX595.package" subcircuit="ic74/74XX595.subcircuit"></item>
+    <item name="74HC688" package="ic74/74HC688.package" subcircuit="ic74/74HC688.subcircuit"></item>
+    </itemset>
+    
+    <itemset category="IC 74/742000-up" type="Subcircuit">
+    <item name="74HC4017" package="ic74/74HC4017.package" subcircuit="ic74/74HC4017.subcircuit"></item>
+    <item name="74HC4020" package="ic74/74HC4020.package" subcircuit="ic74/74HC4020.subcircuit"></item>
+    <item name="74HC4022" package="ic74/74HC4022.package" subcircuit="ic74/74HC4022.subcircuit"></item>
+    <item name="74HC4022_LS" package="ic74/74HC4022-LS.package" subcircuit="ic74/74HC4022.subcircuit"></item>
+    <item name="74HC4024" package="ic74/74HC4024.package" subcircuit="ic74/74HC4024.subcircuit"></item>
+    <item name="74HC4028" package="ic74/74HC4028.package" subcircuit="ic74/74HC4028.subcircuit"></item>
+    <item name="74HC4040" package="ic74/74HC4040.package" subcircuit="ic74/74HC4040.subcircuit"></item>
+    <item name="74HC4511" package="ic74/74HC4511.package" subcircuit="ic74/74HC4511.subcircuit"></item>
+    <item name="74HC4514" package="ic74/74HC4514.package" subcircuit="ic74/74HC4514.subcircuit"></item>
+    <item name="74HC4515" package="ic74/74HC4515.package" subcircuit="ic74/74HC4515.subcircuit"></item>
+    <item name="74HC4518" package="ic74/74HC4518.package" subcircuit="ic74/74HC4518.subcircuit"></item>
+    <item name="74HC4520" package="ic74/74HC4520.package" subcircuit="ic74/74HC4520.subcircuit"></item>
+    <item name="74HC4543" package="ic74/74HC4543.package" subcircuit="ic74/74HC4543.subcircuit"></item>
+    
+    </itemset>
+
+</itemlib>
+

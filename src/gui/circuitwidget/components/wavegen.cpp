@@ -21,6 +21,13 @@
 #include "pin.h"
 #include "simulator.h"
 
+static const char* WaveGen_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Volt Base"),
+    QT_TRANSLATE_NOOP("App::Property","Duty Square"),
+    QT_TRANSLATE_NOOP("App::Property","Quality"),
+    QT_TRANSLATE_NOOP("App::Property","Wave Type")
+};
+
 Component* WaveGen::construct( QObject* parent, QString type, QString id )
 {
     return new WaveGen( parent, type, id );
@@ -39,6 +46,8 @@ LibraryItem* WaveGen::libraryItem()
 WaveGen::WaveGen( QObject* parent, QString type, QString id )
        : ClockBase( parent, type, id )
 {
+    Q_UNUSED( WaveGen_properties );
+    
     m_voltBase = 0;
     m_lastVout = 0;
     m_type = Sine;
@@ -163,7 +172,7 @@ void WaveGen::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidge
     else
         p->setBrush( QColor( 230, 230, 255 ) );
 
-    p->drawRoundedRect( boundingRect(),2 ,2 );
+    p->drawRoundedRect( m_area,2 ,2 );
 
     QPen pen;
     pen.setWidth(1);

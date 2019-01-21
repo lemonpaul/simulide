@@ -215,7 +215,7 @@ avr_set_console_register(
 		avr_register_io_write(avr, addr, _avr_io_console_write, NULL);
 }
 
-void
+int
 avr_loadcode(
 		avr_t * avr,
 		uint8_t * code,
@@ -225,9 +225,10 @@ avr_loadcode(
 	if ((address + size) > avr->flashend+1) {
 		AVR_LOG(avr, LOG_ERROR, "avr_loadcode(): Attempted to load code of size %d but flash size is only %d.\n",
 			size, avr->flashend + 1);
-		abort();
+        return -1;
 	}
 	memcpy(avr->flash + address, code, size);
+    return 0;
 }
 
 /**

@@ -27,11 +27,13 @@ class LibraryItem;
 
 class MAINMODULE_EXPORT ItemLibrary
 {
+    Q_DECLARE_TR_FUNCTIONS( ItemLibrary )
+    
     public:
         ItemLibrary();
         ~ItemLibrary();
 
-        static ItemLibrary* self() { return m_pSelf; }
+ static ItemLibrary* self() { return m_pSelf; }
 
         /**
          * Returns a list of items in the library
@@ -56,7 +58,7 @@ class MAINMODULE_EXPORT ItemLibrary
 
     
     protected:
-        static ItemLibrary* m_pSelf;
+ static ItemLibrary* m_pSelf;
 
         QList<LibraryItem*> m_items;
         //QStringList m_plugins;
@@ -77,6 +79,7 @@ class MAINMODULE_EXPORT LibraryItem
         QString category() const { return m_category; }
         QString iconfile() const { return m_iconfile; }
         QString type()     const { return m_type; }
+        QString* help();
 
         createItemPtr createItemFnPtr() const { return createItem; }
 
@@ -85,6 +88,7 @@ class MAINMODULE_EXPORT LibraryItem
         QString m_category;
         QString m_iconfile;
         QString m_type;
+        QString m_help;
 
         createItemPtr createItem;
 };

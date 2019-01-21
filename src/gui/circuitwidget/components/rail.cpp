@@ -36,7 +36,8 @@ LibraryItem* Rail::libraryItem()
 }
 
 Rail::Rail( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eElement( id.toStdString() )
+    : Component( parent, type, id )
+    , eElement( id.toStdString() )
 {
     setLabelPos(-64,-24 );
     

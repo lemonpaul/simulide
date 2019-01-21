@@ -45,22 +45,23 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         
         void setRate( int rate );
 
-        //void setSerialPortWidget( QWidget* serialPortWidget );
-
         void showSerialPortWidget( bool showIt );
         
         void writeSerialPortWidget( const QByteArray &data );
         
+        void powerCircOn();
+        void powerCircOff();
+        void powerCircDebug( bool run );
+        
     public slots:
-        void newCircuit();
+        bool newCircuit();
         void openCirc();
         void loadCirc( QString path );
         void saveCirc();
         bool saveCircAs();
-        void powerCircOn();
-        void powerCircOff();
         void powerCirc();
         void openInfo();
+        void about();
 
     signals:
         void dataAvailable( const QByteArray &data );
@@ -72,14 +73,13 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         QVBoxLayout    m_verticalLayout;
         QHBoxLayout    m_horizontLayout;
         CircuitView    m_circView;
-        TerminalWidget m_terminal;
-        PlotterWidget  m_plotter;
         
+        TerminalWidget    m_terminal;
+        PlotterWidget     m_plotter;
         SerialPortWidget  m_serial;
-        //QWidget*       m_serialPortWidget;
         
-        QToolBar       m_circToolBar;
-        QLabel*        m_rateLabel;
+        QToolBar m_circToolBar;
+        QLabel*  m_rateLabel;
         
         QAction* newCircAct;
         QAction* openCircAct;
@@ -87,10 +87,13 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         QAction* saveCircAsAct;
         QAction* powerCircAct;
         QAction* infoAct;
+        QAction* aboutAct;
+        QAction* aboutQtAct;
         
-        QString     m_curCirc;
-        QString     m_lastCircDir;
+        QMenu* infoMenu;
         
+        QString m_curCirc;
+        QString m_lastCircDir;
 };
 
 #endif

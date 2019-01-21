@@ -1,0 +1,42 @@
+<circuit type="simulide_0.1">
+ 
+Arduino Uno-7: 
+<item itemtype="Arduino" labelx="0" id="Arduino Uno-7" rotation="0" hflip="1" Show_id="true" labely="-20" valLabRot="0" vflip="1" y="-284" valLabely="0" valLabelx="0" Mhz="16" program="/home/user/Escritorio/kk/simulide_0.1.4/release/SimulIDE_0.1.4-Lin64-NO_PIC/examples/StandardFirmata.ino.hex" objectName="Arduino Uno-7" x="-324" labelrot="0"/>
+ 
+Fixed Volt.-6: 
+<item x="-396" vflip="1" id="Fixed Volt.-6" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-268" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-6" valLabely="8" rotation="0"/>
+ 
+Fixed Volt.-5: 
+<item x="-396" vflip="1" id="Fixed Volt.-5" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-244" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-5" valLabely="8" rotation="0"/>
+ 
+Fixed Volt.-4: 
+<item x="-396" vflip="1" id="Fixed Volt.-4" hflip="1" labelrot="0" valLabRot="0" valLabelx="-16" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-220" labely="-24" itemtype="Fixed Voltage" labelx="-64" objectName="Fixed Volt.-4" valLabely="8" rotation="0"/>
+ 
+Volt. Source-3: 
+<item x="-156" vflip="1" id="Volt. Source-3" hflip="1" labelrot="0" valLabRot="0" valLabelx="-26" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-324" labely="-24" itemtype="Voltage Source" labelx="-16" objectName="Volt. Source-3" valLabely="10" rotation="0"/>
+ 
+Volt. Source-2: 
+<item x="-68" vflip="1" id="Volt. Source-2" hflip="1" labelrot="0" valLabRot="0" valLabelx="-26" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-324" labely="-24" itemtype="Voltage Source" labelx="-16" objectName="Volt. Source-2" valLabely="10" rotation="0"/>
+ 
+Volt. Source-1: 
+<item x="44" vflip="1" id="Volt. Source-1" hflip="1" labelrot="0" valLabRot="0" valLabelx="-26" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-324" labely="-24" itemtype="Voltage Source" labelx="-16" objectName="Volt. Source-1" valLabely="10" rotation="0"/>
+ 
+Connector-8: 
+<item endpinid="Arduino Uno-7-PD0" x="-380" vflip="1" id="Connector-8" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-9" Show_id="false" startpinid="Fixed Volt.-6-outnod" pointList="-380,-268,-316,-268" y="-268" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-8" valLabely="0" rotation="0"/>
+ 
+Connector-10: 
+<item endpinid="Arduino Uno-7-PD3" x="-380" vflip="1" id="Connector-10" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-11" Show_id="false" startpinid="Fixed Volt.-5-outnod" pointList="-380,-244,-316,-244" y="-244" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-10" valLabely="0" rotation="0"/>
+ 
+Connector-12: 
+<item endpinid="Arduino Uno-7-PD6" x="-380" vflip="1" id="Connector-12" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-13" Show_id="false" startpinid="Fixed Volt.-4-outnod" pointList="-380,-220,-316,-220" y="-220" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-12" valLabely="0" rotation="0"/>
+ 
+Connector-14: 
+<item endpinid="Arduino Uno-7-PC3" x="-140" vflip="1" id="Connector-14" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-15" Show_id="false" startpinid="Volt. Source-3-outPin" pointList="-140,-324,-132,-324,-132,-252,-172,-252" y="-324" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-14" valLabely="0" rotation="0"/>
+ 
+Connector-16: 
+<item endpinid="Arduino Uno-7-PC2" x="-52" vflip="1" id="Connector-16" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-17" Show_id="false" startpinid="Volt. Source-2-outPin" pointList="-52,-324,-28,-324,-28,-244,-172,-244" y="-324" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-16" valLabely="0" rotation="0"/>
+ 
+Connector-18: 
+<item endpinid="Arduino Uno-7-PC0" x="60" vflip="1" id="Connector-18" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-19" Show_id="false" startpinid="Volt. Source-1-outPin" pointList="60,-324,60,-228,-172,-228" y="-324" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-18" valLabely="0" rotation="0"/>
+ 
+</circuit>

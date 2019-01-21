@@ -18,11 +18,18 @@
  ***************************************************************************/
 
 #include "e-gate.h"
-#include <QDebug>
+#include "simulator.h"
+//#include <QDebug>
+
+bool eGate::m_oscCtrl = false;
+
 eGate::eGate( std::string id, int inputs )
      : eLogicDevice( id )
 {
     m_tristate = false;
+    m_oscCtrl  = false;
+    m_openCol  = false;
+    m_oscCount = 0;
 }
 eGate::~eGate()
 {
@@ -37,10 +44,33 @@ void eGate::initialize()
         eNode* enode = m_input[i]->getEpin()->getEnode();
         if( enode ) enode->addToChangedFast(this);
     }
+    m_oscCtrl  = false;
+    m_oscCount = 0;
 }
 
 void eGate::setVChanged()
 {
+    uint64_t step = Simulator::self()->step();
+
+    if( step-m_lastStep < 2 )                // Detect Oscillating gates
+    {
+        if(( m_oscCount < 10 ) && !m_oscCtrl )
+        {
+            m_oscCount++;
+            if( m_oscCount == 10 ) 
+            {
+                m_oscCtrl = true;
+                return;
+            }
+        }
+    }
+    else if( m_oscCount > 0 ) 
+    {
+        if( m_oscCount == 10 ) m_oscCtrl  = false;
+        m_oscCount = 0;
+    }
+    m_lastStep = step;
+    
     if( m_tristate ) eLogicDevice::updateOutEnabled();
 
     int  inputs = 0;
@@ -51,9 +81,21 @@ void eGate::setVChanged()
 
         if( state ) inputs++;
     }
-    //qDebug() << "eGate::setVChanged" << inputs <<m_output[0]->imp(); 
+    //qDebug() << "eGate::setVChanged" << inputs <<m_output[0]->imp()<<m_outImp; 
+
+    bool out = calcOutput( inputs );
     
-    eLogicDevice::setOut( 0, calcOutput( inputs ) );// In each gate type
+    if( m_openCol ) 
+    {
+        double imp = m_outImp;
+        bool oOut = out;
+        if( m_output[0]->isInverted() ) oOut = !out;
+        if( oOut || !eLogicDevice::outputEnabled() ) imp = high_imp;
+        
+        m_output[0]->setImp( imp );
+    }
+    
+    eLogicDevice::setOut( 0, out );// In each gate type
 }
 
 bool eGate::calcOutput( int inputs ) 
@@ -68,4 +110,20 @@ bool eGate::tristate()
 void eGate::setTristate( bool t )
 {
     m_tristate = t;
+}
+
+bool eGate::openCol()
+{
+    return m_openCol;
+}
+
+void eGate::setOpenCol( bool op )
+{
+    m_openCol = op;
+    
+    double imp = m_outImp;
+    
+    if( op && m_output[0]->out() ) imp = high_imp;
+    
+    m_output[0]->setImp( imp );
 }

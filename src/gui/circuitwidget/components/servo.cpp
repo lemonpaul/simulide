@@ -20,6 +20,9 @@
 #include "servo.h"
 #include "simulator.h"
 
+static const char* Servo_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Speed")
+};
 
 Component* Servo::construct( QObject* parent, QString type, QString id )
 {
@@ -40,6 +43,8 @@ Servo::Servo( QObject* parent, QString type, QString id )
      : LogicComponent( parent, type, id )
      , eLogicDevice( id.toStdString() )
 {
+    Q_UNUSED( Servo_properties );
+    
     m_width  = 10;
     m_height = 6;
     
@@ -93,7 +98,7 @@ void Servo::resetState()
 
 void Servo::updateStep()
 {
-    unsigned long long step = Simulator::self()->step();
+    uint64_t step = Simulator::self()->step();
 
     if( m_targetPos != m_pos )
     {

@@ -37,6 +37,7 @@ class InoDebugger : public BaseDebugger
         
         enum board_t {
             Uno = 0,
+            Mega,
             Nano,
             Duemilanove,
             Leonardo,
@@ -49,24 +50,16 @@ class InoDebugger : public BaseDebugger
         board_t board() { return m_board; }
         void setBoard( board_t b ){ m_board = b; }
 
-        bool loadFirmware();
-
-        int  step();     // Run 1 step and returns actual source line number
-        int  stepOver();
-        int getValidLine( int line );
-        
         int compile();
+        void mapFlashToSource();
         
     private:
-        void mapInoToFlash();
-
-        QHash<int, int> m_inoToFlash;               // Map .ino code line to flash adress
-        QHash<int, int> m_flashToIno;               // Map flash adress to .ino code line
-        
         int m_lastInoLine;
+        int m_loopInoLine;
         int m_processorType;
         
         QStringList boardList;
+        
         QString m_customBoard;
         board_t m_board;
 };

@@ -17,18 +17,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef NO_PIC
   
 #ifndef PICPROCESSOR_H
 #define PICPROCESSOR_H
 
 #include "baseprocessor.h"
-#include "gpsim/pic-processor.h"
-#include "gpsim/registers.h"
-#include "gpsim/uart.h"
-#include "gpsim/pir.h"
 
-class RegBitSink;
+#include "registers.h"
+#include "hexutils.h"
+
+class pic_processor;
+class _RCSTA;
 
 class PicProcessor : public BaseProcessor
 {
@@ -43,52 +42,29 @@ class PicProcessor : public BaseProcessor
         void terminate();
 
         void reset();
-        void stepOne();
         void step(); 
+        void stepOne();
+        void stepCpu();
         int pc();
 
         int getRamValue( int address );
 
         void uartIn( uint32_t value );
         
-        void readUsart();
-        
-        void bitChange( QString regName, int bit, bool value );
-        
         pic_processor* getCpu() { return m_pPicProcessor; }
 
     private:
- 
         virtual int  validate( int address );
         
-        int m_cpi;
+        double m_ipc;
+        double m_pendingIpc;
         
         pic_processor* m_pPicProcessor;
-
-        bool m_DoneGpsimInit;
-        bool m_lastTrmtBit;
         
-        _RCREG* m_rcReg;
-        _TXSTA* m_txsta;
-        PIR* m_pir;
+        IntelHexProgramFileType m_hexLoader;
         
-        //RegBitSink* m_tmrtBitSink;
+        _RCSTA* m_rcsta;
 };
 
-class RegBitSink : public BitSink  // BitSink inform us about bit changes in a register
-{
 
-    public:
-        RegBitSink(PicProcessor* picProcessor, QString name, int bit );
-        ~RegBitSink();
-
-        void setSink(bool b);  // Called by gpsim when bit changes
-      
-    private:
-        PicProcessor* m_picProcessor;
-        
-        QString m_regName;
-        int     m_bit;
-};
-#endif
 #endif

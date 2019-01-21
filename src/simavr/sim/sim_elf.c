@@ -41,7 +41,7 @@
 #define O_BINARY 0
 #endif
 
-void
+int
 avr_load_firmware(
 		avr_t * avr,
 		elf_firmware_t * firmware)
@@ -73,8 +73,10 @@ avr_load_firmware(
 	}
 #endif
 
-	avr_loadcode(avr, firmware->flash,
-			firmware->flashsize, firmware->flashbase);
+    if( avr_loadcode(avr, firmware->flash,
+            firmware->flashsize, firmware->flashbase) != 0){
+            return -1;
+    }
 	avr->codeend = firmware->flashsize +
 			firmware->flashbase - firmware->datasize;
 
@@ -104,7 +106,7 @@ avr_load_firmware(
 
 	// rest is initialization of the VCD file
 	if (firmware->tracecount == 0)
-		return;
+        return 0;
 	avr->vcd = malloc(sizeof(*avr->vcd));
 	memset(avr->vcd, 0, sizeof(*avr->vcd));
 	avr_vcd_init(avr,
@@ -184,6 +186,8 @@ avr_load_firmware(
 	// the firmware probably knows best when to start/stop it
 	if (!firmware->command_register_addr)
 		avr_vcd_start(avr->vcd);
+
+    return 0;
 }
 
 static void

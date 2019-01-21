@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
     QString locale   = QLocale::system().name().split("_").first();
     QString langFile = "../share/simulide/translations/simulide_"+locale+".qm";
     
+    QFile file( langFile );
+    if( !file.exists() ) langFile = "../share/simulide/translations/simulide_en.qm";
+    
     QTranslator translator;
     translator.load( langFile );
     app.installTranslator( &translator );

@@ -18,6 +18,8 @@
  ***************************************************************************/
 
 #include "connectorline.h"
+#include "connector.h"
+#include "circuitview.h"
 #include "circuit.h"
 #include "node.h"
 #include "utils.h"
@@ -25,67 +27,114 @@
 ConnectorLine::ConnectorLine( int x1, int y1, int x2, int y2, Connector* connector )
              : QGraphicsObject()
 {
-   setParent(connector);
-   m_pConnector = connector;
+    setParent(connector);
+    m_pConnector = connector;
+    
+    m_prevLine = 0l;
+    m_nextLine = 0l;
 
-   m_p1X = x1;
-   m_p1Y = y1;
-   m_p2X = x2;
-   m_p2Y = y2;
-   
-   m_isBus = false;
+    m_p1X = x1;
+    m_p1Y = y1;
+    m_p2X = x2;
+    m_p2Y = y2;
 
-   this->setFlag( QGraphicsItem::ItemIsSelectable, true );
+    m_isBus  = false;
+    m_moveP1 = false;
+    m_moveP2 = false;
 
-   //setToolTip( QString("Wire:\n Left-Click to start a wire \n Ctrl+Left-Click to move Line \n Right-Click for Context Menu ") );
+    this->setFlag( QGraphicsItem::ItemIsSelectable, true );
 
-   setCursor(Qt::CrossCursor);
+    setCursor(Qt::CrossCursor);
 
-   updatePos();
+    updatePos();
 }
 ConnectorLine::~ConnectorLine(){}
 
 QRectF ConnectorLine::boundingRect() const
 {
-   if     ( m_p2X > m_p1X ) return QRect( 0,           -4,           m_p2X-m_p1X, 8 );
-   else if( m_p2X < m_p1X ) return QRect( m_p2X-m_p1X, -4,           m_p1X-m_p2X, 8 );
-   else if( m_p2Y > m_p1Y ) return QRect(-4,            0,           8,           m_p2Y-m_p1Y );
-   else if( m_p2Y < m_p1Y ) return QRect(-4,            m_p2Y-m_p1Y, 8,           m_p1Y-m_p2Y );
-   else                     return QRect( 0,            0,           0,           0 );
+    if( (m_p2X - m_p1X)!=0 && (m_p2Y - m_p1Y)!=0 ) return QRect( 0,    0,             m_p2X-m_p1X, m_p2Y-m_p1Y );
+    else if( m_p2X > m_p1X ) return QRect(-1,            -4,             m_p2X-m_p1X+2, 8 );
+    else if( m_p2X < m_p1X ) return QRect( m_p2X-m_p1X-1,-4,             m_p1X-m_p2X+2, 8 );
+    else if( m_p2Y > m_p1Y ) return QRect(-4,            -1,             8,             m_p2Y-m_p1Y+2 );
+    else if( m_p2Y < m_p1Y ) return QRect(-4,             m_p2Y-m_p1Y-1, 8,             m_p1Y-m_p2Y+2 );
+    else                     return QRect( 0,             0,             0,             0 );
 }
 
 void ConnectorLine::sSetP1( QPoint point )
 {
-   prepareGeometryChange();
-   m_p1X = point.x();
-   m_p1Y = point.y();
-   updatePos();
+    prepareGeometryChange();
+    m_p1X = point.x();
+    m_p1Y = point.y();
+    updatePos();
 }
 
 void ConnectorLine::sSetP2( QPoint point )
 {
-   prepareGeometryChange();
-   m_p2X = point.x();
-   m_p2Y = point.y();
-   updatePos();
+    prepareGeometryChange();
+    m_p2X = point.x();
+    m_p2Y = point.y();
+    updatePos();
 }
 
 void ConnectorLine::setP1( QPoint point )
 {
-   emit yourP2changed( point );
-   sSetP1( point );
+    if( m_prevLine ) m_prevLine->sSetP2( point );
+    sSetP1( point );
 }
 
 void ConnectorLine::setP2( QPoint point )
 {
-   emit yourP1changed( point );
-   emit moved();
-   sSetP2( point );
+    if( m_nextLine ) m_nextLine->sSetP1( point );
+    sSetP2( point );
+}
+
+void ConnectorLine::moveSimple( QPointF delta )
+{
+    bool deltaH  = fabs( delta.x() )> 0;
+    bool deltaV  = fabs( delta.y() )> 0;
+    
+    prepareGeometryChange();
+
+    m_p1X = m_p1X + delta.x();
+    m_p1Y = m_p1Y + delta.y();
+    m_p2Y = m_p2Y + delta.y();
+    m_p2X = m_p2X + delta.x();
+
+    bool isHoriz = ( dy() == 0 ) && ( dx() != 0 );
+    
+    if( m_prevLine && !(m_prevLine->isSelected()) )
+    {
+        m_prevLine->moveLine( delta.toPoint() );
+        
+        if( (  isHoriz && deltaV )
+          ||( !isHoriz && deltaH ))
+            m_prevLine->sSetP2( QPoint( m_p1X, m_p1Y) );
+            
+        m_prevLine->updatePos();
+        m_prevLine->updatePrev();
+    }
+    if( m_nextLine && !(m_nextLine->isSelected()) ) 
+    {
+        m_nextLine->moveLine( delta.toPoint() ); 
+        
+        if( (  isHoriz && deltaV )
+          ||( !isHoriz && deltaH ))
+            m_nextLine->sSetP1( QPoint( m_p2X, m_p2Y) );
+            
+        m_nextLine->updatePos();
+        m_nextLine->updateNext();
+    }
+    updatePos();
 }
 
 void ConnectorLine::move( QPointF delta )
 {
-    if( Circuit::self()->pasting() )
+    // If contiguous lines are also selected, just move line.
+    bool moveSimple = false;
+    /* !( ( m_prevLine && !(m_prevLine->isSelected()) )
+                       ||( m_nextLine && !(m_nextLine->isSelected()) ));*/
+                       
+    if( Circuit::self()->pasting() || moveSimple )
     {
         prepareGeometryChange();
         m_p1Y = m_p1Y + delta.y();
@@ -96,59 +145,101 @@ void ConnectorLine::move( QPointF delta )
 
         return;
     }
-   int myindex = m_pConnector->lineList()->indexOf( this );
-   if( ( myindex == 0 ) || ( myindex == m_pConnector->lineList()->size()-1 ) )
-       return;    //avoid moving first or last line
+    int myindex = m_pConnector->lineList()->indexOf( this );
+    if( ( myindex == 0 ) || ( myindex == m_pConnector->lineList()->size()-1 ) )
+        return;    //avoid moving first or last line
 
-   moveLine( delta.toPoint() );
+    moveLine( delta.toPoint() );
+    updatePos();
+    updateLines();
+    m_pConnector->refreshPointList();
 }
 
 void ConnectorLine::moveLine( QPoint delta )
 {
-   prepareGeometryChange();
+    prepareGeometryChange();
 
-   if( ( dy() == 0 ) && ( dx() != 0 ) )
-   {
+    if( /*( dy() == 0 ) &&*/ ( dx() != 0 ) )
+    {
        m_p1Y = m_p1Y + delta.y();
        m_p2Y = m_p2Y + delta.y();
-   }
-   else if( ( dx() == 0 ) && ( dy() != 0 ) )
-   {
+    }
+    if( /*( dx() == 0 ) &&*/ ( dy() != 0 ) )
+    {
        m_p1X = m_p1X + delta.x();
        m_p2X = m_p2X + delta.x();
-   }
-   else return;                     //line is "0"
+    }
+    //else return;                     //line is "0"
+}
 
-   updatePos();
+void ConnectorLine::updateLines()
+{
+    updatePrev();
+    updateNext();
+}
 
-   emit yourP2changed( QPoint( m_p1X, m_p1Y) );
-   emit yourP1changed( QPoint( m_p2X, m_p2Y) );
+void ConnectorLine::updatePrev()
+{
+    if( m_prevLine ) m_prevLine->sSetP2( QPoint( m_p1X, m_p1Y) );
+}
+
+void ConnectorLine::updateNext()
+{
+    if( m_nextLine ) 
+    {
+        m_nextLine->sSetP1( QPoint( m_p2X, m_p2Y) );
+        m_nextLine->updatePos();
+    }
 }
 
 void ConnectorLine::updatePos()
 {
-   setPos( m_p1X, m_p1Y );
-   m_pConnector->refreshPointList();
-   update();
+    setPos( m_p1X, m_p1Y );
+    
+    update();
 }
 
-void ConnectorLine::remove() { m_pConnector->remove(); }
-
-void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
+void ConnectorLine::setPrevLine( ConnectorLine* prevLine )
 {
-   if( event->button() == Qt::LeftButton )
-   {
-       if( event->modifiers() == Qt::ControlModifier )      // Move Line
-       {
-           event->accept();
+    m_prevLine = prevLine;
+}
 
-           if  ( dy() == 0 )   setCursor( Qt::SplitVCursor );
-           else                setCursor( Qt::SplitHCursor );
+void ConnectorLine::setNextLine( ConnectorLine* nextLine )
+{
+    m_nextLine = nextLine;
+}
 
-           grabMouse();
-       }
-       else                                    // Connecting a wire here
-       {
+void ConnectorLine::remove() 
+{ 
+    Circuit::self()->saveState();
+    m_pConnector->remove(); 
+}
+
+void ConnectorLine::mousePressEvent( QGraphicsSceneMouseEvent* event )
+{
+    bool dragging = ( CircuitView::self()->dragMode() == QGraphicsView::ScrollHandDrag );
+
+    if( event->button() == Qt::LeftButton )
+    {
+        if( event->modifiers() == Qt::ControlModifier ) setSelected( !isSelected() ); // Select - Deselect
+        
+        else if( event->modifiers() & Qt::ShiftModifier ) // Move Corner
+        {
+            QPoint evPoint = togrid( event->scenePos() ).toPoint();
+            
+            if     ( evPoint==p1() ) m_moveP1 = true;
+            else if( evPoint==p2() ) m_moveP2 = true;
+        }
+        else if( dragging )      // Move Line
+        {
+            event->accept();
+
+            if     ( dy() == 0 ) CircuitView::self()->viewport()->setCursor( Qt::SplitVCursor );
+            else if( dx() == 0 ) CircuitView::self()->viewport()->setCursor( Qt::SplitHCursor );
+            else                 CircuitView::self()->viewport()->setCursor( Qt::SizeAllCursor );
+        }
+        else                                    // Connecting a wire here
+        {   
            if( Circuit::self()->is_constarted() )       
            {
                Connector* con = Circuit::self()->getNewConnector();
@@ -205,8 +296,8 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
            {
                event->accept();
 
-               if( dy() == 0 )    point1.setY( m_p1Y );
-               else                point1.setX( m_p1X );
+               if( dy() == 0 ) point1.setY( m_p1Y );
+               else            point1.setX( m_p1X );
 
                index = myindex+1;
 
@@ -238,40 +329,50 @@ void ConnectorLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
                Circuit::self()->newconnector( node->getPin(1) );      // start a new connector
 
            if( pauseSim ) Simulator::self()->runContinuous();
-       }
-   }
-   else event->ignore();
+        }
+    }
+    else event->ignore();
 }
 
-
-void ConnectorLine::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+void ConnectorLine::mouseMoveEvent( QGraphicsSceneMouseEvent* event )
 {
-   event->accept();
+    event->accept();
+    
+    QPoint delta = togrid( event->scenePos() ).toPoint() - togrid(event->lastScenePos()).toPoint();
+   
+    if( event->modifiers() & Qt::ShiftModifier ) // Move Corner
+    {
+        //qDebug() << "ConnectorLine::mousePressEvent"<<event->scenePos()<<evPoint<<p1()<<p2();
+        //qDebug() << "ConnectorLine::mousePressEvent corner"<<delta;
+        if     ( m_moveP1 ) setP1( p1()+delta );
+        else if( m_moveP2 ) setP2( p2()+delta );
 
-   int myindex = m_pConnector->lineList()->indexOf( this );
+    }
+    else
+    {
+        int myindex = m_pConnector->lineList()->indexOf( this );
+        
+        if( myindex == 0 )
+            m_pConnector->addConLine( p1().x(), p1().y(), p1().x(), p1().y(), myindex );
 
-   if( myindex == 0 )
-       m_pConnector->addConLine( p1().x(), p1().y(), p1().x(), p1().y(), myindex );
+        else if( myindex == m_pConnector->lineList()->size()-1 )
+            m_pConnector->addConLine( p2().x(), p2().y(), p2().x(), p2().y(), myindex + 1 );
 
-   else if( myindex == m_pConnector->lineList()->size()-1 )
-       m_pConnector->addConLine( p2().x(), p2().y(), p2().x(), p2().y(), myindex + 1 );
-
-   QPoint delta = togrid( event->scenePos() ).toPoint() - togrid(event->lastScenePos()).toPoint();
-
-   moveLine( delta );
+        moveLine( delta );
+    }
+    updatePos();
+    updateLines();
 }
 
-void ConnectorLine::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+void ConnectorLine::mouseReleaseEvent( QGraphicsSceneMouseEvent* event )
 {
-   event->accept();
-
-   m_pConnector->remNullLines();
-
-   setCursor(Qt::CrossCursor);
-   ungrabMouse();
+    event->accept();
+    m_moveP1 = false;
+    m_moveP2 = false;
+    m_pConnector->remNullLines();
 }
 
-void ConnectorLine::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+void ConnectorLine::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 {
    if( m_pConnector->endPin() )
    {
@@ -290,6 +391,46 @@ void ConnectorLine::setIsBus( bool bus )
     m_isBus = bus;
 }
 
+void ConnectorLine::setConnector( Connector* con ) { m_pConnector = con; }
+
+QPoint ConnectorLine::p1() { return QPoint( m_p1X, m_p1Y ); }
+QPoint ConnectorLine::p2() { return QPoint( m_p2X, m_p2Y ); }
+
+int ConnectorLine::dx() { return (m_p2X - m_p1X);}
+int ConnectorLine::dy() { return (m_p2Y - m_p1Y);}
+
+bool ConnectorLine::isDiagonal()
+{
+    return ( abs(m_p2X - m_p1X)>0 && abs(m_p2Y - m_p1Y)>0 );
+}
+
+Connector* ConnectorLine::connector(){ return m_pConnector; }
+
+QPainterPath ConnectorLine::shape() const
+{
+    QPainterPath path;
+    
+    QVector<QPointF> points;
+    
+    if( abs(m_p2X - m_p1X) > abs(m_p2Y - m_p1Y) )
+    {
+        points << mapFromScene( QPointF( m_p1X, m_p1Y-4 ) )
+               << mapFromScene( QPointF( m_p1X, m_p1Y+4 ) )
+               << mapFromScene( QPointF( m_p2X, m_p2Y+4 ) )
+               << mapFromScene( QPointF( m_p2X, m_p2Y-4 ) );
+    }
+    else
+    {
+        points << mapFromScene( QPointF( m_p1X-4, m_p1Y ) )
+               << mapFromScene( QPointF( m_p1X+4, m_p1Y ) )
+               << mapFromScene( QPointF( m_p2X+4, m_p2Y ) )
+               << mapFromScene( QPointF( m_p2X-4, m_p2Y ) );
+    }
+    path.addPolygon( QPolygonF(points) );
+    path.closeSubpath();
+    return path;
+}
+
 void ConnectorLine::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Q_UNUSED(option);
@@ -302,23 +443,28 @@ void ConnectorLine::paint( QPainter* p, const QStyleOptionGraphicsItem* option, 
 
     QColor color;
     if( isSelected() ) color = QColor( Qt::darkGray );
-    else               color = QColor( 40, 40, 60 /*Qt::black*/ );
-    /*{
-        int volt = 50*int( m_pConnector->getVolt() );
-        if( volt > 250 )volt = 250;
-        if( volt < 0 ) volt = 0;
+    else if( !m_isBus  && Circuit::self()->animate() )               //color = QColor( 40, 40, 60 /*Qt::black*/ );
+    {
+        if( m_pConnector->getVolt() > 2.5 ) color = QColor( 200, 50, 50 );
+        else                                color = QColor( 50, 50, 200 );
+        //int volt = 50*int( m_pConnector->getVolt() );
+        //if( volt > 250 )volt = 250;
+        //if( volt < 0 ) volt = 0;
 
-        if( m_pConnector->endPin()
+        /*if( m_pConnector->endPin()
         && (m_pConnector->startPin()->changed()
         ||  m_pConnector->endPin()->changed()) )
-        { pen.setWidth(3); }
+        { pen.setWidth(3); }*/
 
-        color = QColor( volt, 50, 250-volt);
-    }*/
+        //color = QColor( volt, 50, 250-volt);
+    }
+    else color = QColor( 40, 40, 60 /*Qt::black*/ );
 
     QPen pen( color, 2.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
     //p->setBrush( Qt::green );
     //p->drawRect( boundingRect() );
+    //p->setBrush( Qt::blue );
+    //p->drawPath( shape() );
     
     if( m_isBus ) 
     {
@@ -329,3 +475,4 @@ void ConnectorLine::paint( QPainter* p, const QStyleOptionGraphicsItem* option, 
     p->setPen( pen );
     p->drawLine( 0, 0, dx(), dy());
 }
+

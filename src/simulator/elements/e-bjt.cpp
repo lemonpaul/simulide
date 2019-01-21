@@ -36,6 +36,7 @@ eBJT::eBJT( std::string id )
     ssa << m_elmId << "-BEdiode";
     m_BEdiode = new ePN( ssa.str() );
     m_BEdiode->initEpins();
+    setBEthr( 0.7 );
     
     /*std::stringstream ssb;
     ssb << m_elmId << "-BCdiode";
@@ -50,7 +51,9 @@ eBJT::~eBJT()
 
 void eBJT::initialize()
 {
-    eResistor::setRes( 400/m_gain );
+    //eResistor::setRes( 400/m_gain );
+    eResistor::setAdmit( 0 );
+    eResistor::stamp();
     
     m_accuracy = Simulator::self()->NLaccuracy();
     //m_stage = 0;
@@ -118,51 +121,76 @@ void eBJT::setVChanged()
     double maxCurrCE = voltCE/m_resist;
     double current = maxCurrCE;
     
-    //if( voltBE > 0.6 ) 
+    if( !m_Efollow )
     {
-        if( !m_Efollow )
+        if( m_PNP )
         {
-            if( m_PNP )
-            {
-                if( fabs( voltE-m_voltE )<0 ){ m_Efollow = true; }
-            }
-            else if(( fabs(m_voltE) > 1e-3 )&&( m_voltE != voltE )){ m_Efollow = true; }
-            
-            m_voltE = voltE;
+            if( fabs( voltE-m_voltE )<0 ){ m_Efollow = true; }
         }
-        double satK = 0;
-    
-        if( voltCE < voltBE )          
-        {
-            satK = voltCE/voltBE-1;
-            satK = pow( satK, 2 );
+        else if(( fabs(m_voltE) > 1e-3 )&&( m_voltE != voltE ))
+        { 
+            m_Efollow = true; 
+            eResistor::setRes( 400/m_gain );
+            eResistor::stamp();
         }
-        m_baseCurr = m_BEdiode->current();
-    
-        double currentCE = m_baseCurr*m_gain*(1+voltCE/75);
-        currentCE -= currentCE*satK;
         
-        //qDebug()<<"m_baseCurr"<<m_baseCurr<<"    currentCE"<<currentCE<<"     maxCurrCE"<<maxCurrCE<<"     voltBE"<<voltBE <<"    m_Efollow"<<m_Efollow;
+        m_voltE = voltE;
+    }
+    double satK = 0;
 
-        if(( currentCE > maxCurrCE )&&( !m_Efollow ) )
-            eResistor::setRes( voltCE/currentCE );
+    if( voltCE < voltBE )          
+    {
+        satK = voltCE/voltBE-1;
+        satK = pow( satK, 2 );
+    }
+    m_baseCurr = m_BEdiode->current();
 
+    double currentCE = m_baseCurr*m_gain*(1+voltCE/75);
+    currentCE -= currentCE*satK;
+    
+    //qDebug()<<"m_baseCurr"<<m_baseCurr<<"    currentCE"<<currentCE<<"     maxCurrCE"<<maxCurrCE<<"     voltBE"<<voltBE <<"    m_Efollow"<<m_Efollow;
+
+    if( m_Efollow )
+    {
         current = maxCurrCE-currentCE;
         
-        if( m_Efollow ) current = m_lastOut+(current-m_lastOut)/5;
+        current = m_lastOut+(current-m_lastOut)/5;
 
         if( current < 0 ) current = 0;
         
         //qDebug()<<"current"<<current<<"  m_baseCurr"<<m_baseCurr<<"  currentCE"<<currentCE<<"  maxCurrCE"<<maxCurrCE<<"  voltBE"<<voltBE <<" m_Efollow"<<m_Efollow;
-    }
-    if( m_PNP ) current = -current;
 
-    double accuracy = m_accuracy;
-    if( m_Efollow ) accuracy /= 5;
-    if( fabs(current-m_lastOut) < accuracy ) return;
-    
-    m_lastOut = current;
-    m_ePin[0]->stampCurrent( current );
-    m_ePin[1]->stampCurrent(-current );
+        if( m_PNP ) current = -current;
+
+        double accuracy = m_accuracy/5;
+
+        if( fabs(current-m_lastOut) < accuracy ) return;
+        
+        m_lastOut = current;
+        m_ePin[0]->stampCurrent( current );
+        m_ePin[1]->stampCurrent(-current );
+    }
+    else
+    {
+        double admit = 0;
+        if( currentCE!=0 && voltCE!=0 ) admit = currentCE/voltCE;
+        if( admit < 0 ) admit = 0;
+        //admit = m_lastOut+(admit-m_lastOut)/2;
+        admit *= 1.1;
+        
+        if( fabs(admit-m_lastOut) < m_accuracy ) return;
+        
+        eResistor::setAdmit( admit );
+        eResistor::stamp();
+        m_lastOut = admit;
+    }
 }
 
+double eBJT::BEthr() {return m_BEthr;}
+
+void eBJT::setBEthr( double thr )
+{
+    if( thr == 0 ) thr = 0.7;
+    m_BEdiode->setThreshold(thr);
+    m_BEthr = thr;
+}

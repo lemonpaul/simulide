@@ -18,6 +18,7 @@
  ***************************************************************************/
  
 #include "itemlibrary.h"
+#include "simuapi_apppath.h"
 #include "appiface.h"
 
 //BEGIN Item includes
@@ -26,10 +27,12 @@
 #include "arduino.h"
 #include "audio_out.h"
 #include "avrcomponent.h"
+#include "bcdto7s.h"
 #include "bcdtodec.h"
 #include "bincounter.h"
 #include "bjt.h"
 #include "buffer.h"
+#include "bus.h"
 #include "capacitor.h"
 #include "clock.h"
 #include "currsource.h"
@@ -37,17 +40,20 @@
 #include "dectobcd.h"
 #include "demux.h"
 #include "diode.h"
+#include "elcapacitor.h"
 #include "ellipse.h"
 #include "flipflopd.h"
 #include "flipflopjk.h"
 #include "fulladder.h"
+#include "function.h"
 #include "gate_and.h"
 #include "gate_or.h"
 #include "gate_xor.h"
 #include "ground.h"
 #include "hd44780.h"
-#include "i2c.h"
-#include "inbus.h"
+#include "i2cram.h"
+#include "i2ctoparallel.h"
+//#include "inbus.h"
 #include "inductor.h"
 #include "keypad.h"
 #include "ks0108.h"
@@ -56,18 +62,20 @@
 #include "ledbar.h"
 #include "ledmatrix.h"
 #include "line.h"
+#include "lm555.h"
 #include "logicinput.h"
 #include "mosfet.h"
 #include "mux.h"
 #include "op_amp.h"
 #include "oscope.h"
-#include "outbus.h"
+//#include "outbus.h"
 #include "piccomponent.h"
 #include "pcd8544.h"
 #include "probe.h"
 #include "potentiometer.h"
 #include "push.h"
 #include "rail.h"
+#include "ram8bit.h"
 #include "rectangle.h"
 #include "relay-spst.h"
 #include "resistor.h"
@@ -79,15 +87,14 @@
 #include "stepper.h"
 #include "subcircuit.h"
 #include "switch.h"
+#include "switchdip.h"
 #include "textcomponent.h"
-#include "toggleswitch.h"
+//#include "toggleswitch.h"
 #include "voltimeter.h"
 #include "volt_reg.h"
 #include "voltsource.h"
 #include "wavegen.h"
 //END Item includes
-
-#include "simuapi_apppath.h"
 
 ItemLibrary* ItemLibrary::m_pSelf = 0l;
 
@@ -119,13 +126,15 @@ void ItemLibrary::loadItems()
     // Switches
     addItem( Push::libraryItem() );
     addItem( Switch::libraryItem() );
-    addItem( ToggleSwitch::libraryItem() );
+    //addItem( ToggleSwitch::libraryItem() );
+    addItem( SwitchDip::libraryItem() );
     addItem( RelaySPST::libraryItem() );
     // Passive
     addItem( Potentiometer::libraryItem() );
     addItem( Resistor::libraryItem() );
     addItem( ResistorDip::libraryItem() );
     addItem( Capacitor::libraryItem() );
+    addItem( elCapacitor::libraryItem() );
     addItem( Inductor::libraryItem() );
     // Active
     addItem( Diode::libraryItem() );
@@ -150,12 +159,17 @@ void ItemLibrary::loadItems()
     addItem( AVRComponent::libraryItem() );
     addItem( Arduino::libraryItem() );
     // Logic
-    //addItem( I2C::libraryItem() );
     addItem( SevenSegmentBCD::libraryItem() );
+    addItem( new LibraryItem( tr("Gates"),tr("Logic"), "gates.png","", 0l ) );
+    addItem( new LibraryItem( tr("Arithmetic"),tr("Logic"), "2to2.png","", 0l ) );
+    addItem( new LibraryItem( tr("Memory"),tr("Logic"), "subc.png","", 0l ) );
+    addItem( new LibraryItem( tr("Converters"),tr("Logic"), "1to2.png","", 0l ) );
+    addItem( new LibraryItem( tr("Other Logic"),tr("Logic"), "2to3.png","", 0l ) );
     addItem( Buffer::libraryItem() );
     addItem( AndGate::libraryItem() );
     addItem( OrGate::libraryItem() );
     addItem( XorGate::libraryItem() );
+    addItem( Function::libraryItem() );
     addItem( FlipFlopD::libraryItem() );
     addItem( FlipFlopJK::libraryItem() );
     addItem( BinCounter::libraryItem() );
@@ -166,10 +180,16 @@ void ItemLibrary::loadItems()
     addItem( Demux::libraryItem() );
     addItem( BcdToDec::libraryItem() );
     addItem( DecToBcd::libraryItem() );
+    addItem( BcdTo7S::libraryItem() );
     addItem( ADC::libraryItem() );
     addItem( DAC::libraryItem() );
-    addItem( OutBus::libraryItem() );
-    addItem( InBus::libraryItem() );
+    addItem( Bus::libraryItem() );
+//    addItem( OutBus::libraryItem() );
+//    addItem( InBus::libraryItem() );
+    addItem( Ram8bit::libraryItem() );
+    addItem( I2CRam::libraryItem() );
+    addItem( I2CToParallel::libraryItem() );
+    addItem( Lm555::libraryItem() );
     // Subcircuits
     addItem( SubCircuit::libraryItem() );
     // Other
@@ -267,7 +287,39 @@ LibraryItem::LibraryItem( const QString &name,
     m_category  = category;
     m_iconfile  = iconName;
     m_type      = type;
+    m_help      = "Sorry... no Help Available";
     createItem  = _createItem;
+
 }
+
 LibraryItem::~LibraryItem() { }
+
+QString* LibraryItem::help() 
+{
+    if( m_help == "Sorry... no Help Available" )
+    {
+        QString locale   = "_"+QLocale::system().name().split("_").first();
+        QString type = m_type;
+        QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+type.toLower()+locale+".txt" );
+        
+        if( dfPath == "" ) 
+            dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+type.toLower()+".txt" );
+
+        if( dfPath != "" )
+        {
+            QFile file( dfPath );
+            
+            if( file.open(QFile::ReadOnly | QFile::Text) ) // Get Text from Help File
+            {
+                QTextStream s1( &file );
+            
+                m_help = "";
+                m_help.append(s1.readAll());
+
+                file.close();
+            }
+        }
+    }
+    return &m_help; 
+}
 

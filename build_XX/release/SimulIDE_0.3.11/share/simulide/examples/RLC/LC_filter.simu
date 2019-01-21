@@ -1,0 +1,36 @@
+<circuit type="simulide_0.1">
+ 
+Node-6: 
+<item valLabelx="0" valLabely="0" x="4" itemtype="Node" y="-92" labelrot="0" vflip="1" labely="-24" valLabRot="0" objectName="Node-6" labelx="-16" Show_id="false" hflip="1" id="Node-6" rotation="0"/>
+ 
+Ground (0 V)-5: 
+<item valLabelx="0" valLabely="0" x="92" itemtype="Ground" y="-4" labelrot="0" vflip="1" labely="-24" valLabRot="0" objectName="Ground (0 V)-5" labelx="-16" Show_id="false" hflip="1" id="Ground (0 V)-5" rotation="0"/>
+ 
+Capacitor-4: 
+<item valLabRot="0" y="-92" Capacitance="9.9999999999999911" labelx="-16" x="60" objectName="Capacitor-4" Unit=" uF" valLabelx="-16" vflip="1" hflip="1" Show_Cap="true" valLabely="8" labelrot="0" Show_id="false" labely="-24" itemtype="Capacitor" id="Capacitor-4" rotation="0"/>
+ 
+Inductor-3: 
+<item valLabRot="0" y="-92" labelx="-16" x="-60" objectName="Inductor-3" Unit=" mH" valLabelx="-18" vflip="1" hflip="1" valLabely="6" labelrot="0" Show_id="false" labely="-24" Inductance="1" Show_Ind="true" itemtype="Inductor" id="Inductor-3" rotation="0"/>
+ 
+Oscope-2: 
+<item Filter="0.29999999999999999" valLabelx="0" valLabely="0" x="-44" itemtype="Oscope" y="-228" labelrot="0" vflip="1" labely="-24" valLabRot="0" objectName="Oscope-2" labelx="-16" Show_id="false" hflip="1" id="Oscope-2" rotation="0"/>
+ 
+Wave Gen.-1: 
+<item valLabRot="0" Wave_Type="0" y="-92" Show_Volt="true" labelx="-64" x="-156" objectName="Wave Gen.-1" Volt_Base="0" Unit=" V" valLabelx="-16" vflip="1" hflip="1" valLabely="8" labelrot="0" Show_id="false" Freq="500" labely="-24" Voltage="5" itemtype="WaveGen" id="Wave Gen.-1" rotation="0"/>
+ 
+Connector-7: 
+<item valLabRot="0" y="-20" startpinid="Ground (0 V)-5-Gnd" labelx="-16" x="92" objectName="Connector-7" pointList="92,-20,92,-92,76,-92" endpinid="Capacitor-4-rPin" valLabelx="0" vflip="1" enodeid="Circ_eNode-8" hflip="1" valLabely="0" labelrot="0" Show_id="false" labely="-24" itemtype="Connector" id="Connector-7" rotation="0"/>
+ 
+Connector-9: 
+<item valLabRot="0" y="-92" startpinid="Inductor-3-rPin" labelx="-16" x="-44" objectName="Connector-9" pointList="-44,-92,4,-92" endpinid="Node-6-0" valLabelx="0" vflip="1" enodeid="Circ_eNode-10" hflip="1" valLabely="0" labelrot="0" Show_id="false" labely="-24" itemtype="Connector" id="Connector-9" rotation="0"/>
+ 
+Connector-11: 
+<item valLabRot="0" y="-92" startpinid="Node-6-2" labelx="-16" x="4" objectName="Connector-11" pointList="4,-92,44,-92" endpinid="Capacitor-4-lPin" valLabelx="0" vflip="1" enodeid="Circ_eNode-10" hflip="1" valLabely="0" labelrot="0" Show_id="false" labely="-24" itemtype="Connector" id="Connector-11" rotation="0"/>
+ 
+Connector-12: 
+<item valLabRot="0" y="-228" startpinid="Oscope-2-PinP" labelx="-16" x="-164" objectName="Connector-12" pointList="-164,-228,-180,-228,-180,-148,4,-148,4,-92" endpinid="Node-6-1" valLabelx="0" vflip="1" enodeid="Circ_eNode-10" hflip="1" valLabely="0" labelrot="0" Show_id="false" labely="-24" itemtype="Connector" id="Connector-12" rotation="0"/>
+ 
+Connector-13: 
+<item valLabRot="0" y="-92" startpinid="Wave Gen.-1-outnod" labelx="-16" x="-140" objectName="Connector-13" pointList="-140,-92,-76,-92" endpinid="Inductor-3-lPin" valLabelx="0" vflip="1" enodeid="Circ_eNode-14" hflip="1" valLabely="0" labelrot="0" Show_id="false" labely="-24" itemtype="Connector" id="Connector-13" rotation="0"/>
+ 
+</circuit>

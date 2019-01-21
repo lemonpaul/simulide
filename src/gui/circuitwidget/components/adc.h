@@ -20,9 +20,10 @@
 #ifndef ADC_H
 #define ADC_H
 
-#include "itemlibrary.h"
 #include "logiccomponent.h"
 #include "e-inbus.h"
+
+class LibraryItem;
 
 class MAINMODULE_EXPORT ADC : public LogicComponent, public eInBus
 {

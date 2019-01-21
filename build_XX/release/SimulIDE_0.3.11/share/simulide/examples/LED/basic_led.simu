@@ -1,0 +1,30 @@
+<circuit type="simulide_0.1">
+ 
+Volt. Source-6: 
+<item x="-372" vflip="1" id="Volt. Source-6" hflip="1" labelrot="0" valLabRot="0" valLabelx="-25" Show_Volt="true" Voltage="5" Show_id="false" Unit=" V" y="-148" labely="-24" itemtype="Voltage Source" labelx="-16" objectName="Volt. Source-6" valLabely="16" rotation="0"/>
+ 
+Led-5: 
+<item x="-260" MaxCurrent="0.029999999999999999" Grounded="false" vflip="1" id="Led-5" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" Resistance="0.59999999999999998" Show_id="false" y="-148" labely="-24" itemtype="Led" labelx="-16" threshold="2.3999999999999999" objectName="Led-5" valLabely="0" rotation="0"/>
+ 
+Resistor-4: 
+<item x="-148" vflip="1" id="Resistor-4" hflip="1" labelrot="0" valLabRot="0" valLabelx="-18" Resistance="100" Show_id="false" Unit=" Ω" y="-148" labely="-24" itemtype="Resistor" labelx="-16" objectName="Resistor-4" valLabely="8" rotation="0" Show_res="true"/>
+ 
+Ground (0 V)-3: 
+<item itemtype="Ground" labelx="-16" id="Ground (0 V)-3" rotation="0" hflip="1" Show_id="false" labely="-24" valLabRot="0" vflip="1" y="-44" valLabely="0" valLabelx="0" objectName="Ground (0 V)-3" x="-92" labelrot="0"/>
+ 
+Probe-2: 
+<item itemtype="Probe" labelx="16" Show_volt="true" id="Probe-2" rotation="-45" hflip="1" Show_id="false" labely="-16" valLabRot="45" vflip="1" y="-164" valLabely="0" valLabelx="16" objectName="Probe-2" x="-316" labelrot="45"/>
+ 
+Probe-1: 
+<item itemtype="Probe" labelx="16" Show_volt="true" id="Probe-1" rotation="-45" hflip="1" Show_id="false" labely="-16" valLabRot="45" vflip="1" y="-164" valLabely="0" valLabelx="16" objectName="Probe-1" x="-204" labelrot="45"/>
+ 
+Connector-7: 
+<item endpinid="Led-5-lPin" x="-356" vflip="1" id="Connector-7" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-8" Show_id="false" startpinid="Volt. Source-6-outPin" pointList="-356,-148,-276,-148" y="-148" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-7" valLabely="0" rotation="0"/>
+ 
+Connector-9: 
+<item endpinid="Resistor-4-lPin" x="-244" vflip="1" id="Connector-9" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-10" Show_id="false" startpinid="Led-5-rPin" pointList="-244,-148,-164,-148" y="-148" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-9" valLabely="0" rotation="0"/>
+ 
+Connector-11: 
+<item endpinid="Ground (0 V)-3-Gnd" x="-132" vflip="1" id="Connector-11" hflip="1" labelrot="0" valLabRot="0" valLabelx="0" enodeid="Circ_eNode-12" Show_id="false" startpinid="Resistor-4-rPin" pointList="-132,-148,-92,-148,-92,-60" y="-148" labely="-24" itemtype="Connector" labelx="-16" objectName="Connector-11" valLabely="0" rotation="0"/>
+ 
+</circuit>

@@ -30,18 +30,19 @@ LibraryItem* Mux::libraryItem()
 {
     return new LibraryItem(
         tr( "Mux" ),
-        tr( "Logic" ),
-        "subc.png",
+        tr( "Logic/Converters" ),
+        "mux.png",
         "Mux",
         Mux::construct );
 }
 
 Mux::Mux( QObject* parent, QString type, QString id )
-        : LogicComponent( parent, type, id ), eMux( id.toStdString() )
+   : LogicComponent( parent, type, id )
+   , eMux( id.toStdString() )
 {
     m_width  = 4;
     m_height = 10;
-
+    
     QStringList pinList;
 
     pinList // Inputs:
@@ -54,9 +55,9 @@ Mux::Mux( QObject* parent, QString type, QString id )
             << "IL07 D6"
             << "IL08 D7"
             
-            << "ID03 S0"
+            << "ID03  S0"
             << "ID02 S1 "
-            << "ID01 S2 "
+            << "ID01S2 "
             
             << "IU03OE "
             
@@ -65,7 +66,7 @@ Mux::Mux( QObject* parent, QString type, QString id )
             << "OR06!Y "
             ;
     init( pinList );
-    
+    m_area = QRect( -(m_width/2)*8-1, -(m_height/2)*8-8-1, m_width*8+2, m_height*8+16+2 );
     
     eLogicDevice::createOutEnablePin( m_inPin[11] );    // IOutput Enable
     
@@ -74,6 +75,7 @@ Mux::Mux( QObject* parent, QString type, QString id )
         
     eLogicDevice::createOutput( m_outPin[0] );
     eLogicDevice::createOutput( m_outPin[1] );
+    
 }
 Mux::~Mux(){}
 
@@ -84,6 +86,35 @@ void Mux::setInvertInps( bool invert )
     {
         m_input[i]->setInverted( invert );
     }
+}
+
+QPainterPath Mux::shape() const
+{
+    QPainterPath path;
+    
+    QVector<QPointF> points;
+    
+    points << QPointF(-(m_width/2)*8,-(m_height/2)*8-6 )
+           << QPointF(-(m_width/2)*8, (m_height/2)*8+6 )
+           << QPointF( (m_width/2)*8, (m_height/2)*8-2 )
+           << QPointF( (m_width/2)*8,-(m_height/2)*8+2 );
+        
+    path.addPolygon( QPolygonF(points) );
+    path.closeSubpath();
+    return path;
+}
+
+void Mux::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
+{
+    Component::paint( p, option, widget );
+
+    static const QPointF points[4] = {
+        QPointF(-(m_width/2)*8,-(m_height/2)*8-6 ),
+        QPointF(-(m_width/2)*8, (m_height/2)*8+6 ),
+        QPointF( (m_width/2)*8, (m_height/2)*8-2 ),
+        QPointF( (m_width/2)*8,-(m_height/2)*8+2 )};
+
+    p->drawPolygon(points, 4);
 }
 
 #include "moc_mux.cpp"

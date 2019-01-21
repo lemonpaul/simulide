@@ -23,6 +23,11 @@
 #include "connector.h"
 #include "itemlibrary.h"
 
+static const char* Inductor_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Inductance"),
+    QT_TRANSLATE_NOOP("App::Property","Show Ind")
+};
+
 
 Component* Inductor::construct( QObject* parent, QString type, QString id )
 { return new Inductor( parent, type, id ); }
@@ -38,8 +43,11 @@ LibraryItem* Inductor::libraryItem()
 }
 
 Inductor::Inductor( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eInductor( id.toStdString() )
+        : Component( parent, type, id )
+        , eInductor( id.toStdString() )
 {
+    Q_UNUSED( Inductor_properties );
+    
     m_ePin.resize(2);
     
     m_area = QRectF( -10, -10, 20, 20 );

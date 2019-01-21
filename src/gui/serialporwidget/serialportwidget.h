@@ -70,6 +70,9 @@ class QIntValidator;
 class SerialPortWidget : public QWidget
 {
     Q_OBJECT
+    
+    Q_PROPERTY( QString  itemtype  READ itemType )
+    Q_PROPERTY( QStringList SettingsProp  READ settingsProp WRITE setSettingsProp )
 
     public:
         struct Settings
@@ -90,6 +93,11 @@ class SerialPortWidget : public QWidget
 
         explicit SerialPortWidget( QWidget* parent = 0l );
         ~SerialPortWidget();
+        
+        QString itemType(){ return "SerialPort"; }
+        
+        QStringList settingsProp();
+        void setSettingsProp( QStringList s );
 
         void setVisible( bool visible );
         

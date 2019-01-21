@@ -24,9 +24,13 @@
 #include "filebrowser.h"
 #include "utils.h"
 
+EditorWindow*  EditorWindow::m_pSelf = 0l;
+
 EditorWindow::EditorWindow( QWidget* parent )
             : QWidget( parent )
 {
+    m_pSelf = this;
+    
     createWidgets();
     createActions();
     createToolBars();
@@ -36,39 +40,32 @@ EditorWindow::EditorWindow( QWidget* parent )
     // Redirect stdout to outPane
     /*mybuf = new mystreambuf( outPane );
     std::cout.rdbuf( mybuf );*/
-    
-    connect( FileBrowser::self(), SIGNAL( openFileWithEditor(QString) )
-           , this               , SLOT( loadFile(QString) ));
 }
 EditorWindow::~EditorWindow(){}
 
 bool EditorWindow::close()
-{
-    getCodeEditor()->writeSettings();
+{    
     writeSettings();
     
     for( int i=0; i<m_docWidget->count(); i++ )
     {
         closeTab( m_docWidget->currentIndex() );
     }
-    
     return maybeSave();
 }
 
 void EditorWindow::keyPressEvent( QKeyEvent* event )
 {
-    if (event->key() == Qt::Key_N && (event->modifiers() & Qt::ControlModifier))
+    if( event->key() == Qt::Key_N && (event->modifiers() & Qt::ControlModifier))
     {
         newFile();
     }
-    else if (event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
+    else if( event->key() == Qt::Key_S && (event->modifiers() & Qt::ControlModifier))
     {
-        if (event->modifiers() & Qt::ShiftModifier)
-            saveAs();
-        else
-            save();
+        if( event->modifiers() & Qt::ShiftModifier) saveAs();
+        else                                        save();
     }
-    else if (event->key() == Qt::Key_O && (event->modifiers() & Qt::ControlModifier))
+    else if( event->key() == Qt::Key_O && (event->modifiers() & Qt::ControlModifier))
     {
         open();
     }
@@ -81,8 +78,8 @@ void EditorWindow::newFile()
     m_docWidget->addTab( baseWidget, "New" );
     m_docWidget->setCurrentWidget( baseWidget );
     
-    connect(baseWidget->m_codeEditor->document(), SIGNAL( contentsChanged()),
-            this,                                 SLOT(   documentWasModified()));
+    connect( baseWidget->m_codeEditor->document(), SIGNAL( contentsChanged()),
+             this,                                 SLOT(   documentWasModified()));
             
     m_fileList << "New";
     enableFileActs( true ); 
@@ -129,8 +126,8 @@ bool EditorWindow::save()
 
 bool EditorWindow::saveAs()
 {
-    QString fileName = QFileDialog::getSaveFileName(this);
-    if (fileName.isEmpty()) return false;
+    QString fileName = QFileDialog::getSaveFileName( this, tr("Save Document As"), m_lastDir );
+    if( fileName.isEmpty() ) return false;
 
     m_fileList.replace( m_docWidget->currentIndex(), fileName );
 
@@ -140,9 +137,9 @@ bool EditorWindow::saveAs()
 bool EditorWindow::saveFile(const QString &fileName)
 {
     QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Text))
+    if( !file.open(QFile::WriteOnly | QFile::Text) )
     {
-        QMessageBox::warning(this, tr("Application"),
+        QMessageBox::warning(this, "EditorWindow::saveFile",
                              tr("Cannot write file %1:\n%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
@@ -168,22 +165,24 @@ bool EditorWindow::maybeSave()
     if( getCodeEditor()->document()->isModified() )
     {
         QMessageBox::StandardButton ret;
-        ret = QMessageBox::warning(this, tr("Application"),
+        ret = QMessageBox::warning( this, "EditorWindow::saveFile",
               tr("\nThe Document has been modified.\nDo you want to save your changes?\n"),
               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-        if      (ret == QMessageBox::Save)   return save();
-        else if (ret == QMessageBox::Cancel) return false;
+              
+        if     ( ret == QMessageBox::Save )   return save();
+        else if( ret == QMessageBox::Cancel ) return false;
     }
     return true;
     //"+strippedName( m_lastDir )+"
 }
 
-void EditorWindow::documentWasModified(  )
+void EditorWindow::documentWasModified()
 {
-    QTextDocument *doc = getCodeEditor()->document();
+    CodeEditor* ce = getCodeEditor();
+    QTextDocument *doc = ce->document();
     
     bool    modified = doc->isModified();
-    int     index      = m_docWidget->currentIndex();
+    int     index    = m_docWidget->currentIndex();
     QString tabText  = m_docWidget->tabText( index );
 
     if     ( modified && !tabText.endsWith("*") ) tabText.append("*");
@@ -195,6 +194,8 @@ void EditorWindow::documentWasModified(  )
     undoAct->setEnabled( false );
     if( doc->isRedoAvailable() ) redoAct->setEnabled( true );
     if( doc->isUndoAvailable() ) undoAct->setEnabled( true );
+    
+    ce->setCompiled( false );
 }
 
 void EditorWindow::enableFileActs( bool enable )
@@ -228,7 +229,7 @@ void EditorWindow::tabContextMenu( const QPoint &eventpoint )
     if( !ce ) return;
     
     QMenu* menu = new QMenu();
-    QAction* setCompilerAction = menu->addAction(QIcon(":/copy.png"),"set Compiler Path");
+    QAction* setCompilerAction = menu->addAction(QIcon(":/copy.png"),tr("set Compiler Path"));
     connect( setCompilerAction, SIGNAL( triggered()), this, SLOT(setCompiler()) );
 
     menu->exec( mapToGlobal(eventpoint) );
@@ -326,7 +327,7 @@ void EditorWindow::createActions()
     redoAct->setEnabled(false);
     connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
 
-    runAct =  new QAction(QIcon(":/play.png"),tr("Run To Breakpoint"), this);
+    runAct =  new QAction(QIcon(":/runtobk.png"),tr("Run To Breakpoint"), this);
     runAct->setStatusTip(tr("Run to next breakpoint"));
     runAct->setEnabled(false);
     connect(runAct, SIGNAL(triggered()), this, SLOT(run()));
@@ -351,7 +352,7 @@ void EditorWindow::createActions()
     resetAct->setEnabled(false);
     connect( resetAct, SIGNAL(triggered()), this, SLOT(reset()) );
 
-    stopAct = new QAction(QIcon(":/stop.png"),tr("Stop"), this);
+    stopAct = new QAction(QIcon(":/stop.png"),tr("Stop Debugger"), this);
     stopAct->setStatusTip(tr("Stop debugger"));
     stopAct->setEnabled(false);
     connect( stopAct, SIGNAL(triggered()), this, SLOT(stop()) );
@@ -366,13 +367,13 @@ void EditorWindow::createActions()
     loadAct->setEnabled(false);
     connect( loadAct, SIGNAL(triggered()), this, SLOT(upload()) );
 
-    aboutAct = new QAction(QIcon(":/info.png"),tr("&About"), this);
+    /*aboutAct = new QAction(QIcon(":/info.png"),tr("&About"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
-    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
+    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));*/
 
-    aboutQtAct = new QAction(QIcon(":/info.png"),tr("About &Qt"), this);
+    /*aboutQtAct = new QAction(QIcon(":/info.png"),tr("About &Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));*/
 
     //connect(m_codeEditor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
     //connect(m_codeEditor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
@@ -429,12 +430,33 @@ void EditorWindow::debug()
     {
         m_editorToolBar->setVisible( false);
         m_debuggerToolBar->setVisible( true );
+
+        runAct->setEnabled( true );
+        stepAct->setEnabled( true );
+        resetAct->setEnabled( true );
+        pauseAct->setEnabled( false );
     }
 }
-void EditorWindow::run()     { getCodeEditor()->run(); }
+
+void EditorWindow::run()     
+{ 
+    runAct->setEnabled( false );
+    stepAct->setEnabled( false );
+    resetAct->setEnabled( false );
+    pauseAct->setEnabled( true );
+    getCodeEditor()->run(); 
+}
+
 void EditorWindow::step()    { getCodeEditor()->step(); }
 void EditorWindow::stepOver(){ getCodeEditor()->stepOver(); }
-void EditorWindow::pause()   { getCodeEditor()->pause(); }
+void EditorWindow::pause()   
+{ 
+    getCodeEditor()->pause(); 
+    runAct->setEnabled( true );
+    stepAct->setEnabled( true );
+    resetAct->setEnabled( true );
+    pauseAct->setEnabled( false );
+}
 void EditorWindow::reset()   { getCodeEditor()->reset(); }
 void EditorWindow::stop()    
 { 
@@ -444,15 +466,19 @@ void EditorWindow::stop()
 }
 void EditorWindow::compile() 
 { 
-    CodeEditor* ce = getCodeEditor();
-    if( ce->document()->isModified() ) save();
-    ce->compile(); 
+    getCodeEditor()->compile(); 
 }
 void EditorWindow::upload()  { getCodeEditor()->upload(); }
 
 void EditorWindow::findReplaceDialog() 
-{ 
-    findRepDiaWidget->setTextEdit( getCodeEditor() );
+{
+    CodeEditor* ce = getCodeEditor();
+    
+    findRepDiaWidget->setTextEdit( ce );
+    
+    QString text =ce->textCursor().selectedText();
+    if( text != "" ) findRepDiaWidget->setTextToFind( text );
+
     findRepDiaWidget->show(); 
 }
 
@@ -514,7 +540,8 @@ QString EditorWindow::strippedName(const QString &fullFileName)
 
 void EditorWindow::about()
 {
-   QMessageBox::about(this, tr("About Application"),
-            tr(""));
+   /*QMessageBox::about(this, tr("About Application"),
+            tr(""));*/
+            ;
 }
 #include  "moc_editorwindow.cpp"

@@ -34,7 +34,7 @@ LibraryItem* Led::libraryItem()
 }
 
 Led::Led( QObject* parent, QString type, QString id )
-    : LedBase( parent, type, id )
+   : LedBase( parent, type, id )
 {
     m_pin.resize( 2 );
     

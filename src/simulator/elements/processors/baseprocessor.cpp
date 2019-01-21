@@ -64,12 +64,27 @@ void BaseProcessor::initialized()
 
     m_loadStatus = true;
     m_nextCycle = m_mcuStepsPT;
+    m_msimStep = 0;
 
     if( m_ramTable == 0l )
     {
         m_ramTable = new RamTable( this );
         MainWindow::self()->m_ramTabWidgetLayout->addWidget( m_ramTable );
         //qDebug() << "RmTable:" << m_ramTable;
+    }
+}
+
+void BaseProcessor::runSimuStep()
+{
+    Simulator::self()->runCircuitStep();
+    
+    m_msimStep++;
+    if( m_msimStep == 50000 ) // 20 fps
+    {
+        m_msimStep = 0;
+        
+        Simulator::self()->runGraphicStep();
+        PlotterWidget::self()->step();
     }
 }
 
@@ -203,8 +218,10 @@ void BaseProcessor::setRegisters() // get register addresses from data file
             int address   = 0;
             bool isNumber = false;
 
-            line.remove("EQU");
-            QStringList wordList = line.split(" "); // Split in words
+            line.remove(" ");
+            QStringList wordList = line.split("EQU"); // Split in words
+            if( wordList.size() < 2 ) continue;
+
             name    = wordList.takeFirst();
             while( addrtxt.isEmpty() ) addrtxt = wordList.takeFirst();
 
@@ -222,9 +239,11 @@ void BaseProcessor::setRegisters() // get register addresses from data file
 
 void BaseProcessor::uartOut( uint32_t value ) // Send value to OutPanelText
 {
+    //qDebug()<<"BaseProcessor::uartOut" << value;
     if( m_usartTerm )
     {
-        TerminalWidget::self()->uartOut( value );
+        if( value != 13 ) // '\r'
+            TerminalWidget::self()->uartOut( value );
     }
     if( m_serialPort )
     {
@@ -238,6 +257,7 @@ void BaseProcessor::uartOut( uint32_t value ) // Send value to OutPanelText
 
 void BaseProcessor::uartIn( uint32_t value ) // Receive one byte on Uart
 {
+    //qDebug()<<"BaseProcessor::uartIn" << value;
     if( m_usartTerm )
     {
         TerminalWidget::self()->uartIn( value );

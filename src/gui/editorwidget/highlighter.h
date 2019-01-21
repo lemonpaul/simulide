@@ -40,6 +40,8 @@ class Highlighter : public QSyntaxHighlighter
         void readSintaxFile( const QString &fileName );
 
         void addRegisters( QStringList patterns );
+        
+        void setMultiline( bool set );
 
     protected:
         void highlightBlock(const QString &text);
@@ -55,6 +57,7 @@ class Highlighter : public QSyntaxHighlighter
         void addRule( QTextCharFormat, QString );
         void processRule( HighlightingRule rule, QString lcText );
 
+        bool m_multiline;
         
         QVector<HighlightingRule> m_highlightingRules;
 

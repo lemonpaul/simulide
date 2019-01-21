@@ -21,12 +21,23 @@
 #include "simulator.h"
 #include "circuit.h"
 
+#include <math.h>
+
+static const char* RelayBase_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Rcoil"),
+    QT_TRANSLATE_NOOP("App::Property","Itrig"),
+    QT_TRANSLATE_NOOP("App::Property","Poles"),
+    QT_TRANSLATE_NOOP("App::Property","DT"),
+    QT_TRANSLATE_NOOP("App::Property","Norm Close")
+};
 
 RelayBase::RelayBase( QObject* parent, QString type, QString id )
          : Component( parent, type, id )
          , eInductor( id.toStdString() )
 {
-    // This is a "real" coil, so is an Inductor in series with a Resistor: -Ind-Nod-Res-
+    Q_UNUSED( RelayBase_properties );
+    
+    // This represents a coil, so is an Inductor in series with a Resistor: -Ind-Nod-Res-
     // We need to create the resistor, internal eNode and do the connections.
 
     m_numthrows = 0;

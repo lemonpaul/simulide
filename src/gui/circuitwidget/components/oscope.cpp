@@ -24,6 +24,10 @@
 #include "circuitwidget.h"
 #include "oscopewidget.h"
 
+static const char* Oscope_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Filter")
+};
+
 Component* Oscope::construct( QObject* parent, QString type, QString id )
 {
     return new Oscope( parent, type, id );
@@ -44,6 +48,8 @@ Oscope::Oscope( QObject* parent, QString type, QString id )
       , eElement( (id+"-eElement").toStdString() )
       , m_topW( )
 {
+    Q_UNUSED( Oscope_properties );
+    
     m_area = QRectF( -115, -65, 230, 130 );
     
     m_pin.resize(2);
@@ -72,7 +78,7 @@ Oscope::Oscope( QObject* parent, QString type, QString id )
     m_proxy->setPos( QPoint( -110, -60) );
     //m_proxy->setFlag(QGraphicsItem::ItemNegativeZStacksBehindParent, true );
     
-    Simulator::self()->addToUpdateList( this );
+    //Simulator::self()->addToUpdateList( this );
 }
 
 Oscope::~Oscope() 

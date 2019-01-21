@@ -49,9 +49,11 @@ double eResistor::res() { return m_resist; }
 
 void eResistor::setRes( double resist )
 {
-    if( resist<1e-9 ) resist = 1e-9;
+    if( resist < 1e-12 ) resist = 1e-12;
+    
     m_admit = 1/resist;
     m_resist = resist;
+    
     stamp();
 }
 

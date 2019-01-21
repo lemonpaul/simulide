@@ -1,0 +1,45 @@
+<circuit noLinAcc="5" type="simulide_0.1" reactStep="50" noLinStep="10" speed="1000000">
+ 
+74HC4020-5: 
+<item id="74HC4020-5" vflip="1" labelx="-9" labelrot="0" rotation="0" x="-388" objectName="74HC4020-5" Show_id="true" y="-76" valLabRot="0" valLabely="0" hflip="1" itemtype="Subcircuit" labely="-18" valLabelx="0"/>
+ 
+Clock-4: 
+<item Voltage="5" labelrot="0" Running="true" valLabRot="0" id="Clock-4" Show_Volt="true" y="28" labelx="-64" valLabely="8" objectName="Clock-4" itemtype="Clock" vflip="1" x="-380" Unit=" V" Show_id="false" valLabelx="-16" rotation="0" labely="-24" hflip="1" Freq="10"/>
+ 
+Fixed Volt.-3: 
+<item Voltage="5" labelrot="0" valLabRot="0" id="Fixed Volt.-3" Show_Volt="true" y="52" labelx="-64" valLabely="8" objectName="Fixed Volt.-3" itemtype="Fixed Voltage" vflip="1" x="-332" Unit=" V" Show_id="false" valLabelx="-16" rotation="0" labely="-24" hflip="1"/>
+ 
+Probe-2: 
+<item id="Probe-2" PlotterCh="0" vflip="1" labelx="16" labelrot="45" rotation="-45" x="-268" Show_volt="true" objectName="Probe-2" Show_id="false" y="-28" valLabRot="45" valLabely="0" hflip="1" itemtype="Probe" labely="-16" valLabelx="16"/>
+ 
+7 Seg BCD-1: 
+<item id="7 Seg BCD-1" vflip="1" labelx="-16" labelrot="0" rotation="0" x="-428" objectName="7 Seg BCD-1" Show_id="false" y="-108" valLabRot="0" valLabely="0" hflip="1" itemtype="7-Seg BCD" labely="-24" valLabelx="0"/>
+ 
+Connector-6: 
+<item labelrot="0" valLabRot="0" id="Connector-6" endpinid="74HC4020-5-!CP" y="28" labelx="-16" valLabely="0" objectName="Connector-6" itemtype="Connector" enodeid="Circ_eNode-7" vflip="1" x="-364" Show_id="false" valLabelx="0" pointList="-364,28,-324,28,-324,-20,-348,-20" rotation="0" startpinid="Clock-4-outnod" labely="-24" hflip="1"/>
+ 
+Connector-8: 
+<item labelrot="0" valLabRot="0" id="Connector-8" endpinid="74HC4020-5-MR" y="52" labelx="-16" valLabely="0" objectName="Connector-8" itemtype="Connector" enodeid="Circ_eNode-9" vflip="1" x="-316" Show_id="false" valLabelx="0" pointList="-316,52,-316,-28,-348,-28" rotation="0" startpinid="Fixed Volt.-3-outnod" labely="-24" hflip="1"/>
+ 
+Connector-10: 
+<item labelrot="0" valLabRot="0" id="Connector-10" endpinid="74HC4020-5-Q0" y="-12" labelx="-16" valLabely="0" objectName="Connector-10" itemtype="Connector" enodeid="Circ_eNode-11" vflip="1" x="-284" Show_id="false" valLabelx="0" pointList="-284,-12,-348,-12" rotation="0" startpinid="Probe-2-inpin" labely="-24" hflip="1"/>
+ 
+Connector-12: 
+<item labelrot="0" valLabRot="0" id="Connector-12" endpinid="74HC4020-5-Q3" y="-76" labelx="-16" valLabely="0" objectName="Connector-12" itemtype="Connector" enodeid="Circ_eNode-13" vflip="1" x="-412" Show_id="false" valLabelx="0" pointList="-412,-76,-412,-20,-396,-20" rotation="0" startpinid="7 Seg BCD-1-in0" labely="-24" hflip="1"/>
+ 
+Connector-14: 
+<item labelrot="0" valLabRot="0" id="Connector-14" endpinid="74HC4020-5-Q4" y="-76" labelx="-16" valLabely="0" objectName="Connector-14" itemtype="Connector" enodeid="Circ_eNode-15" vflip="1" x="-420" Show_id="false" valLabelx="0" pointList="-420,-76,-420,-36,-396,-36" rotation="0" startpinid="7 Seg BCD-1-in1" labely="-24" hflip="1"/>
+ 
+Connector-16: 
+<item labelrot="0" valLabRot="0" id="Connector-16" endpinid="74HC4020-5-Q5" y="-76" labelx="-16" valLabely="0" objectName="Connector-16" itemtype="Connector" enodeid="Circ_eNode-17" vflip="1" x="-428" Show_id="false" valLabelx="0" pointList="-428,-76,-428,-44,-396,-44" rotation="0" startpinid="7 Seg BCD-1-in2" labely="-24" hflip="1"/>
+ 
+Connector-18: 
+<item labelrot="0" valLabRot="0" id="Connector-18" endpinid="74HC4020-5-Q6" y="-76" labelx="-16" valLabely="0" objectName="Connector-18" itemtype="Connector" enodeid="Circ_eNode-19" vflip="1" x="-436" Show_id="false" valLabelx="0" pointList="-436,-76,-436,-28,-396,-28" rotation="0" startpinid="7 Seg BCD-1-in3" labely="-24" hflip="1"/>
+ 
+PlotterWidget-154: 
+<item locale="" minimumSize="" focus="false" contextMenuPolicy="1" accessibleName="" size="" MinVolt="-500" font="Sans Serif,9,-1,5,50,0,0,0,0,0" sizeIncrement="" windowFilePath="" windowModified="false" acceptDrops="false" whatsThis="" childrenRegion="" objectName="PlotterWidget-154" windowTitle="" layoutDirection="0" enabled="true" baseSize="" focusPolicy="0" rect="" width="200" maximumHeight="200" pos="" autoFillBackground="false" styleSheet="" statusTip="" itemtype="Plotter" y="0" frameGeometry="" minimized="false" palette="" childrenRect="" geometry="" minimumHeight="200" windowOpacity="1" MaxVolt="500" frameSize="" maximumSize="" inputMethodHints="0" visible="false" updatesEnabled="true" sizeHint="" accessibleDescription="" maximized="false" mouseTracking="false" maximumWidth="1000" sizePolicy="" windowIconText="" fullScreen="false" toolTipDuration="-1" x="0" normalGeometry="" toolTip="" isActiveWindow="true" minimumWidth="200" windowIcon="" cursor="" modal="false" minimumSizeHint="" height="200" windowModality="0"/>
+ 
+SerialPortWidget-155: 
+<item locale="" minimumSize="" focus="false" contextMenuPolicy="1" accessibleName="" size="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" sizeIncrement="" windowFilePath="" windowModified="false" acceptDrops="false" whatsThis="" childrenRegion="" objectName="SerialPortWidget-155" windowTitle="Configuracion" layoutDirection="0" enabled="true" SettingsProp="ttyS0,0,3,0,0,0" baseSize="" focusPolicy="0" rect="" width="313" maximumHeight="170" pos="" autoFillBackground="false" styleSheet="" statusTip="" itemtype="SerialPort" y="0" frameGeometry="" minimized="false" palette="" childrenRect="" geometry="" minimumHeight="0" windowOpacity="1" frameSize="" maximumSize="" inputMethodHints="0" visible="false" updatesEnabled="true" sizeHint="" accessibleDescription="" maximized="false" mouseTracking="false" maximumWidth="450" sizePolicy="" windowIconText="" fullScreen="false" toolTipDuration="-1" x="0" normalGeometry="" toolTip="" isActiveWindow="true" minimumWidth="0" windowIcon="" cursor="" modal="false" minimumSizeHint="" height="141" windowModality="0"/>
+ 
+</circuit>

@@ -21,6 +21,11 @@
 #include "connector.h"
 #include "pin.h"
 
+static const char* Diode_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Threshold"),
+    QT_TRANSLATE_NOOP("App::Property","Zener Volt")
+};
+
 Component* Diode::construct( QObject* parent, QString type, QString id )
 { return new Diode( parent, type, id ); }
 
@@ -35,8 +40,11 @@ LibraryItem* Diode::libraryItem()
 }
 
 Diode::Diode( QObject* parent, QString type, QString id )
-    : Component( parent, type, id ), eDiode( id.toStdString() )
+     : Component( parent, type, id )
+     , eDiode( id.toStdString() )
 {
+    Q_UNUSED( Diode_properties );
+    
     m_pin.resize(2);
     QString nodid = m_id;
     nodid.append(QString("-lPin"));

@@ -1,0 +1,57 @@
+<circuit type="simulide_0.1">
+ 
+Rail.-38: 
+<item Voltage="5" valLabRot="0" valLabelx="8" valLabely="-22" labelrot="0" y="-348" objectName="Rail.-38" id="Rail.-38" vflip="1" rotation="0" Show_id="false" labelx="-64" x="-236" itemtype="Rail" Unit=" V" Show_Volt="true" labely="-24" hflip="-1"/>
+ 
+pic16f877a-2: 
+<item y="-300" labelrot="0" Mhz="16" itemtype="PIC" Show_id="true" labelx="-8" labely="-17" valLabely="0" hflip="1" rotation="0" valLabelx="0" valLabRot="0" program="KS0108_16f877a.hex" objectName="pic16f877a-2" vflip="1" id="pic16f877a" x="-252"/>
+ 
+Ks0108-1: 
+<item y="-300" labelrot="0" itemtype="Ks0108" Show_id="true" labelx="-29" labely="-72" valLabely="0" hflip="1" rotation="0" valLabelx="0" valLabRot="0" objectName="Ks0108-1" vflip="1" id="Ks0108" x="-372" CS_Active_Low="true"/>
+ 
+Connector-3: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-164" objectName="Connector-3" id="Connector-3" vflip="1" pointList="-260,-164,-428,-164,-428,-244" rotation="0" Show_id="false" enodeid="Circ_eNode-4" labelx="-16" endpinid="Ks0108-1-PinRst" x="-260" startpinid="pic16f877a-2-RC2" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-5: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-148" objectName="Connector-5" id="Connector-5" vflip="1" pointList="-260,-148,-404,-148,-404,-244" rotation="0" Show_id="false" enodeid="Circ_eNode-6" labelx="-16" endpinid="Ks0108-1-dataPin0" x="-260" startpinid="pic16f877a-2-RD0" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-7: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-140" objectName="Connector-7" id="Connector-7" vflip="1" pointList="-260,-140,-396,-140,-396,-244" rotation="0" Show_id="false" enodeid="Circ_eNode-8" labelx="-16" endpinid="Ks0108-1-dataPin1" x="-260" startpinid="pic16f877a-2-RD1" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-9: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-140" objectName="Connector-9" id="Connector-9" vflip="1" pointList="-196,-140,-196,-124,-388,-124,-388,-244" rotation="0" Show_id="false" enodeid="Circ_eNode-10" labelx="-16" endpinid="Ks0108-1-dataPin2" x="-196" startpinid="pic16f877a-2-RD2" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-11: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-244" objectName="Connector-11" id="Connector-11" vflip="1" pointList="-380,-244,-380,-116,-188,-116,-188,-148,-196,-148" rotation="0" Show_id="false" enodeid="Circ_eNode-12" labelx="-16" endpinid="pic16f877a-2-RD3" x="-380" startpinid="Ks0108-1-dataPin3" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-13: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-204" objectName="Connector-13" id="Connector-13" vflip="1" pointList="-196,-204,-164,-204,-164,-92,-356,-92,-356,-244" rotation="0" Show_id="false" enodeid="Circ_eNode-14" labelx="-16" endpinid="Ks0108-1-dataPin6" x="-196" startpinid="pic16f877a-2-RD6" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-15: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-188" objectName="Connector-15" id="Connector-15" vflip="1" pointList="-196,-188,-180,-188,-180,-108,-372,-108,-372,-244" rotation="0" Show_id="false" enodeid="Circ_eNode-16" labelx="-16" endpinid="Ks0108-1-dataPin4" x="-196" startpinid="pic16f877a-2-RD4" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-17: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-244" objectName="Connector-17" id="Connector-17" vflip="1" pointList="-364,-244,-364,-100,-172,-100,-172,-196,-196,-196" rotation="0" Show_id="false" enodeid="Circ_eNode-18" labelx="-16" endpinid="pic16f877a-2-RD5" x="-364" startpinid="Ks0108-1-dataPin5" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-19: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-244" objectName="Connector-19" id="Connector-19" vflip="1" pointList="-324,-244,-324,-236,-260,-236" rotation="0" Show_id="false" enodeid="Circ_eNode-20" labelx="-16" endpinid="pic16f877a-2-RE0" x="-324" startpinid="Ks0108-1-PinDC" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-21: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-244" objectName="Connector-21" id="Connector-21" vflip="1" pointList="-332,-244,-332,-228,-260,-228" rotation="0" Show_id="false" enodeid="Circ_eNode-22" labelx="-16" endpinid="pic16f877a-2-RE1" x="-332" startpinid="Ks0108-1-PinRW" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-23: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-244" objectName="Connector-23" id="Connector-23" vflip="1" pointList="-340,-244,-340,-220,-260,-220" rotation="0" Show_id="false" enodeid="Circ_eNode-24" labelx="-16" endpinid="pic16f877a-2-RE2" x="-340" startpinid="Ks0108-1-PinEn" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-25: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-244" objectName="Connector-25" id="Connector-25" vflip="1" pointList="-348,-244,-348,-84,-156,-84,-156,-212,-196,-212" rotation="0" Show_id="false" enodeid="Circ_eNode-26" labelx="-16" endpinid="pic16f877a-2-RD7" x="-348" startpinid="Ks0108-1-dataPin7" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-27: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-244" objectName="Connector-27" id="Connector-27" vflip="1" pointList="-420,-244,-420,-172,-260,-172" rotation="0" Show_id="false" enodeid="Circ_eNode-28" labelx="-16" endpinid="pic16f877a-2-RC1" x="-420" startpinid="Ks0108-1-PinCs2" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-29: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-180" objectName="Connector-29" id="Connector-29" vflip="1" pointList="-260,-180,-412,-180,-412,-244" rotation="0" Show_id="false" enodeid="Circ_eNode-30" labelx="-16" endpinid="Ks0108-1-PinCs1" x="-260" startpinid="pic16f877a-2-RC0" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+Connector-39: 
+<item valLabRot="0" valLabelx="0" valLabely="0" labelrot="0" y="-348" objectName="Connector-39" id="Connector-39" vflip="1" pointList="-252,-348,-276,-348,-276,-292,-260,-292" rotation="0" Show_id="false" enodeid="enode-39" labelx="-16" endpinid="pic16f877a-2-MCLR" x="-252" startpinid="Rail.-38-outnod" itemtype="Connector" labely="-24" hflip="1"/>
+ 
+</circuit>

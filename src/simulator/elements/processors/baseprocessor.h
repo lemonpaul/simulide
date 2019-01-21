@@ -50,6 +50,7 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
         virtual void setSteps( int steps );
         virtual void step()=0;
         virtual void stepOne()=0;
+        virtual void stepCpu()=0;
         virtual void reset()=0;
         virtual int  pc()=0;
         
@@ -73,12 +74,15 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
  
         virtual void setRegisters();
         virtual int  validate( int address )=0;
+        
+        void runSimuStep();
 
         QString m_symbolFile;
         QString m_dataFile;
         QString m_device;
         
         int  m_mcuStepsPT;
+        int  m_msimStep;
         unsigned long m_nextCycle;
 
         RamTable* m_ramTable;

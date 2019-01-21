@@ -26,7 +26,7 @@
 class MAINMODULE_EXPORT Diode : public Component, public eDiode
 {
     Q_OBJECT
-    Q_PROPERTY( double threshold  READ threshold WRITE setThreshold DESIGNABLE true USER true )
+    Q_PROPERTY( double Threshold  READ threshold WRITE setThreshold DESIGNABLE true USER true )
     Q_PROPERTY( double Zener_Volt READ zenerV    WRITE setZenerV    DESIGNABLE true USER true )
     
 

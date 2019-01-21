@@ -19,12 +19,18 @@
 
 #include "probe.h"
 #include "connector.h"
+#include "connectorline.h"
+#include "e-source.h"
 #include "simulator.h"
 #include "itemlibrary.h"
 #include "circuitwidget.h"
+#include "pin.h"
 
-bool     Probe::m_oscopeBusy = false;
-QString* Probe::m_helpStatic=0l;
+#include <math.h>
+
+static const char* Probe_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","PlotterCh")
+};
 
 Component* Probe::construct( QObject* parent, QString type, QString id )
 { return new Probe( parent, type, id ); }
@@ -43,11 +49,13 @@ Probe::Probe( QObject* parent, QString type, QString id )
      : Component( parent, type, id )
      , eElement( id.toStdString() )
 {
+    Q_UNUSED( Probe_properties );
+    
+    m_area = QRect( -8, -8, 16, 16 );
     m_readPin = 0l;
     m_readConn = 0l;
-    //m_haveOscope = false;
     m_voltTrig = 2.5;
-    m_plotterLine = -1;
+    m_plotterLine = 0;
     m_plotterColor = QColor( 255, 255, 255 );
 
     // Create Input Pin
@@ -57,7 +65,7 @@ Probe::Probe( QObject* parent, QString type, QString id )
     QPoint nodpos = QPoint(-22,0);
     m_inputpin = new Pin( 180, nodpos, nodid, 0, this);
     m_inputpin->setLength( 20 );
-    m_inputpin->setBoundingRect( QRect(-2, -2, 4, 4) );
+    m_inputpin->setBoundingRect( QRect(-2, -2, 6, 4) );
     
     nodid.append( QString("-eSource") );
     m_inSource = new eSource( nodid.toStdString(), m_inputpin );
@@ -74,13 +82,6 @@ Probe::Probe( QObject* parent, QString type, QString id )
     setShowVal( true );
     
     setLabelPos( 16, -16 , 45 );
-    
-    if( !m_helpStatic  )         // Only load Help Text once for a class
-    {
-        m_helpStatic = new QString();
-        m_helpStatic->append( getHelp( "help/probe.txt" ) );
-    }
-    m_help = m_helpStatic;
 
     Simulator::self()->addToUpdateList( this );
 }
@@ -118,9 +119,9 @@ void Probe::updateStep()
     {
         if( it->type() == 65536 )                           // Component
         {
-            ConnectorLine *line =  qgraphicsitem_cast<ConnectorLine*>( it );
+            ConnectorLine* line =  qgraphicsitem_cast<ConnectorLine*>( it );
 
-            Connector *con = line->connector();
+            Connector* con = line->connector();
 
             if( con->objectName().startsWith("Connector") ) // Connector found
             {
@@ -151,7 +152,7 @@ void Probe::setVolt( double volt )
     
     m_valLabel->setPlainText( QString("%1 V").arg(double(dispVolt)/100) );
 
-    if( m_plotterLine > -1 ) PlotterWidget::self()->setData(m_plotterLine, m_voltIn*100 );
+    if( m_plotterLine > 0 ) PlotterWidget::self()->setData(m_plotterLine, m_voltIn*100 );
 
     update();       // Repaint
 }
@@ -176,12 +177,26 @@ void Probe::remove()
     Component::remove();
 }
 
+int Probe::plotter()
+{
+    return m_plotterLine ;
+}
+
+void Probe::setPlotter( int channel )
+{
+    m_plotterLine = channel;
+    if( channel == 0 ) return;
+    PlotterWidget::self()->addChannel( channel );
+    PlotterWidget::self()->setData( m_plotterLine, int(m_voltIn*100) );
+    m_plotterColor = PlotterWidget::self()->getColor( m_plotterLine );
+}
+
 void Probe::slotPlotterAdd()
 {
-    if( m_plotterLine != -1 ) return;            // Already have plotter
+    if( m_plotterLine != 0 ) return;            // Already have plotter
     
-    m_plotterLine = PlotterWidget::self()->addChannel();
-    if( m_plotterLine < 0 ) return;
+    m_plotterLine = PlotterWidget::self()->getChannel();
+    if( m_plotterLine < 1 ) return;
 
     PlotterWidget::self()->setData( m_plotterLine, int(m_voltIn*100) );
     m_plotterColor = PlotterWidget::self()->getColor( m_plotterLine );
@@ -191,10 +206,10 @@ void Probe::slotPlotterAdd()
 void Probe::slotPlotterRem()
 {
     //qDebug() << m_plotterLine;
-    if( m_plotterLine < 0 ) return;              // No plotter to remove
+    if( m_plotterLine == 0 ) return;              // No plotter to remove
 
     PlotterWidget::self()->remChannel( m_plotterLine );
-    m_plotterLine = -1;
+    m_plotterLine = 0;
     update();       // Repaint
 }
 
@@ -203,10 +218,10 @@ void Probe::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     event->accept();
     QMenu *menu = new QMenu();
 
-    QAction *plotterAddAction = menu->addAction(QIcon(":/fileopen.png"),"Add to Plotter");
+    QAction *plotterAddAction = menu->addAction(QIcon(":/fileopen.png"),tr("Add to Plotter"));
     connect(plotterAddAction, SIGNAL(triggered()), this, SLOT(slotPlotterAdd()));
 
-    QAction *plotterRemAction = menu->addAction(QIcon(":/fileopen.png"),"Remove from Plotter");
+    QAction *plotterRemAction = menu->addAction(QIcon(":/fileopen.png"),tr("Remove from Plotter"));
     connect(plotterRemAction, SIGNAL(triggered()), this, SLOT(slotPlotterRem()));
     
     menu->addSeparator();
@@ -215,15 +230,32 @@ void Probe::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     menu->deleteLater();
 }
 
+QPainterPath Probe::shape() const
+{
+    QPainterPath path;
+    path.addEllipse( m_area );
+    return path;
+}
+
 void Probe::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
     Component::paint( p, option, widget );
 
-    if( m_plotterLine > -1 )            p->setBrush( m_plotterColor );
+    if( m_plotterLine > 0 )           p->setBrush( m_plotterColor );
     else if ( m_voltIn > m_voltTrig)  p->setBrush( QColor( 255, 166, 0 ) );
     else                              p->setBrush( QColor( 230, 230, 255 ) );
 
-    p->drawEllipse( -8, -8, 16, 16 );
+    p->drawEllipse( m_area );
+    
+    if( m_plotterLine > 0 )
+    {
+        //p->drawLine(-4,-7,-5,-1 );
+        p->drawLine(-5,-1, 1,-3 );
+        p->drawLine( 1,-3,-1, 3 );
+        p->drawLine(-1, 3, 5, 1 );
+        //p->drawLine( 6, 1, 4, 7 );
+        //p->drawLine( 5, 3, 8,  0 );
+    }
 }
 
 #include "moc_probe.cpp"

@@ -8,29 +8,43 @@
 class MAINMODULE_EXPORT TextComponent : public Component
 {
     Q_OBJECT
-    Q_PROPERTY( QString  text  READ getText WRITE setText )
-    Q_PROPERTY( bool Fixed_Width READ fixedW WRITE setFixedW DESIGNABLE true USER true )
-    Q_PROPERTY( int  Margin      READ margin WRITE setMargin DESIGNABLE true USER true )
-    Q_PROPERTY( int  Border      READ border WRITE setBorder DESIGNABLE true USER true )
+    Q_PROPERTY( QString  Text  READ getText    WRITE setText )
+    Q_PROPERTY( QString  Font  READ getFont    WRITE setFont     DESIGNABLE true USER true )
+    Q_PROPERTY( bool Fixed_Width READ fixedW   WRITE setFixedW   DESIGNABLE true USER true )
+    Q_PROPERTY( int  Font_Size   READ fontSize WRITE setFontSize DESIGNABLE true USER true )
+    Q_PROPERTY( int  Margin      READ margin   WRITE setMargin   DESIGNABLE true USER true )
+    Q_PROPERTY( int  Border      READ border   WRITE setBorder   DESIGNABLE true USER true )
     
     public:
         TextComponent( QObject* parent, QString type, QString id );
         ~TextComponent();
+        
+        QRectF boundingRect() const 
+        { 
+            return QRectF( m_area.x()-m_border/2-1, m_area.y()-m_border/2-1, 
+                           m_area.width()+m_border+2, m_area.height()+m_border+2 ); 
+        }
 
  static Component* construct( QObject* parent, QString type, QString id );
  static LibraryItem *libraryItem();
  
-        int margin() { return m_margin; }
+        int  margin();
         void setMargin( int margin );
         
-        int border() { return m_border; }
-        void setBorder( int border ) { m_border = border; }
+        int  border();
+        void setBorder( int border );
         
-        bool fixedW() { return m_fixedW; }
+        int  fontSize();
+        void setFontSize( int size );
+        
+        bool fixedW();
         void setFixedW( bool fixedW );
 
-        QString getText() { return m_text->toPlainText(); }
-        void setText( QString text ) { m_text->document()->setPlainText( text ); }
+        QString getText();
+        void    setText( QString text );
+        
+        QString getFont();
+        void    setFont( QString font );
 
         void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
@@ -42,9 +56,12 @@ class MAINMODULE_EXPORT TextComponent : public Component
     private:
         QGraphicsTextItem* m_text;
         
+        int  m_fontSize;
         int  m_margin;
         int  m_border;
         bool m_fixedW;
+        
+        QString m_font;
 };
 
 #endif // TEXTCOMPONENT_H

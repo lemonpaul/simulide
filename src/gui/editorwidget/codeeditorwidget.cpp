@@ -27,7 +27,7 @@ CodeEditorWidget::CodeEditorWidget( QWidget *parent ) :
 
     createWidgets();
 
-    m_outPane->appendPlainText(tr("Ready\n"));
+    m_outPane->appendPlainText( tr("Ready")+"\n" );
 }
 
 CodeEditorWidget::~CodeEditorWidget()

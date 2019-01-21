@@ -24,8 +24,8 @@
 #include <math.h>   // fabs(x,y)
 
 OscopeWidget::OscopeWidget(  QWidget *parent  )
-    : QWidget( parent )
-    , eElement( "oscope" )
+            : QWidget( parent )
+            , eElement( "oscope" )
 {
     this->setVisible( false );
 
@@ -74,7 +74,7 @@ void OscopeWidget::setOscope( Oscope* oscope )
 
 void OscopeWidget::read()
 {
-    m_reading = true;
+    //m_reading = true;
 }
 
 void OscopeWidget::clear()
@@ -170,6 +170,7 @@ void OscopeWidget::simuClockStep()
             {
                 if( m_numMax > 0 ) 
                     m_freq = 1e6/(m_newReadCount-m_lastMax);
+                    if( m_freq < 0 ) m_freq = 0;
 
                 m_lastMax = m_newReadCount;
             }
@@ -183,8 +184,9 @@ void OscopeWidget::simuClockStep()
         m_falling = true;
         m_lastData = data;
     }
-    if( ++m_stepCount == 50000 )                          // 5 ms Update
+    if( ++m_stepCount == 50000 )                         // 50 ms Update
     {
+        m_reading = true;
         m_stepCount = 0;
         
         double tick = 20*m_Hscale;
@@ -203,14 +205,14 @@ void OscopeWidget::simuClockStep()
         }
         m_tickLabel->setText( "Div:  "+QString::number( val,'f', 2)+unit );
         m_ampLabel->setText(  "Amp: " +QString::number( m_ampli,'f', 2)+" V" );
-
+        
         if( ++m_updtCount >= 20 )                        // 1 Seg Update
         {
+            m_freqLabel->setText( "Freq: "+QString::number(m_freq)+" Hz" );
             m_haveFreq = true;
             m_freq = m_numMax; 
             m_updtCount = 0;
             m_numMax = 0;
-            m_freqLabel->setText( "Freq: "+QString::number(m_freq)+" Hz" );
         }
     }
     if( m_counter == 140 )                   // DataSet Ready to display
@@ -328,7 +330,7 @@ void OscopeWidget::setupWidget(  int size  )
     m_freqLabel = new QLabel( "Freq: 0 Hz", this );
     
     QFont font = m_freqLabel->font();
-    font.setPointSize(8);
+    font.setPixelSize(10);
     font.setBold(true);
     
     m_freqLabel->setFont(font);
@@ -354,14 +356,14 @@ void OscopeWidget::setupWidget(  int size  )
     //m_autoCheck->setLayoutDirection(Qt::RightToLeft);
     m_autoCheck->setChecked( true );
     m_autoCheck->setFixedSize( 38, 16 );
-    font.setPointSize(7);
+    font.setPixelSize(9);
     m_autoCheck->setFont( font );
     row2Layout->addWidget( m_autoCheck );
     
     QLabel* HLabel = new QLabel( "H", this );
     HLabel->setAlignment( Qt::AlignBottom | Qt::AlignHCenter );
     HLabel->setFixedSize( 14, 16 );
-    font.setPointSize(8);
+    font.setPixelSize(10);
     HLabel->setFont( font );
     row2Layout->addWidget( HLabel );
     

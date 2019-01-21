@@ -20,10 +20,10 @@
 #ifndef SUBCIRCUIT_H
 #define SUBCIRCUIT_H
 
-#include "package.h"
+#include "chip.h"
 #include "itemlibrary.h"
 
-class MAINMODULE_EXPORT SubCircuit : public Package
+class MAINMODULE_EXPORT SubCircuit : public Chip
 {
     Q_OBJECT
 
@@ -36,7 +36,7 @@ class MAINMODULE_EXPORT SubCircuit : public Package
         static LibraryItem * libraryItem();
 
         virtual void initialize();
-        virtual void initPackage();
+        virtual void initChip();
     
     public slots:
         virtual void remove();

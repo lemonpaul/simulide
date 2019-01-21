@@ -44,6 +44,9 @@ class MAINMODULE_EXPORT LogicComponent : public Component
         
     protected:
         Pin* createPin( QString data , QString pinId );
+        
+        void deleteInputs( int inputs );
+        void deleteOutputs( int inputs );
     
         std::vector<Pin*> m_inPin;
         std::vector<Pin*> m_outPin;

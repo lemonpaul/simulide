@@ -17,7 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QDebug>
+//#include <QDebug>
+//#include <math.h>
 
 #include "e-diode.h"
 #include "e-node.h"
@@ -76,7 +77,7 @@ void eDiode::setVChanged()
     double deltaR = m_imped;
     double deltaV = m_threshold;
 
-    if( m_voltPN <= m_threshold )   // Not conducing
+    if( (m_threshold-m_voltPN) > 1e-6 )   // Not conducing
     {
         if( (m_zenerV > 0)&&(m_voltPN <-m_zenerV) )
             deltaV =-m_zenerV;

@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "simulator.h"
+#include "circuit.h"
 #include "matrixsolver.h"
 #include "e-element.h"
 #include "oscopewidget.h"
@@ -27,7 +28,8 @@
 #include "outpaneltext.h"
 #include "mcucomponent.h"
 #include "mainwindow.h"
-
+#include "circuitwidget.h"
+#include "baseprocessor.h"
 
 Simulator* Simulator::m_pSelf = 0l;
 
@@ -37,6 +39,7 @@ Simulator::Simulator( QObject* parent )
     m_pSelf = this;
 
     m_isrunning = false;
+    m_debugging = false;
     m_paused    = false;
 
     m_step       = 0;
@@ -46,13 +49,9 @@ Simulator::Simulator( QObject* parent )
     m_lastRefTime = 0;
     m_stepsPrea  = 50;
     m_stepsNolin = 10;
-    m_mcuStepsPT = 16;
     m_simuRate   = 1000000;
-    m_nlAcc = 5; // Non-Linear accuracy
+    m_noLinAcc = 5; // Non-Linear accuracy
 
-    //QThread      matrixThread;
-    //m_matrix.moveToThread( &m_mcuThread );
-    //matrixThread.start();
     m_RefTimer.start();
 }
 Simulator::~Simulator()
@@ -77,34 +76,34 @@ void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 m
     e->accept();
     
     if( !m_isrunning ) return;
-    if(!m_CircuitFuture.isFinished() ) return;
-    
     if( m_error ) 
     {
-        
         CircuitWidget::self()->powerCircOff();
         CircuitWidget::self()->setRate( -1 );
         return;
     }
-    //m_CircuitFuture.waitForFinished();
-    foreach( eElement* el, m_updateList ) el->updateStep();
-    m_CircuitFuture = QtConcurrent::run( this, &Simulator::runCircuit ); // Run Circuit in a parallel thread
-
-    // Run Graphic Elements
-    PlotterWidget::self()->step();
-    TerminalWidget::self()->step();
-    
+    if( !m_CircuitFuture.isFinished() ) // Stop remaining parallel thread 
+    {
+        m_isrunning = false;
+        m_CircuitFuture.waitForFinished();
+        m_isrunning = true;
+        //return;
+    }
     // Get Real Simulation Speed
-    qint64 refTime      = m_RefTimer.nsecsElapsed();
-    qint64 deltaRefTime = refTime-m_lastRefTime;
+    uint64_t refTime      = m_RefTimer.nsecsElapsed();
+    uint64_t deltaRefTime = refTime-m_lastRefTime;
 
     if( deltaRefTime >= 1e9 )          // We want steps per Sec = 1e9 ns
     {
-        qint64 stepsPerSec = (m_step-m_lastStep)*1e9/deltaRefTime;
+        stepsPerSec = (m_step-m_lastStep)*1e9/deltaRefTime;
         CircuitWidget::self()->setRate( (stepsPerSec*100)/m_simuRate );
         m_lastStep    = m_step;
         m_lastRefTime = refTime;
     }
+    runGraphicStep();
+    
+    // Run Circuit in parallel thread
+    m_CircuitFuture = QtConcurrent::run( this, &Simulator::runCircuit ); // Run Circuit in a parallel thread
 }
 
 void Simulator::runCircuit()
@@ -112,54 +111,72 @@ void Simulator::runCircuit()
     for( int i=0; i<m_circuitRate; i++ )
     {
         if( !m_isrunning ) return;
-        m_step ++;
-
-        // Run Reactive Elements
-        if( ++m_reacCounter == m_stepsPrea )
+        
+        // Run Graphic Elements
+        if( ++m_updtCounter >= m_circuitRate )
         {
-            m_reacCounter = 0;
-
-            foreach( eElement* el, m_reactiveList ) el->setVChanged();
-            m_reactiveList.clear();
+            m_updtCounter = 0;
+            
+            PlotterWidget::self()->step();
         }
-        // Run Sinchronized to Simulation Clock elements
-        foreach( eElement* el, m_simuClock ) el->simuClockStep();
-
-        // Run Fast elements
-        foreach( eElement* el, m_changedFast ) el->setVChanged();
-        m_changedFast.clear();
-
-        // Run Mcus
-        if( BaseProcessor::self() ) BaseProcessor::self()->step();
-
-        // Run Non-Linear elements
-        if( ++m_noLinCounter == m_stepsNolin )
-        {
-            m_noLinCounter = 0;
-            int counter = 0;
-            while( !m_nonLinear.isEmpty() ) // Run untill all converged
-            {
-                foreach( eElement* el, m_nonLinear ) el->setVChanged();
-                m_nonLinear.clear();
-
-                if( !m_eChangedNodeList.isEmpty() ) 
-                { 
-                    solveMatrix();
-                    if( !m_isrunning ) return;
-                }
-                
-                if( ++counter > 100 ) break; // Limit the number of loops
-            }
-            //if( counter > 0 ) qDebug() << "\nSimulator::runCircuit  Non-Linear Solved in steps:"<<counter;
-        }
-        if( !m_eChangedNodeList.isEmpty() ) 
-        { 
-            solveMatrix();
-            if( !m_isrunning ) return;
-        }
+        runCircuitStep();
     }
- }
+}
 
+void Simulator::runCircuitStep()
+{
+    m_step ++;
+
+    // Run Reactive Elements
+    if( ++m_reacCounter >= m_stepsPrea )
+    {
+        m_reacCounter = 0;
+        foreach( eElement* el, m_reactiveList ) el->setVChanged();
+        m_reactiveList.clear();
+    }
+
+    // Run Sinchronized to Simulation Clock elements
+    foreach( eElement* el, m_simuClock ) el->simuClockStep();
+
+    // Run Fast elements
+    foreach( eElement* el, m_changedFast ) el->setVChanged();
+    m_changedFast.clear();
+
+    if( BaseProcessor::self() && !m_debugging ) BaseProcessor::self()->step();
+
+    // Run Non-Linear elements
+    if( ++m_noLinCounter >= m_stepsNolin )
+    {
+        m_noLinCounter = 0;
+        int counter = 0;
+        while( !m_nonLinear.isEmpty() ) // Run untill all converged
+        {
+            foreach( eElement* el, m_nonLinear ) el->setVChanged();
+            m_nonLinear.clear();
+
+            if( !m_eChangedNodeList.isEmpty() ) 
+            { 
+                solveMatrix();
+                //if( !m_isrunning ) return;
+            }
+            if( ++counter > 200 ) break; // Limit the number of loops
+        }
+        //if( counter > 0 ) qDebug() << "\nSimulator::runCircuit  Non-Linear Solved in steps:"<<counter;
+    }
+    if( !m_eChangedNodeList.isEmpty() ) 
+    { 
+        solveMatrix();
+        if( !m_isrunning ) return;
+    }
+}
+
+void Simulator::runGraphicStep()
+{
+    foreach( eElement* el, m_updateList ) el->updateStep();
+    TerminalWidget::self()->step();
+    if( Circuit::self()->animate() ) Circuit::self()->update();
+}
+ 
 void Simulator::runExtraStep()
 {
     if( !m_eChangedNodeList.isEmpty() ) 
@@ -175,20 +192,38 @@ void Simulator::runExtraStep()
 
 void Simulator::runContinuous()
 {
+    if( m_debugging )
+    {
+        debug();
+        emit resumeDebug();
+        return;
+    }
+    simuRateChanged( m_simuRate );
+    startSim();
+    m_debugging = false;
+    std::cout << "\n    Running \n"<<std::endl;
+    m_timerId = this->startTimer( m_timerTick );
+}
+
+void Simulator::debug()
+{
+    startSim();
+    m_debugging = true;
+    std::cout << "\n    Debugging \n"<<std::endl;
+}
+
+void Simulator::startSim()
+{
     m_nonLinear.clear();
     m_changedFast.clear();
     m_reactiveList.clear();
     m_eChangedNodeList.clear();
-
+    
     foreach( eElement* el, m_elementList )    // Initialize all Elements
     {
-        if( !m_paused )
-        {
-            //std::cout << "el->resetState()<< getId()
-            //      <<  std::endl;
-            el->resetState();
-            m_paused = false;
-        }
+        //std::cout << "initializing  "<< el->getId()
+        //          <<  std::endl;
+        if( !m_paused ) el->resetState();
         el->initialize();
     }
     // Initialize Matrix
@@ -198,28 +233,33 @@ void Simulator::runContinuous()
     // m_matrix.printMatrix();
     if( !m_matrix.solveMatrix() )
     {
-        std::cout << "Simulator::runContinuous, Failed to solve Matrix"
+        std::cout << "Simulator::startSim, Failed to solve Matrix"
                   <<  std::endl;
         CircuitWidget::self()->powerCircOff();
         CircuitWidget::self()->setRate( -1 );
         return;
     }
-    
     m_reacCounter  = 0;
     m_noLinCounter = 0;
-
-    simuRateChanged( m_simuRate );
-
     m_isrunning = true;
+    m_paused = false;
     m_error = false;
-    std::cout << "\n    Running \n"<<std::endl;
-    m_timerId = this->startTimer( m_timerTick );
+}
+
+void Simulator::stopDebug()
+{
+    m_debugging = false;
 }
 
 void Simulator::stopSim()
 {
     if( !m_isrunning ) return;
-
+    
+    if( m_debugging ) emit pauseDebug();
+    
+    m_paused = false;
+    m_isrunning = false;
+    
     stopTimer();
 
     foreach( eNode* node,  m_eNodeList  )  node->setVolt( 0 );
@@ -233,12 +273,35 @@ void Simulator::stopSim()
     if( McuComponent::self() ) McuComponent::self()->reset();
 
     CircuitWidget::self()->setRate( 0 );
+    Circuit::self()->update();
+    
+    std::cout << "\n    Simulation Stopped \n" << std::endl;
 }
 
 void Simulator::pauseSim()
 {
-    stopTimer();
+    if( m_debugging ) emit pauseDebug();
+    
+    m_isrunning = false;
     m_paused = true;
+    
+    stopTimer();
+    
+    std::cout << "\n    Simulation Paused \n" << std::endl;
+}
+
+void Simulator::resumeSim()
+{
+    m_isrunning = true;
+    m_paused = false;
+    
+    if( m_debugging )
+    {
+        emit resumeDebug();
+        return;
+    }
+    std::cout << "\n    Resuming Simulation\n" << std::endl;
+    m_timerId = this->startTimer( m_timerTick );
 }
 
 void Simulator::stopTimer()
@@ -247,18 +310,13 @@ void Simulator::stopTimer()
     {
         this->killTimer( m_timerId );
         m_timerId = 0;
+        m_CircuitFuture.waitForFinished();
     }
-    m_isrunning = false;
-    std::cout << "\n    Simulation Stopped \n" << std::endl;
-
-    m_CircuitFuture.waitForFinished();
 }
 
-void Simulator::resumeSim()
+void Simulator::resumeTimer()
 {
-    std::cout << "\n    Resuming Simulation\n" << std::endl;
-    m_timerId = this->startTimer( m_timerTick );
-    m_isrunning = true;
+    if( m_timerId == 0 ) m_timerId = this->startTimer( m_timerTick );
 }
 
 int Simulator::simuRateChanged( int rate )
@@ -289,7 +347,6 @@ int Simulator::simuRateChanged( int rate )
 
     std::cout << "\nFPS:              " << fps
               << "\nCircuit Rate:     " << m_circuitRate
-              << "\nMcu     Rate:     " << m_mcuStepsPT
               << std::endl
               << "\nSimulation Speed: " << m_simuRate
               /*<< "\nReactive   Speed: " << m_simuRate/m_stepsPrea*/
@@ -304,6 +361,11 @@ int Simulator::simuRateChanged( int rate )
 bool Simulator::isRunning()
 {
     return m_isrunning;
+}
+
+bool Simulator::isPaused()
+{
+    return m_paused;
 }
 
 int Simulator::reaClock()
@@ -341,30 +403,25 @@ void Simulator::setNoLinClock( int value )
 
     if( running ) runContinuous();
 }
-void Simulator::setMcuClock( int value )
-{
-    m_mcuStepsPT = value;
-    BaseProcessor::self()->setSteps( value );
-    //m_pic.setSteps( value );
-}
-int Simulator::nlAcc(){ return m_nlAcc; }
-void  Simulator::setNlAcc( int ac )
+
+int Simulator::noLinAcc(){ return m_noLinAcc; }
+void  Simulator::setNoLinAcc( int ac )
 {
     bool running = m_isrunning;
     if( running ) stopSim();
 
     if     ( ac < 3 )  ac = 3;
     else if( ac > 14 ) ac = 14;
-    m_nlAcc = ac;
+    m_noLinAcc = ac;
 
     if( running ) runContinuous();
 }
 double Simulator::NLaccuracy()
 {
-    return 1/pow(10,m_nlAcc)/2;
+    return 1/pow(10,m_noLinAcc)/2;
 }
 
-unsigned long long Simulator::step()
+uint64_t Simulator::step()
 {
     return m_step;
 }

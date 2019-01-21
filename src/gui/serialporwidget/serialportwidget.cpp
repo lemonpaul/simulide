@@ -68,14 +68,13 @@ SerialPortWidget* SerialPortWidget::m_pSelf = 0l;
 static const char blankString[] = QT_TRANSLATE_NOOP( "SerialPortWidget", "N/A" );
 
 SerialPortWidget::SerialPortWidget( QWidget *parent )
-              : QWidget(parent),
-                ui( new Ui::SerialPortWidget )
+                : QWidget(parent)
+                , ui( new Ui::SerialPortWidget )
 {
     ui->setupUi( this );
 
     m_pSelf = this;
     
-
     m_serial = new QSerialPort( this );
 
     intValidator = new QIntValidator( 0, 4000000, this );
@@ -84,19 +83,22 @@ SerialPortWidget::SerialPortWidget( QWidget *parent )
 
     connect( ui->openButton, &QPushButton::clicked,
                        this, &SerialPortWidget::open);
+                       
     connect( ui->closeButton, &QPushButton::clicked,
                         this, &SerialPortWidget::close);
+                        
     connect( ui->serialPortInfoListBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                                   this, &SerialPortWidget::showPortInfo);
+                                  
     connect( ui->baudRateBox,  static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                         this, &SerialPortWidget::checkCustomBaudRatePolicy);
+                        
     connect( ui->serialPortInfoListBox,  static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
                                   this, &SerialPortWidget::checkCustomDevicePathPolicy);
 
-    connect( m_serial, &QSerialPort::readyRead, 
-                 this, &SerialPortWidget::readData);
-    connect( this, &SerialPortWidget::getData, 
-             this, &SerialPortWidget::slotWriteData );
+    connect( m_serial, &QSerialPort::readyRead, this, &SerialPortWidget::readData);
+                 
+    connect( this, &SerialPortWidget::getData, this, &SerialPortWidget::slotWriteData );
 
     fillPortsParameters();
     fillPortsInfo();
@@ -107,6 +109,7 @@ SerialPortWidget::SerialPortWidget( QWidget *parent )
 
 SerialPortWidget::~SerialPortWidget()
 {
+    if( m_serial->isOpen() ) m_serial->close();
     delete ui;
 }
 
@@ -119,6 +122,36 @@ void SerialPortWidget::setVisible( bool visible )
 SerialPortWidget::Settings SerialPortWidget::settings() const
 {
     return currentSettings;
+}
+
+QStringList SerialPortWidget::settingsProp()
+{
+    QStringList s;
+    
+    s << currentSettings.name
+    << QString::number( ui->baudRateBox->currentIndex() )
+    << QString::number( ui->dataBitsBox->currentIndex() )
+    << QString::number( ui->parityBox->currentIndex() )
+    << QString::number( ui->stopBitsBox->currentIndex() )
+    << QString::number( ui->flowControlBox->currentIndex() ) ;
+    
+    return s;
+}
+
+void SerialPortWidget::setSettingsProp( QStringList s )
+{
+    ui->serialPortInfoListBox->setCurrentText( s.at(0) );
+
+    int baud = s.at(1).toInt();
+    if( baud == 5 ) ui->baudRateBox->setCurrentText( s.at(1) );
+    else            ui->baudRateBox->setCurrentIndex( baud );
+
+    ui->dataBitsBox->setCurrentIndex( s.at(2).toInt() );
+    ui->parityBox->setCurrentIndex( s.at(3).toInt() );
+    ui->stopBitsBox->setCurrentIndex( s.at(4).toInt() );
+    ui->flowControlBox->setCurrentIndex( s.at(5).toInt() );
+    
+    updateSettings();
 }
 
 void SerialPortWidget::showPortInfo( int idx )
@@ -149,8 +182,8 @@ void SerialPortWidget::open()
         ui->closeButton->setEnabled( true );
 
         qDebug()<<(tr("Connected to %1 : %2, %3, %4, %5, %6")
-                          .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
-                          .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
+                    .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
+                    .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
     }
     else
     {
@@ -171,8 +204,7 @@ void SerialPortWidget::readData()
 
     //qDebug()<<"SerialPortWidget::readData" << data;
 
-    for( int i=0; i<data.size(); i++ )
-            BaseProcessor::self()->uartIn( data.at(i) );
+    for( int i=0; i<data.size(); i++ ) BaseProcessor::self()->uartIn( data.at(i) );
 }
 
 void SerialPortWidget::writeData( const QByteArray &data )
@@ -185,7 +217,6 @@ void SerialPortWidget::slotWriteData( const QByteArray &data )
 {
     if( m_serial->isOpen() )
     {
-       //qint64 written =
        m_serial->write( data );
         //qDebug() << "SerialPortWidget::slotWriteData"<<written<<data;
     }
@@ -208,7 +239,12 @@ void SerialPortWidget::checkCustomDevicePathPolicy(int idx)
     bool isCustomPath = !ui->serialPortInfoListBox->itemData(idx).isValid();
     ui->serialPortInfoListBox->setEditable(isCustomPath);
     if( isCustomPath )
+    {
+        QString port = ui->serialPortInfoListBox->currentText();
+        if( port == tr("Custom") ) port ="";
         ui->serialPortInfoListBox->clearEditText();
+        ui->serialPortInfoListBox->setCurrentText( port );
+    }
 }
 
 void SerialPortWidget::fillPortsParameters()
@@ -234,13 +270,13 @@ void SerialPortWidget::fillPortsParameters()
 
     ui->stopBitsBox->addItem(QStringLiteral("1"), QSerialPort::OneStop);
 #ifdef Q_OS_WIN
-    ui->stopBitsBox->addItem(tr("1.5"), QSerialPort::OneAndHalfStop);
+    ui->stopBitsBox->addItem( "1.5", QSerialPort::OneAndHalfStop);
 #endif
     ui->stopBitsBox->addItem(QStringLiteral("2"), QSerialPort::TwoStop);
 
     ui->flowControlBox->addItem(tr( "None"),     QSerialPort::NoFlowControl);
-    ui->flowControlBox->addItem(tr( "RTS/CTS"),  QSerialPort::HardwareControl);
-    ui->flowControlBox->addItem(tr( "XON/XOFF"), QSerialPort::SoftwareControl);
+    ui->flowControlBox->addItem(    "RTS/CTS" ,  QSerialPort::HardwareControl);
+    ui->flowControlBox->addItem(    "XON/XOFF",  QSerialPort::SoftwareControl);
 }
 
 void SerialPortWidget::fillPortsInfo()

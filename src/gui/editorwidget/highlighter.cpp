@@ -23,8 +23,10 @@
 #include "utils.h"
 
 Highlighter::Highlighter( QTextDocument *parent )
-    : QSyntaxHighlighter( parent )
+           : QSyntaxHighlighter( parent )
 { 
+    m_multiline = false;
+    
     multiLineCommentFormat.setForeground( Qt::red );
     multiLineCommentFormat.setFontItalic( true );
 
@@ -134,27 +136,29 @@ void Highlighter::highlightBlock( const QString &text )
         processRule( rule, lcText );
     }
 
-    // Multiline comment:
-    setCurrentBlockState( 0 );
-    int startIndex = 0;
-    if( previousBlockState() != 1 )
-        startIndex = commentStartExpression.indexIn( text );
-
-    while( startIndex >= 0 )
+    if( m_multiline )                              // Multiline comment:
     {
-        int endIndex = commentEndExpression.indexIn( text, startIndex );
-        int commentLength;
-        if( endIndex == -1 )
+        setCurrentBlockState( 0 );
+        int startIndex = 0;
+        if( previousBlockState() != 1 )
+            startIndex = commentStartExpression.indexIn( text );
+
+        while( startIndex >= 0 )
         {
-            setCurrentBlockState( 1 );
-            commentLength = text.length(   )- startIndex;
+            int endIndex = commentEndExpression.indexIn( text, startIndex );
+            int commentLength;
+            if( endIndex == -1 )
+            {
+                setCurrentBlockState( 1 );
+                commentLength = text.length(   )- startIndex;
+            }
+            else
+            {
+                commentLength = endIndex - startIndex + commentEndExpression.matchedLength();
+            }
+            setFormat( startIndex, commentLength, multiLineCommentFormat );
+            startIndex = commentStartExpression.indexIn( text, startIndex + commentLength );
         }
-        else
-        {
-            commentLength = endIndex - startIndex + commentEndExpression.matchedLength();
-        }
-        setFormat( startIndex, commentLength, multiLineCommentFormat );
-        startIndex = commentStartExpression.indexIn( text, startIndex + commentLength );
     }
 }
 
@@ -184,6 +188,10 @@ void Highlighter::addRule( QTextCharFormat format, QString exp )
     m_highlightingRules.append(rule);
 }
 
+void Highlighter::setMultiline( bool set )
+{
+    m_multiline = set;
+}
 
 /*classFormat.setFontWeight( QFont::Bold );
 classFormat.setForeground( Qt::darkMagenta );

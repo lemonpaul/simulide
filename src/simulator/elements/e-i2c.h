@@ -25,7 +25,9 @@
 #define I2C_READING   2
 #define I2C_WRITTING  3
 #define I2C_STOPPED   4
-#define I2C_NOTME     5
+#define I2C_ACK       5
+#define I2C_ENDACK    6
+#define I2C_WAITACK   7
 
 
 #include "e-logic_device.h"
@@ -40,26 +42,30 @@ class MAINMODULE_EXPORT eI2C : public eLogicDevice
 
         virtual void initialize();
         virtual void setVChanged();
-        virtual void dataByteRecieved();
+        virtual void writeByte();
+        virtual void readByte();
+        
+        void setAddress( int address );
 
         void createPins();
 
-        void sendBite( char byte );
-
     protected:
-        char txReg;                                      // byte to Send
-        char rxReg;                                      // byte Received
-        char state;                                      // current state of i2c
-        int address;                                // Addresr number
-        char addressBits;                                // number of address bits
-        char bitsRcv;                                    // number of bits recieved
+        void readBit();
+        void writeBit();
+        void ACK();
+        void waitACK();
+        
+        int m_address;                                 // Device Address
+        
+        int m_txReg;                                     // Byte to Send
+        int m_rxReg;                                    // Byte Received
+        int m_state;                             // Current State of i2c
+        int m_lastState;                            // Last State of i2c
+        int m_addressBits;                   // Number of m_address bits
+        int m_bitPtr;                                     // Bit Pointer
 
+        bool m_SDA;
         bool m_lastSDA;
-        bool m_rw;                       //
-        bool m_inputAvailable;           // A byte is available at rxReg
-        bool m_outputAvailable;          // A byte is available at txReg
-
-        int m_out;
 };
 
 
