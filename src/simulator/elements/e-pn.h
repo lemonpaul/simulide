@@ -31,7 +31,8 @@ class MAINMODULE_EXPORT ePN : public eResistor
         virtual double threshold() { return m_threshold; }
         virtual void  setThreshold( double threshold );
 
-        virtual void initialize();
+        virtual void stamp();
+        virtual void resetState();
 
         virtual void setVChanged();
 

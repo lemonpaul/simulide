@@ -38,6 +38,9 @@ static const char* LogicComponent_properties[] = {
     QT_TRANSLATE_NOOP("App::Property","Num Outputs"),
     QT_TRANSLATE_NOOP("App::Property","Num Bits"),
     QT_TRANSLATE_NOOP("App::Property","Channels"),
+    QT_TRANSLATE_NOOP("App::Property","Open Collector"),
+    QT_TRANSLATE_NOOP("App::Property","Trigger"),
+    QT_TRANSLATE_NOOP("App::Property"," 16 Bits")
 };
 
 LogicComponent::LogicComponent( QObject* parent, QString type, QString id )
@@ -61,7 +64,7 @@ void LogicComponent::init( QStringList pins )
 
     // Example: pin = "IL02Name" => input, left, number 2, label = "Name"
     
-    foreach( QString pin, pins )    
+    for( QString pin : pins )    
     {
              if( pin.startsWith( "I" ) ) inputs.append(  pin.remove(0,1) );
         else if( pin.startsWith( "O" ) ) outputs.append( pin.remove(0,1) );
@@ -72,7 +75,7 @@ void LogicComponent::init( QStringList pins )
     // configure Input Pins............................................
     setNumInps( inputs.length() );
     int i = 0;
-    foreach( QString input, inputs )
+    for( QString input : inputs )
     {
         // Example input = "L02Name"
         QString pin = input.left(3);        // Pin position
@@ -86,7 +89,7 @@ void LogicComponent::init( QStringList pins )
     // configure Output Pins............................................
     setNumOuts( outputs.length() );
     i = 0;
-    foreach( QString output, outputs )
+    for( QString output : outputs )
     {
         // Example output = "L02Name"
         QString pin = output.left(3);        // Pin position
@@ -205,8 +208,10 @@ void LogicComponent::deleteOutputs( int outputs )
     for( int i=m_numOutPins-1; i>m_numOutPins-outputs-1; i-- )
     {
         if( m_outPin[i]->isConnected() ) m_outPin[i]->connector()->remove();
+        //else                             m_outPin[i]->reset();
+
         if( m_outPin[i]->scene() ) Circuit::self()->removeItem( m_outPin[i] );
-        m_outPin[i]->reset();
+
         delete m_outPin[i];
     }
     m_numOutPins -= outputs;

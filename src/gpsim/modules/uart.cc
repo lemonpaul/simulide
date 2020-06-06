@@ -97,6 +97,7 @@ class RCSignalControl : public SignalControl
     private:
       _RCSTA *m_rcsta;
 };
+
 // Drive date of DT  pin when transmitting
 class RCSignalSource : public SignalControl
 {
@@ -218,32 +219,36 @@ _TXSTA::~_TXSTA()
 }
 
 //-----------------------------------------------------------
-_RCREG::_RCREG(Processor *pCpu, const char *pName, const char *pDesc, USART_MODULE *pUSART)
-  : sfr_register(pCpu, pName, pDesc), fifo_sp(0),  mUSART(pUSART), m_rcsta(0)
+_RCREG::_RCREG( Processor *pCpu, const char *pName, const char *pDesc, USART_MODULE *pUSART )
+      : sfr_register(pCpu, pName, pDesc), fifo_sp(0),  mUSART(pUSART), m_rcsta(0)
 {
   assert(mUSART);
 }
 
-_TXREG::_TXREG(Processor *pCpu, const char *pName, const char *pDesc, USART_MODULE *pUSART)
-  : sfr_register(pCpu, pName, pDesc), m_txsta(0), mUSART(pUSART)
+_TXREG::_TXREG( Processor *pCpu, const char *pName, const char *pDesc, USART_MODULE *pUSART )
+      : sfr_register( pCpu, pName, pDesc ), m_txsta(0), mUSART(pUSART)
 {
-  assert(mUSART);
+    assert(mUSART);
+
+    m_uartN = QString::fromStdString( name() ).remove("txreg").toInt();
+    if( m_uartN > 0 ) m_uartN--;
+    //qDebug() << "TXREG " << QString::fromStdString( name() )<<m_uartN;
 }
 
 _BAUDCON::_BAUDCON(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc)
+        : sfr_register(pCpu, pName, pDesc)
 {
 }
 
 _SPBRG::_SPBRG(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc),
-    txsta(0), rcsta(0), brgh(0), baudcon(0), start_cycle(0), last_cycle(0),
-    future_cycle(0), running(false), skip(0)
+      : sfr_register(pCpu, pName, pDesc),
+        txsta(0), rcsta(0), brgh(0), baudcon(0), start_cycle(0), last_cycle(0),
+        future_cycle(0), running(false), skip(0)
 {
 }
 
 _SPBRGH::_SPBRGH(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc), m_spbrg(0)
+       : sfr_register(pCpu, pName, pDesc), m_spbrg(0)
 {
 }
 
@@ -257,37 +262,33 @@ _SPBRGH::_SPBRGH(Processor *pCpu, const char *pName, const char *pDesc)
 // register empties.  RRR 10/2014
 
 
-void _TXREG::put(uint new_value)
+void _TXREG::put( uint new_value )
 {
-  value.put(new_value & 0xff);
+    value.put(new_value & 0xff);
 
-  assert(m_txsta);
-  assert(m_rcsta);
+    assert(m_txsta);
+    assert(m_rcsta);
 
-  // The transmit register has data,
-  // so clear the TXIF flag
+    // The transmit register has data, so clear the TXIF flag
 
-  full = true;
-  get_cycles().set_break(get_cycles().get() + 1, this);
+    full = true;
+    get_cycles().set_break(get_cycles().get() + 1, this);
 
-  if(m_txsta->bTRMT() && m_txsta->bTXEN())
-  {
-      // If the transmit buffer is empty and the transmitter is enabled
-      // then transmit this new data now...
+    if(m_txsta->bTRMT() && m_txsta->bTXEN())// If the transmit buffer is empty and the transmitter is enabled
+    {                                       // then transmit this new data now...
+        get_cycles().set_break(get_cycles().get() + 2, this);
 
-      get_cycles().set_break(get_cycles().get() + 2, this);
-      
-      if (m_txsta->bSYNC()) m_rcsta->sync_start_transmitting();
-      else                  m_txsta->start_transmitting();
-  }
-  else if(m_txsta->bTRMT() && m_txsta->bSYNC())
-  {
+        if (m_txsta->bSYNC()) m_rcsta->sync_start_transmitting();
+        else                  m_txsta->start_transmitting();
+    }
+    else if(m_txsta->bTRMT() && m_txsta->bSYNC())
+    {
         m_txsta->value.put(m_txsta->value.get() & ~ _TXSTA::TRMT);
-  }
-  BaseProcessor::self()->uartOut( new_value );
+    }
+    BaseProcessor::self()->uartOut( m_uartN, new_value );
 }
 
-void _TXREG::put_value(uint new_value)
+void _TXREG::put_value( uint new_value )
 {
   put(new_value);
   update();
@@ -895,12 +896,14 @@ void _RCSTA::sync_start_transmitting()
         callback();
     }
 }
+
 void _RCSTA::set_old_clock_state(char new3State)
 {
     bool state = (new3State == '1' || new3State == 'W');
     state = mUSART->baudcon.txckp() ? !state : state;
     old_clock_state = state;
 }
+
 void _RCSTA::clock_edge(char new3State)
 {
     bool state = (new3State == '1' || new3State == 'W');
@@ -1351,7 +1354,7 @@ void _SPBRG::start()
 {
   if (running) return;
   
-  if(! skip  || get_cycles().get() >= skip)
+  if( !skip  || get_cycles().get() >= skip )
   {
     if(cpu) last_cycle = get_cycles().get();
     skip = 0;
@@ -1408,10 +1411,8 @@ uint64_t _SPBRG::get_last_cycle()
 {
   // There's a chance that a SPBRG break point exists on the current
   // cpu cycle, but has not yet been serviced.
-  if(cpu)
-    return( (get_cycles().get() == future_cycle) ? future_cycle : last_cycle);
-  else
-    return 0;
+  if(cpu) return( (get_cycles().get() == future_cycle) ? future_cycle : last_cycle);
+  else    return 0;
 }
 //--------------------------
 //uint64_t _SPBRG::get_cpu_cycle(uint edges_from_now)
@@ -1456,11 +1457,9 @@ void _SPBRG::callback()
 
   if((rcsta && rcsta->bSPEN()) || (txsta && txsta->bTXEN()))
   {
-
       // If the serial port is enabled, then set another
       // break point for the next clock edge.
       get_next_cycle_break();
-
   }
   else running = false;
 }
@@ -1484,8 +1483,8 @@ void _BAUDCON::put(uint new_value)
 
   value.put(new_value);
 
-  if( (old_value ^ value.get()) & TXCKP) {
-    // The TXCKP bit has changed states.
+  if( (old_value ^ value.get()) & TXCKP) // The TXCKP bit has changed states.
+  {
     txsta->set_pin_pol ((value.get() & TXCKP) ? true : false);
   }
 }
@@ -1535,15 +1534,18 @@ void USART_MODULE::set_TXpin(PinModule *tx_pin)
 {
   txsta.setIOpin(tx_pin);
 }
+
 void USART_MODULE::set_RXpin(PinModule *rx_pin)
 {
   rcsta.setIOpin(rx_pin);
 }
+
 bool USART_MODULE::bIsTXempty()
 {
   if (m_txif) return m_txif->Get();
   return pir ? pir->get_txif() : true;
 }
+
 void USART_MODULE::emptyTX()
 {
   Dprintf(("usart::empty - setting TXIF %s\n", txsta.name().c_str()));
@@ -1551,10 +1553,7 @@ void USART_MODULE::emptyTX()
   if (txsta.bTXEN())
   {
     if (m_txif)   m_txif->Trigger();
-    else if (pir)
-    {
-        pir->set_txif();
-    }
+    else if (pir) pir->set_txif();
     else          assert(pir);
   }
 
@@ -1571,19 +1570,15 @@ void USART_MODULE::full()
 void USART_MODULE::set_rcif()
 {
   Dprintf((" - setting RCIF\n"));
-  if (m_rcif)
-      m_rcif->Trigger();
-  else if(pir)
-    pir->set_rcif();
+  if (m_rcif)  m_rcif->Trigger();
+  else if(pir) pir->set_rcif();
 }
 
 void USART_MODULE::clear_rcif()
 {
   Dprintf((" - clearing RCIF\n"));
-  if (m_rcif)
-        m_rcif->Clear();
-  else if(pir)
-    pir->clear_rcif();
+  if (m_rcif) m_rcif->Clear();
+  else if(pir) pir->clear_rcif();
 }
 
 //--------------------------------------------------

@@ -39,7 +39,7 @@ keywords: data keyword1 keyword2 number preprocessor lineComment multiLineCommen
 
 
 data-style: #500030 default true false
-data: byte double int uint long short signed char const enum static struct union unsigned  virtual void volatile bool
+data: byte double float int uint long short signed char const enum static struct union unsigned  virtual void volatile bool
 
 keyword1-style: #202060 default true false
 keyword1: class explicit friend inline namespace operator private protected public signals slots template typedef typename

@@ -47,6 +47,15 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         
         void setTitle( QString title );
         
+        double fontScale() { return m_fontScale; }
+        void setFontScale( double scale ) { m_fontScale = scale; }
+
+        int autoBck();
+        void setAutoBck( int secs );
+
+        QString* circHelp() ;
+        void loadCircHelp();
+        
         QTabWidget*  m_sidepanel;
         QWidget*     m_ramTabWidget;
         QGridLayout* m_ramTabWidgetLayout;
@@ -71,10 +80,14 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         void writeSettings();
         void applyStile();
         
+        float m_fontScale;
+        int m_autoBck;
+        
         QSettings m_settings;
         
         QString m_version;
         QString m_styleSheet;
+        QString m_circHelp;
 
         QHash<QString, QPluginLoader*>  m_plugins;
         

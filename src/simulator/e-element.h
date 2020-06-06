@@ -21,8 +21,11 @@
 #define EELEMENT_H
 
 #include <string>
-#include "e-pin.h"
+#include <math.h>
 #include <QPointer>
+#include <QDebug>
+#include "e-pin.h"
+
 
 // The following provides compatibility with gcc compiler v5 and up
 // (i.e. c++11 standard complience)
@@ -35,7 +38,7 @@
 class MAINMODULE_EXPORT eElement
 {
     public:
-    eElement( std::string id=0 );
+        eElement( std::string id=0 );
         virtual ~eElement();
 
         virtual void initEpins();
@@ -50,13 +53,12 @@ class MAINMODULE_EXPORT eElement
 
         virtual void initialize(){;}
         virtual void resetState(){;}
+        virtual void attach(){;}
         virtual void stamp(){;}
 
         virtual void simuClockStep(){;}
         virtual void updateStep(){;}
         virtual void setVChanged(){;}
-        
-        //virtual bool converged() { return m_converged; }
 
         static GNU_CONST_STATIC_FLOAT_DECLARATION double cero_doub         = 1e-14;
         static GNU_CONST_STATIC_FLOAT_DECLARATION double high_imp          = 1e14;
@@ -68,8 +70,7 @@ class MAINMODULE_EXPORT eElement
         std::vector<ePin*> m_ePin;
 
         std::string m_elmId;
-        
-        //bool m_converged;
 };
 
 #endif
+

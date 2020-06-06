@@ -23,8 +23,8 @@
 
     <pin side="left" pos="1"  type="" id="B"   label="B"  /><!-- packagePin1 -->
     <pin side="left" pos="2"  type="" id="C"   label="C"  /><!-- packagePin2 -->
-    <pin side="left" pos="3"  type="" id="LT"  label="LT" /><!-- packagePin3 -->
-    <pin side="left" pos="4"  type="" id="BI"  label="BI" /><!-- packagePin4 -->
+    <pin side="left" pos="3"  type="" id="!LT" label="!LT" /><!-- packagePin3 -->
+    <pin side="left" pos="4"  type="" id="!BI" label="!BI" /><!-- packagePin4 -->
     <pin side="left" pos="5"  type="" id="LE"  label="LE" /><!-- packagePin5 -->
     <pin side="left" pos="6"  type="" id="D"   label="D"  /><!-- packagePin6 -->
     <pin side="left" pos="7"  type="" id="A"   label="A"  /><!-- packagePin7 -->

@@ -12,7 +12,7 @@
         inverted = "false"
         numInputs = "4"
         connections="
-        output0-packagePin15
+        output0-Package_Y0
         input3-eNode0
         input2-eNode7
         input1-eNode8
@@ -29,7 +29,7 @@
         inverted = "false"
         numInputs = "4"
         connections="
-        output0-packagePin14
+        output0-Package_Y1
         input3-eNode0
         input0-eNode6
         input2-eNode7
@@ -46,7 +46,7 @@
         inverted = "false"
         numInputs = "4"
         connections="
-        output0-packagePin13
+        output0-Package_Y2
         input3-eNode0
         input1-eNode5
         input2-eNode7
@@ -63,7 +63,7 @@
         inverted = "false"
         numInputs = "4"
         connections="
-        output0-packagePin12
+        output0-Package_Y3
         input3-eNode0
         input1-eNode5
         input0-eNode6
@@ -80,7 +80,7 @@
         inverted = "false"
         numInputs = "4"
         connections="
-        output0-packagePin10
+        output0-Package_Y5
         input3-eNode0
         input1-eNode4
         input2-eNode6
@@ -97,7 +97,7 @@
         inverted = "false"
         numInputs = "4"
         connections="
-        output0-packagePin7
+        output0-Package_Y7
         input0-eNode0
         input3-eNode4
         input1-eNode5
@@ -114,7 +114,7 @@
         inverted = "false"
         numInputs = "4"
         connections="
-        output0-packagePin11
+        output0-Package_Y4
         input3-eNode0
         input2-eNode4
         input1-eNode8
@@ -131,7 +131,7 @@
         inverted = "false"
         numInputs = "4"
         connections="
-        output0-packagePin9
+        output0-Package_Y6
         input3-eNode0
         input1-eNode4
         input2-eNode5
@@ -165,7 +165,7 @@
         tristate = "false"
         connections="
         output0-eNode1
-        input0-packagePin6" >
+        input0-Package_E3" >
     </item>
 
     <item itemtype="eBuffer"
@@ -179,7 +179,7 @@
         tristate = "false"
         connections="
         output0-eNode2
-        input0-packagePin5" >
+        input0-Package_!E2" >
     </item>
 
     <item itemtype="eBuffer"
@@ -193,7 +193,7 @@
         tristate = "false"
         connections="
         output0-eNode3
-        input0-packagePin4" >
+        input0-Package_!E1" >
     </item>
 
     <item itemtype="eBuffer"
@@ -206,7 +206,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin2
+        input0-Package_A1
         output0-eNode8" >
     </item>
 
@@ -220,7 +220,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin3
+        input0-Package_A2
         output0-eNode7" >
     </item>
 
@@ -277,7 +277,7 @@
         tristate = "false"
         connections="
         output0-eNode9
-        input0-packagePin1" >
+        input0-Package_A0" >
     </item>
 
 </subcircuit>

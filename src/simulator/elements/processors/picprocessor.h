@@ -49,7 +49,9 @@ class PicProcessor : public BaseProcessor
 
         int getRamValue( int address );
 
-        void uartIn( uint32_t value );
+        void uartIn( int uart, uint32_t value );
+
+        QVector<int> eeprom();
         
         pic_processor* getCpu() { return m_pPicProcessor; }
 
@@ -57,13 +59,12 @@ class PicProcessor : public BaseProcessor
         virtual int  validate( int address );
         
         double m_ipc;
-        double m_pendingIpc;
         
         pic_processor* m_pPicProcessor;
         
         IntelHexProgramFileType m_hexLoader;
         
-        _RCSTA* m_rcsta;
+        QVector<_RCSTA*> m_rcsta;
 };
 
 

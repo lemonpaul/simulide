@@ -21,6 +21,7 @@
 #include "mainwindow.h"
 #include "connector.h"
 #include "connectorline.h"
+#include "propertieswidget.h"
 #include "itemlibrary.h"
 #include "circuit.h"
 #include "utils.h"
@@ -37,17 +38,15 @@ static const char* Component_properties[] = {
     QT_TRANSLATE_NOOP("App::Property","Color")
 };
 
-Component::Component( QObject* parent , QString type, QString id )
-         : QObject(parent), QGraphicsItem()
+Component::Component( QObject* parent, QString type, QString id )
+         : QObject( parent )
+         , QGraphicsItem()
          , multUnits( "TGMk munp" )
 {
     Q_UNUSED( Component_properties );
     //setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-    /*if( ( type != "Connector" )&&( type != "Node" ) )
-    {
-        LibraryItem* li= ItemLibrary::self()->libraryItem( type );
-        if( li ) m_help = li->help();
-    }*/
+
+    m_help = 0l;
     m_value    = 0;
     m_unitMult = 1;
     m_Hflip  = 1;
@@ -60,6 +59,22 @@ Component::Component( QObject* parent , QString type, QString id )
     m_moving = false;
     m_printable = false;
     m_BackGround = "";
+
+    if( ( type != "Connector" )&&( type != "Node" ) )
+    {
+        LibraryItem* li= ItemLibrary::self()->libraryItem( type );
+
+        if( li )
+        {
+            if( type == "Subcircuit" )
+            {
+                QString name = id;
+                name = name.split( "-" ).first();
+                m_help = new QString( li->getHelpFile( name ) );
+            }
+            else m_help = li->help();
+        }
+    }
     
     QFont f;
     f.setPixelSize(10);
@@ -78,6 +93,7 @@ Component::Component( QObject* parent , QString type, QString id )
     setShowVal( false );
     
     setObjectName( id );
+    setIdLabel( id );
     setId(id);
 
     setCursor( Qt::OpenHandCursor );
@@ -85,8 +101,10 @@ Component::Component( QObject* parent , QString type, QString id )
     
     //setTransformOriginPoint( boundingRect().center() );
 
-    if( type == "Connector" ) Circuit::self()->conList()->append( this );
-    else                      Circuit::self()->compList()->prepend( this );
+    if     ( type == "Connector" )  Circuit::self()->conList()->append( this );
+    else if( type == "SerialPort" ) Circuit::self()->compList()->append( this );
+    else if( type == "SerialTerm" ) Circuit::self()->compList()->append( this );
+    else                            Circuit::self()->compList()->prepend( this );
 }
 Component::~Component(){}
 
@@ -102,12 +120,12 @@ void Component::mousePressEvent( QGraphicsSceneMouseEvent* event )
             {
                 QList<QGraphicsItem*> itemlist = Circuit::self()->selectedItems();
 
-                foreach( QGraphicsItem* item, itemlist ) item->setSelected( false );
+                for( QGraphicsItem* item : itemlist ) item->setSelected( false );
 
                 setSelected( true );
             }
             QPropertyEditorWidget::self()->setObject( this );
-            //PropertiesWidget::self()->setHelpText( m_help );
+            PropertiesWidget::self()->setHelpText( m_help );
             
             setCursor( Qt::ClosedHandCursor );
         }
@@ -116,10 +134,10 @@ void Component::mousePressEvent( QGraphicsSceneMouseEvent* event )
 
 void Component::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* event )
 {
-    if ( event->button() == Qt::LeftButton )
+    if( event->button() == Qt::LeftButton )
     {
         QPropertyEditorWidget::self()->setObject( this );
-        //PropertiesWidget::self()->setHelpText( m_help );
+        PropertiesWidget::self()->setHelpText( m_help );
         //QPropertyEditorWidget::self()->setVisible( true );
     }
 }
@@ -136,14 +154,14 @@ void Component::mouseMoveEvent( QGraphicsSceneMouseEvent* event )
     if( !deltaH && !deltaV ) return;
 
     QList<QGraphicsItem*> itemlist = Circuit::self()->selectedItems();
-    if( !itemlist.isEmpty() )
+    if( itemlist.size() > 1 )
     {
         if( !m_moving )
         {
             Circuit::self()->saveState();
             m_moving = true;
         }
-        foreach( QGraphicsItem* item, itemlist )
+        for( QGraphicsItem* item : itemlist )
         {
             ConnectorLine* line =  qgraphicsitem_cast<ConnectorLine* >( item );
             if( line->objectName() == "" ) 
@@ -153,7 +171,7 @@ void Component::mouseMoveEvent( QGraphicsSceneMouseEvent* event )
             }
 
         }
-        foreach( QGraphicsItem* item, itemlist )
+        for( QGraphicsItem* item : itemlist )
         {
             Component* comp =  qgraphicsitem_cast<Component*>( item );
             if(comp && (comp->objectName() != "") && (!comp->objectName().contains("Connector")) )
@@ -161,19 +179,26 @@ void Component::mouseMoveEvent( QGraphicsSceneMouseEvent* event )
                 comp->move( delta );
             }
         }
-        foreach( Component* comp, *(Circuit::self()->conList()) )
+        for( Component* comp : *(Circuit::self()->conList()) )
         {
             Connector* con = static_cast<Connector*>( comp );
             con->startPin()->isMoved();
             con->endPin()->isMoved();
         }
     }
+    else this->move( delta );
 }
 
 void Component::move( QPointF delta )
 {
     setPos( pos() + delta );
-    //emit moved();
+    emit moved();
+}
+
+void Component::moveTo( QPointF pos )
+{
+    setPos( pos );
+    emit moved();
 }
 
 void Component::mouseReleaseEvent( QGraphicsSceneMouseEvent* event )
@@ -231,6 +256,7 @@ void Component::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu 
 
 void Component::slotCopy()
 {
+    if( !isSelected() ) Circuit::self()->clearSelection();
     setSelected( true );
     Circuit::self()->copy( m_eventpoint );
 }
@@ -247,6 +273,8 @@ void Component::remove()
     for( uint i=0; i<m_pin.size(); i++ )   // Remove connectors attached
     {
         Pin* pin = m_pin[i];
+        if( !pin ) continue;
+        
         if( pin && pin->isConnected())
         {
             Connector* con = pin->connector();
@@ -259,7 +287,7 @@ void Component::remove()
 void Component::slotProperties()
 {
     QPropertyEditorWidget::self()->setObject( this );
-    //PropertiesWidget::self()->setHelpText( m_help );
+    PropertiesWidget::self()->setHelpText( m_help );
     MainWindow::self()->m_sidepanel->setCurrentIndex( 2 ); // Open Properties tab
 }
 
@@ -405,6 +433,8 @@ void Component::setUnit( QString un )
     m_valLabel->setPlainText( QString::number(m_value)+m_mult+m_unit );
 }
 
+double Component::getmultValue() { return m_value*m_unitMult; }
+
 bool Component::showId()               { return m_showId; }
 void Component::setShowId( bool show ) 
 { 
@@ -419,8 +449,11 @@ void Component::setShowVal( bool show )
     m_showVal = show; 
 }
 
+QString Component::idLabel() { return m_idLabel->toPlainText(); }
+void Component::setIdLabel( QString id ) { m_idLabel->setPlainText( id ); }
+
 QString Component::itemID()         { return  m_id; }
-void Component::setId( QString id ) {  m_id = id; m_idLabel->setPlainText( m_id ); }
+void Component::setId( QString id ) {  m_id = id;  }
 
 int Component::labelx()            { return m_idLabel->m_labelx; }
 void Component::setLabelX( int x ) { m_idLabel->m_labelx = x; }
@@ -522,30 +555,30 @@ Label::Label( Component* parent )
     
     this->document()->setDocumentMargin(0);
     
-    connect(document(), SIGNAL(contentsChange(int, int, int)),
-            this,       SLOT(updateGeometry(int, int, int)));
+    connect( document(), SIGNAL( contentsChange(int, int, int)),
+             this,       SLOT(   updateGeometry(int, int, int)));
+            
     //document()->setDefaultStyleSheet( QString("p {max-width: 500px;}") );
-    //document()->set
 }
 Label::~Label() { }
 
-void Label::updateGeometry(int, int, int)
+void Label::updateGeometry( int, int, int )
 {
-    document()->setTextWidth(-1);
+    document()->setTextWidth( -1 );
     //setTextWidth( boundingRect().width() );
     //setItemSize(boundingRect().width(), boundingRect().height());
     //adjustSize();
 }
 
-void Label::focusOutEvent(QFocusEvent *event)
+void Label::focusOutEvent( QFocusEvent *event )
 {
-    setTextInteractionFlags(Qt::NoTextInteraction);
+    setTextInteractionFlags( Qt::NoTextInteraction );
     m_parentComp->updateLabel( this, document()->toPlainText() );
     
     QGraphicsTextItem::focusOutEvent(event);
 }
 
-void Label::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+void Label::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* event )
 {
     if( !isEnabled() ) return;
     //setTextInteractionFlags(Qt::TextEditorInteraction);
@@ -553,7 +586,7 @@ void Label::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
-void Label::mousePressEvent(QGraphicsSceneMouseEvent* event)
+void Label::mousePressEvent( QGraphicsSceneMouseEvent* event )
 {
     if ( event->button() == Qt::LeftButton )
     {
@@ -563,7 +596,7 @@ void Label::mousePressEvent(QGraphicsSceneMouseEvent* event)
     }
 }
 
-void Label::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+void Label::mouseMoveEvent( QGraphicsSceneMouseEvent* event )
 {
     event->accept();
     setPos(  pos() + mapToItem( m_parentComp, event->pos() ) - mapToItem( m_parentComp, event->lastPos() ) );
@@ -571,14 +604,14 @@ void Label::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     m_labely = int(pos().y());
 }
 
-void Label::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+void Label::mouseReleaseEvent( QGraphicsSceneMouseEvent* event )
 {
     event->accept();
     setCursor( Qt::OpenHandCursor );
     ungrabMouse();
 }
 
-void Label::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+void Label::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 {
     if( !acceptedMouseButtons() ) event->ignore();
     else
@@ -631,14 +664,14 @@ void Label::rotate180()
 void Label::H_flip( int hf )
 {
     if( !isEnabled() ) return;
-    setTransform(QTransform::fromScale(hf, 1));
+    setTransform( QTransform::fromScale(hf, 1) );
     //m_idLabel->rotateCCW();
 }
 
 void Label::V_flip( int vf )
 {
     if( !isEnabled() ) return;
-    setTransform(QTransform::fromScale(1, vf));
+    setTransform( QTransform::fromScale(1, vf) );
 }
 
 /*void Label::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

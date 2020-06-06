@@ -42,6 +42,7 @@ class RenderArea : public QWidget
         void setTick( int tickUs );
         
         void setZero( int zero );
+        void setXScale( int scale );
 
     public slots:
         void setPen( const int channel, const QPen &pen );
@@ -62,7 +63,9 @@ class RenderArea : public QWidget
         int m_width;
         int m_height;
         int m_sec;
-        int m_zero;
+        int m_zero0;
+        int m_zero1;
+        int m_xScale;
          
         QString m_tick;
  };

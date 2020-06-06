@@ -26,9 +26,7 @@ License along with this library; if not, see
 
 #include <stdio.h>
 
-
 class InvalidRegister;   // Forward reference
-
 
 #ifndef __SSP_H__
 #define __SSP_H__
@@ -68,8 +66,6 @@ class SSP1_MODULE;
 
 class _SSPCON : public sfr_register, public TriggerObject
 {
-
-
 public:
 
   enum {
@@ -95,8 +91,6 @@ public:
     SSPM_I2Cfirmwaremaster_10bitaddr_ints = 0xf,
     */
   };
-
-
 
   _SSPCON(Processor *pCpu, SSP_MODULE *);
 
@@ -130,11 +124,11 @@ public:
   void setSSPOV() { put_value(value.get() | SSPOV);}
   void setSSPMODULE(SSP_MODULE *);
 
-
 private:
   SSP_MODULE *m_sspmod;
 
 };
+
 class _SSPCON2 : public sfr_register
 {
  public:
@@ -211,7 +205,6 @@ private:
   SSP_MODULE   *m_sspmod;
 };
 
-
 class _SSPBUF : public sfr_register
 {
 public:
@@ -220,7 +213,6 @@ public:
 
   _SSPBUF(Processor *pCpu, SSP_MODULE *);
 
-
   virtual void put(uint new_value);
   virtual void put_value(uint new_value);
   virtual uint get();
@@ -228,6 +220,7 @@ public:
 
   bool isFull() { return m_bIsFull; }
   void setFullFlag(bool bNewFull) { m_bIsFull = bNewFull; }
+
 private:
   SSP_MODULE   *m_sspmod;
   bool m_bIsFull;
@@ -249,6 +242,7 @@ class _SSPADD : public sfr_register
   virtual void put(uint new_value);
   virtual void put_value(uint new_value);
   virtual uint get();
+
 private:
   SSP_MODULE   *m_sspmod;
 };
@@ -271,7 +265,6 @@ class SPI: public  TriggerObject
   virtual void callback();
   void newSSPBUF(uint);
   virtual void startSPI();
-
   
 protected:
   uint m_SSPsr;  // internal Shift Register
@@ -281,7 +274,6 @@ protected:
     eWAITING_FOR_LAST_SMP
   } m_state;
 
-
   int bits_transfered;
   Processor *cpu;
 };
@@ -289,7 +281,6 @@ protected:
 class SPI_1: public  SPI
 {
  public:
-
   _SSP1CON3        *m_ssp1con3;
   _SSPADD     *m_sspadd;
 
@@ -334,7 +325,6 @@ class I2C: public  TriggerObject
   bool          scl_pos_tran();
   bool          scl_clock_low();
 
-
 protected:
   uint m_SSPsr;  // internal Shift Register
 
@@ -353,7 +343,6 @@ protected:
     CLK_RX_ACK
   } i2c_state;
 
-
   int      bits_transfered;
   int   phase;
   uint64_t future_cycle;
@@ -366,14 +355,13 @@ class I2C_1: public  I2C
   SSP_MODULE *m_sspmod;
   _SSP1CON3  *m_sspcon3;
 
-
   virtual void clock(bool);
   virtual void bus_collide();
   virtual bool do_stop_sspif();
   
-
   I2C_1(SSP_MODULE *, _SSPCON *, _SSPSTAT *, _SSPBUF *, _SSPCON2 *, _SSPADD *, _SSP1CON3 *);
 };
+
 class SSP_MODULE 
 {
  public:
@@ -396,8 +384,6 @@ class SSP_MODULE
             PinModule *_SsPin,
                PicTrisRegister *_i2ctris, 
             SSP_TYPE ssptype = SSP_TYPE_BSSP);
-
-
 
   virtual void SDI_SinkState(char);
   virtual void SS_SinkState(char);
@@ -437,6 +423,7 @@ class SSP_MODULE
   virtual void releaseSCKpin();
 
   Processor *cpu;
+
 protected:
   InterruptSource *m_ssp_if;
   InterruptSource *m_bcl_if;

@@ -31,6 +31,7 @@ class MAINMODULE_EXPORT eSource : public eElement
         virtual ~eSource();
 
         virtual void initialize();
+        
         void stamp();
         void stampOutput();
 

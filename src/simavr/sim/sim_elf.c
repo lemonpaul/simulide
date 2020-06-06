@@ -22,6 +22,8 @@
 	You should have received a copy of the GNU General Public License
 	along with simavr.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+
 
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -29,9 +31,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+//#ifndef _WIN32
 #include <libelf.h>
 #include <gelf.h>
-
+//#endif
 #include "sim_elf.h"
 #include "sim_vcd_file.h"
 #include "avr_eeprom.h"
@@ -189,7 +192,7 @@ avr_load_firmware(
 
     return 0;
 }
-
+//#ifndef _WIN32
 static void
 elf_parse_mmcu_section(
 		elf_firmware_t * firmware,
@@ -446,4 +449,4 @@ int elf_read_firmware(const char * file, elf_firmware_t * firmware)
 	close(fd);
 	return 0;
 }
-
+//#endif

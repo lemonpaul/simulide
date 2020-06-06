@@ -16,6 +16,7 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
  *                                                                         *
  ***************************************************************************/
+//#ifndef _WIN32
 
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -338,3 +339,4 @@ int elf_read_firmware_ext(const char * file, elf_firmware_t * firmware)
 	return 0;
 }
 
+//#endif

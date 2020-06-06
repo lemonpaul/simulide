@@ -23,17 +23,19 @@
 #include <QtWidgets>
 
 #include "chip.h"
+#include "memdata.h"
+#include <QtSerialPort/QSerialPort>
 
 class BaseProcessor;
 class McuComponentPin;
 
-class MAINMODULE_EXPORT McuComponent : public Chip
+class MAINMODULE_EXPORT McuComponent : public Chip, public MemData
 {
     Q_OBJECT
-    Q_PROPERTY( QString  Program     READ program WRITE setProgram DESIGNABLE true  USER true )
-    Q_PROPERTY( int      Mhz         READ freq    WRITE setFreq    DESIGNABLE true  USER true )
-    Q_PROPERTY( bool     Ser_Port    READ serPort WRITE setSerPort )
-    Q_PROPERTY( bool     Ser_Monitor READ serMon  WRITE setSerMon )
+    Q_PROPERTY( QVector<int> eeprom  READ eeprom   WRITE setEeprom )
+    Q_PROPERTY( QString  Program     READ program  WRITE setProgram  DESIGNABLE true  USER true )
+    Q_PROPERTY( double   Mhz         READ freq     WRITE setFreq     DESIGNABLE true  USER true )
+    Q_PROPERTY( bool     Auto_Load   READ autoLoad WRITE setAutoLoad DESIGNABLE true  USER true )
 
     public:
 
@@ -42,24 +44,34 @@ class MAINMODULE_EXPORT McuComponent : public Chip
         
  static McuComponent* self() { return m_pSelf; }
 
-        QString program()   const      { return  m_symbolFile; }
+        virtual void updateStep();
+        virtual void runAutoLoad();
+
+        QString program()   const { return  m_symbolFile; }
         void setProgram( QString pro );
+
+        double freq();
+        virtual void setFreq( double freq );
+
+        bool autoLoad() { return m_autoLoad; }
+        void setAutoLoad( bool al ) { m_autoLoad = al; }
         
         QString device() { return m_device; }
 
-        int  freq();
-        virtual void setFreq( int freq );
         virtual void initChip();
-        
-        bool serPort();
-        void setSerPort( bool set );
-        
-        bool serMon();
-        void setSerMon( bool set );
+
+        void setEeprom(QVector<int> eep );
+        QVector<int> eeprom();
+
+        virtual void setLogicSymbol( bool ls );
         
         QList<McuComponentPin*> getPinList() { return m_pinList; }
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
+
+    signals:
+        void closeSerials();
+        void openSerials();
   
     public slots:
         virtual void terminate();
@@ -69,9 +81,10 @@ class MAINMODULE_EXPORT McuComponent : public Chip
         void slotLoad();
         void slotReload();
         void slotOpenTerm();
-        void slotCloseTerm();
         void slotOpenSerial();
-        void slotCloseSerial();
+
+        void loadData();
+        void saveData();
         
         void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
         
@@ -86,16 +99,15 @@ class MAINMODULE_EXPORT McuComponent : public Chip
 
         BaseProcessor* m_processor;
 
-        int m_freq;             // Clock Frequency Mhz
+        double m_freq;           // Clock Frequency Mhz
         
         bool m_attached;
-        bool m_serPort;
-        bool m_serMon;
+        bool m_autoLoad;
 
         QString m_device;       // Name of device
         QString m_symbolFile;   // firmware file loaded
         QString m_lastFirmDir;  // Last firmware folder used
-        
+
         QList<McuComponentPin*> m_pinList;
 };
 #endif

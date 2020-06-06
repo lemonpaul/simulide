@@ -60,6 +60,7 @@ inline QString fileToString( const QString &fileName, const QString &caller )
         return "";
     }
     QTextStream in(&file);
+    in.setCodec("UTF-8");
     QString text = in.readAll();
     file.close();
 
@@ -77,10 +78,28 @@ inline QStringList fileToStringList( const QString &fileName, const QString &cal
         return text;
     }
     QTextStream in(&file);
+    in.setCodec("UTF-8");
     while( !in.atEnd() ) text.append( in.readLine() );
     file.close();
 
     return text;
+}
+
+inline QByteArray fileToByteArray( const QString &fileName, const QString &caller )
+{
+    QByteArray ba;
+
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        MessageBoxNB( "ERROR", "Cannot read file "+fileName+":\n"+file.errorString() );
+        return ba;
+    }
+    ba = file.readAll();
+
+    file.close();
+
+    return ba;
 }
 
 inline QString val2hex( int d )
@@ -124,7 +143,9 @@ inline QPoint roundDown( const QPoint & p, int roundness )
     return QPoint( roundDown( p.x(), roundness ), roundDown( p.y(), roundness ) );
 }
 
-inline int snapToGrid( int x  ) { return roundDown( x, 8 )*8 + 4; }
+inline int snapToGrid( int x ) { return roundDown( x+2, 4 )*4; }
+
+inline int snapToCompGrid( int x ) { return roundDown( x+4, 8 )*8; }
 
 inline QPointF togrid( QPointF point )
 {
@@ -132,6 +153,16 @@ inline QPointF togrid( QPointF point )
     valor = snapToGrid( (int)point.x() );
     point.rx() = (float)valor;
     valor = snapToGrid( (int)point.y() );
+    point.ry() = (float)valor;
+    return point;
+}
+
+inline QPointF toCompGrid( QPointF point )
+{
+    int valor;
+    valor = snapToCompGrid( (int)point.x() );
+    point.rx() = (float)valor;
+    valor = snapToCompGrid( (int)point.y() );
     point.ry() = (float)valor;
     return point;
 }
@@ -153,6 +184,17 @@ inline int getAlignment( QPointF p1, QPointF p2 )
     if( p1.y() == p2.y() ) align += 1;           // Aligned in X axis
 
     return align;
+}
+
+#include "pin.h"
+inline bool lessPinX( Pin* pinA, Pin* pinB )
+{
+    return pinA->x() < pinB->x();
+}
+
+inline bool lessPinY( Pin* pinA, Pin* pinB )
+{
+    return pinA->y() < pinB->y();
 }
 #endif
 

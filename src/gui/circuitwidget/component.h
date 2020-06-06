@@ -26,6 +26,7 @@
 
 #include "QPropertyEditorWidget.h"
 
+Q_DECLARE_METATYPE( QList<int> )
 
 class Pin;
 class Label;
@@ -35,8 +36,8 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 
-    Q_PROPERTY( QString  itemtype  READ itemType )
-    Q_PROPERTY( QString  id        READ itemID    WRITE setId      DESIGNABLE true USER true )
+    Q_PROPERTY( QString  itemtype  READ itemType  USER true )
+    Q_PROPERTY( QString  id        READ idLabel   WRITE setIdLabel DESIGNABLE true USER true )
     Q_PROPERTY( bool     Show_id   READ showId    WRITE setShowId  DESIGNABLE true USER true )
     Q_PROPERTY( qreal    rotation  READ rotation  WRITE setRotation )
     Q_PROPERTY( int      x         READ x         WRITE setX )
@@ -58,6 +59,9 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
 
         enum { Type = UserType + 1 };
         int type() const { return Type; }
+
+        QString idLabel();
+        void setIdLabel( QString id );
 
         QString itemID();
         void setId( QString id );
@@ -103,7 +107,10 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         
         void updateLabel( Label* label, QString txt );
         
+        double getmultValue();
+        
         //QString getHelp( QString file );
+        virtual void setBackground( QString bck ){ m_BackGround = bck; }
         
         void setPrintable( bool p );
         QString print();
@@ -115,6 +122,7 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         virtual void inStateChanged( int ){}
 
         virtual void move( QPointF delta );
+        void moveTo( QPointF pos );
 
         virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
@@ -134,11 +142,11 @@ class MAINMODULE_EXPORT Component : public QObject, public QGraphicsItem
         virtual void remove();
 
     protected:
-        void mousePressEvent(QGraphicsSceneMouseEvent* event);
-        void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
-        void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
-        void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
-        void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
+        void mousePressEvent( QGraphicsSceneMouseEvent* event );
+        void mouseDoubleClickEvent( QGraphicsSceneMouseEvent* event );
+        void mouseMoveEvent( QGraphicsSceneMouseEvent* event );
+        void mouseReleaseEvent( QGraphicsSceneMouseEvent* event );
+        void contextMenuEvent( QGraphicsSceneContextMenuEvent* event );
         void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
 
         void setValue( double val );

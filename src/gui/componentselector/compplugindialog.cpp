@@ -81,7 +81,7 @@ void CompPluginDialog::setPluginList()
 
     QList<QTreeWidgetItem*> itemList = ComponentSelector::self()->findItems("",Qt::MatchStartsWith);
 
-    foreach( QTreeWidgetItem* item, itemList )
+    for( QTreeWidgetItem* item : itemList )
     {
         addItem( item );
     }
@@ -93,7 +93,7 @@ void CompPluginDialog::setPluginList()
     pluginsDir.cd( "plugins" );
     QStringList dirList = pluginsDir.entryList( QDir::Dirs );
 
-    foreach( QString  dirName, dirList )
+    for( QString  dirName : dirList )
     {
         if( dirName.contains(".") ) continue;
 
@@ -148,7 +148,7 @@ void CompPluginDialog::reject()
 {
     this->setVisible( false );
 
-    foreach( QListWidgetItem* listItem, m_compList->findItems("",Qt::MatchStartsWith) )
+    for( QListWidgetItem* listItem : m_compList->findItems("",Qt::MatchStartsWith) )
     {
         bool hidden = ( listItem->checkState() == Qt::Unchecked );
 

@@ -31,9 +31,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin2
-        input1-packagePin3
-        output0-packagePin1" >
+        input0-Package_1B
+        input1-Package_1A
+        output0-Package_1Y" >
     </item>
 
     <item itemtype="eOrGate"
@@ -46,9 +46,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin5
-        input1-packagePin6
-        output0-packagePin4" >
+        input0-Package_2B
+        input1-Package_2A
+        output0-Package_2Y" >
     </item>
 
     <item itemtype="eOrGate"
@@ -61,9 +61,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin8
-        input1-packagePin9
-        output0-packagePin10" >
+        input0-Package_3B
+        input1-Package_3A
+        output0-Package_3Y" >
     </item>
 
     <item itemtype="eOrGate"
@@ -76,9 +76,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin11
-        input1-packagePin12
-        output0-packagePin13" >
+        input0-Package_4B
+        input1-Package_4A
+        output0-Package_4Y" >
     </item>
 
 </subcircuit>

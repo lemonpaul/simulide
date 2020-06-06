@@ -96,10 +96,10 @@ avr_timer_comp(
 						p->io.irq[TIMER_IRQ_OUT_COMP + comp].value ? 0 : 1);
 			break;
 		case avr_timer_com_clear:
-			avr_raise_irq(irq, 0);
+            avr_raise_irq(irq, 0);
 			break;
 		case avr_timer_com_set:
-			avr_raise_irq(irq, 1);
+            avr_raise_irq(irq, 1);
 			break;
 	}
 
@@ -614,9 +614,12 @@ avr_timer_write_ocr(
 			avr_timer_reconfigure(timer, 0);
 			break;
 		case avr_timer_wgm_pwm:
-			if (timer->mode.top != avr_timer_wgm_reg_ocra) {
+			if (timer->mode.top != avr_timer_wgm_reg_ocra) { // ICR is the top, update comp_cycles
+				uint32_t ocr = _timer_get_comp_ocr(avr, comp);
+				uint32_t prescaler = timer->cs_div_value;
+				comp->comp_cycles = prescaler * ocr;
 				avr_raise_irq(timer->io.irq + TIMER_IRQ_OUT_PWM0, _timer_get_ocr(timer, AVR_TIMER_COMPA));
-			} else {
+			}else {
 				avr_timer_reconfigure(timer, 0); // if OCRA is the top, reconfigure needed
 			}
 			avr_raise_irq(timer->io.irq + TIMER_IRQ_OUT_PWM1, _timer_get_ocr(timer, AVR_TIMER_COMPB));

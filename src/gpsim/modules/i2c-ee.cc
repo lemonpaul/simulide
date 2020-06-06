@@ -58,7 +58,7 @@ using namespace std;
 //
 
 PromAddress::PromAddress(I2C_EE *eeprom, const char *_name, const char * desc)
-    : Value(_name,desc)
+           : Value(_name,desc)
 {
      m_eeprom = eeprom;
 }
@@ -80,8 +80,7 @@ class I2C_SLAVE_SDA : public IO_open_collector
 
                 // Make the pin an output.
             update_direction( IO_bi_directional::DIR_OUTPUT, true );
-
-        };
+        }
 
         void setDrivenState(bool new_dstate)
         {
@@ -120,12 +119,10 @@ class I2C_SLAVE_SCL : public IO_open_collector
 
                 // Make the pin an output.
             update_direction(IO_bi_directional::DIR_INPUT,true);
-
-        };
+        }
 
       void setDrivenState(bool new_state)
       {
-
         bool diff = new_state ^ bDrivenState;
 
         Dprintf(("i2c_slave scl setDrivenState %d\n", new_state));
@@ -303,7 +300,6 @@ void i2c_slave::new_sda_edge(bool direction)
             xfr_data = 0;
         }
      }
-
 }
 
 bool i2c_slave::shift_read_bit ( bool x )
@@ -337,7 +333,8 @@ bool i2c_slave::match_address()
         }
         return false;
 }
-const char * i2c_slave::state_name()
+
+const char* i2c_slave::state_name()
 {
   switch (bus_state) {
   case IDLE:
@@ -455,7 +452,6 @@ void I2C_EE::put_data(uint data)
          xfr_addr = ((xfr_addr << 8) | data ) % rom_size;
          if (--m_addr_cnt == 0)
          {
-
               write_page_off = xfr_addr % write_page_size;
               xfr_addr -= write_page_off;
 
@@ -485,13 +481,11 @@ void I2C_EE::put_data(uint data)
 
 uint I2C_EE::get_data()
 {
-
     uint data = rom[xfr_addr]->get();
 
     xfr_addr = (xfr_addr + 1) % rom_size;
     return (data);
 }
-
 
 
 // Bit 0 is write protect, 1-3 is A0 - A2
@@ -549,7 +543,7 @@ void I2C_EE::write_busy()
 {
     uint64_t fc;
 
-    if (! ee_busy && ! m_write_protect)
+    if( ! ee_busy && ! m_write_protect )
     {
         fc = (uint64_t)(get_cycles().instruction_cps() * 0.005);
         get_cycles().set_break(get_cycles().get() + fc, this);
@@ -568,7 +562,7 @@ void I2C_EE::callback_print()
 
 bool I2C_EE::match_address()
 {
-  if ((xfr_data & 0xf0) == 0xa0 && ((xfr_data & m_CSmask) == m_chipselect)) 
+  if( (xfr_data & 0xf0) == 0xa0 && ((xfr_data & m_CSmask) == m_chipselect) )
   {
     m_command = xfr_data;
     return true;
@@ -589,7 +583,7 @@ void I2C_EE::reset(RESET_TYPE by)
     }
 }
 
-void I2C_EE::attach ( Stimulus_Node *_scl, Stimulus_Node *_sda )
+void I2C_EE::attach ( Stimulus_Node* _scl, Stimulus_Node* _sda )
 {
   _scl->attach_stimulus ( scl );
   _sda->attach_stimulus ( sda );
@@ -603,8 +597,7 @@ void I2C_EE::dump()
     cout << "     " << hex;
 
     // Column labels
-    for (i = 0; i < 16; i++)
-      cout << setw(2) << setfill('0') <<  i << ' ';
+    for( i = 0; i < 16; i++) cout << setw(2) << setfill('0') <<  i << ' ';
 
     cout << '\n';
 

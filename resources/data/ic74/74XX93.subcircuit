@@ -41,8 +41,8 @@
         input1-eNode0
         input2-eNode0
         input3-eNode1
-        clock-packagePin8
-        output0-packagePin11" >
+        clock-Package_Q2
+        output0-Package_Q3" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -58,8 +58,8 @@
         input0-eNode0
         input2-eNode0
         input3-eNode1
-        clock-packagePin9
-        output0-packagePin8" >
+        clock-Package_Q1
+        output0-Package_Q2" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -75,8 +75,8 @@
         input0-eNode0
         input2-eNode0
         input3-eNode1
-        clock-packagePin1
-        output0-packagePin9" >
+        clock-Package_CP1
+        output0-Package_Q1" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -92,8 +92,8 @@
         input0-eNode0
         input2-eNode0
         input3-eNode1
-        clock-packagePin14
-        output0-packagePin12" >
+        clock-Package_CP0
+        output0-Package_Q0" >
     </item>
 
     <item itemtype="eAndGate"
@@ -107,8 +107,8 @@
         numInputs = "2"
         connections="
         output0-eNode1
-        input0-packagePin2
-        input1-packagePin3" >
+        input0-Package_MR1
+        input1-Package_MR2" >
     </item>
 
 </subcircuit>

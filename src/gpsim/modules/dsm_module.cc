@@ -203,7 +203,7 @@ void DSM_MODULE::rmModSrc(uint old_value)
 void DSM_MODULE::setModSrc(uint new_value, uint diff)
 {
         bool old = mdmin_state;
-           switch (new_value & 0x0f)
+        switch (new_value & 0x0f)
         {
         case 0:
             mdmin_state = mdcon.get_value() & MDBIT;
@@ -217,19 +217,13 @@ void DSM_MODULE::setModSrc(uint new_value, uint diff)
             break;
 
         case 0x8:        // MSSP1
-            if (ssp_mod1)
-            {
-            }
-            else
-                //printf("%s MSSP1 not defined\n", name().c_str();
+            if (ssp_mod1) { }
+            else //printf("%s MSSP1 not defined\n", name().c_str();
             break;
 
         case 0x9:        // MSSP2
-            if (ssp_mod2)
-            {
-            }
-            else
-                //printf("%s MSSP2 not defined\n", name().c_str();
+            if (ssp_mod2) { }
+            else //printf("%s MSSP2 not defined\n", name().c_str();
             break;
 
         case 0xa:        // USART TX
@@ -275,16 +269,13 @@ void DSM_MODULE::setModSrc(uint new_value, uint diff)
         default:
             break;
         }
-        if (old != mdmin_state)
-            dsm_logic(false, false);
+        if (old != mdmin_state) dsm_logic(false, false);
 }
 void DSM_MODULE::minEdge(char new3State)
 {
    bool old = mdmin_state;
    mdmin_state = (new3State == '1' || new3State == 'W');
-   if (old != mdmin_state)
-        dsm_logic(false, false);
-
+   if (old != mdmin_state) dsm_logic(false, false);
 }
 void DSM_MODULE::new_mdsrc(uint old_value, uint new_value)
 {

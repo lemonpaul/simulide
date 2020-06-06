@@ -46,8 +46,8 @@
     <pin side="bottom" pos="7"  type="gnd"   id="GND" label="Gnd"/>
     <pin side="bottom" pos="8"  type="bidir" id="XTAL2" label="XTAL2"/>
     <pin side="bottom" pos="9"  type="bidir" id="XTAL1" label="XTAL1"/>
-    <pin side="bottom" pos="10" type="bidir" id="PD0" label="D0"/>
-    <pin side="bottom" pos="11" type="bidir" id="PD1" label="D1"/>
+    <pin side="bottom" pos="10" type="bidir,scl" id="PD0" label="D0"/>
+    <pin side="bottom" pos="11" type="bidir,sda" id="PD1" label="D1"/>
     <pin side="bottom" pos="12" type="bidir" id="PD2" label="D2"/>
     <pin side="bottom" pos="13" type="bidir" id="PD3" label="D3"/>
     <pin side="bottom" pos="14" type="bidir" id="PD4" label="D4"/>

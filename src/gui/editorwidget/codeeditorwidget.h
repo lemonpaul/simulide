@@ -23,7 +23,6 @@
 #include <QWidget>
 
 #include "codeeditor.h"
-#include "ramtable.h"
 #include "outpaneltext.h"
 
 class MainWindow;
@@ -36,7 +35,7 @@ class CodeEditorWidget : public QWidget
         CodeEditorWidget( QWidget *parent );
         ~CodeEditorWidget();
 
-        CodeEditor   *m_codeEditor;
+        CodeEditor* m_codeEditor;
 
     public slots:
         void setVisible( bool visible );
@@ -44,11 +43,8 @@ class CodeEditorWidget : public QWidget
     private:
         void createWidgets();
 
-        QGridLayout *baseWidgetLayout;
-
-        RamTable     *m_ramTable;
-        OutPanelText *m_outPane;
-        MainWindow   *m_mainWindow;
+        QGridLayout*  baseWidgetLayout;
+        OutPanelText* m_outPane;
 };
 
 #endif // CODEEDITORWIDGET_H

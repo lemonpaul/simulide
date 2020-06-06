@@ -19,6 +19,7 @@
 
 #include "filebrowser.h"
 #include "circuitwidget.h"
+#include "mainwindow.h"
 #include "circuit.h"
 #include "filewidget.h"
 #include "editorwindow.h"
@@ -29,6 +30,8 @@ FileBrowser::FileBrowser( QWidget *parent )
            : QTreeView( parent )
 {
     m_pSelf = this;
+    m_showHidden = false;
+    
     m_fileSystemModel = new QFileSystemModel(this);
     m_fileSystemModel->setRootPath( QDir::rootPath() );
     
@@ -42,7 +45,10 @@ FileBrowser::FileBrowser( QWidget *parent )
     hideColumn( 2 );
     hideColumn( 3 );
     
-    setStyleSheet("border: 0px solid red");
+    double fontScale = MainWindow::self()->fontScale();
+    QString fontSize = QString::number( int(11*fontScale) );
+    
+    setStyleSheet("font-size:"+fontSize+"px; border: 0px solid red");
 }
 
 FileBrowser::~FileBrowser() { }
@@ -98,6 +104,13 @@ void FileBrowser::addBookMark()
     FileWidget::self()->addBookMark( filePath );
 }
 
+void FileBrowser::showHidden()
+{
+    m_showHidden = !m_showHidden;
+    if( m_showHidden ) m_fileSystemModel->setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Hidden );
+    else               m_fileSystemModel->setFilter( QDir::AllEntries | QDir::NoDotAndDotDot | QDir::AllDirs );
+}
+
 void FileBrowser::contextMenuEvent( QContextMenuEvent* event )
 {
     QTreeView::contextMenuEvent( event );
@@ -125,6 +138,12 @@ void FileBrowser::contextMenuEvent( QContextMenuEvent* event )
                      
             menu.addSeparator();
         }
+        
+        QAction* showHidden = menu.addAction( tr("Show Hidden"));
+        showHidden->setCheckable( true );
+        showHidden->setChecked( m_showHidden );
+        connect( showHidden, SIGNAL( triggered()), 
+                 this,       SLOT(   showHidden()) );
         menu.exec( eventPos );
     }
 }

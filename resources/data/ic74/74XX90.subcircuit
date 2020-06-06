@@ -32,8 +32,8 @@
         numInputs = "2"
         connections="
         output0-eNode0
-        input0-packagePin6
-        input1-packagePin7" >
+        input0-Package_MS1
+        input1-Package_MS2" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -46,9 +46,9 @@
         clockInverted = "true"
         connections="
         input2-eNode0
-        clock-packagePin14
+        clock-Package_CP0
         input3-eNode1
-        output0-packagePin12
+        output0-Package_Q0
         input1-eNode3
         input0-eNode3" >
     </item>
@@ -93,12 +93,12 @@
         clockInverted = "true"
         connections="
         input2-eNode0
-        clock-packagePin1
+        clock-Package_CP1
         input3-eNode1
         output1-eNode2
         input1-eNode3
         input0-eNode4
-        output0-packagePin11" >
+        output0-Package_Q3" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -110,9 +110,9 @@
         outImped = "40"
         clockInverted = "true"
         connections="
-        clock-packagePin1
+        clock-Package_CP1
         input0-eNode2
-        output0-packagePin9
+        output0-Package_Q1
         input1-eNode3
         input2-eNode3
         input3-eNode5" >
@@ -129,8 +129,8 @@
         numInputs = "2"
         connections="
         output0-eNode1
-        input0-packagePin2
-        input1-packagePin3" >
+        input0-Package_MR1
+        input1-Package_MR2" >
     </item>
 
     <item itemtype="eAndGate"
@@ -143,8 +143,8 @@
         outImped = "40"
         numInputs = "2"
         connections="
-        input0-packagePin9
-        input1-packagePin8
+        input0-Package_Q1
+        input1-Package_Q2
         output0-eNode4" >
     </item>
 
@@ -157,8 +157,8 @@
         outImped = "40"
         clockInverted = "true"
         connections="
-        clock-packagePin9
-        output0-packagePin8
+        clock-Package_Q1
+        output0-Package_Q2
         input0-eNode3
         input1-eNode3
         input2-eNode3

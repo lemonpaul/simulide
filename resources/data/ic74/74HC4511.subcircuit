@@ -451,7 +451,7 @@
         numInputs = "2"
         connections="
         output0-eNode20
-        input0-packagePin7
+        input0-Package_D0
         input1-eNode39" >
     </item>
 
@@ -465,7 +465,7 @@
         inverted = "true"
         connections="
         output0-eNode21
-        input0-packagePin1" >
+        input0-Package_D1" >
     </item>
 
     <item itemtype="eAndGate"
@@ -494,7 +494,7 @@
         numInputs = "2"
         connections="
         output0-eNode22
-        input0-packagePin1
+        input0-Package_D1
         input1-eNode39" >
     </item>
 
@@ -508,7 +508,7 @@
         inverted = "true"
         connections="
         output0-eNode24
-        input0-packagePin2" >
+        input0-Package_D2" >
     </item>
 
     <item itemtype="eAndGate"
@@ -537,7 +537,7 @@
         numInputs = "2"
         connections="
         output0-eNode25
-        input0-packagePin6
+        input0-Package_D3
         input1-eNode39" >
     </item>
 
@@ -552,7 +552,7 @@
         numInputs = "2"
         connections="
         output0-eNode27
-        input0-packagePin2
+        input0-Package_D2
         input1-eNode39" >
     </item>
 
@@ -581,7 +581,7 @@
         inverted = "true"
         connections="
         output0-eNode29
-        input0-packagePin6" >
+        input0-Package_D3" >
     </item>
 
     <item itemtype="eBuffer"
@@ -594,7 +594,7 @@
         inverted = "true"
         connections="
         output0-eNode31
-        input0-packagePin7" >
+        input0-Package_D0" >
     </item>
 
     <item itemtype="eAndGate"
@@ -608,8 +608,8 @@
         numInputs = "2"
         connections="
         input0-eNode32
-        output0-packagePin12
-        input1-packagePin3" >
+        output0-Package_B
+        input1-Package_!LT" >
     </item>
 
     <item itemtype="eAndGate"
@@ -623,8 +623,8 @@
         numInputs = "2"
         connections="
         input0-eNode33
-        output0-packagePin11
-        input1-packagePin3" >
+        output0-Package_C
+        input1-Package_!LT" >
     </item>
 
     <item itemtype="eAndGate"
@@ -638,8 +638,8 @@
         numInputs = "2"
         connections="
         input0-eNode34
-        output0-packagePin10
-        input1-packagePin3" >
+        output0-Package_D
+        input1-Package_!LT" >
     </item>
 
     <item itemtype="eAndGate"
@@ -653,8 +653,8 @@
         numInputs = "2"
         connections="
         input0-eNode35
-        output0-packagePin13
-        input1-packagePin3" >
+        output0-Package_A
+        input1-Package_!LT" >
     </item>
 
     <item itemtype="eAndGate"
@@ -668,8 +668,8 @@
         numInputs = "2"
         connections="
         input0-eNode36
-        output0-packagePin9
-        input1-packagePin3" >
+        output0-Package_E
+        input1-Package_!LT" >
     </item>
 
     <item itemtype="eAndGate"
@@ -683,8 +683,8 @@
         numInputs = "2"
         connections="
         input0-eNode37
-        output0-packagePin15
-        input1-packagePin3" >
+        output0-Package_F
+        input1-Package_!LT" >
     </item>
 
     <item itemtype="eAndGate"
@@ -698,8 +698,8 @@
         numInputs = "2"
         connections="
         input0-eNode38
-        input1-packagePin3
-        output0-packagePin14" >
+        input1-Package_!LT
+        output0-Package_G" >
     </item>
 
     <item itemtype="eBuffer"
@@ -712,7 +712,7 @@
         inverted = "true"
         connections="
         output0-eNode39
-        input0-packagePin5" >
+        input0-Package_!LE" >
     </item>
 
     <item itemtype="eBuffer"
@@ -724,7 +724,7 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin4
+        input0-Package_!BL
         output0-eNode40" >
     </item>
 

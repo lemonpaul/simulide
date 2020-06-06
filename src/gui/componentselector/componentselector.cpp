@@ -64,7 +64,7 @@ void ComponentSelector::LoadLibraryItems()
 {
     QList<LibraryItem*> itemList = m_itemLibrary.items();
     
-    foreach( LibraryItem* libItem, itemList )
+    for( LibraryItem* libItem : itemList )
     {
         this->addItem( libItem );
     }
@@ -87,7 +87,7 @@ void ComponentSelector::LoadCompSetAt( QDir compSetDir )
 
     qDebug() << "\n" << tr("    Loading Component sets at:")<< "\n" << compSetDir.absolutePath()<<"\n";
 
-    foreach( QString compSetName, xmlList )
+    for( QString compSetName : xmlList )
     {
         QString compSetFilePath = compSetDir.absoluteFilePath( compSetName );
 
@@ -145,8 +145,13 @@ void ComponentSelector::loadXml( const QString &setFile )
                     icon = compSetDir.absoluteFilePath( element.attribute("icon") );
                 }
                 QString name = element.attribute( "name" );
-                addItem( name, category, icon, type );
+                
                 m_xmlFileList[ name ] = setFile;   // Save xml File used to create this item
+                
+                if( element.hasAttribute("info") ) name += "???"+element.attribute( "info" );
+                
+                addItem( name, category, icon, type );
+                
                 node = node.nextSibling();
             }
         }
@@ -180,55 +185,68 @@ void ComponentSelector::addItem( LibraryItem* libItem )
     }
 }
 
-void ComponentSelector::addItem( const QString &name, const QString &_category, const QString &icon, const QString &type )
+void ComponentSelector::addItem( const QString &caption, const QString &_category, const QString &icon, const QString &type )
 {
+    QStringList nameFull = caption.split( "???" );
+    QString         name = nameFull.first();
+    QString info = "";
+    if( nameFull.size() > 1 ) info = nameFull.last();
+    
+    //qDebug()<<name<<info;
+    
     bool hidden = MainWindow::self()->settings()->value( name+"/hidden" ).toBool();
 
     QTreeWidgetItem* catItem = 0l;
     
     QStringList catPath = _category.split( "/" );
-    bool isRootCat      = (catPath.size() == 1);
-    QString category    = catPath.takeLast();
+    bool      isRootCat = (catPath.size() == 1);
+    QString    category = catPath.takeLast();
+    if( category.isEmpty() ) return;
 
     if( !m_categories.contains( category, Qt::CaseSensitive ))  // Create new Category
     {
-        bool c_hidden =  MainWindow::self()->settings()->value( category+"/hidden" ).toBool();
+        bool c_hidden = false;
         bool expanded = false;
-        if( isRootCat ) expanded = true;
-        if( MainWindow::self()->settings()->contains( category+"/collapsed" ) )
-            expanded = !MainWindow::self()->settings()->value( category+"/collapsed" ).toBool();
-
-        m_categories.append( category );
-        catItem = new QTreeWidgetItem(0);
-        catItem->setFlags( QFlag(32) );
-        QFont font = catItem->font(0);
-        font.setPixelSize(13);
-        font.setWeight(75);
 
         if( isRootCat )                              // Is Main Category
         {
+            catItem = new QTreeWidgetItem( this );
             catItem->setIcon( 0, QIcon(":/null-0.png") );
             catItem->setTextColor( 0, QColor( 110, 95, 50 )/*QColor(255, 230, 200)*/ );
             catItem->setBackground( 0, QBrush(QColor(240, 235, 245)) );
+            expanded = true;
         }
+        else catItem = new QTreeWidgetItem(0);
+
+        catItem->setFlags( QFlag(32) );
+        QFont font = catItem->font(0);
+        font.setPixelSize( 13*MainWindow::self()->fontScale() );
+        font.setWeight(75);
         catItem->setFont( 0, font );
         catItem->setText( 0, category );
         catItem->setChildIndicatorPolicy( QTreeWidgetItem::ShowIndicator );
-        
+        m_categories.append( category );
+
         if( !catPath.isEmpty() )
         {
             QString topCat = catPath.takeLast();
-            
+
             QList<QTreeWidgetItem*> list = findItems( topCat, Qt::MatchExactly | Qt::MatchRecursive );
-            
-            if( !list.isEmpty() ) 
+
+            if( !list.isEmpty() )
             {
                 QTreeWidgetItem* topItem = list.first();
                 topItem->addChild( catItem );
             }
         }
         else if( name != "" ) addTopLevelItem( catItem );
-        
+
+        if( MainWindow::self()->settings()->contains( category+"/hidden" ) )
+            c_hidden =  MainWindow::self()->settings()->value( category+"/hidden" ).toBool();
+
+        if( MainWindow::self()->settings()->contains( category+"/collapsed" ) )
+            expanded = !MainWindow::self()->settings()->value( category+"/collapsed" ).toBool();
+
         catItem->setExpanded( expanded );
         catItem->setHidden( c_hidden );
     }
@@ -245,16 +263,27 @@ void ComponentSelector::addItem( const QString &name, const QString &_category, 
 
     QTreeWidgetItem* item =  new QTreeWidgetItem(0);
     QFont font = item->font(0);
-    if( type == "" ) font.setPixelSize( 13 );
-    else             font.setPixelSize(11);
+    
+    double fontScale = MainWindow::self()->fontScale();
+    if( type == "" ) font.setPixelSize( 12*fontScale );
+    else             font.setPixelSize( 11*fontScale );
     font.setWeight( QFont::Bold );
     
     item->setFont( 0, font );
-    item->setText( 0, name );
     item->setFlags( QFlag(32) );
     item->setIcon( 0, QIcon(icon) );
+    item->setText( 0, name+info );
     item->setData( 0, Qt::UserRole, type );
-
+    
+    if( ( type == "Subcircuit" )
+      ||( type == "PIC" )
+      ||( type == "AVR" )
+      ||( type == "Arduino" ) )
+    {
+         item->setData( 0, Qt::WhatsThisRole, name );
+    }
+    else item->setData( 0, Qt::WhatsThisRole, type );
+    
     catItem->addChild( item );
     item->setHidden( hidden );
     if( MainWindow::self()->settings()->contains( name+"/collapsed" ) )
@@ -302,14 +331,13 @@ void ComponentSelector::slotItemClicked( QTreeWidgetItem* item, int column )
     if( !item ) return;
     
     QString type = item->data(0, Qt::UserRole).toString();
-    //m_lastItemClicked = type;
     
     if( type == "" ) return;
     
     QMimeData* mimeData = new QMimeData;
     
-    QString name = item->text(0);
-    //qDebug() <<"ComponentSelector::slotItemClicked"<<name;
+    QString name = item->data(0, Qt::WhatsThisRole).toString(); //item->text(0);
+    //qDebug() <<"ComponentSelector::slotItemClicked"<<name<<type;
     mimeData->setText( name );
     mimeData->setHtml( type );              // esto hay que revisarlo
     

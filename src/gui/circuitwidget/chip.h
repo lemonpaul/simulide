@@ -27,10 +27,14 @@
 class MAINMODULE_EXPORT Chip : public Component, public eElement
 {
     Q_OBJECT
+    Q_PROPERTY( bool Logic_Symbol READ logicSymbol WRITE setLogicSymbol DESIGNABLE true USER true )
 
     public:
         Chip( QObject* parent, QString type, QString id );
         ~Chip();
+        
+        bool logicSymbol();
+        virtual void setLogicSymbol( bool ls );
 
         virtual void initEpins(){;}
 
@@ -44,14 +48,29 @@ class MAINMODULE_EXPORT Chip : public Component, public eElement
 
         virtual void addPin( QString id, QString type, QString label,
                              int pos, int xpos, int ypos, int angle );
+        
+        //virtual void updatePin( QString id, QString type, QString label,
+        //                     int pos, int xpos, int ypos, int angle );
 
         virtual void initChip();
 
-        int   m_numpins;
+        int m_numpins;
+        int m_width;
+        int m_height;
         
-        bool m_isChip;
+        bool m_isLS;
+        bool m_initialized;
 
-        QString m_dataFile;     // file containig package defs
+        QColor m_lsColor;
+        QColor m_icColor;
+
+        QString m_pkgeFile;     // file containig package defs
+        //QString m_dataFile;     // xml file containig entry
+        
+        QList<Pin*> m_topPin;
+        QList<Pin*> m_botPin;
+        QList<Pin*> m_lefPin;
+        QList<Pin*> m_rigPin;
 };
 #endif
 

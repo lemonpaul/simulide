@@ -21,14 +21,10 @@
 #define AVRCOMPONENT_H
 
 
-#include "mcucomponent.h"
-#include "avrcomponentpin.h"
-#include "avrprocessor.h"
+#include "avrcompbase.h"
 #include "itemlibrary.h"
 
-struct avr_t;
-
-class AVRComponent : public McuComponent
+class AVRComponent : public AvrCompBase
 {
     Q_OBJECT
 
@@ -37,30 +33,9 @@ class AVRComponent : public McuComponent
         AVRComponent( QObject* parent, QString type, QString id );
         ~AVRComponent();
     
- static Component* construct( QObject* parent, QString type, QString id );
- static LibraryItem * libraryItem();
+ static Component*   construct( QObject* parent, QString type, QString id );
+ static LibraryItem* libraryItem();
 
-        int getRamValue( int address );
-        
-        void adcread( int channel );
-        
- static void adc_hook( struct avr_irq_t* irq, uint32_t value, void* param )
-        {
-            Q_UNUSED(irq);
-            // get the pointer out of param and asign it to AVRComponentPin*
-            AVRComponent* ptrAVRComponent = reinterpret_cast<AVRComponent*> (param);
-
-            int channel = int( value/524288 );
-            ptrAVRComponent->adcread( channel );
-        }
-
-    private:
-        void attachPins();
-        void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
-        
-        QHash<int, AVRComponentPin*> m_ADCpinList;
-        
-        AvrProcessor m_avr;
 };
 
 #endif

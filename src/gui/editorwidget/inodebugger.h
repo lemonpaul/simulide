@@ -53,6 +53,11 @@ class InoDebugger : public BaseDebugger
         int compile();
         void mapFlashToSource();
         
+        virtual void upload();
+        
+    protected:
+        void getVariables();
+        
     private:
         int m_lastInoLine;
         int m_loopInoLine;

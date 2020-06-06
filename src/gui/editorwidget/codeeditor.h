@@ -27,6 +27,11 @@
 #include "outpaneltext.h"
 #include "ramtable.h"
 
+#define DBG_STOPPED 0
+#define DBG_STEPING 1
+#define DBG_RUNNING 2
+#define DBG_PAUSED  3
+
 class QPaintEvent;
 class QResizeEvent;
 class QSize;
@@ -39,13 +44,13 @@ class CodeEditor : public QPlainTextEdit
 {
     Q_OBJECT
     //Q_PROPERTY( bool   centerOnScroll   READ centerOnScroll    WRITE setCenterOnScroll  DESIGNABLE true USER true )
-    Q_PROPERTY( int  Font_Size   READ fontSize    WRITE setFontSize   DESIGNABLE true USER true )
-    Q_PROPERTY( int  Tab_Size    READ tabSize     WRITE setTabSize    DESIGNABLE true USER true )
-    Q_PROPERTY( bool Spaces_Tabs READ spaceTabs   WRITE setSpaceTabs  DESIGNABLE true USER true )
-    Q_PROPERTY( bool Show_Spaces READ showSpaces  WRITE setShowSpaces DESIGNABLE true USER true )
+    Q_PROPERTY( int  Font_Size     READ fontSize   WRITE setFontSize   DESIGNABLE true USER true )
+    Q_PROPERTY( int  Tab_Size      READ tabSize    WRITE setTabSize    DESIGNABLE true USER true )
+    Q_PROPERTY( bool Spaces_Tabs   READ spaceTabs  WRITE setSpaceTabs  DESIGNABLE true USER true )
+    Q_PROPERTY( bool Show_Spaces   READ showSpaces WRITE setShowSpaces DESIGNABLE true USER true )
 
     public:
-        CodeEditor( QWidget *parent, OutPanelText *outPane, RamTable *ramTable );
+        CodeEditor( QWidget *parent, OutPanelText *outPane );
         ~CodeEditor();
         
         int fontSize();
@@ -59,6 +64,9 @@ class CodeEditor : public QPlainTextEdit
         
         bool spaceTabs();
         void setSpaceTabs( bool on );
+        
+        bool driveCirc();
+        void setDriveCirc( bool drive );
 
         void setFile(const QString &filePath);
         QString getFilePath();
@@ -70,8 +78,8 @@ class CodeEditor : public QPlainTextEdit
         
         bool debugStarted() { return m_debugging; }
         bool initDebbuger();
-
         bool hasDebugger() { return m_debugger!=0l; }
+
         void setCompilerPath();
 
     signals:
@@ -84,7 +92,7 @@ class CodeEditor : public QPlainTextEdit
         void timerTick();
         void compile();
         void upload();
-        void step();
+        void step( bool over=false );
         void stepOver();
         void pause();
         void resume();
@@ -100,6 +108,7 @@ class CodeEditor : public QPlainTextEdit
         void updateLineNumberAreaWidth(int newBlockCount);
         void updateLineNumberArea( const QRect &, int );
         void highlightCurrentLine();
+        void runClockTick();
 
     private:
         int  getSintaxCoincidences(QString& fileName, QStringList& instructions );
@@ -107,14 +116,12 @@ class CodeEditor : public QPlainTextEdit
         void remBreakPoint( int line );
         void updateScreen();
 
-        void runClockTick( bool over=false );
         void setupDebugTimer();
         
         void indentSelection( bool unIndent );
         
-        BaseDebugger*  m_debugger;
-        RamTable*      m_ramTable;
-        OutPanelText*  m_outPane;
+        BaseDebugger* m_debugger;
+        OutPanelText* m_outPane;
 
         LineNumberArea *m_lNumArea;
         Highlighter    *m_hlighter;
@@ -132,14 +139,19 @@ class CodeEditor : public QPlainTextEdit
         int m_brkAction;    // 0 = no action, 1 = add brkpoint, 2 = rem brkpoint
         int m_debugLine;
         int m_prevDebugLine;
+        int m_state;
+        int m_resume;
 
         bool m_isCompiled;
         bool m_debugging;
-        bool m_running;
-        bool m_resume;
+        //bool m_running;
+
+        bool m_stepOver;
         
  static bool  m_showSpaces;
  static bool  m_spaceTabs;
+ static bool  m_driveCirc;
+ 
  static int   m_fontSize;
  static int   m_tabSize;
  static QFont m_font;
@@ -172,4 +184,3 @@ class LineNumberArea : public QWidget
 };
 
 #endif
-

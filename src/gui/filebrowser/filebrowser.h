@@ -39,6 +39,7 @@ class MAINMODULE_EXPORT FileBrowser : public QTreeView
         void open();
         void openInEditor();
         void addBookMark();
+        void showHidden();
         
     protected:
         void contextMenuEvent( QContextMenuEvent* event );
@@ -53,6 +54,8 @@ class MAINMODULE_EXPORT FileBrowser : public QTreeView
         QFileSystemModel* m_fileSystemModel;
         
         QString m_currentPath;
+        
+        bool m_showHidden;
 };
 
 #endif

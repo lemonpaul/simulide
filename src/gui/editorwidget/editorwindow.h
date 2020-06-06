@@ -36,11 +36,16 @@ class EditorWindow : public QWidget
  static EditorWindow* self() { return m_pSelf; }
 
         bool close();
+        
+        void enableStepOver( bool en );
+
+        CodeEditor* getCodeEditor();
 
     public slots:
         void loadFile(const QString &fileName);
         void pause();
         void stop();
+        void run();
         bool save();
         
     private slots:
@@ -50,16 +55,18 @@ class EditorWindow : public QWidget
         void about();
         void closeTab(int);
         void documentWasModified();
-        void tabContextMenu(const QPoint & eventpoint);
+        void tabContextMenu( const QPoint & eventpoint );
+        void tabChanged( int tab );
         void setCompiler();
+        void reload();
 
         void cut();
         void copy();
         void paste();
         void undo();
         void redo();
+        
         void debug();
-        void run();
         void step();
         void stepOver();
         void reset();
@@ -76,11 +83,11 @@ class EditorWindow : public QWidget
         void writeSettings();
         void enableFileActs( bool enable );
         void enableDebugActs( bool enable );
+        void setStepActs();
         void keyPressEvent(QKeyEvent *event);
 
         bool maybeSave();
         bool saveFile(const QString &fileName);
-        CodeEditor* getCodeEditor();
         
         QString strippedName(const QString &fullFileName);
         

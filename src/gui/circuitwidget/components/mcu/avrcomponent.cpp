@@ -18,11 +18,9 @@
  ***************************************************************************/
 
 #include "avrcomponent.h"
-#include "avrprocessor.h"
-#include "itemlibrary.h"
-#include "mainwindow.h"
 #include "circuit.h"
 #include "utils.h"
+
 
 LibraryItem* AVRComponent::libraryItem()
 {
@@ -45,8 +43,8 @@ Component* AVRComponent::construct( QObject* parent, QString type, QString id )
             avr->deleteLater();
             avr = 0l;
             m_error = 0;
+            m_pSelf = 0l;
             m_canCreate = true;
-            
         }
         return avr;
     }
@@ -57,10 +55,9 @@ Component* AVRComponent::construct( QObject* parent, QString type, QString id )
 }
 
 AVRComponent::AVRComponent( QObject* parent, QString type, QString id )
-            : McuComponent( parent, type, id )
+            : AvrCompBase( parent, type, id )
 {
     m_pSelf = this;
-    m_dataFile = "avrs.xml";
     m_processor = AvrProcessor::self();
 
     initChip();
@@ -76,38 +73,5 @@ AVRComponent::AVRComponent( QObject* parent, QString type, QString id )
 }
 AVRComponent::~AVRComponent() { }
 
-void AVRComponent::attachPins()
-{
-    AvrProcessor* ap = dynamic_cast<AvrProcessor*>( m_processor );
-    avr_t* cpu = ap->getCpu();
-
-    for( int i = 0; i < m_numpins; i++ )
-    {
-        AVRComponentPin* pin = dynamic_cast<AVRComponentPin*>( m_pinList[i] );
-        pin->attach( cpu );
-    }
-    cpu->vcc  = 5000;
-    cpu->avcc = 5000;
-    
-    // Registra IRQ para recibir petiones de voltaje de pin ( usado en ADC )
-    avr_irq_t* adcIrq = avr_io_getirq( cpu, AVR_IOCTL_ADC_GETIRQ, ADC_IRQ_OUT_TRIGGER );
-    avr_irq_register_notify( adcIrq, adc_hook, this );
-    
-    m_attached = true;
-}
-
-void AVRComponent::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
-{
-    AVRComponentPin*  newPin = new AVRComponentPin( this, id, type, label, pos, xpos, ypos, angle );
-    m_pinList.append( newPin );
-    
-    if( type.startsWith("adc") ) m_ADCpinList[type.remove("adc").toInt()] = newPin;
-}
-
-void AVRComponent::adcread( int channel )
-{
-    AVRComponentPin* pin = m_ADCpinList.value(channel);
-    if( pin ) pin->adcread();
-}
 
 #include "moc_avrcomponent.cpp"

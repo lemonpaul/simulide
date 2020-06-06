@@ -31,11 +31,15 @@
 #include "circuit.h"
 #include "connector.h"
 #include "simulator.h"
+#include "simuapi_apppath.h"
 #include "utils.h"
 
 
 static const char* McuComponent_properties[] = {
-    QT_TRANSLATE_NOOP("App::Property","Program")
+    QT_TRANSLATE_NOOP("App::Property","Program"),
+    QT_TRANSLATE_NOOP("App::Property","Mhz"),
+    QT_TRANSLATE_NOOP("App::Property","Auto Load"),
+    QT_TRANSLATE_NOOP("App::Property","Init gdb")
 };
 
 McuComponent* McuComponent::m_pSelf = 0l;
@@ -43,15 +47,15 @@ bool McuComponent::m_canCreate = true;
 
 McuComponent::McuComponent( QObject* parent, QString type, QString id )
             : Chip( parent, type, id )
+            , MemData()
 {
     Q_UNUSED( McuComponent_properties );
     
     qDebug() << "        Initializing"<<m_id<<"...";
     
     m_canCreate = false;
-    m_serPort   = false;
-    m_serMon    = false;
     m_attached  = false;
+    m_autoLoad  = false;
     
     m_processor  = 0l;
     m_symbolFile = "";
@@ -63,28 +67,47 @@ McuComponent::McuComponent( QObject* parent, QString type, QString id )
 
     QSettings* settings = MainWindow::self()->settings();
     m_lastFirmDir = settings->value("lastFirmDir").toString();
-    
+
     if( m_lastFirmDir.isEmpty() )
         m_lastFirmDir = QCoreApplication::applicationDirPath();
+
+    Simulator::self()->addToUpdateList( this );
 }
-McuComponent::~McuComponent() {}
+McuComponent::~McuComponent()
+{
+}
+
+void McuComponent::runAutoLoad()
+{
+    if( m_processor->getLoadStatus() )
+    {
+        //qDebug() << "McuComponent::runAutoLoad Autoreloading";
+        if( m_autoLoad ) load( m_symbolFile );
+        emit openSerials();
+    }
+}
+
+void McuComponent::updateStep()
+{
+    m_processor->getRamTable()->updateValues();
+}
 
 void McuComponent::initChip()
 {
     QString compName = m_id.split("-").first(); // for example: "atmega328-1" to: "atmega328"
 
-    m_dataFile = ComponentSelector::self()->getXmlFile( compName );
+    QString dataFile = ComponentSelector::self()->getXmlFile( compName );
     
-    QFile file( m_dataFile );
+    QFile file( dataFile );
     
-    if(( m_dataFile == "" ) || ( !file.exists() ))
+    if(( dataFile == "" ) || ( !file.exists() ))
     {
         m_error = 1;
         return;
     }
     if( !file.open(QFile::ReadOnly | QFile::Text) )
     {
-        MessageBoxNB( "Error", tr("Cannot read file %1:\n%2.").arg(m_dataFile).arg(file.errorString()) );
+        MessageBoxNB( "Error", tr("Cannot read file %1:\n%2.").arg(dataFile).arg(file.errorString()) );
         m_error = 1;
         return;
     }
@@ -92,7 +115,7 @@ void McuComponent::initChip()
     
     if( !domDoc.setContent(&file) )
     {
-        MessageBoxNB( "Error", tr("Cannot set file %1\nto DomDocument").arg(m_dataFile) );
+        MessageBoxNB( "Error", tr("Cannot set file %1\nto DomDocument").arg(dataFile) );
         file.close();
         m_error = 1;
         return;
@@ -114,9 +137,9 @@ void McuComponent::initChip()
             if( element.attribute("name")==compName )
             {
                 // Get package file
-                QDir dataDir(  m_dataFile );
+                QDir dataDir(  dataFile );
                 dataDir.cdUp();             // Indeed it doesn't cd, just take out file name
-                m_dataFile = dataDir.filePath( element.attribute( "package" ) )+".package";
+                m_pkgeFile = dataDir.filePath( element.attribute( "package" ) )+".package";
                 
                 // Get device
                 m_device = element.attribute( "device" );
@@ -142,16 +165,16 @@ void McuComponent::initChip()
     }
 }
 
-int McuComponent::freq()
+double McuComponent::freq()
 { 
     return m_freq; 
 }
-void McuComponent::setFreq( int freq )
+
+void McuComponent::setFreq( double freq )
 { 
     if     ( freq < 0  )  freq = 0;
     else if( freq > 100 ) freq = 100;
-    
-    BaseProcessor::self()->setSteps( freq );
+
     m_freq = freq; 
 }
 
@@ -166,23 +189,25 @@ void McuComponent::reset()
 void McuComponent::terminate()
 {
     qDebug() <<"        Terminating"<<m_id<<"...";
+
     m_processor->terminate();
     for( int i=0; i<m_numpins; i++ ) m_pinList[i]->terminate();
+
     m_pSelf = 0l;
-    //reset();
+
     qDebug() <<"     ..."<<m_id<<"Terminated\n";
 }
 
 void McuComponent::remove()
 {
-    foreach( McuComponentPin* mcupin, m_pinList )
+    emit closeSerials();
+
+    Simulator::self()->remFromUpdateList( this );
+    for( McuComponentPin* mcupin : m_pinList )
     {
         Pin* pin = mcupin->pin(); 
         if( pin->connector() ) pin->connector()->remove();
-        //delete mcupin;
     }
-    slotCloseTerm();
-    slotCloseSerial();
     terminate();
     m_pinList.clear();
     
@@ -210,63 +235,49 @@ void McuComponent::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* me
 
     QAction* reloadAction = menu->addAction( QIcon(":/reload.png"),tr("Reload firmware") );
     connect( reloadAction, SIGNAL(triggered()), this, SLOT(slotReload()) );
+
+    QAction* loadDaAction = menu->addAction( QIcon(":/load.png"),tr("Load EEPROM data") );
+    connect( loadDaAction, SIGNAL(triggered()), this, SLOT(loadData()) );
+
+    QAction* saveDaAction = menu->addAction(QIcon(":/save.png"), tr("Save EEPROM data") );
+    connect( saveDaAction, SIGNAL(triggered()), this, SLOT(saveData()) );
+
+    menu->addSeparator();
     
     QAction* openTerminal = menu->addAction( QIcon(":/terminal.png"),tr("Open Serial Monitor.") );
     connect( openTerminal, SIGNAL(triggered()), this, SLOT(slotOpenTerm()) );
-    
-    QAction* closeTerminal = menu->addAction( QIcon(":/closeterminal.png"),tr("Close Serial Monitor") );
-    connect( closeTerminal, SIGNAL(triggered()), this, SLOT(slotCloseTerm()) );
 
     QAction* openSerial = menu->addAction( QIcon(":/terminal.png"),tr("Open Serial Port.") );
     connect( openSerial, SIGNAL(triggered()), this, SLOT(slotOpenSerial()) );
-
-    QAction* closeSerial = menu->addAction( QIcon(":/closeterminal.png"),tr("Close Serial Port") );
-    connect( closeSerial, SIGNAL(triggered()), this, SLOT(slotCloseSerial()) );
 
     menu->addSeparator();
 
     Component::contextMenu( event, menu );
 }
 
-
 void McuComponent::slotOpenSerial()
 {
-    CircuitWidget::self()->showSerialPortWidget( true );
-    m_processor->setSerPort( true );
-    m_serPort = true;
-}
-
-void McuComponent::slotCloseSerial()
-{
-    CircuitWidget::self()->showSerialPortWidget( false );
-    m_processor->setSerPort( false );
-    m_serPort = false;
+    Component* ser = Circuit::self()->createItem( "SerialPort", "SerialPort-"+Circuit::self()->newSceneId());
+    ser->setPos( pos());
+    Circuit::self()->addItem( ser );
 }
 
 void McuComponent::slotOpenTerm()
 {
-    TerminalWidget::self()->setVisible( true );
-    m_processor->setUsart( true );
-    m_serMon = true;
-}
-
-void McuComponent::slotCloseTerm()
-{
-    TerminalWidget::self()->setVisible( false );
-    m_processor->setUsart( false );
-    m_serMon = false;
+    Component* ser = Circuit::self()->createItem( "SerialTerm", "SerialTerm-"+Circuit::self()->newSceneId());
+    ser->setPos( pos());
+    Circuit::self()->addItem( ser );
 }
 
 void McuComponent::slotLoad()
 {
     const QString dir = m_lastFirmDir;
     QString fileName = QFileDialog::getOpenFileName( 0l, tr("Load Firmware"), dir,
-                       tr("Hex Files (*.hex);;ELF Files (*.elf);;all files (*.*)"));
+                       tr("All files (*.*);;ELF Files (*.elf);;Hex Files (*.hex)"));
                        
-    if (fileName.isEmpty()) return; // User cancels loading
-
-    QDir circuitDir = QFileInfo(Circuit::self()->getFileName()).absoluteDir();
-    load( circuitDir.relativeFilePath(fileName) );
+    if( fileName.isEmpty() ) return; // User cancels loading
+    
+    load( fileName );
 }
 
 void McuComponent::slotReload()
@@ -289,11 +300,13 @@ void McuComponent::load( QString fileName )
         if( !m_attached ) attachPins();
         reset();
         
-        m_symbolFile = fileName;
+        m_symbolFile = circuitDir.relativeFilePath( fileName );
         m_lastFirmDir = cleanPathAbs;
 
         QSettings* settings = MainWindow::self()->settings();
         settings->setValue( "lastFirmDir", m_symbolFile );
+
+        //checkPcLink();
     }
     //else QMessageBox::warning( 0, tr("Error:"), tr("Could not load: \n")+ fileName );
     
@@ -315,26 +328,62 @@ void McuComponent::setProgram( QString pro )
     }
 }
 
-bool McuComponent::serPort()
+void McuComponent::setEeprom( QVector<int> eep )
 {
-    return m_serPort;
+    m_processor->setEeprom( eep );
 }
 
-void McuComponent::setSerPort( bool set )
+QVector<int> McuComponent::eeprom()
 {
-    if( set ) slotOpenSerial();
-    else      slotCloseSerial();
+    QVector<int> eep = m_processor->eeprom();
+    return eep;
 }
 
-bool McuComponent::serMon()
+void McuComponent::loadData()
 {
-    return m_serMon;
+    QVector<int> data;
+
+    bool resize = false;
+    if( !m_processor->getLoadStatus() ) resize = true; // No eeprom initialized yet
+
+    MemData::loadData( &data, resize );
+    m_processor->setEeprom( data );
 }
 
-void McuComponent::setSerMon( bool set )
+void McuComponent::saveData()
 {
-    if( set ) slotOpenTerm();
-    else      slotCloseTerm();
+    QVector<int> data = m_processor->eeprom();
+    MemData::saveData( data );
+}
+
+void McuComponent::setLogicSymbol( bool ls )
+{
+    return;
+    if( m_initialized && (m_isLS == ls) ) return;
+    //qDebug() <<"SubCircuit::setLogicSymbol"<<ls<<m_pkgeFile;
+
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim ) Simulator::self()->pauseSim();
+
+    Circuit::self()->saveState();
+
+    for( McuComponentPin* mcupin : m_pinList )
+    {
+        Pin* pin = mcupin->pin();
+        if( pin->connector() ) pin->connector()->remove();
+        delete mcupin;
+    }
+    m_pinList.clear();
+
+    //clear();
+    m_ePin.clear();
+    m_pin.clear();
+    m_ePin.resize( m_numpins );
+    m_pin.resize( m_numpins );
+
+    //Chip::setLogicSymbol( ls );
+
+    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void McuComponent::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )

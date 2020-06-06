@@ -44,6 +44,7 @@ Component* PICComponent::construct( QObject* parent, QString type, QString id )
             Circuit::self()->removeComp( pic );
             pic = 0l;
             m_error = 0;
+            m_pSelf = 0l;
             m_canCreate = true;
         }
         return pic;
@@ -58,7 +59,6 @@ PICComponent::PICComponent( QObject* parent, QString type, QString id )
             : McuComponent( parent, type, id )
 {
     m_pSelf = this;
-    m_dataFile = "pics.xml";
     m_processor = PicProcessor::self();
 
     //if( m_id.startsWith("PIC") ) m_id.replace( "PIC", "pic16f876" );

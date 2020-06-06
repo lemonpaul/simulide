@@ -32,7 +32,7 @@ AvrAsmDebugger::AvrAsmDebugger( QObject* parent, OutPanelText* outPane, QString 
 {
     Q_UNUSED( AvrAsmDebugger_properties );
     
-    setObjectName( "AVR asm Compiler" );
+    setObjectName( "AVR asm Compiler/Debugger" );
     
     m_compilerPath = "";
     m_avraIncPath  = "";
@@ -65,13 +65,24 @@ int AvrAsmDebugger::compile()
     QString listFile = m_fileDir+m_fileName+".lst";
     QString command  = m_compilerPath+"avra";
     
+    QProcess checkComp( this );
+    checkComp.start( command  );
+    checkComp.waitForFinished(-1);
+    
+    QString p_stdo = checkComp.readAllStandardOutput();
+    if( !p_stdo.toUpper().contains("VERSION") )
+    {
+        m_outPane->appendText( "\navra" );
+        toolChainNotFound();
+        return -1;
+    }
+
     #ifndef Q_OS_UNIX
     command  = addQuotes( command );
     listFile = addQuotes( listFile );
     file     = addQuotes( file );
     avraIncPath = addQuotes( avraIncPath );
     #endif
-
     
     command.append(" -W NoRegDef");             // supress some warnings
     command.append(" -l "+ listFile );               // output list file
@@ -91,11 +102,11 @@ int AvrAsmDebugger::compile()
     m_outPane->writeText( "\n\n" );
 
     int error = 0;
-    if( p_stderr.toUpper().contains("ERROR ") ) 
-    { 
-        QString line;
+
+    if( p_stderr.toUpper().contains("ERROR ") )
+    {
         QStringList lines = p_stderr.split("\n");
-        foreach( line, lines )
+        for( QString line : lines )
         {
             if( !(line.toUpper().contains( "ERROR " )) ) continue;
             QStringList words = line.split(":");
@@ -128,7 +139,7 @@ void AvrAsmDebugger::mapFlashToSource()
     int asmLineNumber = 0;
     int lastAsmLine = asmLines.size();
 
-    foreach( QString lstLine, lstLines )
+    for( QString lstLine : lstLines )
     {
         if( !lstLine.startsWith( "C:") ) continue;            // avra code lines start with C:
 

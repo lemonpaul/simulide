@@ -25,7 +25,7 @@
 PicAsmDebugger::PicAsmDebugger( QObject* parent, OutPanelText* outPane, QString filePath )
               : BaseDebugger( parent,outPane, filePath )
 {
-    setObjectName( "PIC asm Compiler" );
+    setObjectName( "PIC asm Compiler/Debugger" );
     
     m_compilerPath = "";
     m_compSetting = "gpasm_Path";
@@ -46,12 +46,24 @@ int PicAsmDebugger::compile()
     m_outPane->writeText( "-------------------------------------------------------\n" );
     QString command = m_compilerPath+"gpasm";
     
+    QProcess checkComp( this );
+    checkComp.start( command  );
+    checkComp.waitForFinished(-1);
+    
+    QString p_stdo = checkComp.readAllStandardOutput();
+    if( !p_stdo.toUpper().contains("OPTIONS") )
+    {
+        m_outPane->appendText( "\ngpasm" );
+        toolChainNotFound();
+        return -1;
+    }
+    
     #ifndef Q_OS_UNIX
     command  = addQuotes( command );
     file     = addQuotes( file );
     #endif
 
-    command.append(" -L -w1  -i  -ainhx32 " + file);
+    command.append(" -L -w1  -i  -ainhx32 -I "+m_fileDir+" "+ file);
 
     m_outPane->appendText( "Exec: ");
     m_outPane->appendText( command );
@@ -69,14 +81,17 @@ int PicAsmDebugger::compile()
     int error = 0;
     if( p_stdout.toUpper().contains("ERROR") ) 
     {
-        QString line;
         QStringList lines = p_stdout.split("\n");
-        foreach( line, lines )
+        for( QString line : lines )
         {
             if( !(line.toUpper().contains( "ERROR" )) ) continue;
             QStringList words = line.split(":");
-            error = words.at(1).toInt();
-            qDebug() <<line;
+            if( words.size() > 1)
+            {
+                error = words.at(1).toInt();
+                qDebug() <<line;
+            }
+            else error = -1;
             break;
         }
     }
@@ -90,8 +105,8 @@ void PicAsmDebugger::mapFlashToSource()
 {
     m_flashToSource.clear();
     m_sourceToFlash.clear();
-    QString asmFileName = m_fileDir + m_fileName + ".asm";
 
+    QString asmFileName = m_fileDir + m_fileName + ".asm";
     QString lstFileName = m_fileDir + m_fileName + ".lst";
 
     QStringList asmLines = fileToStringList( asmFileName, "PicAsmDebugger::mapLstToAsm" );
@@ -99,12 +114,11 @@ void PicAsmDebugger::mapFlashToSource()
     
     m_lastLine = 0;
 
-    QString line;
     QString asmLine;
     int asmLineNumber = 0;
     int lastAsmLine = asmLines.size();
 
-    foreach( line, lstLines )
+    for( QString line : lstLines )
     {
         if( line.isEmpty() )      continue;
         line = line.toUpper().replace("\t", " ");
@@ -116,7 +130,7 @@ void PicAsmDebugger::mapFlashToSource()
             if( ++asmLineNumber >= lastAsmLine ) break; // End of asm file
             asmLine = asmLines.at( asmLineNumber ).toUpper();
             asmLine = asmLine.replace("\t", " ").remove(" ");
-            if( asmLine.isEmpty() ) continue;
+            if( asmLine.isEmpty() )      continue;
             if( asmLine.startsWith("_")) continue;
             if( asmLine.startsWith(";")) continue;
             if( asmLine.startsWith("#")) continue;
@@ -142,7 +156,7 @@ void PicAsmDebugger::mapFlashToSource()
             //qDebug() <<"asmLineNumber"<<asmLineNumber<<"address"<<address;
         }
     }
-    QHashIterator<int, int> i(m_flashToSource);
+    QHashIterator<int, int> i( m_flashToSource );
     while( i.hasNext() )
     {
         i.next();

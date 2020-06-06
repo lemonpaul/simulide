@@ -49,7 +49,6 @@ void RenderOscope::setMaxMin( double max, double min )
 void RenderOscope::setData( int data[] )
 {
     m_data = data;
-    update();
 }
 
 void RenderOscope::paintEvent( QPaintEvent* /* event */ )

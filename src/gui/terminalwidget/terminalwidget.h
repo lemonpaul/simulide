@@ -24,30 +24,41 @@
 
 #include "outpaneltext.h"
 
+class SerialTerm;
+
 class MAINMODULE_EXPORT TerminalWidget : public QWidget
 {
     Q_OBJECT
 
     public:
-        TerminalWidget( QWidget *parent = 0);
+        TerminalWidget( QWidget* parent=0, SerialTerm* ser=0 );
         ~TerminalWidget();
-        
- static TerminalWidget* self() { return m_pSelf; }
-
-        void uartIn( uint32_t value );
-        void uartOut( uint32_t value );
 
         void step();
- 
+
+        int uart() { return m_uart+1; }
+        void setUart( int uart );
+
+    public slots:
+        void uartChanged( int uart );
+        void close();
+
+    protected:
+        virtual void closeEvent( QCloseEvent* event );
+
     private slots:
         void onTextChanged();
         void onValueChanged();
         void valueButtonClicked();
         void ascciButtonClicked();
+        void addCRClicked();
+        void clearInClicked();
+        void clearOutClicked();
+
+        void uartIn( int uart, int value );
+        void uartOut( int uart, int value );
 
     private:
- static TerminalWidget* m_pSelf;
- 
         QVBoxLayout   m_verticalLayout;
         QHBoxLayout   m_sendLayout;
         QHBoxLayout   m_textLayout;
@@ -57,8 +68,17 @@ class MAINMODULE_EXPORT TerminalWidget : public QWidget
         OutPanelText  m_uartOutPanel;
         QPushButton   m_ascciButton;
         QPushButton   m_valueButton;
+        QPushButton   m_addCrButton;
+        QPushButton   m_clearInButton;
+        QPushButton   m_clearOutButton;
+        QSpinBox      m_uartBox;
+
+        SerialTerm* m_serComp;
 
         bool m_printASCII;
+        bool m_addCR;
+
+        int m_uart;
 };
 
 #endif

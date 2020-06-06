@@ -25,7 +25,6 @@
 #include "circuitview.h"
 #include "plotterwidget.h"
 #include "terminalwidget.h"
-#include "serialportwidget.h"
 
 class MAINMODULE_EXPORT CircuitWidget : public QWidget
 {
@@ -40,15 +39,9 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         void clear();
         
         void createActions();
-        
         void createToolBars();
         
         void setRate( int rate );
-
-        void showSerialPortWidget( bool showIt );
-        
-        void writeSerialPortWidget( const QByteArray &data );
-        
         void powerCircOn();
         void powerCircOff();
         void powerCircDebug( bool run );
@@ -60,11 +53,12 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         void saveCirc();
         bool saveCircAs();
         void powerCirc();
+        void pauseSim();
         void openInfo();
         void about();
 
     signals:
-        void dataAvailable( const QByteArray &data );
+        void dataAvailable( int uart, const QByteArray &data );
         
     private:
 
@@ -74,9 +68,8 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         QHBoxLayout    m_horizontLayout;
         CircuitView    m_circView;
         
-        TerminalWidget    m_terminal;
+        //TerminalWidget    m_terminal;
         PlotterWidget     m_plotter;
-        SerialPortWidget  m_serial;
         
         QToolBar m_circToolBar;
         QLabel*  m_rateLabel;
@@ -86,11 +79,12 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         QAction* saveCircAct;
         QAction* saveCircAsAct;
         QAction* powerCircAct;
+        QAction* pauseSimAct;
         QAction* infoAct;
         QAction* aboutAct;
         QAction* aboutQtAct;
         
-        QMenu* infoMenu;
+        QMenu m_infoMenu;
         
         QString m_curCirc;
         QString m_lastCircDir;

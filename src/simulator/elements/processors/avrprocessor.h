@@ -32,9 +32,13 @@ struct avr_t;
 class AvrProcessor : public BaseProcessor
 {
     Q_OBJECT
+
     public:
         AvrProcessor( QObject* parent=0 );
         ~AvrProcessor();
+
+        bool initGdb();
+        void setInitGdb( bool init );
 
         bool loadFirmware( QString file );
         void terminate();
@@ -46,27 +50,33 @@ class AvrProcessor : public BaseProcessor
         int pc();
 
         int getRamValue( int address );
+
+        QVector<int> eeprom();
         
         avr_t* getCpu() { return m_avrProcessor; }
         void setCpu( avr_t* avrProc ) { m_avrProcessor = avrProc; }
 
-        void uartIn( uint32_t value );
+        void uartIn( int uart, uint32_t value );
         
         static void uart_pty_out_hook( struct avr_irq_t* irq, uint32_t value, void* param )
         {
             Q_UNUSED(irq);
             // get the pointer out of param and asign it to AvrProcessor*
-            AvrProcessor* ptrAvrProcessor = reinterpret_cast<AvrProcessor*> (param);
+            //AvrProcessor* ptrAvrProcessor = reinterpret_cast<AvrProcessor*> (param);
             
-            ptrAvrProcessor->uartOut( value );
+            //ptrAvrProcessor->uartOut( value );
+            intptr_t uart = reinterpret_cast<intptr_t> (param);
+            BaseProcessor::self()->uartOut( uart, value );
         }
 
     private:
         virtual int  validate( int address );
 
+        bool m_initGdb;
+
         //From simavr
         avr_t*     m_avrProcessor;
-        avr_irq_t* m_uartInIrq;
+        QVector<avr_irq_t*> m_uartInIrq;
 };
 
 

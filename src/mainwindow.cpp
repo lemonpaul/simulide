@@ -33,12 +33,12 @@ MainWindow* MainWindow::m_pSelf = 0l;
 
 MainWindow::MainWindow()
           : QMainWindow()
-          , m_settings( "SimulIDE", "SimulIDE" )
+          , m_settings( QStandardPaths::standardLocations( QStandardPaths::DataLocation).first()+"/simulide.ini",  QSettings::IniFormat, this )
 {
     setWindowIcon( QIcon(":/simulide.png") );
     m_pSelf   = this;
     m_circuit = 0l;
-    m_version = "SimulIDE-"+QString(APP_VERSION);
+    m_version = "SimulIDE-"+QString( APP_VERSION );
     
     this->setWindowTitle(m_version);
 
@@ -48,10 +48,31 @@ MainWindow::MainWindow()
 
     if( !pluginsDir.exists() ) pluginsDir.mkpath( userAddonPath );
 
+    m_fontScale = 1.0;
+    if( m_settings.contains( "fontScale" ) ) 
+    {
+        m_fontScale = m_settings.value( "fontScale" ).toFloat();
+        if( m_fontScale == 0 ) m_fontScale = 1;
+    }
+    else
+    {
+        double dpiX = qApp->desktop()->logicalDpiX();
+        m_fontScale = dpiX/96.0;
+    }
+    //qDebug()<<dpiX;
+    loadCircHelp();
     createWidgets();
     readSettings();
     
     loadPlugins();
+
+    QString backPath = m_settings.value( "backupPath" ).toString();
+    if( !backPath.isEmpty() )
+    {
+        //qDebug() << "MainWindow::readSettings" << backPath;
+        if( QFile::exists( backPath ) )
+            CircuitWidget::self()->loadCirc( backPath );
+    }
 }
 MainWindow::~MainWindow(){ }
 
@@ -67,23 +88,39 @@ void MainWindow::closeEvent( QCloseEvent *event )
 
 void MainWindow::readSettings()
 {
-    restoreGeometry(                     m_settings.value("geometry" ).toByteArray());
-    restoreState(                        m_settings.value("windowState" ).toByteArray());
-    m_Centralsplitter->restoreState(     m_settings.value("Centralsplitter/geometry").toByteArray());
+    restoreGeometry(                     m_settings.value( "geometry" ).toByteArray());
+    restoreState(                        m_settings.value( "windowState" ).toByteArray());
+    m_Centralsplitter->restoreState(     m_settings.value( "Centralsplitter/geometry" ).toByteArray());
+
+    int autoBck = 15;
+    if( m_settings.contains( "autoBck" )) autoBck = m_settings.value( "autoBck" ).toInt();
+    Circuit::self()->setAutoBck( autoBck );
 }
 
 void MainWindow::writeSettings()
 {
-    m_settings.setValue( "geometry", saveGeometry() );
+    m_settings.setValue( "autoBck",   m_autoBck );
+    m_settings.setValue( "fontScale", m_fontScale );
+    m_settings.setValue( "geometry",  saveGeometry() );
     m_settings.setValue( "windowState", saveState() );
     m_settings.setValue( "Centralsplitter/geometry", m_Centralsplitter->saveState() );
     
     QList<QTreeWidgetItem*> list = m_components->findItems( "", Qt::MatchStartsWith | Qt::MatchRecursive );
 
-    foreach( QTreeWidgetItem* item, list  )
+    for( QTreeWidgetItem* item : list  )
         m_settings.setValue( item->text(0)+"/collapsed", !item->isExpanded() );
 
     FileWidget::self()->writeSettings();
+}
+
+int MainWindow::autoBck()
+{
+    return m_autoBck;
+}
+
+void MainWindow::setAutoBck( int secs )
+{
+    m_autoBck = secs;
 }
 
 void MainWindow::setTitle( QString title )
@@ -116,6 +153,8 @@ void MainWindow::createWidgets()
     m_sidepanel = new QTabWidget( this );
     m_sidepanel->setObjectName("sidepanel");
     m_sidepanel->setTabPosition( QTabWidget::West );
+    QString fontSize = QString::number( int(11*m_fontScale) );
+    m_sidepanel->tabBar()->setStyleSheet("QTabBar { font-size:"+fontSize+"px; }");
     m_Centralsplitter->addWidget( m_sidepanel );
 
     m_components = new ComponentSelector( m_sidepanel );
@@ -155,6 +194,36 @@ void MainWindow::createWidgets()
     this->showMaximized();
 }
 
+void MainWindow::loadCircHelp()
+{
+    QString locale   = "_"+QLocale::system().name().split("_").first();
+    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+locale+"/circuit"+locale+".txt" );
+
+    if( dfPath == "" )
+        dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/circuit.txt" );
+
+    if( dfPath != "" )
+    {
+        QFile file( dfPath );
+
+        if( file.open(QFile::ReadOnly | QFile::Text) ) // Get Text from Help File
+        {
+            QTextStream s1( &file );
+            s1.setCodec("UTF-8");
+
+            m_circHelp = "";
+            m_circHelp.append(s1.readAll());
+
+            file.close();
+        }
+    }
+}
+
+QString* MainWindow::circHelp()
+{
+    return &m_circHelp;
+}
+
 void MainWindow::loadPlugins()
 {
     // Load main Plugins
@@ -176,7 +245,7 @@ void MainWindow::loadPlugins()
 
     if( !pluginsDir.exists() ) return;
 
-    foreach( QString pluginFolder, pluginsDir.entryList( QDir::Dirs ) )
+    for( QString pluginFolder : pluginsDir.entryList( QDir::Dirs ) )
     {
         if( pluginFolder.contains( "." ) ) continue;
         //qDebug() << pluginFolder;
@@ -212,7 +281,7 @@ void MainWindow::loadPluginsAt( QDir pluginsDir )
 
     qDebug() << "\n    Loading Plugins at:\n"<<pluginsDir.absolutePath()<<"\n";
 
-    foreach( QString libName, fileList )
+    for( QString libName : fileList )
     {
         pluginName = libName.split(".").first().remove("lib").remove("plugin").toUpper();
             

@@ -20,26 +20,18 @@
 #include "codeeditorwidget.h"
 #include "mainwindow.h"
 
-CodeEditorWidget::CodeEditorWidget( QWidget *parent ) :
-    QWidget( parent )
+CodeEditorWidget::CodeEditorWidget( QWidget *parent ) 
+                : QWidget( parent )
 {
-    m_mainWindow = MainWindow::self();
-
     createWidgets();
-
     m_outPane->appendPlainText( tr("Ready")+"\n" );
 }
 
-CodeEditorWidget::~CodeEditorWidget()
-{
-    //delete m_codeEditor;
-    //delete m_outPane;
-    //delete m_ramTable;
-}
+CodeEditorWidget::~CodeEditorWidget() {}
 
 void CodeEditorWidget::createWidgets()
 {
-    QGridLayout *codeWidgetLayout = new QGridLayout( this );
+    QGridLayout* codeWidgetLayout = new QGridLayout( this );
     codeWidgetLayout->setSpacing(0);
     codeWidgetLayout->setContentsMargins(0, 0, 0, 0);
     codeWidgetLayout->setObjectName( "codeWidgetLayout" );
@@ -50,11 +42,11 @@ void CodeEditorWidget::createWidgets()
     codeWidgetLayout->addWidget( splitter0 );
 
     m_outPane    = new OutPanelText( this );
-    m_codeEditor = new CodeEditor(this, m_outPane, m_ramTable);
+    m_codeEditor = new CodeEditor( this, m_outPane );
     
     splitter0->addWidget( m_codeEditor );
-    
     splitter0->addWidget( m_outPane );
+
     QList <int> sizes;
     sizes<<300<<100;
     splitter0->setSizes( sizes );
@@ -62,7 +54,7 @@ void CodeEditorWidget::createWidgets()
 
 void CodeEditorWidget::setVisible( bool visible)
 {
-    m_outPane->setVisible(visible);
+    m_outPane->setVisible( visible );
     QWidget::setVisible( visible );
 }
 

@@ -33,11 +33,15 @@ class MAINMODULE_EXPORT SubCircuit : public Chip
         ~SubCircuit();
         
         static Component* construct( QObject* parent, QString type, QString id );
-        static LibraryItem * libraryItem();
+        static LibraryItem* libraryItem();
+
+        virtual void initChip();
 
         virtual void initialize();
-        virtual void initChip();
-    
+        virtual void attach();
+
+        virtual void setLogicSymbol( bool ls );
+        
     public slots:
         virtual void remove();
 
@@ -45,10 +49,14 @@ class MAINMODULE_EXPORT SubCircuit : public Chip
         virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
         virtual void initSubcircuit();
+        
+        void clear();
 
         void connectEpin( ePin *epin, QString connetTo );
 
         int m_numItems;
+        
+        QString m_subcFile;     // file containig subcircuit defs
 
         QList<eNode*> m_internal_eNode;
         QList<eElement*> m_elementList;

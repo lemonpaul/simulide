@@ -32,8 +32,8 @@
         numInputs = "2"
         connections="
         output0-eNode0
-        input0-packagePin6
-        input1-packagePin7" >
+        input0-Package_MR1
+        input1-Package_MR2" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -46,11 +46,11 @@
         clockInverted = "true"
         connections="
         input3-eNode0
-        clock-packagePin14
+        clock-Package_CP0
         input1-eNode1
         input0-eNode1
         input2-eNode1
-        output0-packagePin12" >
+        output0-Package_Q0" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -65,8 +65,8 @@
         input3-eNode0
         input1-eNode1
         input2-eNode1
-        clock-packagePin1
-        output0-packagePin11
+        clock-Package_CP1
+        output0-Package_Q1
         input0-eNode2" >
     </item>
 
@@ -82,9 +82,9 @@
         input3-eNode0
         input1-eNode1
         input2-eNode1
-        clock-packagePin1
-        input0-packagePin11
-        output0-packagePin9
+        clock-Package_CP1
+        input0-Package_Q1
+        output0-Package_Q2
         output1-eNode2" >
     </item>
 
@@ -101,8 +101,8 @@
         input0-eNode1
         input1-eNode1
         input2-eNode1
-        clock-packagePin9
-        output0-packagePin8" >
+        clock-Package_Q2
+        output0-Package_Q3" >
     </item>
 
     <item itemtype="eRail"

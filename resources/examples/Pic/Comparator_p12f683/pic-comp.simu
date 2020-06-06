@@ -1,24 +1,24 @@
-<circuit type="simulide_0.1">
+<circuit noLinStep="10" reactStep="50" animate="0" noLinAcc="5" speed="1000000" type="simulide_0.1">
  
-Sonda Voltaje.-4: 
-<item rotation="-45" objectName="Sonda Voltaje.-4" itemtype="Probe" labelrot="45" PlotterCh="0" y="-292" hflip="1" Show_volt="true" vflip="1" labely="-16" valLabely="0" valLabelx="16" valLabRot="45" x="-444" labelx="16" Show_id="false" id="Sonda Voltaje.-4"/>
+pic12f683-3: 
+<item id="pic12f683-3" itemtype="PIC" Show_id="true" valLabRot="0" rotation="0" Program="pic-comp.hex" valLabely="0" objectName="pic12f683-3" valLabelx="0" Mhz="4" Ser_Port="false" y="-308" Ser_Monitor="false" labely="-15" x="-540" hflip="1" labelx="-9" labelrot="0" vflip="1"/>
  
-Fuente Voltaje-3: 
-<item Show_id="false" objectName="Fuente Voltaje-3" hflip="1" labelx="-16" itemtype="Voltage Source" y="-364" vflip="1" valLabRot="0" Unit=" V" rotation="0" valLabelx="-26" Voltage="5" labelrot="0" x="-484" id="Fuente Voltaje-3" Show_Volt="true" labely="-24" valLabely="10"/>
+Fuente Voltaje-2: 
+<item id="Fuente Voltaje-2" itemtype="Voltage Source" Show_id="false" valLabRot="0" rotation="0" valLabely="10" objectName="Fuente Voltaje-2" valLabelx="-26" Voltage="5" y="-364" Show_Volt="true" labely="-24" x="-484" hflip="1" labelx="-16" Unit=" V" labelrot="0" vflip="1"/>
  
-pic12f683-1: 
-<item Program="/home/user/Escritorio/tests/pic_comp/pic-comp.hex" Show_id="true" objectName="pic12f683-1" Ser_Port="false" hflip="1" labelx="-9" itemtype="PIC" y="-308" vflip="1" valLabRot="0" Ser_Monitor="false" Mhz="4" rotation="0" valLabelx="0" labelrot="0" x="-540" id="pic12f683-1" labely="-15" valLabely="0"/>
+Sonda Voltaje.-1: 
+<item objectName="Sonda Voltaje.-1" id="Sonda Voltaje.-1" PlotterCh="0" Show_id="false" labelrot="45" vflip="1" y="-292" hflip="1" x="-444" valLabelx="16" valLabely="0" Show_volt="true" labely="-16" valLabRot="45" rotation="-45" labelx="16" itemtype="Probe"/>
  
-Connector-7: 
-<item Show_id="false" startpinid="pic12f683-1-GP2" objectName="Connector-7" hflip="1" labelx="-16" itemtype="Connector" y="-276" vflip="1" valLabRot="0" enodeid="Circ_eNode-8" rotation="0" valLabelx="0" pointList="-500,-276,-460,-276" endpinid="Sonda Voltaje.-4-inpin" labelrot="0" x="-500" id="Connector-7" labely="-24" valLabely="0"/>
+Connector-4: 
+<item startpinid="pic12f683-3-GP2" id="Connector-4" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-4" valLabelx="0" enodeid="Circ_eNode-5" y="-276" endpinid="Sonda Voltaje.-1-inpin" pointList="-500,-276,-460,-276" labely="-24" x="-500" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
  
-Connector-9: 
-<item Show_id="false" startpinid="pic12f683-1-GP1" objectName="Connector-9" hflip="1" labelx="-16" itemtype="Connector" y="-284" vflip="1" valLabRot="0" enodeid="Circ_eNode-10" rotation="0" valLabelx="0" pointList="-500,-284,-468,-284,-468,-364" endpinid="Fuente Voltaje-3-outPin" labelrot="0" x="-500" id="Connector-9" labely="-24" valLabely="0"/>
+Connector-6: 
+<item startpinid="pic12f683-3-GP1" id="Connector-6" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-6" valLabelx="0" enodeid="Circ_eNode-7" y="-284" endpinid="Fuente Voltaje-2-outPin" pointList="-500,-284,-468,-284,-468,-364" labely="-24" x="-500" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
  
-PlotterWidget-11: 
-<item MinVolt="-500" rect="" minimumSize="" minimumHeight="200" acceptDrops="false" whatsThis="" accessibleName="" baseSize="" x="0" sizeIncrement="" frameSize="" maximumWidth="1000" fullScreen="false" objectName="PlotterWidget-11" sizeHint="" styleSheet="" windowModality="0" updatesEnabled="true" windowFilePath="" autoFillBackground="false" height="200" isActiveWindow="true" layoutDirection="0" minimumWidth="200" frameGeometry="" windowOpacity="1" geometry="" enabled="true" minimumSizeHint="" normalGeometry="" cursor="" modal="false" locale="" visible="false" focus="false" childrenRect="" windowIcon="" accessibleDescription="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" focusPolicy="0" sizePolicy="" statusTip="" MaxVolt="500" maximumHeight="200" maximized="false" mouseTracking="false" palette="" maximumSize="" toolTip="" width="200" windowIconText="" contextMenuPolicy="1" windowTitle="" toolTipDuration="-1" y="0" childrenRegion="" inputMethodHints="0" itemtype="Plotter" windowModified="false" pos="" size="" minimized="false"/>
+PlotterWidget-8: 
+<item acceptDrops="false" whatsThis="" visible="false" modal="false" windowIconText="" MinVolt="-500" layoutDirection="0" maximized="false" autoFillBackground="false" updatesEnabled="true" enabled="true" minimized="false" maximumSize="" palette="" rect="" accessibleDescription="" itemtype="Plotter" windowIcon="" MaxVolt="500" locale="" size="" minimumHeight="200" focus="false" windowOpacity="1" x="0" toolTipDuration="-1" width="664" isActiveWindow="true" windowModality="0" statusTip="" geometry="" windowTitle="" minimumWidth="200" sizeIncrement="" frameSize="" windowFilePath="" sizePolicy="" normalGeometry="" sizeHint="" maximumWidth="1000" inputMethodHints="0" pos="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumSize="" windowModified="false" frameGeometry="" objectName="PlotterWidget-8" maximumHeight="200" focusPolicy="0" baseSize="" mouseTracking="false" cursor="" minimumSizeHint="" accessibleName="" fullScreen="false" childrenRect="" styleSheet="" childrenRegion="" toolTip="" contextMenuPolicy="1" height="200" y="484"/>
  
-SerialPortWidget-12: 
-<item rect="" minimumSize="" minimumHeight="0" acceptDrops="false" whatsThis="" accessibleName="" baseSize="" x="0" SettingsProp="ttyS0,0,3,0,0,0" sizeIncrement="" frameSize="" maximumWidth="450" fullScreen="false" objectName="SerialPortWidget-12" sizeHint="" styleSheet="" windowModality="0" updatesEnabled="true" windowFilePath="" autoFillBackground="false" height="141" isActiveWindow="true" layoutDirection="0" minimumWidth="0" frameGeometry="" windowOpacity="1" geometry="" enabled="true" minimumSizeHint="" normalGeometry="" cursor="" modal="false" locale="" visible="false" focus="false" childrenRect="" windowIcon="" accessibleDescription="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" focusPolicy="0" sizePolicy="" statusTip="" maximumHeight="170" maximized="false" mouseTracking="false" palette="" maximumSize="" toolTip="" width="313" windowIconText="" contextMenuPolicy="1" windowTitle="Configuracion" toolTipDuration="-1" y="0" childrenRegion="" inputMethodHints="0" itemtype="SerialPort" windowModified="false" pos="" size="" minimized="false"/>
+SerialPortWidget-9: 
+<item acceptDrops="false" whatsThis="" visible="false" modal="false" windowIconText="" layoutDirection="0" maximized="false" autoFillBackground="false" updatesEnabled="true" enabled="true" minimized="false" maximumSize="" palette="" rect="" accessibleDescription="" itemtype="SerialPort" windowIcon="" locale="" size="" minimumHeight="0" focus="false" windowOpacity="1" x="0" toolTipDuration="-1" width="313" isActiveWindow="true" windowModality="0" statusTip="" geometry="" windowTitle="Configuracion" SettingsProp="ttyS0,0,3,0,0,0" minimumWidth="0" sizeIncrement="" frameSize="" windowFilePath="" sizePolicy="" normalGeometry="" sizeHint="" maximumWidth="450" inputMethodHints="0" pos="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumSize="" windowModified="false" frameGeometry="" objectName="SerialPortWidget-9" maximumHeight="170" focusPolicy="0" baseSize="" mouseTracking="false" cursor="" minimumSizeHint="" accessibleName="" fullScreen="false" childrenRect="" styleSheet="" childrenRegion="" toolTip="" contextMenuPolicy="1" height="141" y="0"/>
  
 </circuit>

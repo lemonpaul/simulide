@@ -28,6 +28,7 @@
 #include "stimuli.h"
 #include "ioports.h"
 #include "pic-processor.h"
+#include "gpsim_time.h"
 
 PICComponentPin::PICComponentPin( McuComponent* mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
                : McuComponentPin( mcu, id, type, label, pos, xpos, ypos, angle )
@@ -106,6 +107,7 @@ void PICComponentPin::update_direction( bool out )
         eSource::setImp( 40 );
         if( m_ePin[0]->isConnected() && m_attached )
             m_ePin[0]->getEnode()->remFromChangedFast(this);
+
     }
     else
     {
@@ -113,6 +115,8 @@ void PICComponentPin::update_direction( bool out )
         if( m_ePin[0]->isConnected() && m_attached )
             m_ePin[0]->getEnode()->addToChangedFast(this);
     }
+    BaseProcessor::self()->p_runExtStep = true; // Run Extra Step when current Processor Step is finished
+    //Simulator::self()->runExtraStep( get_cycles().get() );
 }
 
 void PICComponentPin::update_pullup( bool pullup )
@@ -136,12 +140,9 @@ void PICComponentPin::update_pullup( bool pullup )
         m_pIOPIN->set_nodeVoltage( pullup ? 5:0);
         return;
     }
-    
     m_ePin[0]->stampCurrent( m_voltOut/m_imp );
-    //if( m_ePin[0]->getEnode()->needFastUpdate() ) 
-    {
-        Simulator::self()->runExtraStep();
-    }
+
+    Simulator::self()->runExtraStep( get_cycles().get() );
 }
 
 void PICComponentPin::update_state( bool state )
@@ -158,18 +159,14 @@ void PICComponentPin::update_state( bool state )
         if( state ) eSource::setImp( high_imp );
         else        eSource::setImp( 40 );
 
-        stamp();
+        eSource::stamp();
     }
     else
     {
         eSource::setOut( state );
         eSource::stampOutput();
     }
-
-    //if( m_ePin[0]->getEnode()->needFastUpdate() ) 
-    {
-        Simulator::self()->runExtraStep();
-    }
+    Simulator::self()->runExtraStep( get_cycles().get() );
 }
 
 #include "moc_piccomponentpin.cpp"

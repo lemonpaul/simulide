@@ -38,11 +38,16 @@ class MAINMODULE_EXPORT Pin : public QObject, public QGraphicsItem, public ePin
         enum { Type = UserType + 3 };
         int type() const { return Type; }
 
-        QString itemID();
+        QString pinId();
         
+        bool unused() {return m_unused; }
         void setUnused( bool unused );
 
         void setLength( int length );
+        
+        void setColor( QColor color ) { m_color = color; }
+        void setPinAngle( int angle );
+        int pinAngle() { return m_angle; }
 
         void setBoundingRect( QRect area );
         
@@ -55,16 +60,20 @@ class MAINMODULE_EXPORT Pin : public QObject, public QGraphicsItem, public ePin
         Pin* conPin();
 
         QString getLabelText();
-        void setLabelText( QString label );
         void setLabelPos();
         void setLabelColor( QColor color );
+        void setFontSize( int size );
+
+        void setVisible( bool visible );
 
         void moveBy( int dx, int dy );
 
         void reset();
         
-        void findNodePins();
-        void findConnectedPins();
+        //void findNodePins();
+        //void findConnectedPins();
+        void registerPins( eNode* enode );
+        void registerPinsW( eNode* enode );
         
         void setIsBus( bool bus );
         bool isBus();
@@ -73,6 +82,8 @@ class MAINMODULE_EXPORT Pin : public QObject, public QGraphicsItem, public ePin
 
     public slots:
         void isMoved();
+        void setLabelText( QString label );
+        void setPinId( QString id );
 
     protected:
         void mousePressEvent(QGraphicsSceneMouseEvent* event);
@@ -85,8 +96,9 @@ class MAINMODULE_EXPORT Pin : public QObject, public QGraphicsItem, public ePin
         bool m_isBus;
         bool m_unused;
 
-        QString m_id;
-
+        QString m_labelText;
+        
+        QColor m_color;
         QRect      m_area;
         Connector* my_connector;
         Component* m_component;

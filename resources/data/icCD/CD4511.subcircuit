@@ -14,10 +14,10 @@
         tristate = "true"
         connections="
         output3-eNode0
-        input1-packagePin1
-        input0-packagePin7
-        input2-packagePin2
-        input3-packagePin6
+        input1-Package_B
+        input0-Package_A
+        input2-Package_C
+        input3-Package_D
         outEnable-eNode2
         output0-eNode3
         output1-eNode4
@@ -26,8 +26,7 @@
     </item>
 
     <item itemtype="eResistor"
-        resistance = "10"
-        unit = " kΩ"
+        resistance = "10000"
         connections="
         rPin-eNode0
         lPin-eNode2" >
@@ -45,13 +44,13 @@
         connections="
         input3-eNode0
         outEnable-eNode1
-        output4-packagePin9
-        output0-packagePin13
-        output1-packagePin12
-        output2-packagePin11
-        output3-packagePin10
-        output5-packagePin15
-        output6-packagePin14
+        output4-Package_e
+        output0-Package_a
+        output1-Package_b
+        output2-Package_c
+        output3-Package_d
+        output5-Package_f
+        output6-Package_g
         input0-eNode3
         input1-eNode4
         input2-eNode5" >
@@ -68,7 +67,7 @@
         tristate = "false"
         connections="
         output0-eNode1
-        input0-packagePin4" >
+        input0-Package_!BI" >
     </item>
 
     <item itemtype="eBuffer"
@@ -81,7 +80,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin3
+        input0-Package_!LT
         output0-eNode2" >
     </item>
 
@@ -95,7 +94,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin5
+        input0-Package_LE
         output0-eNode6" >
     </item>
 

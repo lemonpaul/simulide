@@ -22,7 +22,7 @@
 #include "highlighter.h"
 #include "utils.h"
 
-Highlighter::Highlighter( QTextDocument *parent )
+Highlighter::Highlighter( QTextDocument* parent )
            : QSyntaxHighlighter( parent )
 { 
     m_multiline = false;
@@ -63,7 +63,7 @@ void Highlighter::readSintaxFile( const QString &fileName )
         allWords.removeAll("");
         if( allWords.isEmpty() ) continue;
 
-        foreach( QString key, keys )
+        for( QString key : keys )
         {
             QStringList words = allWords;
             QString first = words.takeFirst();
@@ -95,10 +95,10 @@ void Highlighter::readSintaxFile( const QString &fileName )
             }
             else                                    // Is Keyword List
             {
-                foreach( QString exp, words )
+                for( QString exp : words )
                 {
                     if( exp.startsWith("\"")) // RegExp
-                        exp = exp.remove(0, 1).remove( exp.lastIndexOf("\"")-1, 1);
+                        exp = exp.remove(0, 1).remove( exp.lastIndexOf("\""), 1);
                     else exp = "\\b"+exp+"\\b";
                     addRule( format, exp );
                 }
@@ -121,7 +121,7 @@ void Highlighter::addRegisters( QStringList patterns )
     format.setFontWeight( QFont::Bold );
     format.setForeground( QColor( 55, 65, 20 ) );
     
-    foreach( QString exp, patterns ) addRule( format, "\\b"+exp+"\\b" );
+    for( QString exp : patterns ) addRule( format, "\\b"+exp+"\\b" );
     //addRuleSet( format, patterns );
     this->rehighlight();
 }
@@ -131,7 +131,7 @@ void Highlighter::highlightBlock( const QString &text )
     QString lcText = text;
     lcText = lcText.toLower(); // Do case insensitive
 
-    foreach( const HighlightingRule &rule, m_highlightingRules )
+    for( const HighlightingRule &rule : m_highlightingRules )
     {
         processRule( rule, lcText );
     }
@@ -176,7 +176,7 @@ void Highlighter::processRule( HighlightingRule rule, QString lcText )
 
 /*void Highlighter::addRuleSet( QTextCharFormat format, QStringList regExps )
 {
-    foreach( QString exp, regExps ) addRule( format, exp );
+    for( QString exp : regExps ) addRule( format, exp );
 }*/
 
 void Highlighter::addRule( QTextCharFormat format, QString exp )

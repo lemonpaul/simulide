@@ -34,6 +34,9 @@ class GcbDebugger : public BaseDebugger
 
         int  compile();
         void mapFlashToSource();
+        
+    protected:
+        virtual void getSubs();
 
     private:
         void mapGcbToAsm();

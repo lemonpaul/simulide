@@ -27,7 +27,7 @@
         inverted = "false"
         connections="
         output0-eNode0
-        input0-packagePin2" >
+        input0-Package_!1CP1" >
     </item>
 
     <item itemtype="eBuffer"
@@ -40,7 +40,7 @@
         inverted = "true"
         connections="
         output0-eNode1
-        input0-packagePin1" >
+        input0-Package_1CP0" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -56,7 +56,7 @@
         input0-eNode2
         input1-eNode2
         input2-eNode2
-        output0-packagePin3
+        output0-Package_1Q0
         input3-eNode9
         clock-eNode23
         output1-eNode24" >
@@ -83,7 +83,7 @@
         input2-eNode3
         input1-eNode3
         clock-eNode8
-        output0-packagePin4
+        output0-Package_1Q1
         input3-eNode9
         output1-eNode27" >
     </item>
@@ -109,7 +109,7 @@
         input2-eNode4
         input1-eNode4
         clock-eNode7
-        output0-packagePin5
+        output0-Package_1Q2
         input3-eNode9
         output1-eNode20" >
     </item>
@@ -136,7 +136,7 @@
         input1-eNode5
         clock-eNode6
         input3-eNode9
-        output0-packagePin6" >
+        output0-Package_1Q3" >
     </item>
 
     <item itemtype="eRail"
@@ -204,7 +204,7 @@
         inverted = "true"
         connections="
         output0-eNode9
-        input0-packagePin7" >
+        input0-Package_1MR" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -222,7 +222,7 @@
         input1-eNode10
         input3-eNode13
         clock-eNode14
-        output0-packagePin14" >
+        output0-Package_2Q3" >
     </item>
 
     <item itemtype="eRail"
@@ -246,7 +246,7 @@
         input1-eNode11
         input0-eNode11
         input3-eNode13
-        output0-packagePin12
+        output0-Package_2Q1
         clock-eNode15
         output1-eNode26" >
     </item>
@@ -280,7 +280,7 @@
         input2-eNode12
         input3-eNode13
         clock-eNode17
-        output0-packagePin13
+        output0-Package_2Q2
         output1-eNode21" >
     </item>
 
@@ -293,7 +293,7 @@
         outImped = "40"
         inverted = "false"
         connections="
-        input0-packagePin10
+        input0-Package_!2CP1
         output0-eNode18" >
     </item>
 
@@ -308,7 +308,7 @@
         sRInverted = "true"
         connections="
         input3-eNode13
-        output0-packagePin11
+        output0-Package_2Q0
         input1-eNode19
         input0-eNode19
         input2-eNode19
@@ -326,7 +326,7 @@
         inverted = "true"
         connections="
         output0-eNode13
-        input0-packagePin15" >
+        input0-Package_2MR" >
     </item>
 
     <item itemtype="eOrGate"
@@ -386,7 +386,7 @@
         inverted = "true"
         connections="
         output0-eNode16
-        input0-packagePin9" >
+        input0-Package_2CP0" >
     </item>
 
     <item itemtype="eOrGate"

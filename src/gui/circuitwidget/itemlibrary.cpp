@@ -44,6 +44,7 @@
 #include "ellipse.h"
 #include "flipflopd.h"
 #include "flipflopjk.h"
+#include "frequencimeter.h"
 #include "fulladder.h"
 #include "function.h"
 #include "gate_and.h"
@@ -51,6 +52,7 @@
 #include "gate_xor.h"
 #include "ground.h"
 #include "hd44780.h"
+#include "image.h"
 #include "i2cram.h"
 #include "i2ctoparallel.h"
 //#include "inbus.h"
@@ -64,8 +66,10 @@
 #include "line.h"
 #include "lm555.h"
 #include "logicinput.h"
+#include "memory.h"
 #include "mosfet.h"
 #include "mux.h"
+#include "mux_analog.h"
 #include "op_amp.h"
 #include "oscope.h"
 //#include "outbus.h"
@@ -75,25 +79,29 @@
 #include "potentiometer.h"
 #include "push.h"
 #include "rail.h"
-#include "ram8bit.h"
 #include "rectangle.h"
 #include "relay-spst.h"
 #include "resistor.h"
 #include "resistordip.h"
+#include "serialport.h"
+#include "serialterm.h"
 #include "servo.h"
 #include "sevensegment.h"
 #include "sevensegment_bcd.h"
 #include "shiftreg.h"
+#include "sr04.h"
+#include "ssd1306.h"
 #include "stepper.h"
 #include "subcircuit.h"
+#include "subpackage.h"
 #include "switch.h"
 #include "switchdip.h"
 #include "textcomponent.h"
-//#include "toggleswitch.h"
 #include "voltimeter.h"
 #include "volt_reg.h"
 #include "voltsource.h"
 #include "wavegen.h"
+#include "ws2812.h"
 //END Item includes
 
 ItemLibrary* ItemLibrary::m_pSelf = 0l;
@@ -105,7 +113,10 @@ ItemLibrary::ItemLibrary()
     loadItems();
     //loadPlugins();
 }
-ItemLibrary::~ItemLibrary(){}
+ItemLibrary::~ItemLibrary()
+{
+    for( LibraryItem* item : m_items ) delete item;
+}
 
 void ItemLibrary::loadItems()
 {
@@ -114,6 +125,7 @@ void ItemLibrary::loadItems()
     addItem( Probe::libraryItem() );
     addItem( Voltimeter::libraryItem() );
     addItem( Amperimeter::libraryItem() );
+    addItem( Frequencimeter::libraryItem() );
     addItem( Oscope::libraryItem() );
     // Sources
     addItem( LogicInput::libraryItem() );
@@ -142,15 +154,18 @@ void ItemLibrary::loadItems()
     addItem( OpAmp::libraryItem() );
     addItem( Mosfet::libraryItem() );
     addItem( BJT::libraryItem() );
+    addItem( MuxAnalog::libraryItem() );
     // Outputs
     addItem( Led::libraryItem() );
     addItem( LedBar::libraryItem() );
     addItem( LedMatrix::libraryItem() );
+    addItem( WS2812::libraryItem() );
     addItem( SevenSegment::libraryItem() );
     addItem( KeyPad::libraryItem() );
     addItem( Hd44780::libraryItem() );
     addItem( Pcd8544::libraryItem() );
     addItem( Ks0108::libraryItem() );
+    addItem( Ssd1306::libraryItem() );
     addItem( Stepper::libraryItem() );
     addItem( Servo::libraryItem() );
     addItem( AudioOut::libraryItem() );
@@ -158,8 +173,11 @@ void ItemLibrary::loadItems()
     addItem( PICComponent::libraryItem() );
     addItem( AVRComponent::libraryItem() );
     addItem( Arduino::libraryItem() );
+    addItem( new LibraryItem( tr("Sensors"),tr("Micro"), "1to2.png","", 0l ) );
+    addItem( SR04::libraryItem() );
+    addItem( SerialPort::libraryItem() );
+    addItem( SerialTerm::libraryItem() );
     // Logic
-    addItem( SevenSegmentBCD::libraryItem() );
     addItem( new LibraryItem( tr("Gates"),tr("Logic"), "gates.png","", 0l ) );
     addItem( new LibraryItem( tr("Arithmetic"),tr("Logic"), "2to2.png","", 0l ) );
     addItem( new LibraryItem( tr("Memory"),tr("Logic"), "subc.png","", 0l ) );
@@ -184,25 +202,26 @@ void ItemLibrary::loadItems()
     addItem( ADC::libraryItem() );
     addItem( DAC::libraryItem() );
     addItem( Bus::libraryItem() );
-//    addItem( OutBus::libraryItem() );
-//    addItem( InBus::libraryItem() );
-    addItem( Ram8bit::libraryItem() );
+    addItem( SevenSegmentBCD::libraryItem() );
+    addItem( Memory::libraryItem() );
     addItem( I2CRam::libraryItem() );
     addItem( I2CToParallel::libraryItem() );
     addItem( Lm555::libraryItem() );
     // Subcircuits
     addItem( SubCircuit::libraryItem() );
     // Other
+    addItem( Image::libraryItem() );
     addItem( TextComponent::libraryItem() );
     addItem( Rectangle::libraryItem() );
     addItem( Ellipse::libraryItem() );
     addItem( Line::libraryItem() );
+
+    addItem( SubPackage::libraryItem() );
 }
 
 void ItemLibrary::addItem( LibraryItem* item )
 {
-    if (!item)
-        return;
+    if (!item) return;
     m_items.append(item);
 }
 
@@ -218,7 +237,7 @@ void ItemLibrary::addItem( LibraryItem* item )
     QString pluginName = "*plugin.*";
     pluginsDir.setNameFilters( QStringList(pluginName) );
 
-    foreach( pluginName, pluginsDir.entryList( QDir::Files ) )
+    for( pluginName : pluginsDir.entryList( QDir::Files ) )
     {
         QPluginLoader pluginLoader( pluginsDir.absoluteFilePath( pluginName ) );
         QObject *plugin = pluginLoader.instance();
@@ -258,7 +277,7 @@ const QList<LibraryItem *> ItemLibrary::items() const
 
 LibraryItem *ItemLibrary::itemByName(const QString name) const
 {
-    foreach( LibraryItem* item, m_items )
+    for( LibraryItem* item : m_items )
     {
         if( item->name() == name ) return item;
     }
@@ -267,7 +286,7 @@ LibraryItem *ItemLibrary::itemByName(const QString name) const
 
 LibraryItem* ItemLibrary::libraryItem(const QString type ) const
 {
-    foreach( LibraryItem* item, m_items )
+    for( LibraryItem* item : m_items )
     {
         if( item->type() == type ) return item;
     }
@@ -298,28 +317,37 @@ QString* LibraryItem::help()
 {
     if( m_help == "Sorry... no Help Available" )
     {
-        QString locale   = "_"+QLocale::system().name().split("_").first();
-        QString type = m_type;
-        QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+type.toLower()+locale+".txt" );
-        
-        if( dfPath == "" ) 
-            dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+type.toLower()+".txt" );
-
-        if( dfPath != "" )
-        {
-            QFile file( dfPath );
-            
-            if( file.open(QFile::ReadOnly | QFile::Text) ) // Get Text from Help File
-            {
-                QTextStream s1( &file );
-            
-                m_help = "";
-                m_help.append(s1.readAll());
-
-                file.close();
-            }
-        }
+        m_help = getHelpFile( m_type );
     }
     return &m_help; 
 }
 
+QString LibraryItem::getHelpFile( QString name )
+{
+    QString help = "";
+
+    QString locale   = "_"+QLocale::system().name().split("_").first();
+
+    name= name.toLower().replace( " ", "" );
+    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+locale+"/"+name+locale+".txt" );
+
+    if( dfPath == "" )
+        dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+name+".txt" );
+
+    if( dfPath != "" )
+    {
+        QFile file( dfPath );
+
+        if( file.open(QFile::ReadOnly | QFile::Text) ) // Get Text from Help File
+        {
+            QTextStream s1( &file );
+            s1.setCodec("UTF-8");
+
+            help = s1.readAll();
+
+            file.close();
+        }
+        else qDebug() << "LibraryItem::getHelpFile ERROR"<<dfPath;
+    }
+    return help;
+}

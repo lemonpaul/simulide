@@ -30,23 +30,19 @@ class MAINMODULE_EXPORT OutPanelText : public QPlainTextEdit
 {
     Q_OBJECT
     public:
-        OutPanelText(QWidget *parent = 0);
+        OutPanelText( QWidget* parent=0 );
         ~OutPanelText();
-        
- //static OutPanelText* self() { return m_pSelf; }
 
-        void appendText( const QString &text );
-        void writeText( const QString &text );
+        void appendText( const QString text );
+        void writeText( const QString text );
         
         void step();
 
     private:
- //static OutPanelText* m_pSelf;
  
         QString m_text;
  
         OutHighlighter* m_highlighter;
-
 };
 
 // CLASS OutHighlighter ****************************************

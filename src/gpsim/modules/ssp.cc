@@ -139,7 +139,8 @@ class SDO_SignalSource : public SignalControl
 
       virtual void putState(const char new3State)
       {
-        if (new3State != m_cState) {
+        if (new3State != m_cState)
+        {
           m_cState = new3State;
           m_pin->updatePinModule();
         }
@@ -163,7 +164,8 @@ class SDI_SignalSource : public SignalControl
 
       virtual void putState(const char new3State)
       {
-        if (new3State != m_cState) {
+        if (new3State != m_cState)
+        {
           m_cState = new3State;
           m_pin->updatePinModule();
         }
@@ -256,7 +258,7 @@ bool _SSPCON::isSPIActive(uint value)
         case SSPM_SPIslave:
             return(true);
 
-          case SSPM_SPImasterAdd:
+        case SSPM_SPImasterAdd:
             if ((m_sspmod->ssp_type() == SSP_TYPE_MSSP1))
                 return(true);
       }
@@ -340,8 +342,8 @@ bool _SSPCON::isI2CActive(uint val)
 }
 bool _SSPCON::isI2CMaster(uint val)
 {
-    if ( (val & SSPEN) != SSPEN)
-        return(false);
+    if ( (val & SSPEN) != SSPEN) return(false);
+
     switch(val & SSPM_mask)
     {
       case SSPM_MSSPI2Cmaster:
@@ -356,8 +358,8 @@ bool _SSPCON::isI2CMaster(uint val)
 */
 bool _SSPCON::isI2CSlave(uint val)
 {
-    if ( (val & SSPEN) != SSPEN)
-        return(false);
+    if ( (val & SSPEN) != SSPEN) return(false);
+
     switch(val & SSPM_mask)
     {
       case SSPM_I2Cslave_7bitaddr:
@@ -550,14 +552,17 @@ void SPI::clock( bool ClockState )
 
   if( onbeat ) {
     // on beat: data is read in if SMP = 0
-    if( !(sspstat_val & _SSPSTAT::SMP) ) {
+    if( !(sspstat_val & _SSPSTAT::SMP) )
+    {
       m_SSPsr <<= 1;
       if (m_sspmod->get_SDI_State())
         m_SSPsr |= 1;
 
       SPIproto(("In Bit %u byte count=%d onbeat m_SSPsr=0x%02x\n", (m_SSPsr & 1), bits_transfered+1, m_SSPsr));
     }
-  } else {
+  }
+  else
+  {
     // off beat: data is shifted out, data is read in if SMP = 1
 
     if( sspstat_val & _SSPSTAT::SMP ) {
@@ -627,7 +632,8 @@ void SPI::callback()
 
   SPIproto(("callback m_state=%d\n", m_state));
 
-  switch( m_state ) {
+  switch( m_state )
+  {
   case eIDLE:
     break;
   case eACTIVE:
@@ -635,7 +641,8 @@ void SPI::callback()
     clock( m_sspmod->get_SCL_State() );
     break;
   case eWAITING_FOR_LAST_SMP:
-    if( m_sspstat && m_sspstat->value.get() & _SSPSTAT::SMP ) {
+    if( m_sspstat && m_sspstat->value.get() & _SSPSTAT::SMP )
+    {
       m_SSPsr <<= 1;
       if (m_sspmod->get_SDI_State())
         m_SSPsr |= 1;
@@ -1191,18 +1198,18 @@ bool I2C::scl_clock_low()
 }
 void I2C::callback()
 {
-    if (future_cycle != get_cycles().get())
+    if( future_cycle != get_cycles().get() )
     {
         cout << "I2C callback - program error future_cycle=" << future_cycle << " now="
                 << get_cycles().get() << " i2c_state=" << i2c_state << endl;
     }
 
     future_cycle = 0;
-    if (i2c_state == eIDLE) return;
-    switch (phase)
+    if( i2c_state == eIDLE ) return;
+    switch( phase )
     {
     case 0:                // SCL goes high
-        if(scl_pos_tran())
+        if( scl_pos_tran() )
         {
             setBRG();
             m_sspmod->setSCL(true);
@@ -1210,12 +1217,11 @@ void I2C::callback()
         break;
 
     case 1:                // SCL low get data (or STOP, START) from SDA bus
-        if(scl_clock_high())
-            setBRG();
+        if( scl_clock_high() ) setBRG();
         break;
 
     case 2:                // SCL goes low
-        if(scl_neg_tran())
+        if( scl_neg_tran() )
         {
             setBRG();
             m_sspmod->setSCL(false);
@@ -1223,24 +1229,24 @@ void I2C::callback()
         break;
 
     case 3:                // put data on SDA bus
-        if(scl_clock_low())
+        if( scl_clock_low() )
             setBRG();
         break;
     }
     phase = (phase + 1) % 4;
     return;
 
-    switch(i2c_state)
+    switch( i2c_state )
     {
     case CLK_ACKEN:
-        if (phase == 1)
+        if( phase == 1 )
         {
             m_sspmod->setSCL(true);
         }
         else if (phase == 2)
         {
             m_sspmod->setSCL(false);
-                   m_sspcon2->value.put( m_sspcon2->value.get() & ~(_SSPCON2::ACKEN ));
+            m_sspcon2->value.put( m_sspcon2->value.get() & ~(_SSPCON2::ACKEN ));
             m_sspmod->set_sspif();
         }
         else
@@ -1293,11 +1299,11 @@ void I2C::callback()
         {
             if (m_sspstat->value.get() &  _SSPSTAT::P)
             {
-                    m_sspmod->set_sspif();
+                m_sspmod->set_sspif();
             }
             else
             {
-                    m_sspmod->set_bclif();
+                m_sspmod->set_bclif();
             }
             set_idle();
             m_sspcon2->value.put(m_sspcon2->value.get() & ~_SSPCON2::PEN );
@@ -1306,21 +1312,21 @@ void I2C::callback()
 
 
     case CLK_TX_BYTE:
-        if(m_sspmod->get_SCL_State())
+        if( m_sspmod->get_SCL_State() )
         {
             bool n_ack = m_sspmod->get_SDI_State();
             bits_transfered++;
-            if (bits_transfered < 8)
+            if( bits_transfered < 8 )
             {
                 m_SSPsr <<= 1;
-                m_sspmod->setSCL(false);
-                m_sspmod->setSDA((m_SSPsr & 0x80) == 0x80);
+                m_sspmod->setSCL( false );
+                m_sspmod->setSDA(( m_SSPsr & 0x80 ) == 0x80);
             }
             else if(bits_transfered == 8)
             {
                 m_sspmod->setSCL(false);
                 m_sspmod->setSDA(true);
-                    m_sspstat->put_value(m_sspstat->value.get() & ~_SSPSTAT::BF);
+                m_sspstat->put_value(m_sspstat->value.get() & ~_SSPSTAT::BF);
             }
             else
             {
@@ -1340,8 +1346,7 @@ void I2C::callback()
                 m_sspmod->setSCL(false);
             }
         }
-        else
-                m_sspmod->setSCL(true);
+        else    m_sspmod->setSCL(true);
         break;
 
     case CLK_RX_BYTE:
@@ -1361,7 +1366,8 @@ void I2C::callback()
 
     }
 }
-void I2C::clock(bool clock_state)
+
+void I2C::clock( bool clock_state )
 {
     uint sspcon_val = m_sspcon->value.get();
     uint sspstat_val = m_sspstat->value.get();
@@ -1420,7 +1426,6 @@ void I2C::clock(bool clock_state)
                 }
             break;
 
-
            case CLK_TX_BYTE:
            case CLK_RX_BYTE:
              setBRG();
@@ -1439,10 +1444,9 @@ void I2C::clock(bool clock_state)
             if (phase)
             {
                 m_sspmod->setSCL(false);
-                m_sspcon2->value.put(
-                        m_sspcon2->value.get() & ~(_SSPCON2::ACKEN ));
-                    m_sspmod->set_sspif();
-                    set_idle();
+                m_sspcon2->value.put( m_sspcon2->value.get() & ~(_SSPCON2::ACKEN ));
+                m_sspmod->set_sspif();
+                set_idle();
             }
             break;
 
@@ -1455,8 +1459,7 @@ void I2C::clock(bool clock_state)
             }
             else if (phase == 1)
             {
-                m_sspcon2->value.put(m_sspcon2->value.get() &
-                    ~(_SSPCON2::SEN | _SSPCON2::RSEN));
+                m_sspcon2->value.put(m_sspcon2->value.get() & ~(_SSPCON2::SEN | _SSPCON2::RSEN));
             }
             break;
 
@@ -1471,19 +1474,17 @@ void I2C::clock(bool clock_state)
         case RX_CMD2:
             if (bits_transfered == 8)
             {
-                    if ( ( m_SSPsr == 0 &&
-                        (m_sspcon2->value.get() & _SSPCON2::GCEN)
-                      )
+                 if( ( m_SSPsr == 0 && (m_sspcon2->value.get() & _SSPCON2::GCEN) )
                       || match_address(m_SSPsr))
-                    {
+                {
                     I2Cproto(("got address sspsr=0x%2x\n", m_SSPsr));
                 }
                 else
                 {
                     I2Cproto(("address not a match sspsr=0x%02x\n",m_SSPsr));
-                          set_idle();
+                    set_idle();
                     return;
-                    }
+                }
             }
             else if (bits_transfered == 9)
             {
@@ -1503,7 +1504,7 @@ void I2C::clock(bool clock_state)
 
                 if (m_sspmod->SaveSSPsr(m_SSPsr & 0xff) ) // ACK ?
                 {
-                        m_sspmod->setSDA(false);
+                    m_sspmod->setSDA(false);
                 }
                 else
                 {
@@ -1517,7 +1518,6 @@ void I2C::clock(bool clock_state)
                 m_sspstat->put_value(sspstat_val | _SSPSTAT::DA);
             }
             break;
-
 
         case CLK_TX_BYTE:
         case CLK_RX_BYTE:
@@ -1534,24 +1534,24 @@ void I2C::clock(bool clock_state)
             else if(bits_transfered == 8)
             {
                 m_sspmod->setSDA(true);
-                    m_sspstat->put_value(sspstat_val & ~_SSPSTAT::BF);
+                m_sspstat->put_value(sspstat_val & ~_SSPSTAT::BF);
             }
             else if(bits_transfered == 9)
             {
                 m_sspmod->set_sspif();
-                    if (m_sspmod->get_SDI_State())        // NACK
-                    {
+                if (m_sspmod->get_SDI_State())        // NACK
+                {
                     m_sspstat->put_value(sspstat_val & _SSPSTAT::BF);
                     set_idle();
                     return;
-                    }
+                }
                 m_sspstat->put_value(sspstat_val | _SSPSTAT::DA);
-                      if (sspstat_val & _SSPSTAT::RW)
-                    {
+                if (sspstat_val & _SSPSTAT::RW)
+                {
                     sspcon_val &= ~ _SSPCON::CKP;
                     m_sspcon->put_value(sspcon_val);
                     m_sspmod->setSCL(false);
-                    }
+                }
             }
             break;
 
@@ -1583,11 +1583,11 @@ bool I2C::match_address(uint sspsr)
         ret &= mask;
         return !(bool)ret;
     }
-    if (m_sspmod->sspmsk)
-        mask &= m_sspmod->sspmsk->value.get();
+    if (m_sspmod->sspmsk) mask &= m_sspmod->sspmsk->value.get();
 
     return !((sspsr ^ m_sspadd->get()) & mask);
 }
+
 void I2C_1::clock(bool clock_state)
 {
   uint sspcon_val = m_sspcon->value.get();
@@ -1601,8 +1601,7 @@ void I2C_1::clock(bool clock_state)
         switch(i2c_state)
         {
           case CLK_STOP:
-            if (phase == 1)
-                setBRG();
+            if (phase == 1) setBRG();
             break;
 
           case CLK_ACKEN:
@@ -1660,18 +1659,15 @@ void I2C_1::clock(bool clock_state)
                 {
                     m_sspcon3->put(m_sspcon3->value.get() & ~_SSP1CON3::ACKTIM);
                 }
-
-            break;
-
-
+                break;
 
            case CLK_TX_BYTE:
            case CLK_RX_BYTE:
-             setBRG();
-             break;
+                setBRG();
+                break;
 
            default:
-             break;
+                break;
         }
     }
     else        // Do writes of clock low transition
@@ -1683,10 +1679,9 @@ void I2C_1::clock(bool clock_state)
             if (phase)
             {
                 m_sspmod->setSCL(false);
-                m_sspcon2->value.put(
-                        m_sspcon2->value.get() & ~(_SSPCON2::ACKEN ));
-                    m_sspmod->set_sspif();
-                    set_idle();
+                m_sspcon2->value.put( m_sspcon2->value.get() & ~(_SSPCON2::ACKEN ));
+                m_sspmod->set_sspif();
+                set_idle();
             }
             break;
 
@@ -1699,8 +1694,7 @@ void I2C_1::clock(bool clock_state)
             }
             else if (phase == 1)
             {
-                m_sspcon2->value.put(m_sspcon2->value.get() &
-                    ~(_SSPCON2::SEN | _SSPCON2::RSEN));
+                m_sspcon2->value.put(m_sspcon2->value.get() & ~(_SSPCON2::SEN | _SSPCON2::RSEN));
             }
             break;
 
@@ -1715,19 +1709,16 @@ void I2C_1::clock(bool clock_state)
         case RX_CMD2:
             if (bits_transfered == 8)
             {
-                    if ( ( m_SSPsr == 0 &&
-                        (m_sspcon2->value.get() & _SSPCON2::GCEN)
-                      )
-                      || match_address(m_SSPsr))
+                if ( ( m_SSPsr == 0 && (m_sspcon2->value.get() & _SSPCON2::GCEN) )
+                  || match_address(m_SSPsr))
                 {
                 }
                 else
-                    {
-                          cout << "READ_CMD address missmatch " << hex << m_SSPsr <<
-                        " != " << m_sspadd->get() << endl;
-                          set_idle();
+                {
+                    cout << "READ_CMD address missmatch " << hex << m_SSPsr << " != " << m_sspadd->get() << endl;
+                    set_idle();
                     return;
-                    }
+                }
             }
             else if (bits_transfered == 9)
             {
@@ -1752,16 +1743,15 @@ void I2C_1::clock(bool clock_state)
                 {
                     uint sspcon3_val = m_sspcon3->value.get();
 
-
                     m_sspmod->SaveSSPsr(m_SSPsr & 0xff);
                     m_sspcon->value.put(m_sspcon->value.get() & ~_SSPCON::CKP);
                     m_sspcon3->value.put(sspcon3_val | _SSP1CON3::ACKTIM);
                     m_sspmod->setSCL(false);  // clock low
-                        m_sspmod->set_sspif();
+                    m_sspmod->set_sspif();
                 }
                 else if (m_sspmod->SaveSSPsr(m_SSPsr & 0xff) ) // ACK ?
                 {
-                        m_sspmod->setSDA(false);
+                    m_sspmod->setSDA(false);
                 }
                 else
                 {
@@ -1840,71 +1830,73 @@ void I2C::slave_command()
     {
         i2c_state = RX_DATA;
         I2Cproto(("slave_command i2c_state = RX_DATA\n"));
+        return;
+    }
+
+    switch( sspcon_val & _SSPCON::SSPM_mask )
+    {
+        case _SSPCON::SSPM_I2Cslave_10bitaddr_ints:
+
+        case _SSPCON::SSPM_I2Cslave_10bitaddr:
+            if (i2c_state == RX_CMD && (m_SSPsr & 1))
+            {
+                sspstat_val |= _SSPSTAT::RW;
+                i2c_state = TX_DATA;
+                I2Cproto(("slave_command i2c_state = TX_DATA\n"));
+                m_sspmod->setSCL(false);  // clock low
+                sspcon_val &= ~ _SSPCON::CKP;
+                m_sspcon->put_value(sspcon_val);
+            }
+            else
+            {
+                sspstat_val |= _SSPSTAT::UA;
+                i2c_state = (i2c_state == RX_CMD2) ?
+                RX_DATA : RX_CMD2;
+                I2Cproto(("slave_command i2c_state = %s\n", i2c_state ==RX_DATA?"RX_DATA":"RX_CMD2"));
+            }
+            break;
+
+        case _SSPCON::SSPM_I2Cslave_7bitaddr:
+
+        case _SSPCON::SSPM_I2Cslave_7bitaddr_ints:
+            if (i2c_state == RX_CMD && (m_SSPsr & 1))
+            {
+                sspstat_val |= _SSPSTAT::RW;
+                sspstat_val &= ~_SSPSTAT::BF;
+                i2c_state = TX_DATA;
+                I2Cproto(("slave_command i2c_state = TX_DATA\n"));
+                sspcon_val &= ~ _SSPCON::CKP;
+                m_sspcon->put_value(sspcon_val);
+                m_sspmod->setSCL(false);  // clock low
+            }
+            else
+            {
+                i2c_state = RX_DATA;
+                I2Cproto(("slave_command i2c_state = RX_DATA\n"));
+            }
+            break;
+    }
+    m_sspstat->put_value(sspstat_val);
+}
+
+bool I2C::end_ack()
+{
+    m_sspmod->set_sspif();
+    bits_transfered = 0;
+    if (m_sspmod->get_SDI_State())      // NACK
+    {
+        I2Cproto(("end_ack NACK\n"));
+        set_idle();
+        return(false);
     }
     else
     {
-            switch( sspcon_val & _SSPCON::SSPM_mask )
-        {
-              case _SSPCON::SSPM_I2Cslave_10bitaddr_ints:
-              case _SSPCON::SSPM_I2Cslave_10bitaddr:
-                if (i2c_state == RX_CMD && (m_SSPsr & 1))
-                {
-                    sspstat_val |= _SSPSTAT::RW;
-                    i2c_state = TX_DATA;
-                    I2Cproto(("slave_command i2c_state = TX_DATA\n"));
-                        m_sspmod->setSCL(false);  // clock low
-                        sspcon_val &= ~ _SSPCON::CKP;
-                        m_sspcon->put_value(sspcon_val);
-                }
-                else
-                {
-                           sspstat_val |= _SSPSTAT::UA;
-                    i2c_state = (i2c_state == RX_CMD2) ?
-                        RX_DATA : RX_CMD2;
-                    I2Cproto(("slave_command i2c_state = %s\n", i2c_state ==RX_DATA?"RX_DATA":"RX_CMD2"));
-                }
-                break;
-
-              case _SSPCON::SSPM_I2Cslave_7bitaddr:
-              case _SSPCON::SSPM_I2Cslave_7bitaddr_ints:
-                if (i2c_state == RX_CMD && (m_SSPsr & 1))
-                {
-                    sspstat_val |= _SSPSTAT::RW;
-                    sspstat_val &= ~_SSPSTAT::BF;
-                        i2c_state = TX_DATA;
-                    I2Cproto(("slave_command i2c_state = TX_DATA\n"));
-                    sspcon_val &= ~ _SSPCON::CKP;
-                    m_sspcon->put_value(sspcon_val);
-                    m_sspmod->setSCL(false);  // clock low
-                }
-                else
-                {
-                    i2c_state = RX_DATA;
-                    I2Cproto(("slave_command i2c_state = RX_DATA\n"));
-                }
-                break;
-        }
-            m_sspstat->put_value(sspstat_val);
+        m_sspmod->setSDA(true);
+        I2Cproto(("end_ack ACK\n"));
+        return(true);
     }
 }
-bool I2C::end_ack()
-{
 
-        m_sspmod->set_sspif();
-        bits_transfered = 0;
-         if (m_sspmod->get_SDI_State())      // NACK
-        {
-            I2Cproto(("end_ack NACK\n"));
-            set_idle();
-            return(false);
-        }
-        else
-        {
-            m_sspmod->setSDA(true);
-            I2Cproto(("end_ack ACK\n"));
-            return(true);
-        }
-}
 void I2C::bus_collide()
 {
    m_sspcon2->value.put(m_sspcon2->value.get() &
@@ -1925,9 +1917,10 @@ void I2C_1::bus_collide()
    }
    else if (m_sspmod->isI2CSlave() && (m_sspcon3->value.get() & _SSP1CON3::SBCDE))
        m_sspmod->set_bclif();
-   set_idle();
 
+   set_idle();
 }
+
 void I2C::newSSPADD(uint newTxByte)
 {
     uint sspstat_val = m_sspstat->value.get();
@@ -1938,28 +1931,27 @@ void I2C::newSSPADD(uint newTxByte)
         m_sspmod->setSCL(true);                // turn off clock stretch
     }
 }
+
 void I2C::setBRG()
 {
-    if (future_cycle)
-        cout << "ERROR I2C::setBRG called with future_cycle=" << future_cycle << endl;
-      future_cycle = get_cycles().get() +
-                  ((m_sspadd->get() &0x7f)/ 4) + 1;
+    if (future_cycle) cout << "ERROR I2C::setBRG called with future_cycle=" << future_cycle << endl;
+
+      future_cycle = get_cycles().get() + ((m_sspadd->get() &0x7f)/ 4) + 1;
       get_cycles().set_break(future_cycle, this);
 }
 
 void I2C::clrBRG()
 {
-            if (future_cycle)
-            {
-                    get_cycles().clear_break(this);
-                future_cycle = 0;
-            }
+    if (future_cycle)
+    {
+        get_cycles().clear_break(this);
+        future_cycle = 0;
+    }
 }
 void I2C::newSSPBUF(uint newTxByte)
 {
+    if (!m_sspstat || !m_sspcon) return;
 
-    if (!m_sspstat || !m_sspcon)
-        return;
     uint sspstat_val = m_sspstat->value.get();
     uint sspcon_val = m_sspcon->value.get();
 
@@ -1976,35 +1968,32 @@ void I2C::newSSPBUF(uint newTxByte)
             I2Cproto(("%s i2c_state = CLK_TX_BYTE data %x\n", __FUNCTION__, newTxByte));
             setBRG();
         }
-        else
+        else // Collision
         {
-            cout << "I2C::newSSPBUF I2C not idle on write data=" << hex <<
-                newTxByte << endl;
-                  // Collision
-                  m_sspcon->setWCOL();
+            cout << "I2C::newSSPBUF I2C not idle on write data=" << hex << newTxByte << endl;
+
+            m_sspcon->setWCOL();
         }
     }
     else
     {
         if (sspstat_val & _SSPSTAT::RW)
         {
-                  if (!(sspstat_val & _SSPSTAT::BF))
+            if (!(sspstat_val & _SSPSTAT::BF))
             {
                 m_SSPsr = newTxByte;
                 m_sspstat->put_value(sspstat_val | _SSPSTAT::BF);
                 m_sspmod->setSDA((m_SSPsr & 0x80) == 0x80);
                 bits_transfered = 0;
                 I2Cproto(("%s TX 0x%x\n", __FUNCTION__, newTxByte));
-                }
+            }
             else // Collision
             {
-                cout << "I2C::newSSPBUF I2C not idle on write data=" << hex <<
-                     newTxByte << endl;
-                      m_sspcon->setWCOL();
+                cout << "I2C::newSSPBUF I2C not idle on write data=" << hex << newTxByte << endl;
+                m_sspcon->setWCOL();
             }
         }
-        else
-           cout << "I2C::newSSPBUF write SSPSTAT::RW not set\n";
+        else cout << "I2C::newSSPBUF write SSPSTAT::RW not set\n";
     }
 }
 void I2C::sda(bool data_val)
@@ -2022,8 +2011,8 @@ void I2C::sda(bool data_val)
         {
             if (do_stop_sspif()) m_sspmod->set_sspif();
                 stat_val = (stat_val & _SSPSTAT::BF) | _SSPSTAT::P;
-            if (! future_cycle && i2c_state != eIDLE)
-                    set_idle();
+
+            if (!future_cycle && i2c_state != eIDLE) set_idle();
 
             I2Cproto(("I2C::sda got STOP i2c_state=%d\n", i2c_state));
          }
@@ -2043,13 +2032,13 @@ void I2C::sda(bool data_val)
                     if (future_cycle)
                     {
                         phase++;
-                            get_cycles().reassign_break(future_cycle, fc, this);
-                            future_cycle = fc;
+                        get_cycles().reassign_break(future_cycle, fc, this);
+                        future_cycle = fc;
                     }
                     else
                     {
-                            get_cycles().set_break(fc, this);
-                            future_cycle = fc;
+                        get_cycles().set_break(fc, this);
+                        future_cycle = fc;
                     }
                 }
                 break;
@@ -2059,7 +2048,7 @@ void I2C::sda(bool data_val)
                 i2c_state = RX_CMD;
                 break;
             }
-                stat_val = (stat_val & _SSPSTAT::BF) | _SSPSTAT::S;
+            stat_val = (stat_val & _SSPSTAT::BF) | _SSPSTAT::S;
             bits_transfered = 0;
             m_SSPsr = 0;
         }
@@ -2080,10 +2069,12 @@ void I2C::sda(bool data_val)
         }
     }
 }
+
 bool I2C::do_stop_sspif()
 {
     return (false);
 }
+
 bool I2C_1::do_stop_sspif()
 {
     return ( (m_sspcon3->value.get() &_SSP1CON3::PCIE)); 
@@ -2106,7 +2097,6 @@ void I2C::master_rx()
 */
 void I2C::start_bit()
 {
-
     if (m_sspmod->get_SCL_State() && m_sspmod->get_SDI_State())
     {
 
@@ -2114,7 +2104,6 @@ void I2C::start_bit()
         I2Cproto(("%s i2c_state = CLK_START\n", __FUNCTION__));
         phase = 0;
         setBRG();
-
     }
     else
     {
@@ -2161,14 +2150,11 @@ void I2C::stop_bit()
     // Make sure SDA is low
     m_sspmod->setSDA(false);
 
-    
     if (!m_sspmod->get_SDI_State())
     {
         setBRG();
     }
-    else
-        bus_collide();
-
+    else bus_collide();
 }
 
 /*
@@ -2187,11 +2173,9 @@ void I2C::ack_bit()
         setBRG();
         m_sspmod->setSDA((m_sspcon2->value.get() & _SSPCON2::ACKDT) ? true : false);
     }
-    else
-        bus_collide();
-
-
+    else bus_collide();
 }
+
 void SSP_MODULE::initialize(
                         PIR_SET *ps,
                         PinModule *SckPin,
@@ -2220,8 +2204,6 @@ void SSP_MODULE::initialize(
     m_SdoSource = new SDO_SignalSource(this, m_sdo);
     m_SdiSource = new SDI_SignalSource(this, m_sdi);
   }
-
-
 }
 // this allows backward compatibility
 void SSP_MODULE::set_sspif()
@@ -2272,14 +2254,13 @@ void SSP_MODULE::setSCL(bool direction)
 /*
         drive SDA by changing pin direction (with data low)
 */
-void SSP_MODULE::setSDA(bool direction)
+void SSP_MODULE::setSDA( bool direction )
 {
     uint pin = m_sdi->getPinNumber();
     uint tris_val = m_i2c_tris->get_value();
-    if (!direction)
-        tris_val &= ~(1<<pin);
-    else
-        tris_val |= (1<<pin);
+
+    if (!direction) tris_val &= ~(1<<pin);
+    else            tris_val |= (1<<pin);
 
     m_i2c_tris->put(tris_val);
 }
@@ -2433,13 +2414,11 @@ void SSP_MODULE::releaseSDOpin()
 {
     m_sdo_active = false;
 }
+
 void SSP_MODULE::releaseSCKpin()
 {
     m_sck_active = false;
 }
-
-
-
 
 void SSP_MODULE::releaseSCLpin()
 {
@@ -2450,7 +2429,6 @@ void SSP_MODULE::releaseSCLpin()
     }
     m_sck = 0;
 }
-
 
 void SSP_MODULE::releaseSSpin()
 {
@@ -2523,13 +2501,11 @@ void SSP_MODULE::SCL_SinkState(char new3State)
 
   SPIproto(("SCL_SinkState new %d old %d enabled %d m_SS_State %d\n", new_SCL_State, m_SCL_State, sspcon.isSSPEnabled(), m_SS_State));
 
-  if (new_SCL_State == m_SCL_State)
-        return;
+  if (new_SCL_State == m_SCL_State) return;
 
   m_SCL_State = new_SCL_State;
 
-  if (!sspcon.isSSPEnabled() )
-     return;
+  if (!sspcon.isSSPEnabled() ) return;
 
   switch( sspcon.value.get() & _SSPCON::SSPM_mask )
   {
@@ -2555,8 +2531,6 @@ void SSP_MODULE::SCL_SinkState(char new3State)
       case _SSPCON::SSPM_I2Cslave_10bitaddr_ints:
         m_i2c->clock(m_SCL_State);
   }
-
-
 }
 /*
         on write to SSPBUF, pass on to either SPI or I2C if active
@@ -2637,21 +2611,13 @@ void SSP_MODULE::tmr2_clock()
 */
 void SSP_MODULE::newSSPCON2(uint value)
 {
-    if (!m_i2c)
-        return;
+    if (!m_i2c) return;
 
-    if(value & _SSPCON2::SEN)
-        m_i2c->start_bit();
-    else if(value & _SSPCON2::RSEN)
-        m_i2c->rstart_bit();
-    else if (value & _SSPCON2::PEN)
-        m_i2c->stop_bit();
-    else if (value & _SSPCON2::RCEN)
-        m_i2c->master_rx();
-    else if (value & _SSPCON2::ACKEN)
-        m_i2c->ack_bit();
-
-
+    if     ( value & _SSPCON2::SEN )   m_i2c->start_bit();
+    else if( value & _SSPCON2::RSEN )  m_i2c->rstart_bit();
+    else if( value & _SSPCON2::PEN )   m_i2c->stop_bit();
+    else if( value & _SSPCON2::RCEN )  m_i2c->master_rx();
+    else if( value & _SSPCON2::ACKEN ) m_i2c->ack_bit();
 }
 /*
         Process a received data byte
@@ -2662,24 +2628,24 @@ void SSP_MODULE::newSSPCON2(uint value)
 */
 bool SSP_MODULE::SaveSSPsr(uint value)
 {
-        bool ret = false;
-        uint stat_val = sspstat.value.get();
-        uint con_val = sspcon.value.get();
+    bool ret = false;
+    uint stat_val = sspstat.value.get();
+    uint con_val = sspcon.value.get();
 
-        if ((stat_val & _SSPSTAT::BF) == 0)
-        {
-            sspbuf.put_value(value);
-            sspstat.put_value(stat_val | _SSPSTAT::BF);
-            if ((con_val & _SSPCON::SSPOV) == 0)
-                ret = true;
-        }
-        else
-        {
-            sspcon.put_value(con_val | _SSPCON::SSPOV);
-            cout << "SSP receive overflow\n";
-        }
+    if ((stat_val & _SSPSTAT::BF) == 0)
+    {
+        sspbuf.put_value(value);
+        sspstat.put_value(stat_val | _SSPSTAT::BF);
+        if ((con_val & _SSPCON::SSPOV) == 0)
+            ret = true;
+    }
+    else
+    {
+        sspcon.put_value(con_val | _SSPCON::SSPOV);
+        cout << "SSP receive overflow\n";
+    }
 
-        return(ret);
+    return(ret);
 }
 /*
         Process a received data byte
@@ -2735,52 +2701,51 @@ void  _SSPCON2::put_value(uint new_value)
 */
 void _SSPCON2::put(uint new_value)
 {
-  uint old_value = value.get();
-  uint diff = old_value ^ new_value;
-  uint mask = (ACKEN|RCEN|PEN|RSEN|SEN);
-  uint old_active;
+    uint old_value = value.get();
+    uint diff = old_value ^ new_value;
+    uint mask = (ACKEN|RCEN|PEN|RSEN|SEN);
+    uint old_active;
 
-  //Allow SEN to change unless I2CMaster (required for slave)
-  if (!m_sspmod->isI2CMaster()) mask &= ~SEN;
+    //Allow SEN to change unless I2CMaster (required for slave)
+    if (!m_sspmod->isI2CMaster()) mask &= ~SEN;
 
-  old_active = old_value & mask;
+    old_active = old_value & mask;
 
-  if (!diff) return;        // nothing to do
+    if (!diff) return;        // nothing to do
 
-  // if I2C not idle, do not change bits in mask
-  if (!m_sspmod->isI2CIdle() && (diff & mask))
-  {
+    // if I2C not idle, do not change bits in mask
+    if (!m_sspmod->isI2CIdle() && (diff & mask))
+    {
         cout << "Warrning SSPCON::put I2C not idle and new value "
                 << hex << new_value << " changes one of following bits "
                 << mask << endl;
 
         put_value((new_value & ~mask) | old_active);
-  }
-  // Master and only a new command bit to process
-  else if (!old_active && m_sspmod->isI2CMaster())
-  {
-              switch (new_value & (ACKEN|RCEN|PEN|RSEN|SEN))
-              {
+    }
+    // Master and only a new command bit to process
+    else if (!old_active && m_sspmod->isI2CMaster())
+    {
+        switch (new_value & (ACKEN|RCEN|PEN|RSEN|SEN))
+        {
         case ACKEN:
         case RCEN:
         case PEN:
         case RSEN:
         case SEN:
-                  put_value(new_value);
-                  m_sspmod->newSSPCON2(new_value);
+            put_value(new_value);
+            m_sspmod->newSSPCON2(new_value);
             break;
 
         case 0:        // just write value
-                  put_value(new_value);
+            put_value(new_value);
             break;
 
         default:
             cout << "SSPCON2 cannot select more than one function at a time\n";
             break;
          }
-  }
-  else
-        put_value(new_value);
+    }
+    else put_value(new_value);
 }
 
 //-----------------------------------------------------------
@@ -2794,12 +2759,12 @@ _SSP1CON3::_SSP1CON3(Processor *pCpu, SSP1_MODULE *pSSP)
 /*
         write to SSP1CON3 without processing data
 */
-void  _SSP1CON3::put_value(uint new_value)
+void  _SSP1CON3::put_value( uint new_value )
 {
-  value.put(new_value);
+    value.put(new_value);
 }
 
-void _SSP1CON3::put(uint new_value)
+void _SSP1CON3::put( uint new_value )
 {
-   put_value(new_value & ~ACKTIM); // ACKTIM not writable by user
+    put_value( new_value & ~ACKTIM ); // ACKTIM not writable by user
 }

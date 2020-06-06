@@ -13,7 +13,7 @@
         tristate = "false"
         connections="
         output0-eNode0
-        input0-packagePin13" >
+        input0-Package_!CE" >
     </item>
 
     <item itemtype="eAndGate"
@@ -42,7 +42,7 @@
         tristate = "false"
         connections="
         output0-eNode1
-        input0-packagePin14" >
+        input0-Package_CLK" >
     </item>
 
     <item itemtype="eBuffer"
@@ -55,7 +55,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin15
+        input0-Package_MR
         output0-eNode2" >
     </item>
 
@@ -69,7 +69,7 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        output0-packagePin10
+        output0-Package_Q7
         input1-eNode6
         input0-eNode10" >
     </item>
@@ -164,7 +164,7 @@
         numInputs = "2"
         connections="
         input1-eNode5
-        output0-packagePin4
+        output0-Package_Q5
         input0-eNode13" >
     </item>
 
@@ -194,7 +194,7 @@
         numInputs = "2"
         connections="
         input0-eNode5
-        output0-packagePin2
+        output0-Package_Q0
         input1-eNode11" >
     </item>
 
@@ -209,7 +209,7 @@
         numInputs = "2"
         connections="
         input1-eNode6
-        output0-packagePin3
+        output0-Package_Q2
         input0-eNode13" >
     </item>
 
@@ -239,7 +239,7 @@
         numInputs = "2"
         connections="
         input1-eNode9
-        output0-packagePin5
+        output0-Package_Q6
         input0-eNode12" >
     </item>
 
@@ -254,7 +254,7 @@
         numInputs = "2"
         connections="
         input1-eNode9
-        output0-packagePin1
+        output0-Package_Q1
         input0-eNode14" >
     </item>
 
@@ -268,7 +268,7 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        output0-packagePin11
+        output0-Package_Q4
         input0-eNode10
         input1-eNode14" >
     </item>
@@ -283,7 +283,7 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        output0-packagePin7
+        output0-Package_Q3
         input1-eNode11
         input0-eNode12" >
     </item>
@@ -299,7 +299,7 @@
         tristate = "false"
         connections="
         input0-eNode11
-        output0-packagePin12" >
+        output0-Package_Cout" >
     </item>
 
 </subcircuit>

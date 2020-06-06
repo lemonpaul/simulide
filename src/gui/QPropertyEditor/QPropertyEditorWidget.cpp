@@ -25,10 +25,12 @@
 #include "QPropertyModel.h"
 #include "QVariantDelegate.h"
 #include "Property.h"
+#include "mainwindow.h"
 
 QPropertyEditorWidget* QPropertyEditorWidget::m_pSelf = 0l;
 
-QPropertyEditorWidget::QPropertyEditorWidget(QWidget* parent /*= 0*/) : QTreeView(parent)
+QPropertyEditorWidget::QPropertyEditorWidget(QWidget* parent /*= 0*/) 
+                     : QTreeView(parent)
 {
     m_pSelf = this;
     m_model = new QPropertyModel(this);
@@ -36,6 +38,8 @@ QPropertyEditorWidget::QPropertyEditorWidget(QWidget* parent /*= 0*/) : QTreeVie
     setItemDelegate( new QVariantDelegate(this) );
     setAlternatingRowColors(true);
     setIndentation(12);
+    //QString fontSize = QString::number( int(12*MainWindow::self()->fontScale()) );
+    //setStyleSheet("QTreeView { font-size:"+fontSize+"px; }");
     m_propertyObject = 0l;
 }
 

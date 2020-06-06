@@ -80,6 +80,7 @@ class MAINMODULE_EXPORT LibraryItem
         QString iconfile() const { return m_iconfile; }
         QString type()     const { return m_type; }
         QString* help();
+        QString getHelpFile( QString name );
 
         createItemPtr createItemFnPtr() const { return createItem; }
 

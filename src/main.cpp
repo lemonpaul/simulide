@@ -37,6 +37,12 @@ int main(int argc, char *argv[])
     paths.append("plugins/qmltooling");
     paths.append("plugins/printsupport");
     QCoreApplication::setLibraryPaths(paths);
+    
+    if (AttachConsole(ATTACH_PARENT_PROCESS)) 
+    {
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+    }
 #endif
 
     //QApplication::setGraphicsSystem( "raster" );//native, raster, opengl
@@ -54,10 +60,11 @@ int main(int argc, char *argv[])
 
     MainWindow window;
     
-    QRect screenGeometry = QApplication::desktop()->screenGeometry();
+    /*QRect screenGeometry = QApplication::desktop()->screenGeometry();
     int x = ( screenGeometry.width()-window.width() ) / 2;
     int y = ( screenGeometry.height()-window.height() ) / 2;
-    window.move( x, y );
+    window.move( x, y );*/
+    window.scroll( 0, 50 );
 
     window.show();
     app.setApplicationVersion( APP_VERSION );

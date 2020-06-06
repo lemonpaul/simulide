@@ -23,24 +23,24 @@
 
     <item itemtype="eShiftReg" 
     connections="
-    output0-packagePin3 
-    output1-packagePin4 
-    output2-packagePin5 
-    output3-packagePin6 
-    output4-packagePin12 
-    output5-packagePin11 
-    output6-packagePin10 
-    output7-packagePin9
+    output0-Package_Q0 
+    output1-Package_Q1 
+    output2-Package_Q2 
+    output3-Package_Q3 
+    output4-Package_Q4 
+    output5-Package_Q5 
+    output6-Package_Q6 
+    output7-Package_Q7
     input0-eNode0 
-    input1-packagePin13 
-    clock-packagePin14" >
+    input1-Package_!Rst 
+    clock-Package_Clk" >
     </item>
     
     <item itemtype="eAndGate"
     numInputs="2"
     connections="
-    input0-packagePin1 
-    input1-packagePin2 
+    input0-Package_DA 
+    input1-Package_DB 
     output0-eNode0" >
     </item>
     

@@ -30,8 +30,8 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin1
-        output0-packagePin2" >
+        input0-Package_1A
+        output0-Package_1Y" >
     </item>
 
     <item itemtype="eBuffer"
@@ -43,8 +43,8 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin3
-        output0-packagePin4" >
+        input0-Package_2A
+        output0-Package_2Y" >
     </item>
 
     <item itemtype="eBuffer"
@@ -56,8 +56,8 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin5
-        output0-packagePin6" >
+        input0-Package_3A
+        output0-Package_3Y" >
     </item>
 
     <item itemtype="eBuffer"
@@ -69,8 +69,8 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin9
-        output0-packagePin8" >
+        input0-Package_4A
+        output0-Package_4Y" >
     </item>
 
     <item itemtype="eBuffer"
@@ -82,8 +82,8 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin11
-        output0-packagePin10" >
+        input0-Package_5A
+        output0-Package_5Y" >
     </item>
 
     <item itemtype="eBuffer"
@@ -95,8 +95,8 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin13
-        output0-packagePin12" >
+        input0-Package_6A
+        output0-Package_6Y" >
     </item>
 
 </subcircuit>

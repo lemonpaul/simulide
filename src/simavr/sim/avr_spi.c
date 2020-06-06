@@ -23,67 +23,73 @@
 #include "avr_spi.h"
 #include "sim_gdb.h"
 
-static avr_cycle_count_t avr_spi_raise(avr_spi_t * p)
+static avr_cycle_count_t avr_spi_raise( avr_spi_t* p)
 {
-	if (avr_regbit_get(p->bit_bang.avr, p->spe)) {
+    if( avr_regbit_get(p->bit_bang.avr, p->spe) )
+    {
 		avr_raise_interrupt(p->bit_bang.avr, &p->spi);
-		if (avr_regbit_get(p->bit_bang.avr, p->mstr)) {
+        if( avr_regbit_get(p->bit_bang.avr, p->mstr) )
+        {
 			avr_raise_irq(p->io.irq + SPI_IRQ_OUTPUT, p->output_data_register);
 		}
 	}
 	return 0;
 }
 
-static uint32_t avr_spi_transfer_finished(uint32_t data, void *param)
+static uint32_t avr_spi_transfer_finished( uint32_t data, void* param )
 {
-	avr_spi_t * p = (avr_spi_t *)param;
-	if (p->bit_bang.clk_generate)
-		avr_bitbang_stop(&(p->bit_bang));
+    avr_spi_t* p = (avr_spi_t *)param;
+    if( p->bit_bang.clk_generate ) avr_bitbang_stop( &(p->bit_bang) );
+
 	p->input_data_register = data & 0xFF;
-	avr_spi_raise(p);
+    avr_spi_raise( p );
+
+    // MOSI PIN High when idle
+    avr_raise_irq(avr_io_getirq(p->bit_bang.avr, AVR_IOCTL_IOPORT_GETIRQ( p->p_mosi.port ), p->p_mosi.pin), 1);
 	return data;
 }
 
-static void avr_spi_bitbang_switch_mode(avr_spi_t * p, uint8_t master)
+static void avr_spi_bitbang_switch_mode( avr_spi_t* p, uint8_t master )
 {
-	if (master) {
-		p->bit_bang.p_in = p->p_miso;
+    if( master )
+    {
+        p->bit_bang.p_in  = p->p_miso;
 		p->bit_bang.p_out = p->p_mosi;
-		avr_irq_t *irq;
+        avr_irq_t* irq;
 		uint32_t irq_val;
-		irq = avr_io_getirq( p->bit_bang.avr,
-										AVR_IOCTL_IOPORT_GETIRQ(p->p_miso.port),
-										IOPORT_IRQ_DIRECTION_ALL );
+        irq = avr_io_getirq( p->bit_bang.avr, AVR_IOCTL_IOPORT_GETIRQ(p->p_miso.port), IOPORT_IRQ_DIRECTION_ALL );
 		irq_val = irq->value & (1 << p->p_miso.pin);
-		avr_raise_irq(irq, irq_val);
+        avr_raise_irq( irq, irq_val );
+        // MOSI PIN High when idle
+        avr_raise_irq(avr_io_getirq(p->bit_bang.avr, AVR_IOCTL_IOPORT_GETIRQ( p->p_mosi.port ), p->p_mosi.pin), 1);
 		p->bit_bang.clk_generate = 1;
-	} else {
-		p->bit_bang.p_in = p->p_mosi;
+    }
+    else
+    {
+        p->bit_bang.p_in  = p->p_mosi;
 		p->bit_bang.p_out = p->p_miso;
-		avr_irq_t *irq;
+
+        avr_irq_t* irq;
 		uint32_t irq_val;
-		irq = avr_io_getirq( p->bit_bang.avr,
-										AVR_IOCTL_IOPORT_GETIRQ(p->bit_bang.p_clk.port),
-										IOPORT_IRQ_DIRECTION_ALL );
+        irq = avr_io_getirq( p->bit_bang.avr, AVR_IOCTL_IOPORT_GETIRQ(p->bit_bang.p_clk.port), IOPORT_IRQ_DIRECTION_ALL );
 		irq_val = irq->value & (1 << p->bit_bang.p_clk.pin);
-		avr_raise_irq(irq, irq_val);
-		irq = avr_io_getirq( p->bit_bang.avr,
-										AVR_IOCTL_IOPORT_GETIRQ(p->p_mosi.port),
-										IOPORT_IRQ_DIRECTION_ALL );
+        avr_raise_irq( irq, irq_val );
+
+        irq = avr_io_getirq( p->bit_bang.avr, AVR_IOCTL_IOPORT_GETIRQ(p->p_mosi.port), IOPORT_IRQ_DIRECTION_ALL );
 		irq_val = irq->value & (1 << p->p_mosi.pin);
-		avr_raise_irq(irq, irq_val);
-		irq = avr_io_getirq( p->bit_bang.avr,
-										AVR_IOCTL_IOPORT_GETIRQ(p->p_ss.port),
-										IOPORT_IRQ_DIRECTION_ALL );
+        avr_raise_irq( irq, irq_val );
+
+        irq = avr_io_getirq( p->bit_bang.avr, AVR_IOCTL_IOPORT_GETIRQ(p->p_ss.port), IOPORT_IRQ_DIRECTION_ALL );
 		irq_val = irq->value & (1 << p->p_ss.pin);
-		avr_raise_irq(irq, irq_val);
+        avr_raise_irq( irq, irq_val );
+
 		p->bit_bang.clk_generate = 0;
 	}
 }
 
-static uint8_t avr_spi_read(struct avr_t * avr, avr_io_addr_t addr, void * param)
+static uint8_t avr_spi_read( struct avr_t* avr, avr_io_addr_t addr, void* param)
 {
-	avr_spi_t * p = (avr_spi_t *)param;
+    avr_spi_t* p = (avr_spi_t*)param;
 	uint8_t v = p->input_data_register;
 	p->input_data_register = 0;
 	avr_regbit_clear(avr, p->spi.raised);
@@ -91,44 +97,56 @@ static uint8_t avr_spi_read(struct avr_t * avr, avr_io_addr_t addr, void * param
 	return v;
 }
 
-static void avr_spi_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
+static void avr_spi_write( struct avr_t* avr, avr_io_addr_t addr, uint8_t v, void* param)
 {
-	avr_spi_t * p = (avr_spi_t *)param;
+    avr_spi_t* p = (avr_spi_t *)param;
 
-	if (addr == p->r_spdr) {
+    if (addr == p->r_spdr)
+    {
 		/* Clear the SPIF bit. See ATmega164/324/644 manual, Section 18.5.2. */
-		avr_regbit_clear(avr, p->spi.raised);
+        avr_regbit_clear( avr, p->spi.raised );
 
 		// The byte to be sent should NOT be written there,
 		// the value written could never be read back.
 		//avr_core_watch_write(avr, addr, v);
 		p->output_data_register = v;
-		if (avr->gdb) {
-			avr_gdb_handle_watchpoints(avr, addr, AVR_GDB_WATCH_WRITE);
-		}
-		if (avr_regbit_get(avr, p->spe)) {
+        if (avr->gdb) avr_gdb_handle_watchpoints(avr, addr, AVR_GDB_WATCH_WRITE);
+
+        if (avr_regbit_get(avr, p->spe))
+        {
 			avr_bitbang_stop(&(p->bit_bang));
 			avr_bitbang_reset(avr, &(p->bit_bang));
 			p->bit_bang.data = v;
-			if (avr_regbit_get(avr, p->mstr)) {
+
+            if (avr_regbit_get(avr, p->mstr))
+            {
 				p->bit_bang.clk_generate = 1;
 				avr_bitbang_start(&(p->bit_bang));
-			} else {
+            }
+            else
+            {
 				p->bit_bang.clk_generate = 0;
 			}
 		}
-	} else if ((addr == p->r_spcr) || (addr == p->r_spsr)) {
+    }
+    else if ((addr == p->r_spcr) || (addr == p->r_spsr))
+    {
 		avr_core_watch_write(avr, addr, v);
 		avr_bitbang_stop(&(p->bit_bang));
 		avr_bitbang_reset(avr, &(p->bit_bang));
-		if (avr_regbit_get(avr, p->spe)) {
-			p->bit_bang.clk_phase = avr_regbit_get(avr, p->cpha);
-			p->bit_bang.clk_pol = avr_regbit_get(avr, p->cpol);
-			p->bit_bang.data_order = avr_regbit_get(avr, p->dord);
-			if (avr_regbit_get(avr, p->mstr)) {
+
+        if (avr_regbit_get(avr, p->spe))
+        {
+            p->bit_bang.clk_phase  = avr_regbit_get( avr, p->cpha );
+            p->bit_bang.clk_pol    = avr_regbit_get( avr, p->cpol );
+            p->bit_bang.data_order = avr_regbit_get( avr, p->dord );
+
+            if( avr_regbit_get( avr, p->mstr ))
+            {
 				int clock_divider_ix = (avr_regbit_get(avr, p->spr[0]) | avr_regbit_get(avr, p->spr[1]));
 				int clock_divider = 1;
-				switch (clock_divider_ix) {
+                switch( clock_divider_ix )
+                {
 					case 0:
 						clock_divider = 4;
 						break;
@@ -142,54 +160,59 @@ static void avr_spi_write(struct avr_t * avr, avr_io_addr_t addr, uint8_t v, voi
 						clock_divider = 128;
 						break;
 				}
-				if (avr_regbit_get(avr, p->spr[2]))
-					clock_divider /= 2;
-				p->bit_bang.clk_cycles = clock_divider;
-				avr_spi_bitbang_switch_mode(p, 1);
+                if( avr_regbit_get(avr, p->spr[2]) ) clock_divider /= 2;
 
-			} else {
-				avr_spi_bitbang_switch_mode(p, 0);
+				p->bit_bang.clk_cycles = clock_divider;
+                avr_spi_bitbang_switch_mode( p, 1 );
+            }
+            else
+            {
+                avr_spi_bitbang_switch_mode( p, 0 );
 			}
 		}
 	}
 }
 
-static void avr_spi_ss_hook(struct avr_irq_t * irq, uint32_t value, void * param)
+static void avr_spi_ss_hook( struct avr_irq_t * irq, uint32_t value, void * param)
 {
-	avr_spi_t * p = (avr_spi_t *)param;
+    avr_spi_t* p = (avr_spi_t*)param;
 
-	if (avr_regbit_get(p->bit_bang.avr, p->mstr)) { // master mode
+    if( avr_regbit_get(p->bit_bang.avr, p->mstr) )  // master mode
+    {
 		avr_ioport_state_t iostate;
 		uint8_t dir = 0;
 
 		avr_ioctl(p->bit_bang.avr, AVR_IOCTL_IOPORT_GETSTATE( p->p_ss.port ), &iostate);
 		dir = ( iostate.ddr >> p->p_ss.pin ) & 1;
-		if (!dir) {
-			if (!value) {
-				// other master is active, reset to slave mode
-				avr_bitbang_stop(&(p->bit_bang));
-				avr_bitbang_reset(p->bit_bang.avr, &(p->bit_bang));
-				avr_regbit_setto(p->bit_bang.avr, p->mstr, 0);
-				avr_spi_bitbang_switch_mode(p, 0);
+        if( !dir )
+        {
+            if( !value ) // other master is active, reset to slave mode
+            {
+                avr_bitbang_stop( &(p->bit_bang) );
+                avr_bitbang_reset( p->bit_bang.avr, &(p->bit_bang) );
+                avr_regbit_setto( p->bit_bang.avr, p->mstr, 0);
+                avr_spi_bitbang_switch_mode( p, 0);
 				avr_spi_raise(p);
 			}
 		}
-	} else { // slave mode
-		if (value) {
+    }
+    else // slave mode
+    {
+        if (value)
+        {
 			avr_bitbang_stop(&(p->bit_bang));
 			avr_bitbang_reset(p->bit_bang.avr, &(p->bit_bang));
 		}
 	}
 }
 
-static void avr_spi_irq_input(struct avr_irq_t * irq, uint32_t value, void * param)
+static void avr_spi_irq_input( struct avr_irq_t * irq, uint32_t value, void * param)
 {
 	avr_spi_t * p = (avr_spi_t *)param;
 	avr_t * avr = p->io.avr;
 
 	// check to see if receiver is enabled
-	if (!avr_regbit_get(avr, p->spe))
-		return;
+    if (!avr_regbit_get(avr, p->spe)) return;
 
 	// double buffer the input.. ?
 	p->input_data_register = value;
@@ -197,14 +220,12 @@ static void avr_spi_irq_input(struct avr_irq_t * irq, uint32_t value, void * par
 
 	// if in slave mode, 
 	// 'output' the byte only when we received one...
-	if (!avr_regbit_get(avr, p->mstr)) {
-		avr_raise_irq(p->io.irq + SPI_IRQ_OUTPUT, avr->data[p->r_spdr]);
-	}
+    if (!avr_regbit_get(avr, p->mstr)) avr_raise_irq(p->io.irq + SPI_IRQ_OUTPUT, avr->data[p->r_spdr]);
 }
 
-void avr_spi_reset(struct avr_io_t *io)
+void avr_spi_reset( struct avr_io_t* io)
 {
-	avr_spi_t * p = (avr_spi_t *)io;
+    avr_spi_t* p = (avr_spi_t*)io;
 	avr_bitbang_reset(p->bit_bang.avr, &(p->bit_bang));
 	avr_irq_register_notify(p->io.irq + SPI_IRQ_INPUT, avr_spi_irq_input, p);
 }
@@ -220,7 +241,7 @@ static	avr_io_t	_io = {
 	.irq_names = irq_names,
 };
 
-void avr_spi_init(avr_t * avr, avr_spi_t * p)
+void avr_spi_init( avr_t* avr, avr_spi_t* p)
 {
 	p->io = _io;
 

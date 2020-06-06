@@ -16,7 +16,7 @@
         input2-eNode0
         input1-eNode0
         clock-eNode7
-        output0-packagePin3
+        output0-Package_Q6
         input3-eNode14" >
     </item>
 
@@ -41,7 +41,7 @@
         input0-eNode1
         input1-eNode1
         output1-eNode5
-        output0-packagePin6
+        output0-Package_Q3
         clock-eNode13
         input3-eNode14" >
     </item>
@@ -68,7 +68,7 @@
         input2-eNode2
         clock-eNode6
         output1-eNode7
-        output0-packagePin4
+        output0-Package_Q5
         input3-eNode14" >
     </item>
 
@@ -93,7 +93,7 @@
         input0-eNode3
         input1-eNode3
         clock-eNode8
-        output0-packagePin12
+        output0-Package_Q0
         output1-eNode12
         input3-eNode14" >
     </item>
@@ -127,7 +127,7 @@
         input0-eNode4
         clock-eNode5
         output1-eNode6
-        output0-packagePin5
+        output0-Package_Q4
         input3-eNode14" >
     </item>
 
@@ -141,7 +141,7 @@
         inverted = "true"
         connections="
         output0-eNode8
-        input0-packagePin1" >
+        input0-Package_!CP" >
     </item>
 
     <item itemtype="eBuffer"
@@ -153,7 +153,7 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin2
+        input0-Package_MR
         output0-eNode14" >
     </item>
 
@@ -173,7 +173,7 @@
         input0-eNode10
         clock-eNode12
         input3-eNode14
-        output0-packagePin11" >
+        output0-Package_Q1" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -192,7 +192,7 @@
         input2-eNode11
         output1-eNode13
         input3-eNode14
-        output0-packagePin9" >
+        output0-Package_Q2" >
     </item>
 
     <item itemtype="eRail"

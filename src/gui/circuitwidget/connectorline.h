@@ -91,6 +91,7 @@ class MAINMODULE_EXPORT ConnectorLine : public QGraphicsObject
         bool m_isBus;
         bool m_moveP1;
         bool m_moveP2;
+        bool m_moving;
 
         Connector* m_pConnector;
         ConnectorLine* m_prevLine;

@@ -410,9 +410,9 @@ void Cycle_Counter::breakpoint()
 
   // Loop in case there are multiple breaks
   //while(value == break_on_this && active.next) {
-  while(active.next  && value == active.next->break_value) 
+  while( active.next  && value == active.next->break_value )
   {
-    if(active.next->f) 
+    if( active.next->f )
     {
       // This flag will get set true if the call back
       // function moves the break point to another cycle.
@@ -420,20 +420,20 @@ void Cycle_Counter::breakpoint()
       TriggerObject *lastBreak = active.next->f;
 
       // this stops recursive callbacks
-      if (l1->bActive) 
+      if( l1->bActive )
       {
         l1->bActive = false;
         lastBreak->callback();
       }
-      clear_current_break(lastBreak);
+      clear_current_break( lastBreak );
     } 
     else 
     {
-      get_bp().check_cycle_break(active.next->breakpoint_number);
+      get_bp().check_cycle_break( active.next->breakpoint_number );
       clear_current_break();
     }
   }
-  if(active.next) break_on_this = active.next->break_value;
+  if( active.next ) break_on_this = active.next->break_value;
 }
 
 //------------------------------------------------------------------------

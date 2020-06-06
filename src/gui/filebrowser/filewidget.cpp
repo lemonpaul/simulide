@@ -50,10 +50,16 @@ FileWidget::FileWidget( QWidget* parent )
     m_fileBrowser->setPath( QDir::rootPath() );
     vLayout->addWidget( m_fileBrowser );
     
+    QSettings* settings = MainWindow::self()->settings();
+    QDir setDir( settings->fileName() );
+    setDir.cdUp( );
+    QString settingsDir = setDir.absolutePath() ;
+    
     addEntry( "FileSystem", QDir::rootPath() );
     addEntry( "Home",       QDir::homePath() );
     addEntry( "Examples",   SIMUAPI_AppPath::self()->ROExamFolder().absolutePath() );
     addEntry( "Data",       SIMUAPI_AppPath::self()->RODataFolder().absolutePath() );
+    addEntry( "Settings",   settingsDir );
     
     
     connect( m_bookmarks, SIGNAL( itemClicked( QListWidgetItem* )), 
@@ -65,8 +71,6 @@ FileWidget::FileWidget( QWidget* parent )
     connect( m_path, SIGNAL( editingFinished() ),
              this,   SLOT(  pathChanged()));
              
-
-    QSettings* settings = MainWindow::self()->settings();
     int size = settings->beginReadArray("bookmarks");
     
     for( int i=0; i<size; i++ ) 
@@ -106,7 +110,7 @@ void FileWidget::addEntry( QString name, QString path )
     item->setData( 4, path );
     
     QFont font;
-    font.setPixelSize(12);
+    font.setPixelSize( 11*MainWindow::self()->fontScale() );
     font.setWeight(70);
     item->setFont( font );
     item->setIcon( QIcon(":/open.png") );

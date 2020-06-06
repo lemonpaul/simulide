@@ -26,6 +26,7 @@
 #include "codeeditor.h"
 #include "gcbdebugger.h"
 #include "inodebugger.h"
+#include "b16asmdebugger.h"
 #include "avrasmdebugger.h"
 #include "picasmdebugger.h"
 #include "mcucomponent.h"
@@ -49,11 +50,12 @@ QStringList CodeEditor::m_avrInstr = QString("add adc adiw sub subi sbc sbci sbi
  
 bool  CodeEditor::m_showSpaces = false;
 bool  CodeEditor::m_spaceTabs  = false;
+bool  CodeEditor::m_driveCirc  = false;
 int   CodeEditor::m_fontSize = 13;
 int   CodeEditor::m_tabSize = 4;
 QFont CodeEditor::m_font;
 
-CodeEditor::CodeEditor( QWidget* parent, OutPanelText *outPane, RamTable *ramTable ) 
+CodeEditor::CodeEditor( QWidget* parent, OutPanelText* outPane )
           : QPlainTextEdit( parent )
 {
     Q_UNUSED( CodeEditor_properties );
@@ -61,7 +63,6 @@ CodeEditor::CodeEditor( QWidget* parent, OutPanelText *outPane, RamTable *ramTab
     setObjectName( "Editor" );
     
     m_outPane   = outPane;
-    m_ramTable  = ramTable;
     m_lNumArea  = new LineNumberArea( this );
     m_hlighter  = new Highlighter( document() );
     //m_appPath   = QCoreApplication::applicationDirPath();
@@ -69,9 +70,12 @@ CodeEditor::CodeEditor( QWidget* parent, OutPanelText *outPane, RamTable *ramTab
     m_debugger = 0l;
     m_debugLine = 0;
     m_brkAction = 0;
-    m_running   = false;
+    m_state     = DBG_STOPPED;
+    //m_running   = false;
     m_isCompiled= false;
     m_debugging = false;
+    m_stepOver  = false;
+    m_driveCirc = false;
     
     m_font.setFamily("Monospace");
     m_font.setFixedPitch( true );
@@ -206,6 +210,10 @@ void CodeEditor::setFile( const QString& filePath )
         QString path = sintaxPath + "makef.sintax";
         m_hlighter->readSintaxFile( path );
     }
+    else if( m_file.endsWith(".sac") )
+    {
+        m_debugger = new B16AsmDebugger( this, m_outPane, filePath );
+    }
 }
 
 int CodeEditor::getSintaxCoincidences( QString& fileName, QStringList& instructions )
@@ -214,13 +222,15 @@ int CodeEditor::getSintaxCoincidences( QString& fileName, QStringList& instructi
 
     int coincidences = 0;
 
-    foreach( QString line, lines )
+    for( QString line : lines )
     {
         if( line.isEmpty()      ) continue;
         if( line.startsWith("#")) continue;
         if( line.startsWith(";")) continue;
         if( line.startsWith(".")) continue;
-        foreach( QString instruction, instructions )
+        line =line.toLower();
+        
+        for( QString instruction : instructions )
         {
             if( line.contains( QRegExp( "\\b"+instruction+"\\b" ) ))
                 coincidences++;
@@ -324,8 +334,11 @@ void CodeEditor::upload()
 void CodeEditor::addBreakPoint( int line )
 {
     if( !m_debugging ) return;
+    
 
     int validLine = m_debugger->getValidLine( line );
+    
+    //qDebug() <<"CodeEditor::addBreakPoint" <<validLine;
 
     if( !m_brkPoints.contains( line ) ) m_brkPoints.append( validLine );
 }
@@ -334,106 +347,116 @@ void CodeEditor::remBreakPoint( int line ) { m_brkPoints.removeOne( line ); }
 
 void CodeEditor::run()
 {
-    if( m_running ) return;
+    if( m_state == DBG_RUNNING ) return;
 
-    if( !m_debugger->driveCirc() ) Simulator::self()->stopTimer();
-    m_running = true;
+    if( !m_driveCirc ) Simulator::self()->stopTimer();
+
+    m_state = DBG_RUNNING;
+
     timerTick();
 }
 
-void CodeEditor::step()
+void CodeEditor::step( bool over )
 {
-    if( m_running ) return;
+    if( m_state == DBG_RUNNING ) return;
     
-    if( !m_debugger->driveCirc() ) Simulator::self()->stopTimer();
-    runClockTick();
-    if( !m_debugger->driveCirc() ) Simulator::self()->resumeTimer();
-    updateScreen();
+    m_stepOver = over;
+    
+    if( over )
+    {
+        addBreakPoint( m_debugLine+1 );
+        EditorWindow::self()->run();
+    }
+    else
+    {
+        if( !m_driveCirc ) Simulator::self()->stopTimer();
+        m_prevDebugLine = m_debugLine;
+        m_state = DBG_STEPING;
+        runClockTick();
+    }
+    //updateScreen();
 }
 
 void CodeEditor::stepOver()
 {
-    if( m_running ) return;
-
-    runClockTick( true );
-    updateScreen();
+    QList<int> subLines = m_debugger->getSubLines();
+    bool over = false;
+    if( subLines.contains( m_debugLine ) ) over = true;
+    //qDebug() << "CodeEditor::stepOver()"<<over;
+    step( over );
 }
 
-void CodeEditor::pause()
-{
-    //if( !m_running ) return;
-    m_resume = m_running;
-    m_running = false;
-    updateScreen();
-}
-
-void CodeEditor::resume()
+void CodeEditor::runClockTick()
 {
     if( !m_debugging )  return;
-    
-    if( !BaseProcessor::self() ) 
-    {
-        m_outPane->writeText( tr("\nError:  Mcu Deleted while Debugging!!\n") );
-        EditorWindow::self()->stop() ;
-    }
-    else m_running = m_resume;
-    updateScreen();
-}
+    if( m_state == DBG_PAUSED ) return;
 
-void CodeEditor::reset()
-{
-    if( m_running ) pause();
-    
-    McuComponent::self()->reset();
-    m_debugLine = 1; //m_debugger->getProgramStart();
-    
-    updateScreen();
-}
-
-void CodeEditor::runClockTick( bool over )
-{
-    if( !m_debugging )  return;
-    
-    m_prevDebugLine = m_debugLine;
-
-    do{     
+    uint64_t time0 = Simulator::self()->mS();
+    int i=0;
+    for( i=0; i<200000; i++ )
+    {     
         m_debugLine = m_debugger->step();
-        if( m_debugLine == m_prevDebugLine ) m_debugLine = m_debugger->step();
-        m_prevDebugLine = m_debugLine;
+        
+        if( m_debugLine >= 0 ) break;                // New Line reached
+
+        if( Simulator::self()->mS()-time0 > 100 )
+            break; // Avoid blocking GUI
     }
-    while( m_debugLine <= 0 ); // Run to next src line
     //qDebug() <<"m_prevDebugLine "<<m_prevDebugLine<< "  m_debugLine "<<m_debugLine;
     
-    if( m_debugger->driveCirc() ) Simulator::self()->runGraphicStep();
+    if( m_debugLine < 0 )                           // Step Not Finished
+    {
+        QTimer::singleShot( 5, this, SLOT( runClockTick()) );
+    }
+    else                                            // Step Finished
+    {
+        if( m_driveCirc ) Simulator::self()->runGraphicStep1();
+        EditorWindow::self()->pause();
+        if( !m_driveCirc ) Simulator::self()->resumeTimer();
+    }
+    if( m_debugLine > 0 ) m_prevDebugLine = m_debugLine;
+    else                  m_debugLine = m_prevDebugLine;
 }
 
 void CodeEditor::timerTick()
 {
-    if( !m_running ) return;
-    
-    for( int i=0; i<1000; i++ )
+    if( m_state != DBG_RUNNING )
     {
-        runClockTick();
-        if( m_brkPoints.contains( m_debugLine ) ) 
+        if( m_stepOver )
+        {
+            m_stepOver = false;
+            m_brkPoints.takeLast();
+        }
+        return;
+    }
+    
+    m_prevDebugLine = m_debugLine;
+    for( int i=0; i<200000; i++ )
+    {
+        m_debugLine = m_debugger->step();
+        
+        if( (m_prevDebugLine != m_debugLine) && m_brkPoints.contains( m_debugLine ) ) 
         {
             pause();
             break;
         }
+        if( m_debugLine > 0 ) m_prevDebugLine = m_debugLine;
+        else                  m_debugLine = m_prevDebugLine;
     }
-    if( m_running ) QTimer::singleShot( 10, this, SLOT( timerTick()) );
+    if( m_state == DBG_RUNNING ) QTimer::singleShot( 5, this, SLOT( timerTick()) );
     else 
     {
-        if( !m_debugger->driveCirc() ) Simulator::self()->resumeTimer();
+        if( !m_driveCirc ) Simulator::self()->resumeTimer();
         EditorWindow::self()->pause();
+        
+        if( m_stepOver )
+        {
+            m_stepOver = false;
+            m_brkPoints.takeLast();
+        }
+        updateScreen();
     }
-    updateScreen();
-}
-
-void CodeEditor::updateScreen()
-{
-    setTextCursor( QTextCursor(document()->findBlockByLineNumber(m_debugLine-1)));
-    ensureCursorVisible();
-    update();
+    //if( !m_stepOver ) updateScreen();
 }
 
 bool CodeEditor::initDebbuger()
@@ -458,7 +481,7 @@ bool CodeEditor::initDebbuger()
         m_outPane->writeText( "\n    "+tr("Error: No File... ")+"\n" );
         error = true;
     }
-    else if( !m_isCompiled ) 
+    //else if( !m_isCompiled ) 
     {
         compile();
         if( !m_isCompiled )                           // Error compiling
@@ -481,17 +504,22 @@ bool CodeEditor::initDebbuger()
         }        
         else 
         {
+            if( m_debugger->type==1 ) EditorWindow::self()->enableStepOver( true );
+            else                      EditorWindow::self()->enableStepOver( false );
+            
             m_debugging = true;
             reset();
 
-            if( Simulator::self()->isRunning() ) Simulator::self()->stopSim();
+            /*if( Simulator::self()->isRunning() ) Simulator::self()->stopSim();
             
-            if( m_debugger->driveCirc() ) CircuitWidget::self()->powerCircDebug( false );
+            if( m_driveCirc ) CircuitWidget::self()->powerCircDebug( false );
             else
             {
                 BaseProcessor::self()->setSteps( 0 );
                 CircuitWidget::self()->powerCircDebug( true );
-            }
+            }*/
+            setDriveCirc( m_driveCirc );
+            
             m_outPane->writeText( tr("Debbuger Started ")+"\n" );
             setReadOnly( true );
         }
@@ -507,17 +535,76 @@ void CodeEditor::stopDebbuger()
         m_brkPoints.clear();
         m_debugLine = m_prevDebugLine = 0;
         
-        if( !m_debugger->driveCirc() ) 
-            McuComponent::self()->setFreq( McuComponent::self()->freq() );
-        
         CircuitWidget::self()->powerCircOff();
         Simulator::self()->stopDebug();
-        pause();
         
-        setReadOnly( false );
+        m_state = DBG_STOPPED;
         m_debugging = false;
+        setReadOnly( false );
+        updateScreen();
     }
     m_outPane->writeText( tr("Debbuger Stopped ")+"\n" );
+}
+
+void CodeEditor::pause()
+{
+    if( !m_debugging )  return;
+    //if( !m_running ) return;
+
+    m_resume = m_state;
+    m_state  = DBG_PAUSED;
+    updateScreen();
+}
+
+void CodeEditor::resume()
+{
+    if( !m_debugging )  return;
+
+    if( !BaseProcessor::self() )
+    {
+        m_outPane->writeText( tr("\nError:  Mcu Deleted while Debugging!!\n") );
+        EditorWindow::self()->stop() ;
+    }
+    else
+    {
+        m_state = m_resume;
+        if( !m_driveCirc ) Simulator::self()->resumeTimer();
+    }
+    updateScreen();
+}
+
+void CodeEditor::reset()
+{
+    if( m_state == DBG_RUNNING ) pause();
+
+    McuComponent::self()->reset();
+    m_debugLine = 1; //m_debugger->getProgramStart();
+
+    updateScreen();
+}
+
+bool CodeEditor::driveCirc()
+{
+    return m_driveCirc;
+}
+
+void CodeEditor::setDriveCirc( bool drive )
+{
+    m_driveCirc = drive;
+    
+    if( m_debugging )
+    {
+        if( Simulator::self()->isRunning() ) Simulator::self()->stopSim();
+            
+        CircuitWidget::self()->powerCircDebug( !m_driveCirc );
+    }
+}
+
+void CodeEditor::updateScreen()
+{
+    setTextCursor( QTextCursor(document()->findBlockByLineNumber(m_debugLine-1)));
+    ensureCursorVisible();
+    update();
 }
 
 int CodeEditor::lineNumberAreaWidth()
@@ -814,7 +901,7 @@ void CodeEditor::indentSelection( bool unIndent )
     for (int i = 0; i < lines; i++)
     {
         QString line = list[i];
-        
+
         if( unIndent ) 
         {
             int n = m_tab.size();
@@ -823,6 +910,7 @@ void CodeEditor::indentSelection( bool unIndent )
             
             while( n1 > 0 )
             {
+                if( line.size() <= n2 ) break;
                 QString car = line.at(n2);
                 
                 if( car == " " ) 

@@ -27,71 +27,131 @@
     </itemset>
     
     <itemset category="IC 74/7400-7499" type="Subcircuit">
-    <item name="74HC00"  package="ic74/74HC00.package"  subcircuit="ic74/74HC00.subcircuit" ></item>
-    <item name="74HC02"  package="ic74/74HC02.package"  subcircuit="ic74/74HC02.subcircuit" ></item>
-    <item name="74HC04"  package="ic74/74HC04.package"  subcircuit="ic74/74HC04.subcircuit" ></item>
-    <item name="74HC08"  package="ic74/74HC08.package"  subcircuit="ic74/74HC08.subcircuit" ></item>
-    <item name="74HC32"  package="ic74/74HC32.package"  subcircuit="ic74/74HC32.subcircuit" ></item>
-    <item name="74HC42"  package="ic74/74HC42.package"  subcircuit="ic74/74HC42.subcircuit" ></item>
-    <item name="74HC74"  package="ic74/74HC74.package"  subcircuit="ic74/74HC74.subcircuit" ></item>
-    <item name="74HC75"  package="ic74/74HC75.package"  subcircuit="ic74/74HC75.subcircuit" ></item>
-    <item name="74HC85"  package="ic74/74HC85.package"  subcircuit="ic74/74HC85.subcircuit" ></item>
-    <item name="74HC86"  package="ic74/74HC86.package"  subcircuit="ic74/74HC86.subcircuit" ></item>
-    <item name="74XX90"  package="ic74/74XX90.package"  subcircuit="ic74/74XX90.subcircuit" ></item>
-    <item name="74XX92"  package="ic74/74XX92.package"  subcircuit="ic74/74XX92.subcircuit" ></item>
-    <item name="74XX93"  package="ic74/74XX93.package"  subcircuit="ic74/74XX93.subcircuit" ></item>
+    <item name="74HC00"  package="ic74/4X2IGate" subcircuit="ic74/74HC00" info="  quad 2-input NAND gate" ></item>
+    <item name="74XX01"  package="ic74/74HC02"   subcircuit="ic74/74XX01" info="  quad 2-input NAND gate, open Drain Outputs" ></item>
+    <item name="74HC02"  package="ic74/74HC02"   subcircuit="ic74/74HC02" info="  quad 2-input NOR gate" ></item>
+    <item name="74HC04"  package="ic74/74HC04"   subcircuit="ic74/74HC04" info="  hex inverter gate" ></item>
+    <item name="74HC08"  package="ic74/4X2IGate" subcircuit="ic74/74HC08" info="  quad 2-input AND gate" ></item>
+    <item name="74HC32"  package="ic74/4X2IGate" subcircuit="ic74/74HC32" info="  quad 2-input OR gate" ></item>
+    <item name="74HC42"  package="ic74/74HC42"   subcircuit="ic74/74HC42" info="  BCD to decimal decoder " ></item>
+    <item name="74HC73"  package="ic74/74HC73"   subcircuit="ic74/74HC73" info="  dual J-K flip-flop, asynchronous clear " ></item>
+    <item name="74HC74"  package="ic74/74HC74"   subcircuit="ic74/74HC74" info="  dual D positive edge triggered flip-flop, asynchronous preset and clear " ></item>
+    <item name="74HC75"  package="ic74/74HC75"   subcircuit="ic74/74HC75" info="  4-bit bistable latch, complementary outputs " ></item>
+    <item name="74HC76"  package="ic74/74HC76"   subcircuit="ic74/74HC76" info="  dual J-K flip-flop, asynchronous preset and clear" ></item>
+    <item name="74HC77"  package="ic74/74HC77"   subcircuit="ic74/74HC77" info="  4-bit bistable latch " ></item>
+    <item name="74HC85"  package="ic74/74HC85"   subcircuit="ic74/74HC85" info="  4-bit magnitude comparator" ></item>
+    <item name="74HC86"  package="ic74/4X2IGate" subcircuit="ic74/74HC86" info="  quad 2-input XOR gate" ></item>
+    <item name="74XX90"  package="ic74/74XX90"   subcircuit="ic74/74XX90" info="  decade counter (separate divide-by-2 and divide-by-5 sections) " ></item>
+    <item name="74XX91"  package="ic74/74XX91"   subcircuit="ic74/74XX91" info="  serial-in, serial-out, 8-bit shift register " ></item>
+    <item name="74XX92"  package="ic74/74XX92"   subcircuit="ic74/74XX92" info="  divide-by-12 counter (separate divide-by-2 and divide-by-6 sections) " ></item>
+    <item name="74XX93"  package="ic74/74XX93"   subcircuit="ic74/74XX93" info="  4-bit binary counter (separate divide-by-2 and divide-by-8 sections) " ></item>
+    <item name="74XX95"  package="ic74/74XX95"   subcircuit="ic74/74XX95" info="  4-bit parallel-access shift register " ></item>
+    <item name="74XX96"  package="ic74/74XX96"   subcircuit="ic74/74XX96" info="  5-bit parallel-load shift register " ></item>
     </itemset>
     
     <itemset category="IC 74/74100-74199" type="Subcircuit">
-    <item name="74HC137" package="ic74/74HC137.package" subcircuit="ic74/74HC137.subcircuit"></item>
-    <item name="74HC138" package="ic74/74HC138.package" subcircuit="ic74/74HC138.subcircuit"></item>
-    <item name="74HC139" package="ic74/74HC139.package" subcircuit="ic74/74HC139.subcircuit"></item>
-    <item name="74HC147" package="ic74/74HC147.package" subcircuit="ic74/74HC147.subcircuit"></item>
-    <item name="74HC148" package="ic74/74HC148.package" subcircuit="ic74/74HC148.subcircuit"></item>
-    <item name="74HC151" package="ic74/74XX151.package" subcircuit="ic74/74XX151.subcircuit"></item>
-    <item name="74HC154" package="ic74/74HC154.package" subcircuit="ic74/74HC154.subcircuit"></item>
-    <item name="74HC155" package="ic74/74HC155.package" subcircuit="ic74/74HC155.subcircuit"></item>
-    <item name="74HC160" package="ic74/74HC160.package" subcircuit="ic74/74HC160.subcircuit"></item>
-    <item name="74HC161" package="ic74/74HC161.package" subcircuit="ic74/74HC161.subcircuit"></item>
-    <item name="74HC162" package="ic74/74HC162.package" subcircuit="ic74/74HC162.subcircuit"></item>
-    <item name="74HC163" package="ic74/74HC163.package" subcircuit="ic74/74HC163.subcircuit"></item>
-    <item name="74HC164" package="ic74/74XX164.package" subcircuit="ic74/74XX164.subcircuit"></item>
-    <item name="74HC165" package="ic74/74HC165.package" subcircuit="ic74/74HC165.subcircuit"></item>
-    <item name="74HC181" package="ic74/74HC181.package" subcircuit="ic74/74HC181.subcircuit"></item>
-    <item name="74HC190" package="ic74/74HC190.package" subcircuit="ic74/74HC190.subcircuit"></item>
-    <item name="74HC191" package="ic74/74HC191.package" subcircuit="ic74/74HC191.subcircuit"></item>
-    <item name="74HC192" package="ic74/74HC192.package" subcircuit="ic74/74HC192.subcircuit"></item>
-    <item name="74HC193" package="ic74/74HC193.package" subcircuit="ic74/74HC193.subcircuit"></item>
-    <item name="74HC194" package="ic74/74HC194.package" subcircuit="ic74/74HC194.subcircuit"></item>
+    <item name="74HC107" package="ic74/74HC107" subcircuit="ic74/74HC107" info="  dual J-K flip-flop, clear " ></item>
+    <item name="74HC109" package="ic74/74HC109" subcircuit="ic74/74HC109" info="  dual J-Not-K positive-edge-triggered flip-flop, clear and preset " ></item>
+    <item name="74HC112" package="ic74/74HC112" subcircuit="ic74/74HC112" info="  dual J-K negative-edge-triggered flip-flop, clear and preset " ></item>
+    <item name="74HC113" package="ic74/74HC113" subcircuit="ic74/74HC113" info="  dual J-K negative-edge-triggered flip-flop, preset " ></item>
+    <item name="74HC137" package="ic74/74HC137" subcircuit="ic74/74HC137" info="  3-line to 8-line decoder/demultiplexer, address latch, inverting outputs " ></item>
+    <item name="74HC138" package="ic74/74HC138" subcircuit="ic74/74HC138" info="  3-line to 8-line decoder/demultiplexer, inverting outputs " ></item>
+    <item name="74HC139" package="ic74/74HC139" subcircuit="ic74/74HC139" info="  dual 2 to 4-line decoder/demultiplexer, inverting outputs " ></item>
+    <item name="74HC147" package="ic74/74HC147" subcircuit="ic74/74HC147" info="  10-line to 4-line priority encoder" ></item>
+    <item name="74HC148" package="ic74/74HC148" subcircuit="ic74/74HC148" info="  8-line to 3-line priority encoder " ></item>
+    <item name="74XX150" package="ic74/74XX150" subcircuit="ic74/74XX150" info="  16-line to 1-line data selector/multiplexer " ></item>
+    <item name="74HC151" package="ic74/74HC151" subcircuit="ic74/74HC151" info="  8-line to 1-line data selector/multiplexer " ></item>
+    <item name="74HC153" package="ic74/74HC153" subcircuit="ic74/74HC153" info="  dual 4-line to 1-line data selector/multiplexer " ></item>
+    <item name="74HC154" package="ic74/74HC154" subcircuit="ic74/74HC154" info="  4-line to 16-line decoder/demultiplexer, inverting outputs " ></item>
+    <item name="74HC155" package="ic74/74HC155" subcircuit="ic74/74HC155" info="  dual 2-line to 4-line decoder/demultiplexer, inverting outputs" ></item>
+    <item name="74HC157" package="ic74/74HC157" subcircuit="ic74/74HC157" info="  quad 2-line to 1-line data selector/multiplexers " ></item>
+    <item name="74HC158" package="ic74/74HC158" subcircuit="ic74/74HC158" info="  quad 2-line to 1-line data selector/multiplexers, inverting outputs " ></item>
+    <item name="74HC160" package="ic74/74HC160" subcircuit="ic74/74HC160" info="  synchronous presettable 4-bit decade counter, asynchronous clear" ></item>
+    <item name="74HC161" package="ic74/74HC160" subcircuit="ic74/74HC161" info="  synchronous presettable 4-bit binary counter, asynchronous clear " ></item>
+    <item name="74HC162" package="ic74/74HC160" subcircuit="ic74/74HC162" info="  synchronous presettable 4-bit decade counter, synchronous clear " ></item>
+    <item name="74HC163" package="ic74/74HC160" subcircuit="ic74/74HC163" info="  synchronous presettable 4-bit binary counter, synchronous clear " ></item>
+    <item name="74HC164" package="ic74/74XX164" subcircuit="ic74/74XX164" info="  8-bit parallel-out serial shift register, asynchronous clear " ></item>
+    <item name="74HC165" package="ic74/74HC165" subcircuit="ic74/74HC165" info="  8-bit serial shift register, parallel load, complementary outputs" ></item>
+    <item name="74XX166" package="ic74/74XX166" subcircuit="ic74/74XX166" info="  8-bit serial shift register, parallel load" ></item>
+    <item name="74XX170" package="ic74/74XX170" subcircuit="ic74/74XX170" info="  4X4 register file, open collector output" ></item>
+    <item name="74HC173" package="ic74/74HC173" subcircuit="ic74/74HC173" info="  quad D flip-flop, asynchronous clear " ></item>
+    <item name="74HC174" package="ic74/74HC174" subcircuit="ic74/74HC174" info="  hex D flip-flop, common asynchronous clear" ></item>
+    <item name="74HC175" package="ic74/74HC175" subcircuit="ic74/74HC175" info="  quad D edge-triggered flip-flop, complementary outputs and asynchronous clear " ></item>
+    <item name="74XX176" package="ic74/74XX176" subcircuit="ic74/74XX176" info="  presettable decade (bi-quinary) counter/latch " ></item>
+    <item name="74XX177" package="ic74/74XX176" subcircuit="ic74/74XX177" info="  presettable binary counter/latch" ></item>
+    <item name="74XX178" package="ic74/74XX178" subcircuit="ic74/74XX178" info="  4 bit parallel-access shift register" ></item>
+    <item name="74XX179" package="ic74/74XX179" subcircuit="ic74/74XX179" info="  4 bit parallel-access shift register, direct clear" ></item>
+    <item name="74HC181" package="ic74/74HC181" subcircuit="ic74/74HC181" info="  4-bit arithmetic logic unit and function generator " ></item>
+    <item name="74HC182" package="ic74/74HC182" subcircuit="ic74/74HC182" info="  lookahead carry generator " ></item>
+    <item name="74HC190" package="ic74/74HC190" subcircuit="ic74/74HC190" info="  synchronous presettable up/down decade counter" ></item>
+    <item name="74HC191" package="ic74/74HC190" subcircuit="ic74/74HC191" info="  synchronous presettable up/down binary counter" ></item>
+    <item name="74HC192" package="ic74/74HC192" subcircuit="ic74/74HC192" info="  synchronous presettable up/down decade counter, clear " ></item>
+    <item name="74HC193" package="ic74/74HC192" subcircuit="ic74/74HC193" info="  synchronous presettable up/down 4-bit binary counter, clear" ></item>
+    <item name="74HC194" package="ic74/74HC194" subcircuit="ic74/74HC194" info="  4-bit bidirectional universal shift register" ></item>
+    <item name="74XX195" package="ic74/74XX195" subcircuit="ic74/74XX195" info="  4-bit parellel access shift register" ></item>
+    <item name="74XX196" package="ic74/74XX176" subcircuit="ic74/74XX196" info="  presettable decade counter/latch" ></item>
+    <item name="74XX197" package="ic74/74XX176" subcircuit="ic74/74XX197" info="  presettable binary counter/latch" ></item>
+    <item name="74XX198" package="ic74/74XX198" subcircuit="ic74/74XX198" info="  8 bit bidirectional shift register" ></item>
+    <item name="74XX199" package="ic74/74XX199" subcircuit="ic74/74XX199" info="  8 bit shift register, parallel load" ></item>
     </itemset>
     
     <itemset category="IC 74/74200-741999" type="Subcircuit">
-    <item name="74HC238" package="ic74/74HC238.package" subcircuit="ic74/74HC238.subcircuit"></item>
-    <item name="74HC273" package="ic74/74HC273.package" subcircuit="ic74/74HC273.subcircuit"></item>
-    <item name="74HC283" package="ic74/74HC283.package" subcircuit="ic74/74HC283.subcircuit"></item>
-    <item name="74HC390" package="ic74/74HC390.package" subcircuit="ic74/74HC390.subcircuit"></item>
-    <item name="74HC393" package="ic74/74HC393.package" subcircuit="ic74/74HC393.subcircuit"></item>
-    <item name="74HC573" package="ic74/74XX573.package" subcircuit="ic74/74XX573.subcircuit"></item>
-    <item name="74HC574" package="ic74/74XX574.package" subcircuit="ic74/74XX574.subcircuit"></item>
-    <item name="74HC595" package="ic74/74XX595.package" subcircuit="ic74/74XX595.subcircuit"></item>
-    <item name="74HC688" package="ic74/74HC688.package" subcircuit="ic74/74HC688.subcircuit"></item>
+    <item name="74HC238" package="ic74/74HC238" subcircuit="ic74/74HC238" info="  3-of-8 decoder/demultiplexer, active high outputs " ></item>
+    <item name="74HC245" package="ic74/74HC245" subcircuit="ic74/74HC245" info="  octal bus transceivers with tristate outputs " ></item>
+    <item name="74HC251" package="ic74/74HC251" subcircuit="ic74/74HC251" info="  8-line to 1-line data selector/multiplexer, tristate outputs  " ></item>
+    <item name="74HC257" package="ic74/74HC257" subcircuit="ic74/74HC257" info="  quad 2-line to 1-line data selector/multiplexers, tristate outputs " ></item>
+    <item name="74HC258" package="ic74/74HC258" subcircuit="ic74/74HC258" info="  quad 2-line to 1-line data selector/multiplexers, inverting and tristate outputs " ></item>
+    <item name="74HC259" package="ic74/74HC259" subcircuit="ic74/74HC259" info="  8-bit addressable latch " ></item>
+    <item name="74HC260" package="ic74/74HC260" subcircuit="ic74/74HC260" info="  octal bus transceivers with tristate and inverted outputputs " ></item>
+    <item name="74HC273" package="ic74/74HC273" subcircuit="ic74/74HC273" info="  8-bit register, asynchronous clear " ></item>
+    <item name="74HC279" package="ic74/74HC279" subcircuit="ic74/74HC279" info="  quad set-reset latch " ></item>
+    <item name="74HC283" package="ic74/74HC283" subcircuit="ic74/74HC283" info="  4-bit binary full adder (has carry in function) " ></item>
+    <item name="74HC298" package="ic74/74HC298" subcircuit="ic74/74HC298" info="  quad 2-line to 1-line multiplexers with storage " ></item>
+    <item name="74HC352" package="ic74/74HC352" subcircuit="ic74/74HC352" info="  dual 4-line to 1-line data selector/multiplexer, inverting outputs " ></item>
+    <item name="74HC353" package="ic74/74HC353" subcircuit="ic74/74HC353" info="  dual 4-line to 1-line data selector/multiplexer, inverting  and tristate outputs " ></item>
+    <item name="74HC354" package="ic74/74HC354" subcircuit="ic74/74HC354" info="  8-line to 1-line data selector/multiplexer with transparent latches, tristate outputs  " ></item>
+    <item name="74HC356" package="ic74/74HC356" subcircuit="ic74/74HC356" info="  8-line to 1-line data selector/multiplexer with register, tristate outputs  " ></item>
+    <item name="74HC373" package="ic74/74HC373" subcircuit="ic74/74HC373" info="  octal transparent latch " ></item>
+    <item name="74HC374" package="ic74/74HC374" subcircuit="ic74/74HC374" info="  octal register " ></item>
+    <item name="74HC375" package="ic74/74HC375" subcircuit="ic74/74HC375" info="  quad bistable latch " ></item>
+    <item name="74HC377" package="ic74/74HC377" subcircuit="ic74/74HC377" info="  8-bit register, clock enable " ></item>
+    <item name="74XX381" package="ic74/74XX381" subcircuit="ic74/74XX381" info="  4-bit arithmetic logic unit / function generator (!P, !G outputs)" ></item>
+    <item name="74XX382" package="ic74/74XX382" subcircuit="ic74/74XX382" info="  4-bit arithmetic logic unit / function generator (OVR, Co outputputs)" ></item>
+    <item name="74HC390" package="ic74/74HC390" subcircuit="ic74/74HC390" info="  dual 4-bit decade counter " ></item>
+    <item name="74HC393" package="ic74/74HC393" subcircuit="ic74/74HC393" info="  dual 4-bit binary counter" ></item>
+    <item name="74XX490" package="ic74/74XX490" subcircuit="ic74/74XX490" info="  dual decade counter " ></item>
+    <item name="74HC573" package="ic74/74HC573" subcircuit="ic74/74HC573" info="  octal D-type transparent latch" ></item>
+    <item name="74HC574" package="ic74/74HC574" subcircuit="ic74/74HC574" info="  octal D-type edge-triggered flip-flop" ></item>
+    <item name="74XX582" package="ic74/74XX582" subcircuit="ic74/74XX582" info="  4-bit BCD ALU" ></item>
+    <item name="74XX583" package="ic74/74XX583" subcircuit="ic74/74XX583" info="  4-bit BCD full adder (has carry in function) " ></item>
+    <item name="74HC590" package="ic74/74HC590" subcircuit="ic74/74HC590" info="  8-bit binary counter, output registers" ></item>
+    <item name="74HC592" package="ic74/74HC592" subcircuit="ic74/74HC592" info="  8-bit binary counter, input registers" ></item>
+    <item name="74HC595" package="ic74/74XX595" subcircuit="ic74/74XX595" info="  8-bit shift registers, output latches, parallel outputs" ></item>
+    <item name="74HC670" package="ic74/74HC670" subcircuit="ic74/74HC670" info="  4X4 register file, 3-state output" ></item>
+    <item name="74HC688" package="ic74/74HC688" subcircuit="ic74/74HC688" info="  8-bit magnitude comparator, enable" ></item>
     </itemset>
     
     <itemset category="IC 74/742000-up" type="Subcircuit">
-    <item name="74HC4017" package="ic74/74HC4017.package" subcircuit="ic74/74HC4017.subcircuit"></item>
-    <item name="74HC4020" package="ic74/74HC4020.package" subcircuit="ic74/74HC4020.subcircuit"></item>
-    <item name="74HC4022" package="ic74/74HC4022.package" subcircuit="ic74/74HC4022.subcircuit"></item>
-    <item name="74HC4022_LS" package="ic74/74HC4022-LS.package" subcircuit="ic74/74HC4022.subcircuit"></item>
-    <item name="74HC4024" package="ic74/74HC4024.package" subcircuit="ic74/74HC4024.subcircuit"></item>
-    <item name="74HC4028" package="ic74/74HC4028.package" subcircuit="ic74/74HC4028.subcircuit"></item>
-    <item name="74HC4040" package="ic74/74HC4040.package" subcircuit="ic74/74HC4040.subcircuit"></item>
-    <item name="74HC4511" package="ic74/74HC4511.package" subcircuit="ic74/74HC4511.subcircuit"></item>
-    <item name="74HC4514" package="ic74/74HC4514.package" subcircuit="ic74/74HC4514.subcircuit"></item>
-    <item name="74HC4515" package="ic74/74HC4515.package" subcircuit="ic74/74HC4515.subcircuit"></item>
-    <item name="74HC4518" package="ic74/74HC4518.package" subcircuit="ic74/74HC4518.subcircuit"></item>
-    <item name="74HC4520" package="ic74/74HC4520.package" subcircuit="ic74/74HC4520.subcircuit"></item>
-    <item name="74HC4543" package="ic74/74HC4543.package" subcircuit="ic74/74HC4543.subcircuit"></item>
-    
+    <item name="74HC4017" package="ic74/74HC4017" subcircuit="ic74/74HC4017" info="  5-stage ÷10 Johnson counter " ></item>
+    <item name="74HC4020" package="ic74/74HC4020" subcircuit="ic74/74HC4020" info="  14-stage binary counter " ></item>
+    <item name="74HC4022" package="ic74/74HC4022" subcircuit="ic74/74HC4022" info="  4-stage ÷8 Johnson counter" ></item>
+    <item name="74HC4024" package="ic74/74HC4024" subcircuit="ic74/74HC4024" info="  7-stage ripple carry binary counter" ></item>
+    <item name="74HC4028" package="ic74/74HC4028" subcircuit="ic74/74HC4028" info="  BCD to decimal decoder" ></item>
+    <item name="74HC4040" package="ic74/74HC4040" subcircuit="ic74/74HC4040" info="  12-stage binary ripple counter" ></item>
+    <item name="74HC4051" package="ic74/74HC4051" subcircuit="ic74/74HC4051" info="  high-speed 8-channel analog multiplexer/demultiplexer " ></item>
+    <item name="74HC4052" package="ic74/74HC4052" subcircuit="ic74/74HC4052" info="  dual 4-channel analog multiplexer/demultiplexer " ></item>
+    <item name="74HC4053" package="ic74/74HC4053" subcircuit="ic74/74HC4053" info="  triple 2-channel analog multiplexer/demultiplexer " ></item>
+    <item name="74HC4060" package="ic74/74HC4060" subcircuit="ic74/74HC4060" info="  14-stage binary ripple counter with oscillator" ></item>
+    <item name="74HC4067" package="ic74/74HC4067" subcircuit="ic74/74HC4067" info="  high-speed 16-channel analog multiplexer/demultiplexer " ></item>
+    <item name="74HC4094" package="icCD/CD4094"   subcircuit="icCD/CD4094"   info="  8-stage shift and store register, tristate outputs" ></item>
+    <item name="74HC4511" package="ic74/74HC4511" subcircuit="ic74/74HC4511" info="  BCD to 7-segment decoder" ></item>
+    <item name="74HC4514" package="ic74/74HC4514" subcircuit="ic74/74HC4514" info="  4-to-16 line decoder/demultiplexer, input latches" ></item>
+    <item name="74HC4515" package="ic74/74HC4515" subcircuit="ic74/74HC4515" info="  4-to-16 line decoder/demultiplexer with input latches; inverting " ></item>
+    <item name="74HC4518" package="ic74/74HC4518" subcircuit="ic74/74HC4518" info="  dual 4-bit synchronous decade counter" ></item>
+    <item name="74HC4520" package="ic74/74HC4518" subcircuit="ic74/74HC4520" info="  dual 4-bit synchronous binary counter " ></item>
+    <item name="74HC4543" package="ic74/74HC4543" subcircuit="ic74/74HC4543" info="  BCD to 7-segment latch/decoder/driver for LCDs " ></item>
+    <item name="74HC40102" package="ic74/74HC40102" subcircuit="ic74/74HC40102" info="  presettable synchronous 2-decade BCD down counter" ></item> 
+    <item name="74HC40103" package="ic74/74HC40102" subcircuit="ic74/74HC40103" info="  presettable 8-bit synchronous down counter " ></item>  
     </itemset>
 
 </itemlib>

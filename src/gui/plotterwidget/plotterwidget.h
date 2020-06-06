@@ -31,6 +31,8 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
     Q_PROPERTY( QString  itemtype  READ itemType )
     Q_PROPERTY( double MaxVolt READ maxVolt  WRITE setMaxVolt )
     Q_PROPERTY( double MinVolt READ minVolt  WRITE setMinVolt )
+    Q_PROPERTY( int    Scale   READ xScale    WRITE xScaleChanged )
+    Q_PROPERTY( int    Tracks  READ tracks   WRITE setTracks )
 
     public:
         PlotterWidget( QWidget *parent );
@@ -40,8 +42,8 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
  
         QString itemType(){ return "Plotter"; }
 
-        int  getChannel();
-        void addChannel( int channel );
+        //int  getChannel();
+        bool addChannel( int channel );
         void remChannel( int channel );
 
         QColor getColor( int channel );
@@ -57,23 +59,31 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
         
         double minVolt();
         void setMinVolt( double volt );
+        
+        int xScale() { return m_xScale; }
+        
+        int tracks();
 
     public slots:
         void maxChanged( double value );
         void minChanged( double value );
+        void xScaleChanged( int scale );
+        void setTracks( int tracks );
         
     private:
  static PlotterWidget* m_pSelf;
 
         void setupWidget();
-        void setScale();
         void setRenderData( int channel, int data );
+        void setScale();
 
         QHBoxLayout* m_horizontalLayout;
         QVBoxLayout* m_verticalLayout;
         QLineEdit*   m_chanLabel[4];
         QDoubleSpinBox* m_maxValue;
         QDoubleSpinBox* m_minValue;
+        QSpinBox*       m_XScale;
+        QSpinBox*       m_tracks;
 
         RenderArea*  m_rArea;
 
@@ -84,6 +94,8 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
         int  m_numchan;
         int  m_counter;
         int  m_ticksPs;
+        int  m_xScale;
+        int  m_numTracks;
         
         int m_maxVolt;
         int m_minVolt;

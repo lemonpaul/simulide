@@ -14,9 +14,9 @@
         numInputs = "3"
         connections="
         output0-eNode0
-        input2-packagePin19
-        input0-packagePin18
-        input1-packagePin3" >
+        input2-Package_!A3
+        input0-Package_!B3
+        input1-Package_S3" >
     </item>
 
     <item itemtype="eOrGate"
@@ -48,8 +48,8 @@
         connections="
         output0-eNode1
         input2-eNode5
-        input0-packagePin19
-        input1-packagePin4" >
+        input0-Package_!A3
+        input1-Package_S2" >
     </item>
 
     <item itemtype="eAndGate"
@@ -65,7 +65,7 @@
         connections="
         output0-eNode2
         input0-eNode5
-        input1-packagePin5" >
+        input1-Package_S1" >
     </item>
 
     <item itemtype="eOrGate"
@@ -97,8 +97,8 @@
         numInputs = "2"
         connections="
         output0-eNode3
-        input1-packagePin18
-        input0-packagePin6" >
+        input1-Package_!B3
+        input0-Package_S0" >
     </item>
 
     <item itemtype="eBuffer"
@@ -113,7 +113,7 @@
         tristate = "false"
         connections="
         output0-eNode4
-        input0-packagePin19" >
+        input0-Package_!A3" >
     </item>
 
     <item itemtype="eBuffer"
@@ -128,7 +128,7 @@
         tristate = "false"
         connections="
         output0-eNode5
-        input0-packagePin18" >
+        input0-Package_!B3" >
     </item>
 
     <item itemtype="eBuffer"
@@ -142,7 +142,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        input0-packagePin21
+        input0-Package_!A2
         output0-eNode7" >
     </item>
 
@@ -157,10 +157,10 @@
         openCollector = "false"
         numInputs = "3"
         connections="
-        input0-packagePin21
+        input0-Package_!A2
         input2-eNode6
         output0-eNode11
-        input1-packagePin4" >
+        input1-Package_S2" >
     </item>
 
     <item itemtype="eAndGate"
@@ -174,10 +174,10 @@
         openCollector = "false"
         numInputs = "3"
         connections="
-        input2-packagePin21
-        input0-packagePin20
+        input2-Package_!A2
+        input0-Package_!B2
         output0-eNode8
-        input1-packagePin3" >
+        input1-Package_S3" >
     </item>
 
     <item itemtype="eBuffer"
@@ -191,7 +191,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        input0-packagePin20
+        input0-Package_!B2
         output0-eNode6" >
     </item>
 
@@ -206,9 +206,9 @@
         openCollector = "false"
         numInputs = "2"
         connections="
-        input1-packagePin20
+        input1-Package_!B2
         output0-eNode10
-        input0-packagePin6" >
+        input0-Package_S0" >
     </item>
 
     <item itemtype="eAndGate"
@@ -224,7 +224,7 @@
         connections="
         input0-eNode6
         output0-eNode9
-        input1-packagePin5" >
+        input1-Package_S1" >
     </item>
 
     <item itemtype="eOrGate"
@@ -271,10 +271,10 @@
         openCollector = "false"
         numInputs = "3"
         connections="
-        input0-packagePin2
+        input0-Package_!A0
         output0-eNode14
         input2-eNode19
-        input1-packagePin4" >
+        input1-Package_S2" >
     </item>
 
     <item itemtype="eBuffer"
@@ -288,7 +288,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        input0-packagePin2
+        input0-Package_!A0
         output0-eNode23" >
     </item>
 
@@ -303,10 +303,10 @@
         openCollector = "false"
         numInputs = "3"
         connections="
-        input2-packagePin2
+        input2-Package_!A0
         output0-eNode15
-        input0-packagePin1
-        input1-packagePin3" >
+        input0-Package_!B0
+        input1-Package_S3" >
     </item>
 
     <item itemtype="eBuffer"
@@ -320,7 +320,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        input0-packagePin23
+        input0-Package_!A1
         output0-eNode12" >
     </item>
 
@@ -335,10 +335,10 @@
         openCollector = "false"
         numInputs = "3"
         connections="
-        input0-packagePin23
+        input0-Package_!A1
         output0-eNode13
         input2-eNode17
-        input1-packagePin4" >
+        input1-Package_S2" >
     </item>
 
     <item itemtype="eAndGate"
@@ -352,10 +352,10 @@
         openCollector = "false"
         numInputs = "3"
         connections="
-        input2-packagePin23
-        input0-packagePin22
+        input2-Package_!A1
+        input0-Package_!B1
         output0-eNode21
-        input1-packagePin3" >
+        input1-Package_S3" >
     </item>
 
     <item itemtype="eOrGate"
@@ -418,7 +418,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        input0-packagePin22
+        input0-Package_!B1
         output0-eNode17" >
     </item>
 
@@ -433,9 +433,9 @@
         openCollector = "false"
         numInputs = "2"
         connections="
-        input1-packagePin22
+        input1-Package_!B1
         output0-eNode16
-        input0-packagePin6" >
+        input0-Package_S0" >
     </item>
 
     <item itemtype="eAndGate"
@@ -451,7 +451,7 @@
         connections="
         input0-eNode17
         output0-eNode22
-        input1-packagePin5" >
+        input1-Package_S1" >
     </item>
 
     <item itemtype="eAndGate"
@@ -466,8 +466,8 @@
         numInputs = "2"
         connections="
         output0-eNode18
-        input1-packagePin1
-        input0-packagePin6" >
+        input1-Package_!B0
+        input0-Package_S0" >
     </item>
 
     <item itemtype="eOrGate"
@@ -499,7 +499,7 @@
         tristate = "false"
         connections="
         output0-eNode19
-        input0-packagePin1" >
+        input0-Package_!B0" >
     </item>
 
     <item itemtype="eAndGate"
@@ -515,7 +515,7 @@
         connections="
         input0-eNode19
         output0-eNode20
-        input1-packagePin5" >
+        input1-Package_S1" >
     </item>
 
     <item itemtype="eBuffer"
@@ -529,7 +529,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        input0-packagePin8
+        input0-Package_M
         output0-eNode54" >
     </item>
 
@@ -544,7 +544,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        output0-packagePin17
+        output0-Package_!G
         input0-eNode26" >
     </item>
 
@@ -576,7 +576,7 @@
         numInputs = "5"
         connections="
         output0-eNode24
-        input4-packagePin7
+        input4-Package_Cn
         input3-eNode56
         input2-eNode58
         input1-eNode60
@@ -594,7 +594,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        output0-packagePin15
+        output0-Package_!P
         input0-eNode25" >
     </item>
 
@@ -712,7 +712,7 @@
         numInputs = "5"
         connections="
         output0-eNode31
-        input0-packagePin7
+        input0-Package_Cn
         input4-eNode54
         input1-eNode56
         input2-eNode58
@@ -830,7 +830,7 @@
         tristate = "false"
         connections="
         input0-eNode36
-        output0-packagePin16" >
+        output0-Package_Cn+4" >
     </item>
 
     <item itemtype="eBuffer"
@@ -844,7 +844,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        output0-packagePin13
+        output0-Package_!F3
         input0-eNode37" >
     </item>
 
@@ -907,7 +907,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        output0-packagePin11
+        output0-Package_!F2
         input0-eNode40" >
     </item>
 
@@ -940,7 +940,7 @@
         numInputs = "4"
         connections="
         output0-eNode42
-        input0-packagePin7
+        input0-Package_Cn
         input3-eNode54
         input1-eNode56
         input2-eNode58" >
@@ -989,7 +989,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        output0-packagePin10
+        output0-Package_!F1
         input0-eNode45" >
     </item>
 
@@ -1051,7 +1051,7 @@
         numInputs = "3"
         connections="
         output0-eNode48
-        input0-packagePin7
+        input0-Package_Cn
         input2-eNode54
         input1-eNode56" >
     </item>
@@ -1083,7 +1083,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        output0-packagePin9
+        output0-Package_!F0
         input0-eNode50" >
     </item>
 
@@ -1129,7 +1129,7 @@
         numInputs = "2"
         connections="
         output0-eNode52
-        input0-packagePin7
+        input0-Package_Cn
         input1-eNode54" >
     </item>
 
@@ -1144,7 +1144,7 @@
         openCollector = "false"
         tristate = "false"
         connections="
-        output0-packagePin14
+        output0-Package_A=B
         input0-eNode53" >
     </item>
 

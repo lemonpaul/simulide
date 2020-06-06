@@ -20,6 +20,8 @@
 #include <iostream>
 #include <math.h>
 
+//#include <iomanip>
+
 #include "circmatrix.h"
 #include "simulator.h"
 
@@ -32,9 +34,8 @@ CircMatrix::CircMatrix()
 }
 CircMatrix::~CircMatrix(){}
 
-void CircMatrix::createMatrix( QList<eNode*> &eNodeList, QList<eElement*> &elementList )
+void CircMatrix::createMatrix( QList<eNode*> &eNodeList )
 {
-    m_elementList = elementList;
     m_eNodeList = &eNodeList;
     m_numEnodes = eNodeList.size();
 
@@ -47,18 +48,8 @@ void CircMatrix::createMatrix( QList<eNode*> &eNodeList, QList<eElement*> &eleme
     m_circChanged  = true;
     m_admitChanged = false;
     m_currChanged  = false;
-    
-     // Initialize eNodes
-    std::cout <<"\nInitializing "<< m_numEnodes << " eNodes"<< std::endl;
-    for( int i=0; i<m_numEnodes; i++ )
-    {
-        eNode* enode = eNodeList.at(i);
-        enode->setNodeNumber( i+1 );
-        enode->initialize();
-    }
-    std::cout <<"\nInitializing "<< m_elementList.size() << " eElements"<< std::endl;
-    foreach( eElement* el, m_elementList ) el->initialize();
-    foreach( eElement* el, m_elementList ) el->stamp();
+
+    std::cout <<"\n  Initializing Matrix: "<< m_numEnodes << " eNodes"<< std::endl;
     for( int i=0; i<m_numEnodes; i++ ) m_eNodeList->at(i)->stampMatrix();
 }
 
@@ -86,10 +77,9 @@ void CircMatrix::addConnections( int enodNum, QList<int>* nodeGroup, QList<int>*
     
     QList<int> cons = enod->getConnections();
     
-    foreach( int nodeNum, cons ) 
+    for( int nodeNum : cons ) 
     {
         if( nodeNum == 0 ) continue;
-        
         if( !nodeGroup->contains( nodeNum ) ) addConnections( nodeNum, nodeGroup, allNodes );
     }
 }
@@ -118,8 +108,9 @@ bool CircMatrix::solveMatrix()
         {
             QList<int> nodeGroup;
             addConnections( allNodes.first(), &nodeGroup, &allNodes ); // Get a group of nodes interconnected
+            //qDebug() <<"CircMatrix::solveMatrix split"<<nodeGroup<<allNodes;
             
-            //foreach( int num, nodeGroup ) allNodes.removeOne(num);
+            //for( int num : nodeGroup ) allNodes.removeOne(num);
             
             int numEnodes = nodeGroup.size();
             if( numEnodes==1 )           // Sigle nodes do by themselves
@@ -127,6 +118,7 @@ bool CircMatrix::solveMatrix()
                 eNode* enod = m_eNodeList->at( nodeGroup[0]-1 );
                 enod->setSingle( true );
                 enod->solveSingle();
+                //qDebug() <<"CircMatrix::solveMatrix solve single"<<enod->itemId();
             }
             else
             {
@@ -150,10 +142,13 @@ bool CircMatrix::solveMatrix()
                     {
                         if( !nodeGroup.contains( x+1 ) ) continue;
                         a[nx][ny] = &(m_circMatrix[x][y]);
+                        //qDebug() <<"CircMatrix::solveMatrix cell"<<nx<<ny<<*(a[nx][ny]);
                         nx++;
                     }
                     b[ny] = &(m_coefVect[y]);
                     eNodeActive.append( m_eNodeList->at(y) );
+                    //eNode* enod = m_eNodeList->at(y);
+                    //qDebug() <<"CircMatrix::solveMatrix node"<<enod->itemId();
                     ny++;
                 }
                 m_aList.append( a );
@@ -170,7 +165,7 @@ bool CircMatrix::solveMatrix()
             }
         }
         m_circChanged  = false;
-        //qDebug() <<group<<"Circuits";
+        //qDebug() <<"CircMatrix::solveMatrix"<<group<<"Circuits";
     }
     else
     {
@@ -209,6 +204,19 @@ void CircMatrix::factorMatrix( int n, int group  )
         }
     }
     
+    /*std::cout << "\nAdmitance Matrix:\n"<< std::endl;
+    for( int i=0; i<n; i++ )
+    {
+        for( int j=0; j<n; j++ )
+        {
+            std::cout << std::setw(10);
+            std::cout << a[i][j];
+        }
+        std::cout << std::setw(10);
+        std::cout << ipvt[i] << std::endl;
+        //std::cout << std::endl;
+    }*/
+    
     int i,j,k;
 
     for( j=0; j<n; j++ ) // use Crout's method; loop through the columns
@@ -229,12 +237,15 @@ void CircMatrix::factorMatrix( int n, int group  )
             for( k=0; k<j; k++ ) q -= a[i][k]*a[k][j];
 
             a[i][j] = q;
-            double x = std::fabs( q );
+            double x = std::abs( q );
+            
+            //qDebug() <<"is"<<x<<">="<<largest<<( x >= largest );
             if( x >= largest )
             {
                 largest = x;
                 largestRow = i;
             }
+            //qDebug() <<"LTE"<<i<<j<<x<<q<<largest<<largestRow<<( !(x < largest) );
         }
 
         if( j != largestRow ) // pivoting
@@ -248,6 +259,7 @@ void CircMatrix::factorMatrix( int n, int group  )
             }
         }
         ipvt[j] = largestRow;      // keep track of row interchanges
+        //qDebug() <<"IPVT"<< j<<largestRow;
 
         if( a[j][j] == 0.0 ) a[j][j]=1e-18;           // avoid zeros
 
@@ -258,6 +270,19 @@ void CircMatrix::factorMatrix( int n, int group  )
         }
     }
     m_aFaList.replace( group, a );
+    
+    /*std::cout << "\nFactored Matrix:\n"<< std::endl;
+    for( int i=0; i<n; i++ )
+    {
+        for( int j=0; j<n; j++ )
+        {
+            std::cout << std::setw(10);
+            std::cout << a[i][j];
+        }
+        std::cout << std::setw(10);
+        std::cout << ipvt[i] << std::endl;
+        //std::cout << std::endl;
+    }*/
 }
 
 bool CircMatrix::luSolve( int n, int group )
@@ -272,8 +297,20 @@ bool CircMatrix::luSolve( int n, int group )
 
     d_vector_t b;
     b.resize( n , 0 );
-    for( int i=0; i<n; i++ ) b[i] = *(bp[i]);             
+    for( int i=0; i<n; i++ ) b[i] = *(bp[i]);
     
+    /*std::cout << "\nAdmitance Matrix luSolve:\n"<< std::endl;
+    for( int i=0; i<n; i++ )
+    {
+        for( int j=0; j<n; j++ )
+        {
+            std::cout << std::setw(10);
+            std::cout << a[i][j]; // <<"\t";
+        }
+        std::cout << std::setw(10);
+        std::cout << b[i]<<"\t"<< ipvt[i] << std::endl;
+    }*/
+
     int i;
     for( i=0; i<n; i++ )                 // find first nonzero b element
     {

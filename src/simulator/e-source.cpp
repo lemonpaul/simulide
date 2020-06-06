@@ -65,14 +65,15 @@ void eSource::initialize()
 
 void eSource::stamp()
 {
-    //qDebug() <<"eSource::stamp"<< m_out;
+    //qDebug() <<"eSource::stamp"<<QString::fromStdString(m_elmId)<< m_out;
     m_ePin[0]->stampAdmitance( m_admit );
     stampOutput();
 }
 
 void eSource::stampOutput()                               // Stamp Output
 {
-    m_scrEnode->setVolt(m_voltOut);
+    //qDebug() <<"eSource::stampOutput"<<QString::fromStdString(m_elmId)<< m_out<<m_voltOut<<m_imp ;
+    m_scrEnode->setVolt( m_voltOut );
 
     m_ePin[0]->stampCurrent( m_voltOut/m_imp );
 }
@@ -122,7 +123,7 @@ void eSource::setImp( double imp )
 {
     m_imp = imp;
     m_admit = 1/m_imp;
-    stamp();
+    eSource::stamp();
 }
 
 double eSource::imp() { return m_imp; }

@@ -24,6 +24,8 @@
 #include "itemlibrary.h"
 #include "utils.h"
 
+#include "avr_twi.h"
+
 LibraryItem* Arduino::libraryItem()
 {
     return new LibraryItem(
@@ -45,6 +47,7 @@ Component* Arduino::construct( QObject* parent, QString type, QString id )
             ard->deleteLater();
             ard = 0l;
             m_error = 0;
+            m_pSelf = 0l;
             m_canCreate = true;
         }
         return ard;
@@ -56,10 +59,9 @@ Component* Arduino::construct( QObject* parent, QString type, QString id )
 }
 
 Arduino::Arduino( QObject* parent, QString type, QString id )
-       : McuComponent( parent, type, id )
+       : AvrCompBase( parent, type, id )
 {
     m_pSelf = this;
-    m_dataFile = "arduinos.xml";
     m_processor = AvrProcessor::self();
     
     setLabelPos( 100,-21, 0); // X, Y, Rot
@@ -86,22 +88,25 @@ Arduino::~Arduino()
 void Arduino::remove()
 {
     m_pb5Pin->setEnode( 0l );
-    
-    Circuit::self()->compList()->removeOne( m_boardLed );
-    Simulator::self()->remFromUpdateList( m_boardLed );
-    
-    delete m_ground;
+    ePin* ledPin0 = m_boardLed->getEpin(0);
+    ledPin0->setEnode( 0l );
+    delete ledPin0;
+
+    ePin* ledPin1 = m_boardLed->getEpin(1);
+    ledPin1->setEnode( 0l );
+    delete ledPin1;
+
     delete m_groundpin;
-    delete m_boardLed;
-    
-    Simulator::self()->remFromEnodeList( m_groundEnode, true );
-    Simulator::self()->remFromEnodeList( m_boardLedEnode, true );
-    Simulator::self()->remFromElementList( this );
+    delete m_ground;
 
     McuComponent::remove();
+
+    Simulator::self()->remFromEnodeList( m_groundEnode, true );
+    Simulator::self()->remFromUpdateList( m_boardLed );
+    Circuit::self()->compList()->removeOne( m_boardLed );
 }
 
-void Arduino::initialize()
+void Arduino::attach()
 {
     eNode* enod = m_pb5Pin->getEnode();
     
@@ -117,7 +122,7 @@ void Arduino::initialize()
         m_boardLedEnode = enod;
     }
     else return;                       // Already connected to boardLed eNode: Do nothing
-    
+    //qDebug() << "Arduino::initialize() Pin 13"<<enod->itemId() ;
     m_boardLed->getEpin(0)->setEnode(enod);
 }
 
@@ -159,7 +164,7 @@ void Arduino::initBoard()
         pin->setLength(0);
         pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false );
         
-        QString pinId = pin->itemID();
+        QString pinId = pin->pinId();
         QString type  = mcuPin->ptype();
         if     ( pinId.contains( "GND" ) )                   // Gnd Pins
         {    
@@ -197,43 +202,7 @@ void Arduino::initBoard()
     }
 }
 
-void Arduino::attachPins()
-{
-    AvrProcessor *ap = dynamic_cast<AvrProcessor*>( m_processor );
-    avr_t *cpu = ap->getCpu();
-
-    for( int i = 0; i < m_numpins; i++ )
-    {
-        AVRComponentPin *pin = dynamic_cast<AVRComponentPin*>( m_pinList[i] );
-        pin->attach( cpu );
-    }
-    cpu->vcc  = 5000;
-    cpu->avcc = 5000;
-    
-    // Registra IRQ para recibir petiones de voltaje de pin ( usado en ADC )
-    avr_irq_t* adcIrq = avr_io_getirq( cpu, AVR_IOCTL_ADC_GETIRQ, ADC_IRQ_OUT_TRIGGER );
-    avr_irq_register_notify( adcIrq, adc_hook, this );
-    
-    m_attached = true;
-}
-
-void Arduino::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
-{
-    //qDebug()<<pos<<id<<label;
-    AVRComponentPin*  newPin = new AVRComponentPin( this, id, type, label, pos, xpos, ypos, angle );
-    m_pinList.append( newPin );
-    
-    if( type.startsWith("adc") )m_ADCpinList[type.right(1).toInt()] = newPin;
-}
-
-void Arduino::adcread( int channel )
-{
-    //qDebug() << "ADC Read channel:" << channel;
-    AVRComponentPin* pin = m_ADCpinList.value(channel);
-    if( pin ) pin->adcread();
-}
-
-void Arduino::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
+void Arduino::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Component::paint( p, option, widget );
 

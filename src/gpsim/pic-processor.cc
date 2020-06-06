@@ -348,7 +348,11 @@ void pic_processor::exit_sleep()
       mCurrentPhase = save_CurrentPhase;
       mCurrentPhase->setNextPhase(save_pNextPhase);
   }
-  else mCurrentPhase->setNextPhase(mExecute1Cycle);
+  else
+  {
+      mCurrentPhase = mExecute1Cycle;
+      mCurrentPhase->setNextPhase(mExecute1Cycle);
+  }
   
   m_ActivityState = ePAActive;
 }
@@ -420,7 +424,7 @@ void pic_processor::step_cycle()
 // return, etc.) then a break point will be set after it and gpsim will
 // begin 'running'. This is useful for stepping over time-consuming calls.
 //
-void pic_processor::step_over (bool refresh)
+void pic_processor::step_over( bool refresh )
 {
 }
 
@@ -432,7 +436,7 @@ void pic_processor::step_over (bool refresh)
 
 void pic_processor::finish()
 {
-  if(!stack) return;
+    if( !stack ) return;
 }
 
 
@@ -440,19 +444,19 @@ void pic_processor::finish()
 //
 // reset - reset the pic based on the desired reset type.
 //
-void pic_processor::reset (RESET_TYPE r)
+void pic_processor::reset( RESET_TYPE r )
 {
-  rma.reset(r);
-  stack->reset(r);
-  wdt.reset(r);
-  pc->reset();
+    rma.reset(r);
+    stack->reset(r);
+    wdt.reset(r);
+    pc->reset();
 
-  bp.clear_global();
+    bp.clear_global();
 
-  switch (r) 
-  {
+    switch (r) 
+    {
       case POR_RESET:
-          if(config_modes) config_modes->print();
+        if( config_modes ) config_modes->print();
         mCurrentPhase = mCurrentPhase ? mCurrentPhase : mExecute1Cycle;
         m_ActivityState = ePAActive;
         break;
@@ -463,7 +467,6 @@ void pic_processor::reset (RESET_TYPE r)
         mCurrentPhase->setNextPhase(mExecute1Cycle);
         m_ActivityState = ePAActive;
         break;
-
 
       case MCLR_RESET:
         cout << "MCLR reset\n";
@@ -513,7 +516,7 @@ void pic_processor::reset (RESET_TYPE r)
         printf("pic_processor::reset unknow reset type %d\n", r);
         m_ActivityState = ePAActive;
         break;
-  }
+    }
 }
 
 //-------------------------------------------------------------------

@@ -45,36 +45,25 @@ extern "C" {
  *
  * @param p		internal bitbang structure
  */
-static void avr_bitbang_read_bit(avr_bitbang_t *p)
+static void avr_bitbang_read_bit( avr_bitbang_t* p )
 {
 	avr_ioport_state_t iostate;
 	uint8_t bit = 0;
 
-	if ( !p->enabled )
-		return;
+    if( !p->enabled ) return;
 
-	// read from HW pin
-	if ( p->p_in.port ) {
-		avr_ioctl(p->avr, AVR_IOCTL_IOPORT_GETSTATE( p->p_in.port ), &iostate);
+    if( p->p_in.port )  // read from HW pin
+    {
+        avr_ioctl( p->avr, AVR_IOCTL_IOPORT_GETSTATE( p->p_in.port ), &iostate );
 		bit = ( iostate.pin >> p->p_in.pin ) & 1;
 
-		if ( p->data_order ) {
-			// data order: shift right
-			p->data = (p->data >> 1) | ( bit << (p->buffer_size-1));
-		} else {
-			// data order: shift left
-			p->data = (p->data << 1) | bit;
-		}
-
+        if( p->data_order ) p->data = (p->data >> 1) | ( bit << (p->buffer_size-1)); // data order: shift right
+        else                p->data = (p->data << 1) | bit; // data order: shift left
 	}
 
-	// module callback
-	if ( p->callback_bit_read ) {
-		p->callback_bit_read(bit, p->callback_param);
-	}
+    if( p->callback_bit_read ) p->callback_bit_read(bit, p->callback_param); // module callback
 
-	// data sanitary
-	p->data = p->data & ~(BITBANG_MASK << p->buffer_size);
+    p->data = p->data & ~(BITBANG_MASK << p->buffer_size); // data sanitary
 }
 
 /**
@@ -82,30 +71,21 @@ static void avr_bitbang_read_bit(avr_bitbang_t *p)
  *
  * @param p		bitbang structure
  */
-static void avr_bitbang_write_bit(avr_bitbang_t *p)
+static void avr_bitbang_write_bit( avr_bitbang_t* p )
 {
 	uint8_t	bit = 0;
 
-	if ( !p->enabled )
-		return;
+    if( !p->enabled ) return;
 
-	if ( p->data_order ) {
-		// data order: shift right
-		bit = p->data & 1;
-	} else {
-		// data order: shift left
-		bit = (p->data >> (p->buffer_size-1)) & 1;
-	}
+    if( p->data_order ) bit = p->data & 1; // data order: shift right
+    else                bit = (p->data >> (p->buffer_size-1)) & 1; // data order: shift left
 
 	// output to HW pin
-	if ( p->p_out.port ) {
+    if( p->p_out.port ) {
 		avr_raise_irq(avr_io_getirq(p->avr, AVR_IOCTL_IOPORT_GETIRQ( p->p_out.port ), p->p_out.pin), bit);
 	}
-
 	// module callback
-	if ( p->callback_bit_write ) {
-		p->callback_bit_write(bit, p->callback_param);
-	}
+    if( p->callback_bit_write ) p->callback_bit_write(bit, p->callback_param);
 }
 
 
@@ -115,13 +95,12 @@ static void avr_bitbang_write_bit(avr_bitbang_t *p)
  * @param p		bitbang structure
  *
  */
-static void avr_bitbang_clk_edge(avr_bitbang_t *p)
+static void avr_bitbang_clk_edge( avr_bitbang_t* p )
 {
 	uint8_t phase = (p->clk_count & 1) ^ p->clk_phase;
-	uint8_t clk = (p->clk_count & 1) ^ p->clk_pol;
+    uint8_t clk   = (p->clk_count & 1) ^ p->clk_pol;
 
-	if ( !p->enabled )
-		return;
+    if( !p->enabled ) return;
 
 	// increase clock
 	p->clk_count++;
@@ -133,17 +112,11 @@ static void avr_bitbang_clk_edge(avr_bitbang_t *p)
 		avr_raise_irq(avr_io_getirq(p->avr, AVR_IOCTL_IOPORT_GETIRQ( p->p_clk.port ), p->p_clk.pin), clk);
 	}
 
-	if ( phase ) {
-		// read data in
-		avr_bitbang_read_bit(p);
+    if( phase ) avr_bitbang_read_bit(p);  // read data in
+    else        avr_bitbang_write_bit(p); // write data out
 
-	} else {
-		// write data out
-		avr_bitbang_write_bit(p);
-	}
-
-	if ( p->clk_count >= (p->buffer_size*2) ) {
-		// transfer finished
+    if ( p->clk_count >= (p->buffer_size*2) ) // transfer finished
+    {
 		if ( p->callback_transfer_finished ) {
 			p->data = p->callback_transfer_finished(p->data, p->callback_param);
 		}
@@ -151,26 +124,22 @@ static void avr_bitbang_clk_edge(avr_bitbang_t *p)
 	}
 }
 
-static avr_cycle_count_t avr_bitbang_clk_timer(struct avr_t * avr, avr_cycle_count_t when, void * param)
+static avr_cycle_count_t avr_bitbang_clk_timer( struct avr_t* avr, avr_cycle_count_t when, void* param )
 {
-	avr_bitbang_t * p = (avr_bitbang_t *)param;
+    avr_bitbang_t* p = (avr_bitbang_t*)param;
 
 	avr_bitbang_clk_edge(p);
 
-	if ( p->enabled )
-		return when + p->clk_cycles/2;
-	else
-		return 0;
+    if( p->enabled ) return when + p->clk_cycles/2;
+    else             return 0;
 }
 
-static void avr_bitbang_clk_hook(struct avr_irq_t * irq, uint32_t value, void * param)
+static void avr_bitbang_clk_hook( struct avr_irq_t* irq, uint32_t value, void* param)
 {
-	avr_bitbang_t * p = (avr_bitbang_t *)param;
+    avr_bitbang_t* p = (avr_bitbang_t*)param;
 	uint8_t clk = (p->clk_count & 1) ^ p->clk_pol;
 
-	// no clock change
-	if ( clk == value )
-		return;
+    if( clk == value ) return; // no clock change
 
 	avr_bitbang_clk_edge(p);
 }
@@ -181,7 +150,7 @@ static void avr_bitbang_clk_hook(struct avr_irq_t * irq, uint32_t value, void * 
  * @param avr	avr attached to
  * @param p		bitbang structure
  */
-void avr_bitbang_reset(avr_t *avr, avr_bitbang_t * p)
+void avr_bitbang_reset( avr_t* avr, avr_bitbang_t* p )
 {
 	p->avr = avr;
 	p->enabled = 0;
@@ -189,11 +158,9 @@ void avr_bitbang_reset(avr_t *avr, avr_bitbang_t * p)
 	p->data = 0;
 
 	if ( p->buffer_size < 1 || p->buffer_size > 32 ) {
-		AVR_LOG(avr, LOG_ERROR,
-				"Error: bitbang buffer size should be between 1 and 32. set value: %d\n", p->buffer_size);
+        AVR_LOG(avr, LOG_ERROR, "Error: bitbang buffer size should be between 1 and 32. set value: %d\n", p->buffer_size);
 		abort();
 	}
-
 }
 
 /**
@@ -204,25 +171,22 @@ void avr_bitbang_reset(avr_t *avr, avr_bitbang_t * p)
  *
  * @param p			bitbang structure
  */
-void avr_bitbang_start(avr_bitbang_t * p)
+void avr_bitbang_start( avr_bitbang_t* p )
 {
 	p->enabled = 1;
 	p->clk_count = 0;
 
-	if ( p->clk_phase == 0 ) {
-		// write first bit
-		avr_bitbang_write_bit(p);
-	}
+    if( p->clk_phase == 0 ) avr_bitbang_write_bit(p); // write first bit
 
-	if ( p->clk_generate ) {
-		// master mode, generate clock -> set timer
+    if( p->clk_generate ) // master mode, generate clock -> set timer
+    {
 		avr_cycle_timer_register(p->avr, (p->clk_cycles/2), avr_bitbang_clk_timer, p);
-	} else {
-		// slave mode -> attach clock function to clock pin
+    }
+    else                 // slave mode -> attach clock function to clock pin
+    {
 		///@todo test
 		avr_irq_register_notify( avr_io_getirq(p->avr, AVR_IOCTL_IOPORT_GETIRQ( p->p_clk.port ), p->p_clk.pin), avr_bitbang_clk_hook, p);
 	}
-
 }
 
 
@@ -233,11 +197,10 @@ void avr_bitbang_start(avr_bitbang_t * p)
  *
  * @param p			bitbang structure
  */
-void avr_bitbang_stop(avr_bitbang_t * p)
+void avr_bitbang_stop( avr_bitbang_t* p )
 {
-
 	p->enabled = 0;
-	avr_cycle_timer_cancel(p->avr, avr_bitbang_clk_timer, p);
+    avr_cycle_timer_cancel( p->avr, avr_bitbang_clk_timer, p );
 	avr_irq_unregister_notify( avr_io_getirq(p->avr, AVR_IOCTL_IOPORT_GETIRQ( p->p_clk.port ), p->p_clk.pin), avr_bitbang_clk_hook, p);
 }
 

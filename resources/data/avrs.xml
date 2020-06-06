@@ -38,7 +38,7 @@
     <item name="attiny4313" package="avr/attiny2313" data="avr/attiny2313a"device="attiny4313" ></item>
     </itemset>
     <itemset category="AVR/atmega" type="AVR">
-    <item name="atmega8"    package="avr/atmega328"  data="avr/atmega328"  device="atmega8" ></item>
+    <item name="atmega8"    package="avr/atmega328"  data="avr/atmega8"    device="atmega8" ></item>
     <item name="atmega16"   package="avr/atmega32"   data="avr/atmega32"   device="atmega16" ></item>
     <item name="atmega16m1" package="avr/atmega16m1" data="avr/atmega16m1" device="atmega16m1"></item>
     <item name="atmega32"   package="avr/atmega32"   data="avr/atmega32"   device="atmega32" ></item>

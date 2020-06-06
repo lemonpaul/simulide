@@ -82,12 +82,12 @@ void Program_Counter::increment()
   Dprintf(("PC=0x%x\n",value));
 
   value = (value + 1);
-  if (value == memory_size) // Some processors start at highest memory and roll over
+  if( value == memory_size ) // Some processors start at highest memory and roll over
   {
         printf("%s PC=0x%x == memory size 0x%x\n", __FUNCTION__, value, memory_size);
         value = 0;
   }
-  else if (value > memory_size) // assume this is a mistake
+  else if( value > memory_size ) // assume this is a mistake
   {
         printf("%s PC=0x%x >= memory size 0x%x\n", __FUNCTION__, value, memory_size);
         bp.halt();
@@ -96,7 +96,7 @@ void Program_Counter::increment()
   // Update PCL sfr to reflect current PC
   update_pcl();
 
-  cpu_pic->mCurrentPhase->setNextPhase(cpu_pic->mExecute1Cycle);
+  cpu_pic->mCurrentPhase->setNextPhase( cpu_pic->mExecute1Cycle );
 }
 
 //--------------------------------------------------

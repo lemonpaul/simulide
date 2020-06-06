@@ -47,7 +47,7 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
         virtual bool getLoadStatus() { return m_loadStatus; }
         virtual void terminate();
 
-        virtual void setSteps( int steps );
+        virtual void setSteps( double steps );
         virtual void step()=0;
         virtual void stepOne()=0;
         virtual void stepCpu()=0;
@@ -60,19 +60,29 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
         virtual int getRegAddress( QString name );
         virtual void addWatchVar( QString name, int address, QString type );
         virtual void updateRamValue( QString name );
-        
-        virtual void setUsart( bool usart ) { m_usartTerm = usart; }
-        virtual void setSerPort( bool serport ) { m_serialPort = serport; }
-        virtual void uartOut( uint32_t value );
-        virtual void uartIn( uint32_t value );
+
+        virtual void uartOut( int uart, uint32_t value );
+        virtual void uartIn( int uart, uint32_t value );
         
         virtual void initialized();
         virtual QStringList getRegList() { return m_regList; }
+        
+        virtual RamTable* getRamTable() { return m_ramTable; }
+
+        virtual QVector<int> eeprom()=0;
+        virtual void setEeprom( QVector<int> eep );
+        
+        virtual void setRegisters();
+
+        bool p_runExtStep;
+
+    signals:
+        void uartDataOut( int uart, int value );
+        void uartDataIn(  int uart, int value );
     
     protected:
  static BaseProcessor* m_pSelf;
- 
-        virtual void setRegisters();
+        
         virtual int  validate( int address )=0;
         
         void runSimuStep();
@@ -81,9 +91,9 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
         QString m_dataFile;
         QString m_device;
         
-        int  m_mcuStepsPT;
+        double m_mcuStepsPT;
         int  m_msimStep;
-        unsigned long m_nextCycle;
+        double m_nextCycle;
 
         RamTable* m_ramTable;
         QStringList m_regList;
@@ -91,10 +101,10 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
         QHash<QString, float> m_floatTable;  // float 32 bits
         QHash<QString, QString> m_typeTable;
 
+        QVector<int> m_eeprom;
+
         bool m_resetStatus;
         bool m_loadStatus;
-        bool m_usartTerm;
-        bool m_serialPort;
 };
 
 

@@ -35,7 +35,6 @@ class MAINMODULE_EXPORT ePin
         void setConnected( bool connected );
 
         double getVolt();
-        //void setVolt( double v );
 
         eNode* getEnode();
         void   setEnode( eNode* enode );

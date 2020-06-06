@@ -34,7 +34,7 @@ class MAINMODULE_EXPORT McuComponentPin : public QObject, public eSource
 
         Pin* pin() const { return ( static_cast<Pin*>(m_ePin[0]) ); }
 
-        virtual void initialize();
+        virtual void stamp();
         virtual void resetState();
         void terminate();
 

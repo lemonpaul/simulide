@@ -32,7 +32,7 @@
         output0-eNode0
         input2-eNode24
         input1-eNode26
-        input0-packagePin12" >
+        input0-Package_Q3" >
     </item>
 
     <item itemtype="eAndGate"
@@ -46,7 +46,7 @@
         numInputs = "3"
         connections="
         output0-eNode1
-        input0-packagePin7
+        input0-Package_SL
         input2-eNode24
         input1-eNode25" >
     </item>
@@ -64,7 +64,7 @@
         output0-eNode2
         input2-eNode23
         input1-eNode25
-        input0-packagePin6" >
+        input0-Package_D3" >
     </item>
 
     <item itemtype="eAndGate"
@@ -78,7 +78,7 @@
         numInputs = "3"
         connections="
         output0-eNode3
-        input2-packagePin13
+        input2-Package_Q2
         input0-eNode23
         input1-eNode26" >
     </item>
@@ -95,9 +95,9 @@
         connections="
         input0-eNode4
         input1-eNode5
-        clock-packagePin11
-        input2-packagePin1
-        output0-packagePin12" >
+        clock-Package_C
+        input2-Package_!R
+        output0-Package_Q3" >
     </item>
 
     <item itemtype="eRail"
@@ -137,7 +137,7 @@
         output0-eNode6
         input2-eNode23
         input1-eNode25
-        input0-packagePin5" >
+        input0-Package_D2" >
     </item>
 
     <item itemtype="eRail"
@@ -159,9 +159,9 @@
         connections="
         input1-eNode7
         input0-eNode8
-        output0-packagePin13
-        clock-packagePin11
-        input2-packagePin1" >
+        output0-Package_Q2
+        clock-Package_C
+        input2-Package_!R" >
     </item>
 
     <item itemtype="eAndGate"
@@ -175,7 +175,7 @@
         numInputs = "3"
         connections="
         output0-eNode9
-        input0-packagePin13
+        input0-Package_Q2
         input2-eNode24
         input1-eNode26" >
     </item>
@@ -191,7 +191,7 @@
         numInputs = "3"
         connections="
         output0-eNode10
-        input2-packagePin14
+        input2-Package_Q1
         input0-eNode23
         input1-eNode26" >
     </item>
@@ -209,7 +209,7 @@
         output0-eNode11
         input2-eNode24
         input1-eNode25
-        input0-packagePin12" >
+        input0-Package_Q3" >
     </item>
 
     <item itemtype="eOrGate"
@@ -242,7 +242,7 @@
         output0-eNode12
         input2-eNode23
         input1-eNode25
-        input0-packagePin4" >
+        input0-Package_D1" >
     </item>
 
     <item itemtype="eRail"
@@ -264,9 +264,9 @@
         connections="
         input1-eNode13
         input0-eNode14
-        output0-packagePin14
-        clock-packagePin11
-        input2-packagePin1" >
+        output0-Package_Q1
+        clock-Package_C
+        input2-Package_!R" >
     </item>
 
     <item itemtype="eAndGate"
@@ -280,7 +280,7 @@
         numInputs = "3"
         connections="
         output0-eNode15
-        input0-packagePin14
+        input0-Package_Q1
         input2-eNode24
         input1-eNode26" >
     </item>
@@ -296,7 +296,7 @@
         numInputs = "3"
         connections="
         output0-eNode16
-        input2-packagePin15
+        input2-Package_Q0
         input0-eNode23
         input1-eNode26" >
     </item>
@@ -312,7 +312,7 @@
         numInputs = "3"
         connections="
         output0-eNode17
-        input0-packagePin13
+        input0-Package_Q2
         input2-eNode24
         input1-eNode25" >
     </item>
@@ -336,9 +336,9 @@
         connections="
         input1-eNode18
         input0-eNode19
-        output0-packagePin15
-        clock-packagePin11
-        input2-packagePin1" >
+        output0-Package_Q0
+        clock-Package_C
+        input2-Package_!R" >
     </item>
 
     <item itemtype="eOrGate"
@@ -369,7 +369,7 @@
         numInputs = "3"
         connections="
         output0-eNode20
-        input0-packagePin15
+        input0-Package_Q0
         input2-eNode24
         input1-eNode26" >
     </item>
@@ -385,7 +385,7 @@
         numInputs = "3"
         connections="
         output0-eNode21
-        input2-packagePin2
+        input2-Package_SR
         input0-eNode23
         input1-eNode26" >
     </item>
@@ -401,7 +401,7 @@
         numInputs = "3"
         connections="
         output0-eNode22
-        input0-packagePin14
+        input0-Package_Q1
         input2-eNode24
         input1-eNode25" >
     </item>
@@ -432,7 +432,7 @@
         connections="
         input2-eNode23
         input1-eNode25
-        input0-packagePin3
+        input0-Package_D0
         output0-eNode27" >
     </item>
 
@@ -447,7 +447,7 @@
         tristate = "false"
         connections="
         output0-eNode24
-        input0-packagePin9" >
+        input0-Package_S0" >
     </item>
 
     <item itemtype="eBuffer"
@@ -475,7 +475,7 @@
         tristate = "false"
         connections="
         output0-eNode26
-        input0-packagePin10" >
+        input0-Package_S1" >
     </item>
 
 </subcircuit>

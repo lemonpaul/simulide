@@ -21,7 +21,6 @@
 #define CONNECTOR_H
 
 #include "component.h"
-//#include "e-node.h"
 
 class ConnectorLine;
 class eNode;
@@ -83,7 +82,7 @@ class MAINMODULE_EXPORT Connector : public Component
         * Finish the creation of this connector,
         * adding the end-pin
         */
-        void closeCon( Pin* endpin );
+        void closeCon( Pin* endpin, bool connect=false );
 
         /**
         * Split this connector in two, the line at index will be the first of new connector,

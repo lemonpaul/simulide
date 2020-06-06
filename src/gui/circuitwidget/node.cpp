@@ -46,15 +46,15 @@ Node::Node( QObject* parent, QString type, QString id )
 }
 Node::~Node(){}
 
-void Node::inStateChanged( int rem ) // Called by pin when connector is removed
+void Node::inStateChanged( int rem ) // Called by pin
 {
     if( rem == 1 ) remove();
-    else if( rem == 0 )
+    /*else if( rem == 0 )
     {
         for( int i=0; i< 3; i++)
             if( m_pin[i]->isConnected() ) m_pin[i]->findConnectedPins();
 
-    }
+    }*/
     else if( rem == 2 ) // Propagate Is Bus
     {
         for( int i=0; i< 3; i++) m_pin[i]->setIsBus( true );
@@ -62,7 +62,13 @@ void Node::inStateChanged( int rem ) // Called by pin when connector is removed
     }
 }
 
-void Node::remove()
+void Node::registerPins( eNode* enode )
+{
+    for( int i=0; i< 3; i++ )
+        if( m_pin[i]->isConnected() ) m_pin[i]->registerPinsW( enode );
+}
+
+void Node::remove() // Only remove if there are less than 3 connectors
 {
     int con[2] = { 0, 0 };
     int conectors = 0;
@@ -81,16 +87,15 @@ void Node::remove()
 
     if( conectors < 3 ) 
     { 
-        if( conectors == 2 ) joinConns( con[0], con[1] ); 
+        if( conectors == 2 ) joinConns( con[0], con[1] );  // 2 Conn
+        else                                               // 1 Conn
+        {
+             if( m_pin[con[0]]->isConnected() ) m_pin[con[0]]->connector()->remove();
+        }
         
         Circuit::self()->compList()->removeOne( this );
         Circuit::self()->removeItem( this );
     }
-    /*else
-    {
-        for( int i=0; i< 3; i++) // Remove all
-        { if ( m_pin[i]->isConnected() ) m_pin[i]->connector()->remove(); }
-    }*/
 }
 
 void Node::joinConns( int c0, int c1 )
@@ -161,10 +166,11 @@ void Node::joinConns( int c0, int c1 )
     //qDebug() << "Node::joinConns removing con1" << con1->objectName();
     con1->remove();
 
-    con->closeCon( pin1->conPin() );
+    con->closeCon( pin1->conPin(), true );
     con->remNullLines();
     
     Circuit::self()->addItem( con );
+    if( this->isSelected() ) con->setSelected( true );
 }
 
 void Node::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
@@ -177,15 +183,8 @@ void Node::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* 
 
     Component::paint( p, option, widget );
     
-    int a =-2;
-    int b = 4;
-    if( m_isBus )
-    {
-        a =-3;
-        b = 6;
-    }
-    
-    p->drawEllipse( QRect( a, a, b, b ) );
+    if( m_isBus ) p->drawEllipse( QPointF(0,0), 1.8, 1.8  );
+    else          p->drawEllipse( QPointF(0,0), 1.4, 1.4 );
 }
 
 #include "moc_node.cpp"

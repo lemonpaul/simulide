@@ -45,21 +45,17 @@ OscopeWidget::OscopeWidget(  QWidget *parent  )
     m_ampli = 0;
     m_filter = 0.3;
 
-    newReading = true;
+    m_newRead = true;
     m_auto = true;
     
-    m_newReadCount = 0;
-    m_stepCount = 0;
-    m_updtCount = 0;
-    m_counter = 0;
-    m_tick    = 0;
     m_oscope  = 0l;
+    //clear();
 }
 OscopeWidget::~OscopeWidget()
 { 
 }
 
-void OscopeWidget::initialize()
+void OscopeWidget::resetState()
 {
     clear();
 }
@@ -72,24 +68,17 @@ void OscopeWidget::setOscope( Oscope* oscope )
     else          Simulator::self()->remFromSimuClockList( this );
 }
 
-void OscopeWidget::read()
-{
-    //m_reading = true;
-}
-
 void OscopeWidget::clear()
 {
     for( int i=0; i<140; i++ ) m_data[i] = 2.5*28;
     m_display->setData( m_data );
     
-    newReading = true;
+    m_newRead = true;
     m_rising   = false;
     m_falling  = false;
-    m_haveFreq = false;
     
-    m_newReadCount = 0;
-    m_stepCount = 0;
-    m_updtCount = 0;
+    m_step = 0;
+    m_totalP = 0;
     m_numCycles = 0;
     m_numMax = 0;
     m_lastData =0;
@@ -98,62 +87,76 @@ void OscopeWidget::clear()
     m_tick = 0;
     m_max =-1e12;
     m_min = 1e12;
-    m_mid = 0;
     Hpos = 0;
     m_freq = 500;
     
-    m_freqLabel->setText( "Freq: 000 Hz" );
+    m_freqLabel->setText( "Frq: 000 Hz" );
     m_ampLabel->setText( "Amp: 0.00 V" );
+}
+
+void OscopeWidget::read()
+{
+    m_stepsPerS = Simulator::self()->stepsPerus()*1e6;
+
+    if( m_step > m_stepsPerS ) clear();
+    if( m_numMax < 2 ) return;
+    m_numMax--;
+    
+    double freq = m_stepsPerS/(double)(m_totalP/m_numMax);
+    //qDebug() <<"Frequencimeter::simuClockStep"<<m_totalP<<m_numMax<<m_totalP/m_numMax;
+    if( m_freq != freq )
+    {
+        m_freq = freq;
+        if     ( freq >= 10000 ) m_freqLabel->setText( "Frq: "+QString::number( freq, 'f', 0 )+" Hz" );
+        else if( freq >= 1000 )  m_freqLabel->setText( "Frq: "+QString::number( freq, 'f', 1 )+" Hz" );
+        else                     m_freqLabel->setText( "Frq: "+QString::number( freq, 'f', 2 )+" Hz" );
+    }
+    m_totalP = 0;
+    m_numMax = 0;
+    m_lastMax = 0;
+    m_step   = 0;
+    
+        m_reading = true;
+        
+    double tick = 20*m_Hscale;
+    double val = tick/m_stepsPerS;
+    QString unit = " S";
+    
+    if( val < 1 )
+    {
+        unit = " mS";
+        val = 1e3*tick/m_stepsPerS;
+        if( val < 1 )
+        {
+            unit = " uS";
+            val = tick;
+        }
+    }
+    m_tickLabel->setText( "Div:  "+QString::number( val,'f', 2)+unit );
+    m_ampLabel->setText(  "Amp: " +QString::number( m_ampli,'f', 2)+" V" );
+    m_display->update();
 }
 
 void OscopeWidget::simuClockStep()
 {
-    //if( !m_reading ) return;
-    
-    if( ++m_newReadCount == 2000000 ) clear();
+    m_step++;
 
     double data = m_oscope->getVolt();
+    double delta = data-m_lastData;
     
     if( data > m_max ) m_max = data;
     if( data < m_min ) m_min = data;
     
-    if( (data-m_lastData)>m_filter )                           // Rising 
+    if( delta > m_filter )                                     // Rising 
     {
-        if( m_reading && newReading )
+        if( m_falling && !m_rising )                        // Min Found
         {
-            if( m_numCycles > 1 )                // Wait for a full wave
-            {
-                m_mid = m_min + m_ampli/2;
+            if( m_numMax > 0 ) m_totalP += m_step-m_lastMax;
 
-                if( data>=m_mid )                         // Rising edge
-                {
-                    m_numCycles = 0;
-                    int per = 1e6/m_freq;
-                    if( per > 1 )
-                    {
-                        if( m_auto ) 
-                        {
-                            m_Vpos = m_mid;
-                            m_Hpos = 0;
-                            m_Vscale = 5/m_ampli;
-                            if     ( m_Vscale > 1000 )  m_Vscale = 1000;
-                            else if( m_Vscale < 0.001 ) m_Vscale = 0.001;
-                            
-                            m_Hscale = abs(per/70)+1;
-                            if( m_Hscale > 10000 ) m_Hscale = 10000;
-                            //if( m_Hscale < 1 )     m_Hscale = 1;
-                        }
-                        Hpos = 0;
-                        m_tick = 0;
-                        m_counter = 0;
-                        m_newReadCount = 0;
-                        newReading = false;
-                    }
-                }
-            }
-        }
-        if( m_falling && !m_rising )                         // Min Found
-        {
+            m_lastMax = m_step;
+            m_numMax++;
+            m_numCycles++;
+
             m_ampli = m_max-m_min;
             m_display->setMaxMin( m_max, m_min );
             m_falling = false;
@@ -161,70 +164,58 @@ void OscopeWidget::simuClockStep()
         }
         m_rising = true;
         m_lastData = data;
-    }
-    else if( (data-m_lastData) < -m_filter )                  // Falling
-    {
-        if( m_rising && !m_falling )                         // Max Found
-        {
-            if( !m_haveFreq )          // Estimate Freq with first cycle
-            {
-                if( m_numMax > 0 ) 
-                    m_freq = 1e6/(m_newReadCount-m_lastMax);
-                    if( m_freq < 0 ) m_freq = 0;
 
-                m_lastMax = m_newReadCount;
+        if( m_reading && m_newRead && ( m_numCycles > 1 ))// Wait for a full wave
+        {
+            double mid = m_min + m_ampli/2;
+
+            if( data >= mid )                             // Rising edge
+            {
+                m_numCycles = 0;
+                int per = m_stepsPerS/m_freq;
+                if( per > 1 )
+                {
+                    if( m_auto ) 
+                    {
+                        m_Vpos = mid;
+                        m_Hpos = 0;
+                        m_Vscale = 5/m_ampli;
+                        if     ( m_Vscale > 1000 )  m_Vscale = 1000;
+                        else if( m_Vscale < 0.001 ) m_Vscale = 0.001;
+                        
+                        m_Hscale = abs(per/70)+1;
+                        if( m_Hscale > 100000 ) m_Hscale = 100000;
+                    }
+                    Hpos = 0;
+                    m_tick = 0;
+                    m_counter = 0;
+                    m_newRead = false;
+                }
             }
-            m_numMax++;
-            m_numCycles++;
-            m_ampli = m_max-m_min;
-            m_display->setMaxMin( m_max, m_min );
+        }
+    }
+    else if( delta < -m_filter )                              // Falling
+    {
+        if( m_rising && !m_falling )                        // Max Found
+        {
+            //m_ampli = m_max-m_min;
+            //m_display->setMaxMin( m_max, m_min );
             m_rising = false;
             m_min = 1e12;
         }
         m_falling = true;
         m_lastData = data;
     }
-    if( ++m_stepCount == 50000 )                         // 50 ms Update
-    {
-        m_reading = true;
-        m_stepCount = 0;
-        
-        double tick = 20*m_Hscale;
-        double val = tick/1e6;
-        QString unit = " S";
-        
-        if( val < 1 )
-        {
-            unit = " mS";
-            val = tick/1e3;
-            if( val < 1 )
-            {
-                unit = " uS";
-                val = tick;
-            }
-        }
-        m_tickLabel->setText( "Div:  "+QString::number( val,'f', 2)+unit );
-        m_ampLabel->setText(  "Amp: " +QString::number( m_ampli,'f', 2)+" V" );
-        
-        if( ++m_updtCount >= 20 )                        // 1 Seg Update
-        {
-            m_freqLabel->setText( "Freq: "+QString::number(m_freq)+" Hz" );
-            m_haveFreq = true;
-            m_freq = m_numMax; 
-            m_updtCount = 0;
-            m_numMax = 0;
-        }
-    }
     if( m_counter == 140 )                   // DataSet Ready to display
     {
         m_display->setData( m_data );
-        newReading = true;
+        m_newRead = true;
         m_reading = false;
         m_numCycles = 0;
         m_counter = 0;
         return; 
     }
-    if( newReading == false )                         // Data Set saving
+    if( m_newRead == false )                          // Data Set saving
     {
         if( m_counter == 140 ) return;          // Done, Wait for update
 

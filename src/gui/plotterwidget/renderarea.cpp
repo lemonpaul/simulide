@@ -30,6 +30,7 @@
      m_width  = width; //1000;
      m_height = height; //180;
      setZero( 0 );
+     setXScale( 1 );
 
      QFont font;
      font.setPixelSize(9);
@@ -48,29 +49,39 @@
      m_sec = 0;
  }
 
- void RenderArea::drawVmark()
- {
-     m_sec++;
+void RenderArea::drawVmark()
+{
+    m_sec++;
 
-     int last = m_width-1;
-     QString sec = "";
+    int last = m_width-m_xScale;
+    QString sec = "";
 
-     QPainter p( &pixmap );
-     if( m_sec == 10 )
+    QPainter p( &pixmap );
+    /*if( m_sec == 10 )
      {
          m_sec = 0;
          p.setPen( QColor( 90, 90, 150 ) );
      }
-     else p.setPen( QColor( 50, 50, 100 ) );
+     else p.setPen( QColor( 50, 50, 100 ) );*/
+    if( m_sec == 10 )
+    {
+        m_sec = 0;
+        QPen pen( QColor( 170, 170, 255 ), 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
+        p.setPen( pen );
+    }
+    else 
+    {
+        QPen pen( QColor( 100, 100, 200 ), 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
+        p.setPen( pen );
+    }
+    sec.setNum(m_sec);
 
-     sec.setNum(m_sec);
+    //int base = m_height-20;
 
-     //int base = m_height-20;
-
-     p.drawLine( last, 0, last, m_height );
-     //p.drawText( last-10, base-5, 10, 20, Qt::AlignHCenter, sec );
-     p.end();
- }
+    p.drawLine( last, 0, last, m_height );
+    //p.drawText( last-10, base-5, 10, 20, Qt::AlignHCenter, sec );
+    p.end();
+}
 
  QSize RenderArea::minimumSizeHint() const  {  return QSize( 100, 150 );  }
 
@@ -85,13 +96,13 @@
  void RenderArea::setBrush( const QBrush &brush )
  {
      this->brush = brush;
-     update();
+     //update();
  }
 
  void RenderArea::setAntialiased( const bool antialiased )
  {
      this->antialiased = antialiased;
-     update();
+     //update();
  }
 
 void RenderArea::setData( const int channel, int data )
@@ -104,38 +115,55 @@ void RenderArea::setData( const int channel, int data )
  
 void RenderArea::setZero( int zero )
 {
-    m_zero = (zero/2+250)*m_height/520;
-    m_zero = m_height-m_zero-4;
+    int zero0 = zero/2-250;
+    m_zero0 = (zero0/2+250)*m_height/520;
+    m_zero0 = m_height-m_zero0-4;
+    
+    int zero1 = zero/2+250;
+    m_zero1 = (zero1/2+250)*m_height/520;
+    m_zero1 = m_height-m_zero1-4;
+}
+
+void RenderArea::setXScale( int scale )
+{
+    m_xScale = scale;
 }
 
 void RenderArea::printData()
 {
-    pixmap.scroll( -1, 0, pixmap.rect() );
+    pixmap.scroll( -m_xScale, 0, pixmap.rect() );
 
     QPainter p( &pixmap );
-
-    if( antialiased )
+    
+    int last = m_width-m_xScale;
+    
+    //p.setPen( QColor( 10, 15, 50 ) );
+    QPen pen( QColor( 5, 10, 30 ), 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
+    p.setPen( pen );
+    
+    for( int i=0; i<m_xScale; i++ )
     {
-        p.setRenderHint( QPainter::Antialiasing, true );
-        //p.translate( +0.5, +0.5 );
+        p.drawLine( last+i, 0, last+i, m_height ); // erase previous line
+
+        /*p.setPen( QColor( 150, 150, 170 ) );
+        p.drawLine( last-m_xScale, m_zero0, last, m_zero0 ); // Linea de base ( 0 ch 0-1)
+        p.drawLine( last-m_xScale, m_zero1, last, m_zero1 ); // Linea de base ( 0 ch 2-3)
+        //p.drawLine( last-1, m_height-33, last, m_height-33 );*/
     }
-    int last = m_width-1;
-
-    //p.setPen( QColor( 50, 50, 100 ) );
-    p.setPen( QColor( 10, 15, 50 ) );
-    p.drawLine( last, 0, last, m_height ); // erase previous line
-
-    p.setPen( QColor( 90, 90, 150 ) );
-    p.drawLine( last-1, m_zero, last, m_zero ); // Linea de base ( 0 )
-    //p.drawLine( last-1, m_height-33, last, m_height-33 );
+    if( antialiased ) p.setRenderHint( QPainter::Antialiasing, true );
 
     for( int i=0; i<4; i++ )
     {
+        int data  = m_data[i];
+        int dataP = m_dataP[i];
+        if(( data > 60000 ) || ( dataP > 60000 )) continue;
+        
         p.setPen( m_pen[i] );
-        p.drawLine( last-1, m_dataP[i], last, m_data[i] );
-        m_dataP[i] = m_data[i];
+        p.drawLine( last-m_xScale, dataP, last, data );
+        m_dataP[i] = data;
     }
     p.end();
+    update();
 }
  
 void RenderArea::setTick( int tickUs )

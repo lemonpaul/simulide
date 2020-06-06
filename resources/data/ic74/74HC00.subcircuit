@@ -31,9 +31,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin1
-        input1-packagePin2
-        output0-packagePin3" >
+        input0-Package_1A
+        input1-Package_1B
+        output0-Package_1Y" >
     </item>
 
     <item itemtype="eAndGate"
@@ -46,9 +46,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin4
-        input1-packagePin5
-        output0-packagePin6" >
+        input0-Package_2A
+        input1-Package_2B
+        output0-Package_2Y" >
     </item>
 
     <item itemtype="eAndGate"
@@ -61,9 +61,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin9
-        input1-packagePin10
-        output0-packagePin8" >
+        input0-Package_3A
+        input1-Package_3B
+        output0-Package_3Y" >
     </item>
 
     <item itemtype="eAndGate"
@@ -76,9 +76,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin12
-        input1-packagePin13
-        output0-packagePin11" >
+        input0-Package_4A
+        input1-Package_4B
+        output0-Package_4Y" >
     </item>
 
 </subcircuit>

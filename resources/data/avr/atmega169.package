@@ -26,8 +26,8 @@
     <pin side="left" pos="4"  type="bidir" id="PE1" label="E1"/>
     <pin side="left" pos="5"  type="bidir" id="PE2" label="E2"/>
     <pin side="left" pos="6"  type="bidir" id="PE3" label="E3"/>
-    <pin side="left" pos="7"  type="bidir" id="PE4" label="E4"/>
-    <pin side="left" pos="8"  type="bidir" id="PE5" label="E5"/>
+    <pin side="left" pos="7"  type="bidir,scl" id="PE4" label="E4"/>
+    <pin side="left" pos="8"  type="bidir,sda" id="PE5" label="E5"/>
     <pin side="left" pos="9"  type="bidir" id="PE6" label="E6"/>
     <pin side="left" pos="10" type="bidir" id="PE7" label="E7"/>
     <pin side="left" pos="11" type="bidir" id="PB0" label="B0"/>

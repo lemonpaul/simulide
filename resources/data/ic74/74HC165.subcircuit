@@ -1454,7 +1454,7 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin1
+        input0-Package_!PL
         output0-eNode80" >
     </item>
 
@@ -1469,7 +1469,7 @@
         numInputs = "2"
         connections="
         input1-eNode80
-        input0-packagePin11
+        input0-Package_D0
         output0-eNode82" >
     </item>
 
@@ -1484,7 +1484,7 @@
         numInputs = "2"
         connections="
         input1-eNode80
-        input0-packagePin12
+        input0-Package_D1
         output0-eNode103" >
     </item>
 
@@ -1499,7 +1499,7 @@
         numInputs = "2"
         connections="
         input1-eNode80
-        input0-packagePin13
+        input0-Package_D2
         output0-eNode83" >
     </item>
 
@@ -1514,7 +1514,7 @@
         numInputs = "2"
         connections="
         input1-eNode80
-        input0-packagePin14
+        input0-Package_D3
         output0-eNode105" >
     </item>
 
@@ -1529,7 +1529,7 @@
         numInputs = "2"
         connections="
         input1-eNode80
-        input0-packagePin3
+        input0-Package_D4
         output0-eNode84" >
     </item>
 
@@ -1544,7 +1544,7 @@
         numInputs = "2"
         connections="
         input1-eNode80
-        input0-packagePin4
+        input0-Package_D5
         output0-eNode85" >
     </item>
 
@@ -1559,7 +1559,7 @@
         numInputs = "2"
         connections="
         input1-eNode80
-        input0-packagePin5
+        input0-Package_D6
         output0-eNode86" >
     </item>
 
@@ -1679,7 +1679,7 @@
         numInputs = "2"
         connections="
         input1-eNode80
-        input0-packagePin6
+        input0-Package_D7
         output0-eNode111" >
     </item>
 
@@ -1708,8 +1708,8 @@
         inverted = "false"
         numInputs = "2"
         connections="
-        input1-packagePin2
-        input0-packagePin15
+        input1-Package_CP
+        input0-Package_!CE
         output0-eNode81" >
     </item>
 
@@ -1722,7 +1722,7 @@
         outImped = "40"
         inverted = "false"
         connections="
-        input0-packagePin10
+        input0-Package_DS
         output0-eNode102" >
     </item>
 
@@ -1736,7 +1736,7 @@
         inverted = "false"
         connections="
         input0-eNode113
-        output0-packagePin7" >
+        output0-Package_!Q7" >
     </item>
 
     <item itemtype="eBuffer"
@@ -1749,7 +1749,7 @@
         inverted = "false"
         connections="
         input0-eNode114
-        output0-packagePin9" >
+        output0-Package_Q7" >
     </item>
 
 </subcircuit>

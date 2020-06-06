@@ -1,4 +1,4 @@
-/*
+﻿/*
 	sim_avr.c
 
 	Copyright 2008, 2009 Michel Pollet <buserror@gmail.com>
@@ -133,9 +133,7 @@ avr_terminate(
 	avr->flash = avr->data = NULL;
 }
 
-void
-avr_reset(
-		avr_t * avr)
+void avr_reset( avr_t* avr)
 {
 	AVR_LOG(avr, LOG_TRACE, "%s reset\n", avr->mmcu);
 
@@ -143,71 +141,63 @@ avr_reset(
 	for(int i = 0x20; i <= avr->ioend; i++)
 		avr->data[i] = 0;
 	_avr_sp_set(avr, avr->ramend);
-	avr->pc = avr->reset_pc;	// Likely to be zero
-	for (int i = 0; i < 8; i++)
-		avr->sreg[i] = 0;
+    avr->pc = avr->reset_pc;	// Likely to be zero
+    for (int i = 0; i < 8; i++) avr->sreg[i] = 0;
+
 	avr_interrupt_reset(avr);
-	avr_cycle_timer_reset(avr);
-	if (avr->reset)
-		avr->reset(avr);
+    avr_cycle_timer_reset(avr);
+    if (avr->reset) avr->reset(avr);
+
 	avr_io_t * port = avr->io_port;
-	while (port) {
-		if (port->reset)
-			port->reset(port);
+    while (port)
+    {
+        if (port->reset) port->reset(port);
 		port = port->next;
 	}
 }
 
-void
-avr_sadly_crashed(
-		avr_t *avr,
-		uint8_t signal)
+void avr_sadly_crashed( avr_t* avr, uint8_t signal)
 {
 	AVR_LOG(avr, LOG_ERROR, "%s\n", __FUNCTION__);
 	avr->state = cpu_Stopped;
-	if (avr->gdb_port) {
+    if (avr->gdb_port)
+    {
 		// enable gdb server, and wait
-		if (!avr->gdb)
-			avr_gdb_init(avr);
+        if (!avr->gdb) avr_gdb_init(avr);
 	}
-	if (!avr->gdb)
-		avr->state = cpu_Crashed;
+    if (!avr->gdb) avr->state = cpu_Crashed;
 }
 
-void
-avr_set_command_register(
-		avr_t * avr,
-		avr_io_addr_t addr)
+void avr_set_command_register( avr_t* avr, avr_io_addr_t addr)
 {
 	avr_cmd_set_register(avr, addr);
 }
 
-static void
-_avr_io_console_write(
+static void _avr_io_console_write(
 		struct avr_t * avr,
 		avr_io_addr_t addr,
 		uint8_t v,
 		void * param)
 {
-	if (v == '\r' && avr->io_console_buffer.buf) {
+    if (v == '\r' && avr->io_console_buffer.buf)
+    {
 		avr->io_console_buffer.buf[avr->io_console_buffer.len] = 0;
 		AVR_LOG(avr, LOG_OUTPUT, "O:" "%s" "" "\n",
 			avr->io_console_buffer.buf);
 		avr->io_console_buffer.len = 0;
 		return;
 	}
-	if (avr->io_console_buffer.len + 1 >= avr->io_console_buffer.size) {
+    if (avr->io_console_buffer.len + 1 >= avr->io_console_buffer.size)
+    {
 		avr->io_console_buffer.size += 128;
 		avr->io_console_buffer.buf = (char*)realloc(
 			avr->io_console_buffer.buf,
 			avr->io_console_buffer.size);
 	}
-	if (v >= ' ')
-		avr->io_console_buffer.buf[avr->io_console_buffer.len++] = v;
+    if (v >= ' ') avr->io_console_buffer.buf[avr->io_console_buffer.len++] = v;
 }
 
-void
-avr_set_console_register(
+void avr_set_console_register(
 		avr_t * avr,
 		avr_io_addr_t addr)
 {
@@ -215,8 +205,7 @@ avr_set_console_register(
 		avr_register_io_write(avr, addr, _avr_io_console_write, NULL);
 }
 
-int
-avr_loadcode(
+int avr_loadcode(
 		avr_t * avr,
 		uint8_t * code,
 		uint32_t size,
@@ -236,10 +225,7 @@ avr_loadcode(
  * a minimum count of requested sleep microseconds are reached
  * (low amounts cannot be handled accurately).
  */
-uint32_t
-avr_pending_sleep_usec(
-		avr_t * avr,
-		avr_cycle_count_t howLong)
+uint32_t avr_pending_sleep_usec( avr_t* avr, avr_cycle_count_t howLong)
 {
 	avr->sleep_usec += avr_cycles_to_usec(avr, howLong);
 	uint32_t usec = avr->sleep_usec;
@@ -250,33 +236,26 @@ avr_pending_sleep_usec(
 	return 0;
 }
 
-void
-avr_callback_sleep_gdb(
-		avr_t * avr,
-		avr_cycle_count_t howLong)
+void avr_callback_sleep_gdb( avr_t* avr, avr_cycle_count_t howLong )
 {
 	uint32_t usec = avr_pending_sleep_usec(avr, howLong);
-	while (avr_gdb_processor(avr, usec))
-		;
+    while (avr_gdb_processor(avr, usec)) ;
 }
 
-void
-avr_callback_run_gdb(
-		avr_t * avr)
+void avr_callback_run_gdb( avr_t* avr )
 {
 	avr_gdb_processor(avr, avr->state == cpu_Stopped);
 
-	if (avr->state == cpu_Stopped)
-		return ;
+    if (avr->state == cpu_Stopped) return ;
 
 	// if we are stepping one instruction, we "run" for one..
 	int step = avr->state == cpu_Step;
-	if (step)
-		avr->state = cpu_Running;
+    if (step) avr->state = cpu_Running;
 
 	avr_flashaddr_t new_pc = avr->pc;
 
-	if (avr->state == cpu_Running) {
+    if (avr->state == cpu_Running)
+    {
 		new_pc = avr_run_one(avr);
 #if CONFIG_SIMAVR_TRACE
 		avr_dump_state(avr);
@@ -289,10 +268,11 @@ avr_callback_run_gdb(
 
 	avr->pc = new_pc;
 
-	if (avr->state == cpu_Sleeping) {
-		if (!avr->sreg[S_I]) {
-			if (avr->log)
-				AVR_LOG(avr, LOG_TRACE, "simavr: sleeping with interrupts off, quitting gracefully\n");
+    if (avr->state == cpu_Sleeping)
+    {
+        if (!avr->sreg[S_I])
+        {
+            if (avr->log) AVR_LOG(avr, LOG_TRACE, "simavr: sleeping with interrupts off, quitting gracefully\n");
 			avr->state = cpu_Done;
 			return;
 		}
@@ -303,29 +283,19 @@ avr_callback_run_gdb(
 		avr->cycle += 1 + sleep;
 	}
 	// Interrupt servicing might change the PC too, during 'sleep'
-	if (avr->state == cpu_Running || avr->state == cpu_Sleeping)
-		avr_service_interrupts(avr);
+    if( avr->state == cpu_Running || avr->state == cpu_Sleeping ) avr_service_interrupts( avr );
 
 	// if we were stepping, use this state to inform remote gdb
-	if (step)
-		avr->state = cpu_StepDone;
-
+    if( step ) avr->state = cpu_StepDone;
 }
 
-void
-avr_callback_sleep_raw(
-		avr_t * avr,
-		avr_cycle_count_t howLong)
+void avr_callback_sleep_raw( avr_t * avr, avr_cycle_count_t howLong)
 {
-	uint32_t usec = avr_pending_sleep_usec(avr, howLong);
-	if (usec > 0) {
-		usleep(usec);
-	}
+    //uint32_t usec = avr_pending_sleep_usec(avr, howLong);
+    //if (usec > 0) usleep(usec);
 }
 
-void
-avr_callback_run_raw(
-		avr_t * avr)
+void avr_callback_run_raw( avr_t* avr )
 {
 	avr_flashaddr_t new_pc = avr->pc;
 
@@ -365,54 +335,42 @@ avr_callback_run_raw(
 	}
 }
 
-
-int
-avr_run(
-		avr_t * avr)
+int avr_run( avr_t * avr)
 {
 	avr->run(avr);
 	return avr->state;
 }
 
-avr_t *
-avr_core_allocate(
-		const avr_t * core,
-		uint32_t coreLen)
+avr_t* avr_core_allocate( const avr_t* core, uint32_t coreLen)
 {
-	uint8_t * b = malloc(coreLen);
+    uint8_t* b = malloc(coreLen);
 	memcpy(b, core, coreLen);
 	return (avr_t *)b;
 }
 
-avr_t *
-avr_make_mcu_by_name(
-		const char *name)
+avr_t* avr_make_mcu_by_name( const char *name)
 {
 	avr_kind_t * maker = NULL;
-	for (int i = 0; avr_kind[i] && !maker; i++) {
+    for (int i = 0; avr_kind[i] && !maker; i++)
+    {
 		for (int j = 0; avr_kind[i]->names[j]; j++)
 			if (!strcmp(avr_kind[i]->names[j], name)) {
 				maker = avr_kind[i];
 				break;
 			}
 	}
-	if (!maker) {
+    if (!maker)
+    {
 		AVR_LOG(((avr_t*)0), LOG_ERROR, "%s: AVR '%s' not known\n", __FUNCTION__, name);
 		return NULL;
 	}
 
-	avr_t * avr = maker->make();
-	AVR_LOG(avr, LOG_TRACE, "Starting %s - flashend %04x ramend %04x e2end %04x\n",
-			avr->mmcu, avr->flashend, avr->ramend, avr->e2end);
+    avr_t* avr = maker->make();
+    AVR_LOG(avr, LOG_TRACE, "Starting %s - flashend %04x ramend %04x e2end %04x\n", avr->mmcu, avr->flashend, avr->ramend, avr->e2end);
 	return avr;
 }
 
-static void
-std_logger(
-		avr_t * avr,
-		const int level,
-		const char * format,
-		va_list ap)
+static void std_logger( avr_t* avr, const int level, const char* format, va_list ap)
 {
 	if (!avr || avr->log >= level) {
 		vfprintf((level > LOG_ERROR) ?  stdout : stderr , format, ap);

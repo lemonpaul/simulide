@@ -29,8 +29,8 @@
         connections="
         input2-eNode0
         input3-eNode1
-        clock-packagePin15
-        output0-packagePin6
+        clock-Package_CLK
+        output0-Package_Q1
         input1-eNode9
         input0-eNode9" >
     </item>
@@ -60,12 +60,12 @@
         clockInverted = "false"
         sRInverted = "false"
         connections="
-        clock-packagePin15
+        clock-Package_CLK
         input3-eNode5
         input2-eNode6
         input1-eNode8
         input0-eNode8
-        output0-packagePin11
+        output0-Package_Q2
         output1-eNode31" >
     </item>
 
@@ -79,11 +79,11 @@
         clockInverted = "false"
         sRInverted = "false"
         connections="
-        clock-packagePin15
+        clock-Package_CLK
         input3-eNode11
         input1-eNode12
         input0-eNode12
-        output0-packagePin14
+        output0-Package_Q3
         input2-eNode13
         output1-eNode32" >
     </item>
@@ -98,11 +98,11 @@
         clockInverted = "false"
         sRInverted = "false"
         connections="
-        clock-packagePin15
+        clock-Package_CLK
         input3-eNode15
         input1-eNode16
         input0-eNode16
-        output0-packagePin2
+        output0-Package_Q4
         input2-eNode17
         output1-eNode33" >
     </item>
@@ -117,7 +117,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin9
+        input0-Package_Rst
         output0-eNode3" >
     </item>
 
@@ -131,9 +131,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin9
+        input0-Package_Rst
         output0-eNode4
-        input1-packagePin1" >
+        input1-Package_PE" >
     </item>
 
     <item itemtype="eAndGate"
@@ -148,7 +148,7 @@
         connections="
         output0-eNode2
         input1-eNode3
-        input0-packagePin4" >
+        input0-Package_P1" >
     </item>
 
     <item itemtype="eAndGate"
@@ -163,7 +163,7 @@
         connections="
         input1-eNode3
         output0-eNode7
-        input0-packagePin12" >
+        input0-Package_P2" >
     </item>
 
     <item itemtype="eAndGate"
@@ -178,7 +178,7 @@
         connections="
         input1-eNode3
         output0-eNode10
-        input0-packagePin13" >
+        input0-Package_P3" >
     </item>
 
     <item itemtype="eAndGate"
@@ -193,7 +193,7 @@
         connections="
         input1-eNode3
         output0-eNode14
-        input0-packagePin3" >
+        input0-Package_P4" >
     </item>
 
     <item itemtype="eBuffer"
@@ -295,9 +295,9 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input1-packagePin6
+        input1-Package_Q1
         output0-eNode18
-        input0-packagePin10" >
+        input0-Package_U/D" >
     </item>
 
     <item itemtype="eAndGate"
@@ -360,7 +360,7 @@
         numInputs = "3"
         connections="
         input2-eNode9
-        output0-packagePin7
+        output0-Package_!CO
         input1-eNode18
         input0-eNode29" >
     </item>
@@ -376,7 +376,7 @@
         tristate = "false"
         connections="
         output0-eNode9
-        input0-packagePin5" >
+        input0-Package_!CI" >
     </item>
 
     <item itemtype="eAndGate"
@@ -389,10 +389,10 @@
         inverted = "true"
         numInputs = "3"
         connections="
-        input1-packagePin11
-        input2-packagePin14
+        input1-Package_Q2
+        input2-Package_Q3
         output0-eNode22
-        input0-packagePin10" >
+        input0-Package_U/D" >
     </item>
 
     <item itemtype="eAndGate"
@@ -405,9 +405,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input1-packagePin11
+        input1-Package_Q2
         output0-eNode24
-        input0-packagePin10" >
+        input0-Package_U/D" >
     </item>
 
     <item itemtype="eAndGate"
@@ -420,8 +420,8 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin14
-        input1-packagePin2
+        input0-Package_Q3
+        input1-Package_Q4
         output0-eNode23" >
     </item>
 
@@ -435,7 +435,7 @@
         inverted = "true"
         numInputs = "3"
         connections="
-        input2-packagePin14
+        input2-Package_Q3
         output0-eNode25
         input0-eNode30
         input1-eNode31" >
@@ -451,9 +451,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input1-packagePin2
+        input1-Package_Q4
         output0-eNode27
-        input0-packagePin10" >
+        input0-Package_U/D" >
     </item>
 
     <item itemtype="eAndGate"
@@ -466,7 +466,7 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input1-packagePin2
+        input1-Package_Q4
         output0-eNode26
         input0-eNode30" >
     </item>
@@ -563,7 +563,7 @@
         tristate = "false"
         connections="
         output0-eNode30
-        input0-packagePin10" >
+        input0-Package_U/D" >
     </item>
 
 </subcircuit>

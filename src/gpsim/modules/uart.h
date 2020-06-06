@@ -62,8 +62,8 @@ class _TXREG : public sfr_register, public TriggerObject
         _TXREG(Processor *pCpu, const char *pName, const char *pDesc,USART_MODULE *);
         virtual void put(uint);
         virtual void put_value(uint);
-        virtual void assign_txsta(_TXSTA *new_txsta) { m_txsta = new_txsta; };
-        virtual void assign_rcsta(_RCSTA *new_rcsta) { m_rcsta = new_rcsta; };
+        virtual void assign_txsta(_TXSTA *new_txsta) { m_txsta = new_txsta; }
+        virtual void assign_rcsta(_RCSTA *new_rcsta) { m_rcsta = new_rcsta; }
         virtual void callback();
         virtual void callback_print();
 
@@ -72,6 +72,7 @@ class _TXREG : public sfr_register, public TriggerObject
         _RCSTA  *m_rcsta;
         USART_MODULE *mUSART;
         bool full;
+        int  m_uartN;  // Uart number
 };
 
 // Transmit Status and Control register
@@ -123,7 +124,7 @@ class _TXSTA : public sfr_register, public TriggerObject
         bool bTX9() { return (value.get() & TX9) != 0; }
         int  bTX9D() { return (value.get() & TX9D) ? 1 : 0; }
 
-        void set_pin_pol ( bool invert ) { bInvertPin = invert; };
+        void set_pin_pol ( bool invert ) { bInvertPin = invert; }
         void releasePin();
 
     protected:
@@ -153,7 +154,7 @@ class _RCREG : public sfr_register
         virtual void push(uint);
         virtual void pop();
 
-    virtual void assign_rcsta(_RCSTA *new_rcsta) { m_rcsta = new_rcsta; };
+    virtual void assign_rcsta(_RCSTA *new_rcsta) { m_rcsta = new_rcsta; }
 
     private:
         USART_MODULE *mUSART;
@@ -230,7 +231,7 @@ class _RCSTA : public sfr_register, public TriggerObject
       bool bCREN() { return (value.get() & CREN); }
       bool bRX9()  { return (value.get() & RX9); }
       virtual void setIOpin(PinModule *);
-      bool rc_is_idle(void) { return ( state <= RCSTA_WAITING_FOR_START ); };
+      bool rc_is_idle(void) { return ( state <= RCSTA_WAITING_FOR_START ); }
       virtual void enableRCPin(char direction = DIR_OUT);
       virtual void disableRCPin();
       void releasePin();
@@ -289,7 +290,7 @@ class _BAUDCON : public sfr_register
 
       virtual void put(uint);
       virtual void put_value(uint);
-      bool brg16(void) { return ( value.get() & BRG16 ) != 0; };
+      bool brg16(void) { return ( value.get() & BRG16 ) != 0; }
       bool txckp() { return ( value.get() & TXCKP) != 0; }
       bool rxdtp() { return ( value.get() & RXDTP) != 0; }
 
@@ -301,7 +302,7 @@ class _SPBRGH : public sfr_register
 {
     public:
         _SPBRGH(Processor *pCpu, const char *pName, const char *pDesc);
-        virtual void assign_spbrg(_SPBRG *new_spbrg) { m_spbrg = new_spbrg; };
+        virtual void assign_spbrg(_SPBRG *new_spbrg) { m_spbrg = new_spbrg; }
         virtual void put(uint);
         virtual void put_value(uint);
         
@@ -369,26 +370,26 @@ class USART_MODULE: public apfpin
         _SPBRGH  spbrgh;
         _BAUDCON baudcon;
 
-        USART_MODULE(Processor *pCpu);
+        USART_MODULE( Processor *pCpu );
         ~USART_MODULE();
 
-        void initialize(PIR *, 
+        void initialize( PIR *,
                 PinModule *tx_pin, PinModule *rx_pin,
                 _TXREG *, _RCREG *);
 
         virtual void setIOpin(int data, PinModule *pin);
-        void set_TXpin(PinModule *tx_pin);
-        void set_RXpin(PinModule *rx_pin);
+        void set_TXpin( PinModule *tx_pin);
+        void set_RXpin( PinModule *rx_pin);
         bool bIsTXempty();
         void emptyTX();
         void full();
         void set_rcif();
         void clear_rcif();
-        void mk_rcif_int(PIR *reg, uint bit)
-              { m_rcif = new InterruptSource(reg, bit);}
+        void mk_rcif_int( PIR *reg, uint bit)
+              { m_rcif = new InterruptSource( reg, bit);}
         void mk_txif_int(PIR *reg, uint bit)
-              { m_txif = new InterruptSource(reg, bit);}
-        bool IsEUSART ( void ) { return is_eusart; };
+              { m_txif = new InterruptSource( reg, bit);}
+        bool IsEUSART ( void ) { return is_eusart; }
         void set_eusart ( bool is_it );
 
     private:

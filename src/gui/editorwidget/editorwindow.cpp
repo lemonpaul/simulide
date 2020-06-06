@@ -34,19 +34,14 @@ EditorWindow::EditorWindow( QWidget* parent )
     createWidgets();
     createActions();
     createToolBars();
-    readSettings();    
-    //newFile();
-
-    // Redirect stdout to outPane
-    /*mybuf = new mystreambuf( outPane );
-    std::cout.rdbuf( mybuf );*/
+    readSettings();
 }
 EditorWindow::~EditorWindow(){}
 
 bool EditorWindow::close()
 {    
     writeSettings();
-    
+
     for( int i=0; i<m_docWidget->count(); i++ )
     {
         closeTab( m_docWidget->currentIndex() );
@@ -89,19 +84,21 @@ void EditorWindow::newFile()
 void EditorWindow::open()
 {
     const QString dir = m_lastDir;
-    QString fileName = QFileDialog::getOpenFileName( this, tr("Load File"), dir, tr("All files (*)"));
+    QString fileName = QFileDialog::getOpenFileName( this, tr("Load File"), dir,
+                       tr("All files")+" (*);;Arduino (*.ino);;Asm (*.asm);;GcBasic (*.gcb)" );
+
     if( !fileName.isEmpty() ) loadFile( fileName );
 }
 
-void EditorWindow::loadFile(const QString &fileName)
+void EditorWindow::loadFile( const QString &fileName )
 {
     if( m_fileList.contains( fileName ) )
     {
         m_docWidget->setCurrentIndex( m_fileList.indexOf( fileName ) );
-        return;
+        //return;
     }
-    newFile();
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    else newFile();
+    QApplication::setOverrideCursor( Qt::WaitCursor );
     
     CodeEditor* ce = getCodeEditor();
     ce->setPlainText( fileToString( fileName, "EditorWindow" ) );
@@ -117,6 +114,12 @@ void EditorWindow::loadFile(const QString &fileName)
     QApplication::restoreOverrideCursor();
 }
 
+void EditorWindow::reload()
+{
+    QString fileName = m_fileList.at( m_docWidget->currentIndex() );
+    loadFile( fileName );
+}
+
 bool EditorWindow::save()
 {
     QString file = getCodeEditor()->getFilePath();
@@ -126,7 +129,15 @@ bool EditorWindow::save()
 
 bool EditorWindow::saveAs()
 {
-    QString fileName = QFileDialog::getSaveFileName( this, tr("Save Document As"), m_lastDir );
+    CodeEditor* ce = getCodeEditor();
+    QFileInfo fi = QFileInfo(ce->getFilePath());
+    QString ext = fi.suffix();
+
+    QString extensions = "";
+    if( ext == "" ) extensions = tr("All files")+" (*);;Arduino (*.ino);;Asm (*.asm);;GcBasic (*.gcb)";
+    else            extensions = "."+ext+"(*."+ext+");;"+tr("All files")+" (*.*)";
+
+    QString fileName = QFileDialog::getSaveFileName( this, tr("Save Document As"), m_lastDir, extensions );
     if( fileName.isEmpty() ) return false;
 
     m_fileList.replace( m_docWidget->currentIndex(), fileName );
@@ -146,6 +157,7 @@ bool EditorWindow::saveFile(const QString &fileName)
         return false;
     }
     QTextStream out(&file);
+    out.setCodec("UTF-8");
     QApplication::setOverrideCursor(Qt::WaitCursor);
     CodeEditor* ce = getCodeEditor();
     out << ce->toPlainText();
@@ -173,14 +185,13 @@ bool EditorWindow::maybeSave()
         else if( ret == QMessageBox::Cancel ) return false;
     }
     return true;
-    //"+strippedName( m_lastDir )+"
 }
 
 void EditorWindow::documentWasModified()
 {
     CodeEditor* ce = getCodeEditor();
     QTextDocument *doc = ce->document();
-    
+
     bool    modified = doc->isModified();
     int     index    = m_docWidget->currentIndex();
     QString tabText  = m_docWidget->tabText( index );
@@ -229,11 +240,19 @@ void EditorWindow::tabContextMenu( const QPoint &eventpoint )
     if( !ce ) return;
     
     QMenu* menu = new QMenu();
-    QAction* setCompilerAction = menu->addAction(QIcon(":/copy.png"),tr("set Compiler Path"));
+    QAction* setCompilerAction = menu->addAction(QIcon(":/copy.png"),tr("Set Compiler Path"));
     connect( setCompilerAction, SIGNAL( triggered()), this, SLOT(setCompiler()) );
+
+    QAction* reloadAction = menu->addAction(QIcon(":/reload.png"),tr("Reload"));
+    connect( reloadAction, SIGNAL( triggered()), this, SLOT(reload()) );
 
     menu->exec( mapToGlobal(eventpoint) );
     menu->deleteLater();
+}
+
+void EditorWindow::tabChanged( int tab )
+{
+    qDebug() << "EditorWindow::tabChanged" << m_docWidget->currentIndex() << tab;
 }
 
 void EditorWindow::setCompiler()
@@ -260,17 +279,20 @@ void EditorWindow::createWidgets()
     m_docWidget->setObjectName("docWidget");
     m_docWidget->setTabPosition( QTabWidget::North );
     m_docWidget->setTabsClosable ( true );
-    m_docWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_docWidget->setContextMenuPolicy( Qt::CustomContextMenu );
+    double fontScale = MainWindow::self()->fontScale();
+    QString fontSize = QString::number( int(10*fontScale) );
+    m_docWidget->tabBar()->setStyleSheet("QTabBar { font-size:"+fontSize+"px; }");
     //m_docWidget->setMovable( true );
     baseWidgetLayout->addWidget( m_docWidget );
     
     connect( m_docWidget, SIGNAL( tabCloseRequested(int)), 
-             this,      SLOT(   closeTab(int)));
+             this,        SLOT(   closeTab(int)));
              
     connect( m_docWidget, SIGNAL( customContextMenuRequested(const QPoint &)), 
-                        SLOT(   tabContextMenu(const QPoint &)));
+             this,        SLOT(   tabContextMenu(const QPoint &)));
                         
-    //connect( m_docWidget, SIGNAL(currentChanged(int)), this, SLOT(documentWasModified(int)));
+    connect( m_docWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     
     setLayout( baseWidgetLayout );
     
@@ -337,9 +359,10 @@ void EditorWindow::createActions()
     stepAct->setEnabled(false);
     connect( stepAct, SIGNAL(triggered()), this, SLOT(step()) );
 
-    stepOverAct = new QAction(QIcon(":/stepover.png"),tr("StepOver"), this);
+    stepOverAct = new QAction(QIcon(":/rotateCW.png"),tr("StepOver"), this);
     stepOverAct->setStatusTip(tr("Step Over"));
     stepOverAct->setEnabled(false);
+    stepOverAct->setVisible(false);
     connect( stepOverAct, SIGNAL(triggered()), this, SLOT(stepOver()) );
 
     pauseAct = new QAction(QIcon(":/pause.png"),tr("Pause"), this);
@@ -389,6 +412,11 @@ void EditorWindow::createActions()
     connect(debugAct, SIGNAL(triggered()), this, SLOT(debug()));
 }
 
+void EditorWindow::enableStepOver( bool en )
+{
+    stepOverAct->setVisible( en );
+}
+
 CodeEditor* EditorWindow::getCodeEditor()
 {
     CodeEditorWidget* actW = dynamic_cast<CodeEditorWidget*>(m_docWidget->currentWidget());
@@ -398,16 +426,19 @@ CodeEditor* EditorWindow::getCodeEditor()
 
 void EditorWindow::closeTab( int index )
 {
-    maybeSave();
+    m_docWidget->setCurrentIndex( index );
+    if( !maybeSave() ) return;
+
     m_fileList.removeAt(index);
-    
+
     if( m_fileList.isEmpty() )
     {
         enableFileActs( false ); // disable file actions
         enableDebugActs( false );
     }
-    
-    CodeEditorWidget *actW = dynamic_cast<CodeEditorWidget*>( m_docWidget->widget(index));
+    if( m_debuggerToolBar->isVisible() ) stop();
+
+    CodeEditorWidget* actW = dynamic_cast<CodeEditorWidget*>( m_docWidget->widget(index));
     m_docWidget->removeTab( index );
     delete actW;
 
@@ -433,42 +464,71 @@ void EditorWindow::debug()
 
         runAct->setEnabled( true );
         stepAct->setEnabled( true );
+        stepOverAct->setEnabled( true );
         resetAct->setEnabled( true );
         pauseAct->setEnabled( false );
     }
 }
 
-void EditorWindow::run()     
+void EditorWindow::run()
+{ 
+    setStepActs();
+    QTimer::singleShot( 10, getCodeEditor(), SLOT( run()) );
+}
+
+void EditorWindow::step()    
+{ 
+    setStepActs();
+    QTimer::singleShot( 10, getCodeEditor(), SLOT( step()) );
+    //getCodeEditor()->step( false ); 
+}
+
+void EditorWindow::stepOver()
+{
+    setStepActs();
+    QTimer::singleShot( 10, getCodeEditor(), SLOT( stepOver()) );
+    //getCodeEditor()->step( true ); 
+}
+
+void EditorWindow::setStepActs()
 { 
     runAct->setEnabled( false );
     stepAct->setEnabled( false );
+    stepOverAct->setEnabled( false );
     resetAct->setEnabled( false );
     pauseAct->setEnabled( true );
-    getCodeEditor()->run(); 
 }
 
-void EditorWindow::step()    { getCodeEditor()->step(); }
-void EditorWindow::stepOver(){ getCodeEditor()->stepOver(); }
 void EditorWindow::pause()   
-{ 
-    getCodeEditor()->pause(); 
+{
+    getCodeEditor()->pause();
     runAct->setEnabled( true );
     stepAct->setEnabled( true );
+    stepOverAct->setEnabled( true );
     resetAct->setEnabled( true );
     pauseAct->setEnabled( false );
 }
-void EditorWindow::reset()   { getCodeEditor()->reset(); }
+void EditorWindow::reset()   
+{ 
+    getCodeEditor()->reset();
+}
+
 void EditorWindow::stop()    
 { 
-    getCodeEditor()->stopDebbuger(); 
+    getCodeEditor()->stopDebbuger();
     m_debuggerToolBar->setVisible( false );
     m_editorToolBar->setVisible( true);
 }
+
 void EditorWindow::compile() 
 { 
-    getCodeEditor()->compile(); 
+    getCodeEditor()->compile();
 }
-void EditorWindow::upload()  { getCodeEditor()->upload(); }
+
+void EditorWindow::upload()  
+{ 
+    getCodeEditor()->upload();
+}
 
 void EditorWindow::findReplaceDialog() 
 {
@@ -506,7 +566,7 @@ void EditorWindow::createToolBars()
     m_editorToolBar->addAction(debugAct);
     
     m_debuggerToolBar->addAction(stepAct);
-    //m_debuggerToolBar->addAction(stepOverAct);
+    m_debuggerToolBar->addAction(stepOverAct);
     m_debuggerToolBar->addAction(runAct);
     m_debuggerToolBar->addAction(pauseAct);
     m_debuggerToolBar->addAction(resetAct);
@@ -517,11 +577,8 @@ void EditorWindow::createToolBars()
 void EditorWindow::readSettings()
 {
     QSettings* settings = MainWindow::self()->settings();
-    
     restoreGeometry( settings->value("geometry").toByteArray() );
-    
     m_docWidget->restoreGeometry( settings->value("docWidget/geometry").toByteArray() );
-    
     m_lastDir = settings->value("lastDir").toString();
 }
 

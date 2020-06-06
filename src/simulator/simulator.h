@@ -46,18 +46,22 @@ class MAINMODULE_EXPORT Simulator : public QObject
         void stopSim();
         void stopDebug();
         void startSim();
-        void debug();
-        void runCircuitStep();
+        void debug( bool run );
         void runGraphicStep();
-        void runExtraStep();
+        void runExtraStep( uint64_t cycle );
+        void runGraphicStep1();
+        void runGraphicStep2();
+        void runCircuit();
         
+        int circuitRate() { return m_circuitRate; }
         int simuRate() { return m_simuRate; }
         int simuRateChanged( int rate );
+        
+        void setTimerScale( int ts ) { m_timerSc = ts; }
 
         int  reaClock();
         void setReaClock( int value );
-        int  noLinClock();
-        void setNoLinClock( int value );
+
         int  noLinAcc();
         void setNoLinAcc( int ac );
         double NLaccuracy();
@@ -66,8 +70,13 @@ class MAINMODULE_EXPORT Simulator : public QObject
         bool isPaused();
         
         uint64_t step();
+        uint64_t circTime();
+        void setCircTime( uint64_t time );
 
         QList<eNode*> geteNodes() { return m_eNodeList; }
+
+        void addToEnodeBusList( eNode* nod );
+        void remFromEnodeBusList( eNode* nod, bool del );
 
         void addToEnodeList( eNode* nod );
         void remFromEnodeList( eNode* nod, bool del );
@@ -97,8 +106,12 @@ class MAINMODULE_EXPORT Simulator : public QObject
         void remFromMcuList( BaseProcessor* proc );
 
         void timerEvent( QTimerEvent* e );
+
+        double stepsPerus();
         
         uint64_t stepsPerSec;
+
+        uint64_t mS(){ return m_RefTimer.elapsed(); }
 
     signals:
         void pauseDebug();
@@ -106,9 +119,7 @@ class MAINMODULE_EXPORT Simulator : public QObject
         
     private:
  static Simulator* m_pSelf;
-        
-        void runCircuit();
-        
+
         inline void solveMatrix();
 
         QFuture<void> m_CircuitFuture;
@@ -117,39 +128,48 @@ class MAINMODULE_EXPORT Simulator : public QObject
 
         QList<eNode*>    m_eNodeList;
         QList<eNode*>    m_eChangedNodeList;
-        
+        QList<eNode*>    m_eNodeBusList;
+
         QList<eElement*> m_elementList;
         QList<eElement*> m_updateList;
         
         QList<eElement*> m_changedFast;
-        QList<eElement*> m_reactiveList;
+        QList<eElement*> m_reactive;
         QList<eElement*> m_nonLinear;
         QList<eElement*> m_simuClock;
         QList<BaseProcessor*> m_mcuList;
 
         bool m_isrunning;
         bool m_debugging;
+        bool m_runMcu;
         bool m_paused;
         bool m_error;
-        int  m_timerId;
-        
-        int m_noLinAcc;
 
+        int m_timerId;
+        int m_timerTick;
+        int m_timerSc;
+        int m_noLinAcc;
         int m_numEnodes;
         int m_simuRate;
         int m_stepsPrea;
-        int m_stepsNolin;
-        int m_timerTick;
-        
-        int m_circuitRate;
-        int m_noLinCounter;
-        int m_reacCounter;
-        int m_updtCounter;
 
+        double m_stepsPerus;
+        double m_stepNS;
+        double m_mcuStepNS;
+        
+        uint64_t m_circuitRate;
+        uint64_t m_reacCounter;
+        uint64_t m_updtCounter;
+
+        uint64_t m_circTime;
         uint64_t m_step;
+        uint64_t m_tStep;
         uint64_t m_lastStep;
         
+        uint64_t m_refTime;
         uint64_t m_lastRefTime;
         QElapsedTimer m_RefTimer;
 };
  #endif
+
+

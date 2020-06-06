@@ -25,7 +25,7 @@
         output1-eNode2
         clock-eNode22
         input3-eNode24
-        output0-packagePin3" >
+        output0-Package_Q4" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -44,7 +44,7 @@
         clock-eNode2
         output1-eNode6
         input3-eNode24
-        output0-packagePin2" >
+        output0-Package_Q5" >
     </item>
 
     <item itemtype="eRail"
@@ -77,7 +77,7 @@
         clock-eNode5
         output1-eNode14
         input3-eNode24
-        output0-packagePin13" >
+        output0-Package_Q7" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -96,7 +96,7 @@
         output1-eNode5
         clock-eNode6
         input3-eNode24
-        output0-packagePin4" >
+        output0-Package_Q6" >
     </item>
 
     <item itemtype="eRail"
@@ -122,7 +122,7 @@
         clock-eNode11
         output1-eNode12
         input3-eNode24
-        output0-packagePin14" >
+        output0-Package_Q9" >
     </item>
 
     <item itemtype="eRail"
@@ -147,7 +147,7 @@
         input2-eNode8
         clock-eNode13
         input3-eNode24
-        output0-packagePin1" >
+        output0-Package_Q11" >
     </item>
 
     <item itemtype="eRail"
@@ -173,7 +173,7 @@
         output1-eNode11
         clock-eNode14
         input3-eNode24
-        output0-packagePin12" >
+        output0-Package_Q8" >
     </item>
 
     <item itemtype="eRail"
@@ -206,7 +206,7 @@
         clock-eNode12
         output1-eNode13
         input3-eNode24
-        output0-packagePin15" >
+        output0-Package_Q10" >
     </item>
 
     <item itemtype="eFlipFlopJK"
@@ -225,7 +225,7 @@
         clock-eNode19
         output1-eNode20
         input3-eNode24
-        output0-packagePin7" >
+        output0-Package_Q1" >
     </item>
 
     <item itemtype="eRail"
@@ -251,7 +251,7 @@
         clock-eNode21
         output1-eNode22
         input3-eNode24
-        output0-packagePin5" >
+        output0-Package_Q3" >
     </item>
 
     <item itemtype="eRail"
@@ -277,7 +277,7 @@
         output1-eNode19
         clock-eNode23
         input3-eNode24
-        output0-packagePin9" >
+        output0-Package_Q0" >
     </item>
 
     <item itemtype="eRail"
@@ -310,7 +310,7 @@
         clock-eNode20
         output1-eNode21
         input3-eNode24
-        output0-packagePin6" >
+        output0-Package_Q2" >
     </item>
 
     <item itemtype="eBuffer"
@@ -323,7 +323,7 @@
         inverted = "true"
         connections="
         output0-eNode23
-        input0-packagePin10" >
+        input0-Package_!CP" >
     </item>
 
     <item itemtype="eBuffer"
@@ -336,7 +336,7 @@
         inverted = "true"
         connections="
         output0-eNode24
-        input0-packagePin11" >
+        input0-Package_MR" >
     </item>
 
 </subcircuit>

@@ -488,8 +488,7 @@ string stimulus::toString()
     ostringstream s;
 
     s << " stimulus ";
-    if(snode)
-        s << " attached to " << snode->name();
+    if(snode) s << " attached to " << snode->name();
         s << endl
         << " Vth=" << get_Vth() << "V"
         << " Zth=" << get_Zth() << " ohms"

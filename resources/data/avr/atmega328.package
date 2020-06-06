@@ -52,8 +52,8 @@
     <pin side="right"   pos="5"  type="adc1"  id="PC1"  label="C1"/>
     <pin side="right"   pos="4"  type="adc2"  id="PC2"  label="C2"/>
     <pin side="right"   pos="3"  type="adc3"  id="PC3"  label="C3"/>
-    <pin side="right"   pos="2"  type="adc4"  id="PC4"  label="C4"/>
-    <pin side="right"   pos="1"  type="adc5"  id="PC5"  label="C5"/>
+    <pin side="right"   pos="2"  type="adc4,sda"  id="PC4"  label="C4"/>
+    <pin side="right"   pos="1"  type="adc5,scl"  id="PC5"  label="C5"/>
     
 </package>
 

@@ -34,6 +34,8 @@ class MAINMODULE_EXPORT Node : public Component
 
         Pin* getPin( int pin ) const { return m_pin[pin]; }
 
+        void registerPins( eNode* enode );
+
         //virtual void setChanged( bool changed );
 
         void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );

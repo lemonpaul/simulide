@@ -81,88 +81,81 @@ public:
 
 class Cycle_Counter
 {
-public:
+    public:
 
-#define BREAK_ARRAY_SIZE  4
-#define BREAK_ARRAY_MASK  (BREAK_ARRAY_SIZE -1)
-  // Largest cycle counter value
+      #define BREAK_ARRAY_SIZE  4
+      #define BREAK_ARRAY_MASK  (BREAK_ARRAY_SIZE -1)
 
-  static const uint64_t  END_OF_TIME=0xFFFFFFFFFFFFFFFFULL;
+      static const uint64_t  END_OF_TIME=0xFFFFFFFFFFFFFFFFULL;// Largest cycle counter value
 
+      bool reassigned;        // Set true when a break point is reassigned (or deleted)
 
-  bool reassigned;        // Set true when a break point is reassigned (or deleted)
+      Cycle_Counter_breakpoint_list
+      active,     // Head of the active breakpoint linked list
+        inactive;   // Head of the inactive one.
 
-  Cycle_Counter_breakpoint_list
-  active,     // Head of the active breakpoint linked list
-    inactive;   // Head of the inactive one.
+      bool bSynchronous; // a flag that's true when the time per counter tick is constant
 
-  bool bSynchronous; // a flag that's true when the time per counter tick is constant
+      Cycle_Counter();
+      ~Cycle_Counter();
+      void preset(uint64_t new_value);     // not used currently.
 
-  Cycle_Counter();
-  ~Cycle_Counter();
-  void preset(uint64_t new_value);     // not used currently.
+      /*
+        increment - This inline member function is called once or
+        twice for every simulated instruction. Its purpose is to
+        increment the cycle counter using roll over arithmetic.
+        If there's a breakpoint set on the new value of the cycle
+        counter then the simulation is either stopped or a callback
+        function is invoked. In either case, the break point is
+        cleared.
+      */
+      void increment();
 
-  /*
-    increment - This inline member function is called once or 
-    twice for every simulated instruction. Its purpose is to
-    increment the cycle counter using roll over arithmetic.
-    If there's a breakpoint set on the new value of the cycle
-    counter then the simulation is either stopped or a callback
-    function is invoked. In either case, the break point is
-    cleared.
-  */
-  void increment();
+      /*
+        advance the Cycle Counter by more than one instruction quantum.
+        This is almost identical to the increment() function except that
+        we allow the counter to be advanced by an arbitrary amount.
+        They're separated only for efficiency reasons. This one runs slower.
+      */
+      inline void advance(uint64_t step)
+      {
+        while (step--)
+        {
+            if (value == break_on_this) breakpoint();
+        }
+          value++;
+      }
 
-  /*
-    advance the Cycle Counter by more than one instruction quantum.
-    This is almost identical to the increment() function except that
-    we allow the counter to be advanced by an arbitrary amount.
-    They're separated only for efficiency reasons. This one runs slower.
-  */    
-  inline void advance(uint64_t step)
-  {
-    while (step--) 
-    {
-        if (value == break_on_this) breakpoint();
-    }
-      value++;
-  }
-  
-  // Return the current cycle counter value
-  uint64_t get()  { return value; }
+      uint64_t get()  { return value; }// Return the current cycle counter value
+      uint64_t get(double future_time_from_now);// Return the cycle counter for some time off in the future:
 
-  // Return the cycle counter for some time off in the future:
-  uint64_t get(double future_time_from_now);
+      bool set_break(uint64_t future_cycle, TriggerObject *f=0, uint abp = MAX_BREAKPOINTS);
+      bool set_break_delta(uint64_t future_cycle, TriggerObject *f=0, uint abp = MAX_BREAKPOINTS);
+      bool reassign_break(uint64_t old_cycle,uint64_t future_cycle, TriggerObject *f=0);
+      void clear_current_break(TriggerObject *f=0);
+      void dump_breakpoints();
 
-  bool set_break(uint64_t future_cycle,
-                 TriggerObject *f=0, uint abp = MAX_BREAKPOINTS);
-  bool set_break_delta(uint64_t future_cycle,
-                       TriggerObject *f=0, uint abp = MAX_BREAKPOINTS);
-  bool reassign_break(uint64_t old_cycle,uint64_t future_cycle, TriggerObject *f=0);
-  void clear_current_break(TriggerObject *f=0);
-  void dump_breakpoints();
+      void clear_break(uint64_t at_cycle);
+      void clear_break(TriggerObject *f);
+      void set_instruction_cps(uint64_t cps);
+      double instruction_cps() { return m_instruction_cps; }
+      double seconds_per_cycle() { return m_seconds_per_cycle; }
 
-  void clear_break(uint64_t at_cycle);
-  void clear_break(TriggerObject *f);
-  void set_instruction_cps(uint64_t cps);
-  double instruction_cps() { return m_instruction_cps; }
-  double seconds_per_cycle() { return m_seconds_per_cycle; }
+    private:
 
-private:
+      // The number of instruction cycles that correspond to one second
+      double m_instruction_cps;
+      double m_seconds_per_cycle;
 
-  // The number of instruction cycles that correspond to one second
-  double m_instruction_cps;
-  double m_seconds_per_cycle;
+      uint64_t value;          // Current value of the cycle counter.
+      uint64_t break_on_this;  // If there's a pending cycle break point, then it'll be this
 
-  uint64_t value;          // Current value of the cycle counter.
-  uint64_t break_on_this;  // If there's a pending cycle break point, then it'll be this
-
-  /*
-    breakpoint
-    when the member function "increment()" encounters a break point, 
-    breakpoint() is called.
-  */
-  void breakpoint();
+      /*
+        breakpoint
+        when the member function "increment()" encounters a break point,
+        breakpoint() is called.
+      */
+      void breakpoint();
 };
 
 #if defined(IN_MODULE) && defined(_WIN32)
@@ -172,11 +165,7 @@ private:
     // we are in gpsim: use of get_cycles() is recommended,
     // even if cycles object can be accessed directly.
     extern Cycle_Counter cycles;
-
-    inline Cycle_Counter &get_cycles()
-    {
-      return cycles;
-    }
+    inline Cycle_Counter &get_cycles() { return cycles; }
 #endif
 
 #endif

@@ -30,20 +30,20 @@
         outImped = "40"
         tristate = "true"
         connections="
-        outEnable-packagePin7
-        output0-packagePin5
-        output1-packagePin6
-        input0-packagePin4
-        input1-packagePin3
-        input2-packagePin2
-        input3-packagePin1
-        input4-packagePin15
-        input5-packagePin14
-        input6-packagePin13
-        input7-packagePin12
-        input10-packagePin9
-        input9-packagePin10
-        input8-packagePin11" >
+        outEnable-Package_E
+        output0-Package_Y
+        output1-Package_!Y
+        input0-Package_I0
+        input1-Package_I1
+        input2-Package_I2
+        input3-Package_I3
+        input4-Package_I4
+        input5-Package_I5
+        input6-Package_I6
+        input7-Package_I7
+        input10-Package_S2
+        input9-Package_S1
+        input8-Package_S0" >
     </item>
 
 </subcircuit>

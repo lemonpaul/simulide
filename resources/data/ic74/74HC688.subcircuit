@@ -27,7 +27,7 @@
         tristate = "false"
         connections="
         output0-eNode0
-        input0-packagePin3" >
+        input0-Package_Q0" >
     </item>
 
     <item itemtype="eBuffer"
@@ -41,7 +41,7 @@
         tristate = "false"
         connections="
         output0-eNode1
-        input0-packagePin2" >
+        input0-Package_P0" >
     </item>
 
     <item itemtype="eBuffer"
@@ -54,7 +54,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin5
+        input0-Package_Q1
         output0-eNode3" >
     </item>
 
@@ -68,7 +68,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin4
+        input0-Package_P1
         output0-eNode2" >
     </item>
 
@@ -96,7 +96,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin7
+        input0-Package_Q2
         output0-eNode5" >
     </item>
 
@@ -110,7 +110,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin8
+        input0-Package_P3
         output0-eNode6" >
     </item>
 
@@ -139,7 +139,7 @@
         tristate = "false"
         connections="
         output0-eNode4
-        input0-packagePin6" >
+        input0-Package_P2" >
     </item>
 
     <item itemtype="eXorGate"
@@ -166,7 +166,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin9
+        input0-Package_Q3
         output0-eNode7" >
     </item>
 
@@ -180,7 +180,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin17
+        input0-Package_P7
         output0-eNode13" >
     </item>
 
@@ -194,7 +194,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin11
+        input0-Package_P4
         output0-eNode15" >
     </item>
 
@@ -223,7 +223,7 @@
         tristate = "false"
         connections="
         output0-eNode8
-        input0-packagePin15" >
+        input0-Package_Q5" >
     </item>
 
     <item itemtype="eBuffer"
@@ -236,7 +236,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin12
+        input0-Package_Q4
         output0-eNode11" >
     </item>
 
@@ -250,7 +250,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin14
+        input0-Package_Q5
         output0-eNode9" >
     </item>
 
@@ -278,7 +278,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin18
+        input0-Package_Q7
         output0-eNode12" >
     </item>
 
@@ -293,7 +293,7 @@
         tristate = "false"
         connections="
         output0-eNode10
-        input0-packagePin13" >
+        input0-Package_P5" >
     </item>
 
     <item itemtype="eXorGate"
@@ -320,7 +320,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin16
+        input0-Package_P6
         output0-eNode14" >
     </item>
 
@@ -356,7 +356,7 @@
         input5-eNode21
         input6-eNode22
         input7-eNode23
-        output0-packagePin19
+        output0-Package_!P=Q
         input8-eNode24" >
     </item>
 
@@ -370,7 +370,7 @@
         inverted = "true"
         tristate = "false"
         connections="
-        input0-packagePin1
+        input0-Package_!E
         output0-eNode24" >
     </item>
 

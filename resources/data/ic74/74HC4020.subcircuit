@@ -17,7 +17,7 @@
         input1-eNode0
         output1-eNode2
         clock-eNode21
-        output0-packagePin6
+        output0-Package_Q6
         input3-eNode27" >
     </item>
 
@@ -43,7 +43,7 @@
         input2-eNode1
         clock-eNode2
         output1-eNode6
-        output0-packagePin13
+        output0-Package_Q7
         input3-eNode27" >
     </item>
 
@@ -76,7 +76,7 @@
         input0-eNode3
         clock-eNode5
         output1-eNode14
-        output0-packagePin14
+        output0-Package_Q9
         input3-eNode27" >
     </item>
 
@@ -95,7 +95,7 @@
         input1-eNode4
         output1-eNode5
         clock-eNode6
-        output0-packagePin12
+        output0-Package_Q8
         input3-eNode27" >
     </item>
 
@@ -121,7 +121,7 @@
         input1-eNode7
         clock-eNode11
         output1-eNode12
-        output0-packagePin1
+        output0-Package_Q11
         input3-eNode27" >
     </item>
 
@@ -146,7 +146,7 @@
         input0-eNode8
         input2-eNode8
         clock-eNode13
-        output0-packagePin3
+        output0-Package_Q13
         input3-eNode27" >
     </item>
 
@@ -172,7 +172,7 @@
         input1-eNode9
         output1-eNode11
         clock-eNode14
-        output0-packagePin15
+        output0-Package_Q10
         input3-eNode27" >
     </item>
 
@@ -205,7 +205,7 @@
         input0-eNode10
         clock-eNode12
         output1-eNode13
-        output0-packagePin2
+        output0-Package_Q12
         input3-eNode27" >
     </item>
 
@@ -223,7 +223,7 @@
         input0-eNode15
         input1-eNode15
         output1-eNode19
-        output0-packagePin7
+        output0-Package_Q3
         clock-eNode26
         input3-eNode27" >
     </item>
@@ -250,7 +250,7 @@
         input2-eNode16
         clock-eNode20
         output1-eNode21
-        output0-packagePin4
+        output0-Package_Q5
         input3-eNode27" >
     </item>
 
@@ -275,7 +275,7 @@
         input0-eNode17
         input1-eNode17
         clock-eNode22
-        output0-packagePin9
+        output0-Package_Q0
         output1-eNode25
         input3-eNode27" >
     </item>
@@ -309,7 +309,7 @@
         input0-eNode18
         clock-eNode19
         output1-eNode20
-        output0-packagePin5
+        output0-Package_Q4
         input3-eNode27" >
     </item>
 
@@ -323,7 +323,7 @@
         inverted = "true"
         connections="
         output0-eNode22
-        input0-packagePin10" >
+        input0-Package_!CP" >
     </item>
 
     <item itemtype="eBuffer"
@@ -335,7 +335,7 @@
         outImped = "40"
         inverted = "true"
         connections="
-        input0-packagePin11
+        input0-Package_MR
         output0-eNode27" >
     </item>
 

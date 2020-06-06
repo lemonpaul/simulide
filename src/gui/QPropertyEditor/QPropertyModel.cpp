@@ -102,8 +102,9 @@ QVariant QPropertyModel::data ( const QModelIndex & index, int role /*= Qt::Disp
     case Qt::DecorationRole:
     case Qt::DisplayRole:
     case Qt::EditRole:
-        if( index.column() == 0 ) { return item->propName(); }
+        if( index.column() == 0 ) return item->propName();
         if( index.column() == 1 ) return item->value(role);
+        break;
     case Qt::BackgroundRole:
         if( item->isRoot() ) return QApplication::palette("QTreeView").brush(QPalette::Normal, QPalette::Button).color();
         break;
@@ -188,10 +189,10 @@ void QPropertyModel::addItem( QObject *propertyObject )
     
     QList<const QMetaObject*> finalClassList;    
     // remove empty classes from hierarchy list
-    foreach(const QMetaObject* obj, classList)
+    for( const QMetaObject* obj : classList )
     {
         bool keep = false;
-        foreach(PropertyPair pair, propertyMap)
+        for(PropertyPair pair : propertyMap)
         {
             if (pair.Object == obj)
             {
@@ -199,7 +200,7 @@ void QPropertyModel::addItem( QObject *propertyObject )
                 break;
             }
         }
-        if (keep) finalClassList.push_back(obj);
+        if( keep ) finalClassList.push_back(obj);
     }
     
     // finally insert properties for classes containing them
@@ -209,14 +210,14 @@ void QPropertyModel::addItem( QObject *propertyObject )
     Property* propertyItem = new Property(propertyObject->objectName (), 0, m_rootItem); 
     beginInsertRows( QModelIndex(), i, i + finalClassList.count() );
 
-    foreach(const QMetaObject* metaObject, finalClassList)
+    for( const QMetaObject* metaObject : finalClassList)
     {
-        foreach(PropertyPair pair, propertyMap)
+        for( PropertyPair pair : propertyMap )
         {
             // Check if the property is associated with the current class from the finalClassList
-            if (pair.Object == metaObject)
+            if( pair.Object == metaObject )
             {
-                QMetaProperty property(pair.Property);
+                QMetaProperty property( pair.Property );
                 Property* p = 0;
                 if (property.type() == QVariant::UserType && !m_userCallbacks.isEmpty())
                 {
@@ -316,7 +317,7 @@ void QPropertyModel::addDynamicProperties( Property* parent, QObject* propertyOb
     beginInsertRows(parentIndex, rows, rows + dynamicProperties.count() - 1 );
     
     // Add properties left in the list
-    foreach(QByteArray dynProp, dynamicProperties )
+    for( QByteArray dynProp : dynamicProperties )
     {
         QVariant v = propertyObject->property(dynProp);
         Property* p = 0;

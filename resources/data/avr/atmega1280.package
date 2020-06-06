@@ -10,7 +10,7 @@
 <!-- *   (at your option) any later version.                                   * -->
 <!-- *                                                                         * -->
 <!-- *   This program is distributed in the hope that it will be useful,       * -->
-<!-- *   but WITHOUT ANY WARRANTY; without even the implied warranty of       atmega2560 * -->
+<!-- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        * -->
 <!-- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * -->
 <!-- *   GNU General Public License for more details.                          * -->
 <!-- *                                                                         * -->
@@ -18,7 +18,7 @@
 <!-- *   along with this program; if not, see <http://www.gnu.org/licenses/>.  * -->
 <!-- *                                                                         * -->
 <!-- *************************************************************************** -->
-atmega32u4
+
 <package name="atmega1280" pins="100" width="28" height="28">
 
     <pin side="left"  pos="2"  type="bidir" id="PG5"  label="G5"/>
@@ -64,8 +64,8 @@ atmega32u4
     <pin side="bottom" pos="16" type="bidir" id="PL5" label="L5"/>
     <pin side="bottom" pos="17" type="bidir" id="PL6" label="L6"/>
     <pin side="bottom" pos="18" type="bidir" id="PL7" label="L7"/>
-    <pin side="bottom" pos="19" type="bidir" id="PD0" label="D0"/>
-    <pin side="bottom" pos="20" type="bidir" id="PD1" label="D1"/>
+    <pin side="bottom" pos="19" type="bidir,scl" id="PD0" label="D0"/>
+    <pin side="bottom" pos="20" type="bidir,sda" id="PD1" label="D1"/>
     <pin side="bottom" pos="21" type="bidir" id="PD2" label="D2"/>
     <pin side="bottom" pos="22" type="bidir" id="PD3" label="D3"/>
     <pin side="bottom" pos="23" type="bidir" id="PD4" label="D4"/>

@@ -28,7 +28,7 @@
         sRInverted = "true"
         connections="
         clock-eNode0
-        input0-packagePin12
+        input0-Package_!TC
         output0-eNode4
         input2-eNode9
         input1-eNode10
@@ -100,7 +100,7 @@
         sRInverted = "true"
         connections="
         clock-eNode0
-        output1-packagePin12
+        output1-Package_!TC
         input0-eNode8
         input2-eNode9
         input1-eNode10
@@ -118,7 +118,7 @@
         tristate = "false"
         connections="
         output0-eNode1
-        input0-packagePin13" >
+        input0-Package_!CE" >
     </item>
 
     <item itemtype="eBuffer"
@@ -132,7 +132,7 @@
         tristate = "false"
         connections="
         output0-eNode2
-        input0-packagePin14" >
+        input0-Package_CP" >
     </item>
 
     <item itemtype="eOrGate"
@@ -145,9 +145,9 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin12
+        input0-Package_!TC
         input1-eNode8
-        output0-packagePin11" >
+        output0-Package_Q9" >
     </item>
 
     <item itemtype="eOrGate"
@@ -160,8 +160,8 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        input0-packagePin12
-        output0-packagePin1
+        input0-Package_!TC
+        output0-Package_Q5
         input1-eNode11" >
     </item>
 
@@ -206,7 +206,7 @@
         numInputs = "2"
         connections="
         input0-eNode4
-        output0-packagePin3
+        output0-Package_Q0
         input1-eNode12" >
     </item>
 
@@ -221,7 +221,7 @@
         numInputs = "2"
         connections="
         input1-eNode4
-        output0-packagePin5
+        output0-Package_Q6
         input0-eNode14" >
     </item>
 
@@ -236,7 +236,7 @@
         numInputs = "2"
         connections="
         input0-eNode5
-        output0-packagePin4
+        output0-Package_Q2
         input1-eNode14" >
     </item>
 
@@ -251,7 +251,7 @@
         numInputs = "2"
         connections="
         input0-eNode5
-        output0-packagePin9
+        output0-Package_Q8
         input1-eNode13" >
     </item>
 
@@ -266,7 +266,7 @@
         numInputs = "2"
         connections="
         input1-eNode7
-        output0-packagePin2
+        output0-Package_Q1
         input0-eNode11" >
     </item>
 
@@ -281,7 +281,7 @@
         numInputs = "2"
         connections="
         input1-eNode7
-        output0-packagePin6
+        output0-Package_Q7
         input0-eNode15" >
     </item>
 
@@ -296,7 +296,7 @@
         numInputs = "2"
         connections="
         input1-eNode8
-        output0-packagePin7
+        output0-Package_Q3
         input0-eNode15" >
     </item>
 
@@ -311,7 +311,7 @@
         tristate = "false"
         connections="
         output0-eNode9
-        input0-packagePin15" >
+        input0-Package_MR" >
     </item>
 
     <item itemtype="eRail"
@@ -331,7 +331,7 @@
         inverted = "true"
         numInputs = "2"
         connections="
-        output0-packagePin10
+        output0-Package_Q4
         input1-eNode12
         input0-eNode13" >
     </item>

@@ -40,15 +40,15 @@ class MAINMODULE_EXPORT CircMatrix
  static CircMatrix* self() { return m_pSelf; }
 
         void printMatrix();
-        void createMatrix( QList<eNode*> &eNodeList, QList<eElement*> &elementList  );
+        void createMatrix( QList<eNode*> &eNodeList );
         void stampMatrix( int row, int col, double value );
         void stampCoef( int row, double value );
         bool solveMatrix();
         
         void setCircChanged();
         
-        d_matrix_t getMatrix(){return m_circMatrix; }
-        d_vector_t getCoeffVect(){ return m_coefVect; }
+        d_matrix_t getMatrix() { return m_circMatrix; }
+        d_vector_t getCoeffVect() { return m_coefVect; }
 
     private:
  static CircMatrix* m_pSelf;
@@ -59,7 +59,6 @@ class MAINMODULE_EXPORT CircMatrix
         
         int m_numEnodes;
         QList<eNode*>* m_eNodeList;
-        QList<eElement*> m_elementList;
         
         QList<dp_matrix_t> m_aList;
         QList<d_matrix_t>  m_aFaList;

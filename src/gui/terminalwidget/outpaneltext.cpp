@@ -20,15 +20,16 @@
 #include <QtGui>
 
 #include "outpaneltext.h"
+#include "mainwindow.h"
 
 
-OutPanelText::OutPanelText( QWidget *parent ) 
+OutPanelText::OutPanelText( QWidget* parent )
             : QPlainTextEdit( parent )
 {
     m_text = "";
     
     //setStyleSheet("background-color: #150925");
-    m_highlighter    = new OutHighlighter( document() );
+    m_highlighter = new OutHighlighter( document() );
 
     QPalette p;// = palette();
     p.setColor(QPalette::Base, QColor( 35, 30, 60) );
@@ -38,40 +39,41 @@ OutPanelText::OutPanelText( QWidget *parent )
     QFont font;
     font.setFamily("Monospace");
     font.setFixedPitch(true);
-    font.setPixelSize(12);
+    font.setPixelSize( 12*MainWindow::self()->fontScale() );
     setFont(font);
 }
 OutPanelText::~OutPanelText(){}
 
 
-void OutPanelText::appendText( const QString &text )
+void OutPanelText::appendText( const QString text )
 {
-    //qDebug() << text;
+    //qDebug() << "OutPanelText::appendText" << text;
     m_text.append( text);
+    //QPlainTextEdit::insertPlainText( text );
 }
 
-void OutPanelText::writeText( const QString &text )
+void OutPanelText::writeText( const QString text )
 {
-    //qDebug() << text;
+    //qDebug()<< "OutPanelText::writeText" << text;
+    //QPlainTextEdit::insertPlainText( text );
     m_text.append( text );
     step();
-    repaint();
 }
 
 void OutPanelText::step()
 {
-    if( m_text != "" )
-    {
-        QPlainTextEdit::insertPlainText( m_text );
-        ensureCursorVisible();
-        m_text = "";
-    }
+    if( m_text == "" ) return;
+
+    QPlainTextEdit::insertPlainText( m_text );
+    ensureCursorVisible();
+    repaint();
+    m_text = "";
 }
 
 // CLASS OutHighlighter ***********************************************
 
 OutHighlighter::OutHighlighter( QTextDocument *parent )
-    : QSyntaxHighlighter( parent )
+              : QSyntaxHighlighter( parent )
 {
     HighlightingRule rule;
 
@@ -80,7 +82,7 @@ OutHighlighter::OutHighlighter( QTextDocument *parent )
     errorFormat.setFontWeight( QFont::Bold );
     QStringList patterns;
     patterns<< "ERROR";
-    foreach( const QString &pattern, patterns )
+    for( const QString &pattern : patterns )
     {
         rule.pattern = QRegExp( pattern );
         rule.format = errorFormat;
@@ -123,7 +125,7 @@ OutHighlighter::OutHighlighter( QTextDocument *parent )
     errorFormat.setForeground( QColor(100, 50, 0) );
     errorFormat.setBackground( QColor(255, 255, 100) );
     errorFormat.setFontWeight( QFont::Bold );
-    rule.pattern = QRegExp("ERROR");
+    rule.pattern = QRegExp(" ERROR");
     rule.format = errorFormat;
     highlightingRules.append(rule);
 }
@@ -134,7 +136,7 @@ void OutHighlighter::highlightBlock( const QString &text )
     QString upText = text;
     upText = upText.toUpper(); // Do case insensitive
 
-    foreach( const HighlightingRule &rule, highlightingRules )
+    for( const HighlightingRule &rule : highlightingRules )
     {
         QRegExp expression( rule.pattern );
         int index = expression.indexIn( upText );

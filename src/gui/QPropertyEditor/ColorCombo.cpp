@@ -33,12 +33,15 @@
 ColorCombo::ColorCombo(QWidget* parent /*= 0*/) : QComboBox(parent)
 {	
 	QStringList colorNames = QColor::colorNames();
-	for (int i = 0; i < colorNames.size(); ++i) {
-		QColor color(colorNames[i]);
-		insertItem(i, colorNames[i]);
-		setItemData(i, color, Qt::DecorationRole);
+    for (int i=0; i<colorNames.size(); ++i)
+    {
+        QColor color( colorNames[i] );
+        insertItem( i, colorNames[i] );
+        setItemData( i, color, Qt::DecorationRole );
 	}
-	addItem(tr("Custom"), QVariant((int)QVariant::UserType));
+    insertItem( colorNames.size(), tr("Transparent") );
+    setItemData( colorNames.size(), QColor( Qt::transparent ), Qt::DecorationRole );
+    addItem(tr("Custom"), QVariant( (int)QVariant::UserType) );
 	connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(currentChanged(int)));
 }
 
@@ -59,29 +62,29 @@ void ColorCombo::setColor(QColor color)
 {
 	m_init = color;
 	setCurrentIndex(findData(color, int(Qt::DecorationRole)));
-	if (currentIndex() == -1)
+    if( currentIndex() == -1 )
 	{
-		addItem(color.name());
-		setItemData(count()-1, color, Qt::DecorationRole);
+        addItem( color.name() );
+        setItemData( count()-1, color, Qt::DecorationRole);
 		setCurrentIndex(count()-1);
 	}
 }
 
 void ColorCombo::currentChanged(int index)
 {
-	if (itemData(index).isValid() && itemData(index) == QVariant((int)QVariant::UserType))
+    if(itemData(index).isValid() && itemData( index ) == QVariant((int)QVariant::UserType))
 	{
-		QColor color = QColorDialog::getColor(m_init, this);		
+        QColor color = QColorDialog::getColor( m_init, this );
 		if (color.isValid())
 		{
 			if (findData(color, int(Qt::DecorationRole)) == -1)
 			{
-				addItem(color.name());
+                addItem( color.name() );
 				setItemData(count()-1, color, Qt::DecorationRole);
 			}
-			setCurrentIndex(findData(color, int(Qt::DecorationRole)));
+            setCurrentIndex( findData(color, int(Qt::DecorationRole)) );
 		}
 		else
-			setCurrentIndex(findData(m_init));
+            setCurrentIndex( findData(m_init) );
 	}
 }
