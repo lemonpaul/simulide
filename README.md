@@ -1,4 +1,4 @@
-# SimulIDE 0.3.10
+# SimulIDE 0.4.13
 
 Electronic Circuit Simulator
 
@@ -38,14 +38,12 @@ Build dependencies:
  - avr-libc
 
  
-Once installed go to build_XX folder, then:
+Basic build steps:
 
 ```
 $ qmake
 $ make
 ```
-
-In folder build_XX/release/SimulIDE_x.x.x you will find executable and all files needed to run SimulIDE.
 
 
 
@@ -66,5 +64,3 @@ Run time dependencies:
  - libelf
 
 
-SimuliDE executable is in bin folder.
-No need for installation, place SimulIDE folder wherever you want and run the executable.
