@@ -50,7 +50,7 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
 
         void clear();
         void step();
-        void setData( int channel, int data );
+        void setData(int channel, double data );
         void setTicksPs( int tps );
         void setPlotterTick( int tickUs );
         
@@ -74,7 +74,7 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
  static PlotterWidget* m_pSelf;
 
         void setupWidget();
-        void setRenderData( int channel, int data );
+        void setRenderData(int channel, double data );
         void setScale();
 
         QHBoxLayout* m_horizontalLayout;
@@ -90,16 +90,17 @@ class MAINMODULE_EXPORT PlotterWidget : public QWidget
         QColor m_color[4];
 
         bool m_channel[4];
-        int  m_data[4];
+
         int  m_numchan;
         int  m_counter;
         int  m_ticksPs;
         int  m_xScale;
         int  m_numTracks;
         
-        int m_maxVolt;
-        int m_minVolt;
-        int m_offset;
+        double m_data[4];
+        double m_maxVolt;
+        double m_minVolt;
+        double m_offset;
 };
 
 #endif

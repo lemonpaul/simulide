@@ -105,12 +105,12 @@ void RenderArea::drawVmark()
      //update();
  }
 
-void RenderArea::setData( const int channel, int data )
+void RenderArea::setData( const int channel, double data )
 {
     data = (data/2+250)*m_height/520;
     data = m_height-data-4;
     m_dataP[channel] = m_data[channel];
-    m_data[channel] = data;
+    m_data[channel]  = data;
 }
  
 void RenderArea::setZero( int zero )

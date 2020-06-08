@@ -36,11 +36,11 @@ class Arduino : public AvrCompBase
         ~Arduino();
 
  static Component* construct( QObject* parent, QString type, QString id );
- static LibraryItem * libraryItem();
+ static LibraryItem* libraryItem();
  
         void attach();
 
-        void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
+        void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
         
     public slots:
         virtual void remove();

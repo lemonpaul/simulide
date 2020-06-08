@@ -24,6 +24,8 @@
 #include "itemlibrary.h"
 #include "utils.h"
 
+#include "hd44780.h"
+
 #include "avr_twi.h"
 
 LibraryItem* Arduino::libraryItem()
@@ -62,6 +64,7 @@ Arduino::Arduino( QObject* parent, QString type, QString id )
        : AvrCompBase( parent, type, id )
 {
     m_pSelf = this;
+
     m_processor = AvrProcessor::self();
     
     setLabelPos( 100,-21, 0); // X, Y, Rot
@@ -104,6 +107,12 @@ void Arduino::remove()
     Simulator::self()->remFromEnodeList( m_groundEnode, true );
     Simulator::self()->remFromUpdateList( m_boardLed );
     Circuit::self()->compList()->removeOne( m_boardLed );
+
+    /*if( m_shield )
+    {
+        Circuit::self()->compList()->removeOne( m_shield );
+        delete m_shield;
+    }*/
 }
 
 void Arduino::attach()
@@ -188,12 +197,12 @@ void Arduino::initBoard()
             mcuPin->setVoltHigh( 12 );
             mcuPin->setVoltLow( 12 );
         }
-        else if( type.contains( "led" ) )                      // Pin 13 
+        else if( type.contains( "led" ) )                      // Pin 13
         {
             //pin->setEnode( m_boardLedEnode );
             m_pb5Pin = pin;
         }
-        else if( pinId.toUpper().contains( "RST" ) )      // Reset Pins
+        else if( pinId.toUpper().contains( "RST" ) )       // Reset Pins
         {
             mcuPin->setImp( 20000 );
             mcuPin->setVoltHigh( 5 );

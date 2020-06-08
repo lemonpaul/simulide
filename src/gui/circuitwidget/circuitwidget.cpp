@@ -305,7 +305,9 @@ void CircuitWidget::about()
                "<br>"
                "<b>Translations:</b> <br>"
                +t+"Spanish: Santiago Gonzalez. <br>"
+               +t+t+"&nbsp; Kike Gl. <br>"
                +t+"Russian: Sergei Chiyanov <br>"
+               +t+"French:  Pascal Cotret <br>"
                );
 }
 

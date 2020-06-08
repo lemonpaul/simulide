@@ -72,7 +72,7 @@
     <item name="pic16f84"   package="pic/pic16f84"   data="pic/pic16f84"   device="pic16f84"   ></item>
     <item name="pic16f87"   package="pic/pic16f627"  data="pic/pic16f87"   device="pic16f87"   ></item>
     <item name="pic16f88"   package="pic/pic16f627"  data="pic/pic16f88"   device="pic16f88"   ></item>
-    <item name="pic16f505"  package="pic/pic16f1503" data="pic/pic16f505"  device="pic16f505"  ></item>
+    <item name="pic16f505"  package="pic/pic16f505"  data="pic/pic16f505"  device="pic16f505"  ></item>
     <item name="pic16f627"  package="pic/pic16f627"  data="pic/pic16f627"  device="pic16f627"  ></item>
     <item name="pic16f627a" package="pic/pic16f627"  data="pic/pic16f627"  device="pic16f627a" ></item>
     <item name="pic16f628"  package="pic/pic16f627"  data="pic/pic16f627"  device="pic16f628"  ></item>

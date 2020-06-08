@@ -53,6 +53,9 @@ class MAINMODULE_EXPORT MainWindow : public QMainWindow
         int autoBck();
         void setAutoBck( int secs );
 
+        QString loc();
+        void setLoc( QString loc );
+
         QString* circHelp() ;
         void loadCircHelp();
         

@@ -192,30 +192,7 @@ bool AvrProcessor::loadFirmware( QString fileN )
     }
     if( f.flashbase ) m_avrProcessor->pc = f.flashbase;
 
-    // Load EEPROM
-    int rom_size = m_avrProcessor->e2end+1;
-    int eep_size = m_eeprom.size();
-
-    //qDebug() << "eeprom size at Load:" << rom_size << eep_size;
-
-    if( eep_size < rom_size ) rom_size = eep_size;
-
-    if( rom_size )
-    {
-        uint8_t rep[rom_size];
-
-        for( int i=0; i<rom_size; i++ )
-        {
-            uint8_t val = m_eeprom[i];
-            rep[i] = val;
-            //qDebug() << i << val;
-        }
-        avr_eeprom_desc_t ee;
-        ee.offset = 0;
-        ee.size = rom_size;
-        ee.ee = &rep[0];
-        avr_ioctl( m_avrProcessor, AVR_IOCTL_EEPROM_SET, &ee );
-    }
+    setEeprom( m_eeprom ); // Load EEPROM
 
     m_avrProcessor->frequency = 16000000;
     m_avrProcessor->cycle = 0;
@@ -259,7 +236,8 @@ void AvrProcessor::step()
         {
             break;//qDebug() << "AvrProcessor::step() CRASHED!!!";
         }
-        else m_avrProcessor->run( m_avrProcessor );
+        else
+            m_avrProcessor->run( m_avrProcessor );
     }
 }
 
@@ -333,6 +311,38 @@ QVector<int> AvrProcessor::eeprom()
         }
     }
     return m_eeprom;
+}
+
+void AvrProcessor::setEeprom( QVector<int> eep )
+{
+    m_eeprom = eep;
+    //qDebug() << "BaseProcessor::setEeprom" <<eep.size()<< eep;
+
+    if( !m_avrProcessor ) return;
+
+    int rom_size = m_avrProcessor->e2end+1;
+    int eep_size = m_eeprom.size();
+
+    //qDebug() << "eeprom size at Load:" << rom_size << eep_size;
+
+    if( eep_size < rom_size ) rom_size = eep_size;
+
+    if( rom_size )
+    {
+        uint8_t rep[rom_size];
+
+        for( int i=0; i<rom_size; i++ )
+        {
+            uint8_t val = m_eeprom[i];
+            rep[i] = val;
+            //qDebug() << i << val;
+        }
+        avr_eeprom_desc_t ee;
+        ee.offset = 0;
+        ee.size = rom_size;
+        ee.ee = &rep[0];
+        avr_ioctl( m_avrProcessor, AVR_IOCTL_EEPROM_SET, &ee );
+    }
 }
 
 bool AvrProcessor::initGdb()

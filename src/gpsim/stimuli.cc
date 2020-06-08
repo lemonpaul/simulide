@@ -687,7 +687,7 @@ void IOPIN::setDrivingState(char new3State)
 {
     bDrivingState = (new3State=='1' || new3State=='W');
 
-    if( m_picPin ) m_picPin->update_state( bDrivingState ); // SimulIDE Pic pin
+    if( m_picPin ) m_picPin->setState( bDrivingState ); // SimulIDE Pic pin
 
     if( m_monitor ) m_monitor->setDrivingState( new3State );
 }
@@ -829,7 +829,7 @@ void IO_bi_directional::update_direction( uint new_direction, bool refresh )
     // If this pin is not associated with an IO Port, but it's tied
     // to a stimulus, then we need to update the stimulus.
 
-    if( m_picPin ) m_picPin->update_direction( out ); // SimulIDE Pic pin
+    if( m_picPin ) m_picPin->setDirection( out ); // SimulIDE Pic pin
 
     if( refresh && snode ) snode->update();
 }
@@ -893,7 +893,7 @@ void IO_bi_directional_pu::update_pullup( char new_state, bool refresh )
       if (snode) snode->update();
       else if (!getDriving()) setDrivenState(bPullUp && !is_analog);
     }
-    if( m_picPin ) m_picPin->update_pullup( bPullUp ); // SimulIDE Pic pin
+    if( m_picPin ) m_picPin->setPullup( bPullUp ); // SimulIDE Pic pin
   }
 }
 
@@ -982,6 +982,7 @@ char IO_open_collector::getBitChar()
     else
       return getDrivenState() ? '1' : '0';
   }
-  return getDrivingState() ? 'W' : '0';
+  //return getDrivingState() ? 'W' : '0';
+  return getDrivenState() ? '1' : '0';   //SimulIDE RA4 not working as input
 }
 

@@ -25,7 +25,6 @@ AVRComponentPin::AVRComponentPin( McuComponent* mcu, QString id, QString type, Q
                : McuComponentPin( mcu, id, type, label, pos, xpos, ypos, angle )
 {
     m_channel = -1;
-    m_isInput = true;
 }
 AVRComponentPin::~AVRComponentPin(){}
 
@@ -42,6 +41,7 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
         // PORTX Register change irq
         QString portName = "PORT";
         portName.append( m_id.at(1) );
+
         int portAddr = BaseProcessor::self()->getRegAddress( portName );
         if( portAddr < 0 )
         {
@@ -79,7 +79,7 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
                 if( ty.startsWith("adc") )
                 {
                     m_channel = ty.right(1).toInt();
-                    m_Write_adc_irq = avr_io_getirq( m_avrProcessor, AVR_IOCTL_ADC_GETIRQ, m_channel);
+                    m_Write_adc_irq = avr_io_getirq( m_avrProcessor, AVR_IOCTL_ADC_GETIRQ, m_channel );
                     break;
                 }
             }
@@ -115,24 +115,6 @@ void AVRComponentPin::attach( avr_t*  AvrProcessor )
     resetState();
 }
 
-void AVRComponentPin::resetState() 
-{
-    if( m_pinType == 1 )                         // Initialize irq flags
-    {
-        if( m_PortRegChangeIrq && m_DdrRegChangeIrq ) 
-        {
-            m_PortChangeIrq->flags    |= IRQ_FLAG_INIT;
-            m_PortRegChangeIrq->flags |= IRQ_FLAG_INIT;
-            m_DdrRegChangeIrq->flags  |= IRQ_FLAG_INIT;
-        } 
-        else 
-        {
-            qDebug()<< "Pin not properly initialized:" << m_port << m_pinN;
-        }
-        McuComponentPin::resetState();
-    }
-}
-
 void AVRComponentPin::setVChanged()
 {
     float volt = m_ePin[0]->getVolt();
@@ -153,68 +135,27 @@ void AVRComponentPin::setVChanged()
     else if( m_pinType == 24 ) { m_avrProcessor->aref = volt*1000;}
 }
 
-void AVRComponentPin::setPullup( uint32_t value )
+void AVRComponentPin::resetState()
 {
-    if( !m_isInput ) return;
-    
-    //qDebug() << "Port" << m_port << m_id << "   pullup: " << (value>0);
-
-    if( value>0 )                         // Activate pullup
+    if( m_pinType == 1 )                         // Initialize irq flags
     {
-        eSource::setImp( 1e5 );
-        m_voltOut = m_voltHigh;
+        if( m_PortRegChangeIrq && m_DdrRegChangeIrq )
+        {
+            m_PortChangeIrq->flags    |= IRQ_FLAG_INIT;
+            m_PortRegChangeIrq->flags |= IRQ_FLAG_INIT;
+            m_DdrRegChangeIrq->flags  |= IRQ_FLAG_INIT;
+        }
+        else
+        {
+            qDebug()<< "Pin not properly initialized:" << m_port << m_pinN;
+        }
+        McuComponentPin::resetState();
     }
-    else                                 // Deactivate pullup
-    {
-        eSource::setImp( high_imp );
-        m_voltOut = m_voltLow;
-    }
-    if( !(m_ePin[0]->isConnected()) ) 
-    {
-        avr_raise_irq( m_Write_stat_irq, (value>0)? 1:0 );
-        return;
-    }
-    
-    eSource::stampOutput();
-    //uint64_t cycle = m_avrProcessor->cycle;
-    //if( m_mcuStepsPT > 1 )
-    //Simulator::self()->setCircTime( cycle );
-    Simulator::self()->runExtraStep( m_avrProcessor->cycle );
 }
 
-void AVRComponentPin::set_pinVoltage( uint32_t value )
+void AVRComponentPin::pullupNotConnected( bool up )
 {
-    if( m_isInput ) return;
-    
-    if( value > 0 ) m_voltOut = m_voltHigh;
-    else            m_voltOut = m_voltLow;
-    
-    eSource::stampOutput();
-    Simulator::self()->runExtraStep( m_avrProcessor->cycle );
-    
-    //qDebug() << "\nPort" << m_port << m_id << "   estado: " << value<<m_voltHigh<<m_voltLow<<m_imp;
-}
-
-void AVRComponentPin::set_pinImpedance( uint32_t value )
-{
-    //qDebug() << "Port" << m_port << m_id << "   salida: " << (value > 0 );
-    
-    if( value > 0 )                                    // Pis is Output
-    {
-        m_isInput = false;
-        eSource::setImp( 40 );
-        if( m_ePin[0]->isConnected() && m_attached )
-            m_ePin[0]->getEnode()->remFromChangedFast(this);
-    }
-    else                                                 // Pin is Input
-    {
-        m_isInput = true;
-        eSource::setImp( high_imp );
-        if( m_ePin[0]->isConnected() && m_attached )
-            m_ePin[0]->getEnode()->addToChangedFast(this);
-    }
-    Simulator::self()->runExtraStep( m_avrProcessor->cycle );
-    //qDebug()<< m_id << "Port" << m_port << m_pinN << "   salida: " << (value and ( 1<<m_pinN ));
+    avr_raise_irq( m_Write_stat_irq, up? 1:0 );
 }
 
 void AVRComponentPin::adcread()

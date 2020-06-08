@@ -59,6 +59,7 @@ void eMosfet::resetState()
     
     m_accuracy = Simulator::self()->NLaccuracy();
 
+    m_gateV = 0;
     m_lastCurrent = 0;
     m_Vs = 0;
     m_Sfollow = false;

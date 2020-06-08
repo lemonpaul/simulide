@@ -19,7 +19,7 @@
 <!-- *                                                                         * -->
 <!-- *************************************************************************** -->
 
-<package name="pic16f627" pins="14" width="4" height="8">
+<package name="pic16f1503" pins="14" width="4" height="8">
 
     <pin side="left"  pos="1"  type="vdd"   id="VDD" label="Vdd"/>
     <pin side="left"  pos="2"  type="bidir" id="RA5" label="A5"/>

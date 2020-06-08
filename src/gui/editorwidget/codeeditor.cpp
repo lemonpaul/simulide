@@ -124,7 +124,14 @@ CodeEditor::~CodeEditor()
 
 void CodeEditor::setFile( const QString& filePath )
 {
-    if( m_debugger ) return;
+    m_isCompiled= false;
+    if( m_file == filePath ) return;
+    
+    if( m_debugger )
+    {
+        delete m_debugger;
+        m_debugger = 0l;
+    }
     
     m_outPane->appendText( "-------------------------------------------------------\n" );
     m_outPane->appendText( tr(" File: ") );
@@ -138,9 +145,7 @@ void CodeEditor::setFile( const QString& filePath )
     m_fileExt  = "."+m_fileName.split(".").last();
     m_fileName = m_fileName.remove( m_fileExt );
     
-    QDir::setCurrent(m_file);
-   
-    m_isCompiled= false;
+    QDir::setCurrent( m_file );
 
     QString sintaxPath = SIMUAPI_AppPath::self()->availableDataFilePath("codeeditor/sintax/");
 
@@ -304,7 +309,7 @@ void CodeEditor::compile()
     }
     else 
     {
-        m_outPane->writeText( "\n"+tr("     ERROR!!! Compilation Faliled")+"\n" );
+        m_outPane->writeText( "\n"+tr("     ERROR!!! Compilation Failed")+"\n" );
         
         if( error > 0 ) // goto error line number
         {
@@ -520,7 +525,7 @@ bool CodeEditor::initDebbuger()
             }*/
             setDriveCirc( m_driveCirc );
             
-            m_outPane->writeText( tr("Debbuger Started ")+"\n" );
+            m_outPane->writeText( tr("Debugger Started ")+"\n" );
             setReadOnly( true );
         }
     }
@@ -543,7 +548,7 @@ void CodeEditor::stopDebbuger()
         setReadOnly( false );
         updateScreen();
     }
-    m_outPane->writeText( tr("Debbuger Stopped ")+"\n" );
+    m_outPane->writeText( tr("Debugger Stopped ")+"\n" );
 }
 
 void CodeEditor::pause()

@@ -35,7 +35,7 @@ class RenderArea : public QWidget
         QSize minimumSizeHint() const;
         QSize sizeHint() const;
 
-        void setData( const int channel, int data );
+        void setData(const int channel, double data );
         void printData();
         void drawVmark();
          

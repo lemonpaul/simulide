@@ -18,6 +18,7 @@
  ***************************************************************************/
  
 #include "itemlibrary.h"
+#include "circuit.h"
 #include "simuapi_apppath.h"
 #include "appiface.h"
 
@@ -142,9 +143,9 @@ void ItemLibrary::loadItems()
     addItem( SwitchDip::libraryItem() );
     addItem( RelaySPST::libraryItem() );
     // Passive
-    addItem( Potentiometer::libraryItem() );
     addItem( Resistor::libraryItem() );
     addItem( ResistorDip::libraryItem() );
+    addItem( Potentiometer::libraryItem() );
     addItem( Capacitor::libraryItem() );
     addItem( elCapacitor::libraryItem() );
     addItem( Inductor::libraryItem() );
@@ -326,7 +327,8 @@ QString LibraryItem::getHelpFile( QString name )
 {
     QString help = "";
 
-    QString locale   = "_"+QLocale::system().name().split("_").first();
+    //QString locale   = "_"+QLocale::system().name().split("_").first();
+    QString locale = "_"+Circuit::self()->loc();
 
     name= name.toLower().replace( " ", "" );
     QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+locale+"/"+name+locale+".txt" );

@@ -91,16 +91,10 @@ bool PicProcessor::loadFirmware( QString fileN )
                                , tr("Could not Load: \"%1\"").arg(m_symbolFile) );
         return false;
     }
-    // Load EEPROM
-    int rom_size = m_pPicProcessor->eeprom->get_rom_size();
-    int eep_size = m_eeprom.size();
+    //m_pPicProcessor->get_Vdd();
+    m_pPicProcessor->set_Vdd( 5 );
+    setEeprom( m_eeprom ); // Load EEPROM
 
-    if( eep_size < rom_size ) rom_size = eep_size;
-
-    for( int i=0; i<rom_size; i++ )
-    {
-        m_pPicProcessor->eeprom->rom[i]->put_value( m_eeprom[i] );
-    }
     int cpi = m_pPicProcessor->get_ClockCycles_per_Instruction();
     m_ipc = 1/(double)cpi;
     m_nextCycle  = m_mcuStepsPT/cpi;
@@ -233,6 +227,23 @@ QVector<int> PicProcessor::eeprom()
 
     //m_pPicProcessor->eeprom->dump();
     return m_eeprom;
+}
+
+void PicProcessor::setEeprom( QVector<int> eep )
+{
+    m_eeprom = eep;
+
+    if( !m_pPicProcessor ) return;
+
+    int rom_size = m_pPicProcessor->eeprom->get_rom_size();
+    int eep_size = m_eeprom.size();
+
+    if( eep_size < rom_size ) rom_size = eep_size;
+
+    for( int i=0; i<rom_size; i++ )
+    {
+        m_pPicProcessor->eeprom->rom[i]->put_value( m_eeprom[i] );
+    }
 }
 
 #include "moc_picprocessor.cpp"

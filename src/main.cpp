@@ -48,7 +48,11 @@ int main(int argc, char *argv[])
     //QApplication::setGraphicsSystem( "raster" );//native, raster, opengl
     QApplication app( argc, argv );
 
+    QSettings settings( QStandardPaths::standardLocations( QStandardPaths::DataLocation).first()+"/simulide.ini",  QSettings::IniFormat, 0l );
+
     QString locale   = QLocale::system().name().split("_").first();
+    if( settings.contains( "language" ) ) locale = settings.value( "language" ).toString();
+
     QString langFile = "../share/simulide/translations/simulide_"+locale+".qm";
     
     QFile file( langFile );
@@ -59,6 +63,7 @@ int main(int argc, char *argv[])
     app.installTranslator( &translator );
 
     MainWindow window;
+    window.setLoc( locale );
     
     /*QRect screenGeometry = QApplication::desktop()->screenGeometry();
     int x = ( screenGeometry.width()-window.width() ) / 2;

@@ -82,18 +82,25 @@ void AvrCompBase::attachPins()
 
 void AvrCompBase::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
 {
-    //qDebug()<<pos<<id<<label;
-    AVRComponentPin* newPin = new AVRComponentPin( this, id, type, label, pos, xpos, ypos, angle );
-    m_pinList.append( newPin );
+    if( m_initialized )
+    {
+        updatePin( id, type, label, pos, xpos, ypos, angle );
+    }
+    else
+    {
+        //qDebug()<<pos<<id<<label;
+        AVRComponentPin* newPin = new AVRComponentPin( this, id, type, label, pos, xpos, ypos, angle );
+        m_pinList.append( newPin );
 
-    QString ty = getType( type, "adc" );
-    if( !ty.isEmpty() ) m_ADCpinList[ty.remove("adc").toInt()] = newPin;
+        QString ty = getType( type, "adc" );
+        if( !ty.isEmpty() ) m_ADCpinList[ty.remove("adc").toInt()] = newPin;
 
-    ty = getType( type, "sda" );
-    if( !ty.isEmpty() ) m_sda = newPin;
+        ty = getType( type, "sda" );
+        if( !ty.isEmpty() ) m_sda = newPin;
 
-    ty = getType( type, "scl" );
-    if( !ty.isEmpty() ) m_scl = newPin;
+        ty = getType( type, "scl" );
+        if( !ty.isEmpty() ) m_scl = newPin;
+    }
 }
 
 QString AvrCompBase::getType( QString type, QString t )

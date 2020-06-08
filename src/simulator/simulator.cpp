@@ -237,7 +237,7 @@ void Simulator::runContinuous()
     startSim();
 
     std::cout << "\n    Simulation Running... \n"<<std::endl;
-    m_timerId = this->startTimer( m_timerTick );
+    m_timerId = this->startTimer( m_timerTick, Qt::PreciseTimer );
 }
 
 void Simulator::debug( bool run )
@@ -308,6 +308,7 @@ void Simulator::startSim()
         CircuitWidget::self()->setRate( -1 );
         return;
     }
+    //for( eElement* el : m_elementList ) el->setVChanged();
     std::cout << "\nCircuit Matrix looks good" <<  std::endl;
     if( !m_paused )
     {
@@ -369,7 +370,7 @@ void Simulator::resumeSim()
     if( m_debugging ) return;
 
     std::cout << "\n    Resuming Simulation\n" << std::endl;
-    m_timerId = this->startTimer( m_timerTick );
+    m_timerId = this->startTimer( m_timerTick, Qt::PreciseTimer );
 }
 
 void Simulator::stopTimer()
@@ -388,7 +389,7 @@ void Simulator::resumeTimer()
     if( m_timerId == 0 )
     {
         m_isrunning = true;
-        m_timerId = this->startTimer( m_timerTick );
+        m_timerId = this->startTimer( m_timerTick, Qt::PreciseTimer );
     }
 }
 

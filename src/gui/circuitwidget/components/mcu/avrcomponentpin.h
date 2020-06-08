@@ -39,18 +39,25 @@ class AVRComponentPin : public McuComponentPin
     public:
         AVRComponentPin( McuComponent *mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
         ~AVRComponentPin();
-        
+
+        virtual void attach( avr_t* AvrProcessor );
+        virtual void setVChanged();
         virtual void resetState();
-        void attach( avr_t * AvrProcessor );
 
-        void setVChanged();
+        virtual void pullupNotConnected( bool up );
+        //virtual void resetOutput();
 
-        void set_pinVoltage( uint32_t value );
-        void set_pinImpedance( uint32_t value );
-        void resetOutput();
         void adcread();
-
         void enableIO( bool en );
+
+        static void ddr_hook( struct avr_irq_t* irq, uint32_t value, void* param )
+        {
+            Q_UNUSED(irq);
+            // get the pointer out of param and asign it to AVRComponentPin*
+            AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
+
+            ptrAVRComponentPin->setDirection( value>0 );
+        }
 
         static void port_hook( struct avr_irq_t* irq, uint32_t value, void* param )
         {
@@ -58,7 +65,7 @@ class AVRComponentPin : public McuComponentPin
             // get the pointer out of param and asign it to AVRComponentPin*
             AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
 
-            ptrAVRComponentPin->set_pinVoltage(value);
+            ptrAVRComponentPin->setState( value>0 );
         }
         
         static void port_reg_hook( struct avr_irq_t* irq, uint32_t value, void* param )
@@ -67,20 +74,11 @@ class AVRComponentPin : public McuComponentPin
             // get the pointer out of param and asign it to AVRComponentPin*
             AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
 
-            ptrAVRComponentPin->setPullup(value);
-        }
-
-        static void ddr_hook( struct avr_irq_t* irq, uint32_t value, void* param )
-        {
-            Q_UNUSED(irq);
-            // get the pointer out of param and asign it to AVRComponentPin*
-            AVRComponentPin * ptrAVRComponentPin = reinterpret_cast<AVRComponentPin *> (param);
-
-            ptrAVRComponentPin->set_pinImpedance(value);
+            ptrAVRComponentPin->setPullup( value>0 );
         }
 
     protected:
-        void setPullup( uint32_t value );
+        //void setPullup( uint32_t value );
 
         int  m_channel;
 

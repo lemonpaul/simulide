@@ -34,6 +34,7 @@
     <item name="DG401"  package="keys/DG401.package"  subcircuit="keys/DG401.subcircuit" info=" High-Speed CMOS Analog Switches" /> 
     <item name="DG403"  package="keys/DG403.package"  subcircuit="keys/DG403.subcircuit" info=" High-Speed CMOS Analog Switches" /> 
     <item name="DG405"  package="keys/DG405.package"  subcircuit="keys/DG405.subcircuit" info=" High-Speed CMOS Analog Switches" />     
+    <item name="L293"   package="keys/L293.package"   subcircuit="keys/L293.subcircuit"  info=" Quadruple half-H drivers" />         
     </itemset>
 
 </itemlib>

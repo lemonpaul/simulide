@@ -22,18 +22,16 @@
 
 #include "piccomponentpin.h"
 #include "piccomponent.h"
-#include "baseprocessor.h"
 #include "simulator.h"
 
-#include "stimuli.h"
-#include "ioports.h"
+//#include "stimuli.h"
+//#include "ioports.h"
 #include "pic-processor.h"
-#include "gpsim_time.h"
+//#include "gpsim_time.h"
 
 PICComponentPin::PICComponentPin( McuComponent* mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
                : McuComponentPin( mcu, id, type, label, pos, xpos, ypos, angle )
 {
-    m_pos = pos;
     m_PicProcessor  = 0l;
     m_pIOPIN        = 0l;
 }
@@ -66,6 +64,7 @@ void PICComponentPin::attach( pic_processor *PicProcessor )
         }
         m_pIOPIN = iopin;
         m_pIOPIN->setPicPin( this );
+
         if( m_pIOPIN->getType() == OPEN_COLLECTOR )
         {
             m_openColl = true;
@@ -97,76 +96,10 @@ void PICComponentPin::setVChanged()
     }
 }
 
-void PICComponentPin::update_direction( bool out )
+void PICComponentPin::pullupNotConnected( bool up )
 {
-    //qDebug() << "PICComponentPin::update_direction "<< m_id << out;
-    m_isInput = !out;
-    
-    if( out )
-    {
-        eSource::setImp( 40 );
-        if( m_ePin[0]->isConnected() && m_attached )
-            m_ePin[0]->getEnode()->remFromChangedFast(this);
-
-    }
-    else
-    {
-        eSource::setImp( high_imp );
-        if( m_ePin[0]->isConnected() && m_attached )
-            m_ePin[0]->getEnode()->addToChangedFast(this);
-    }
-    BaseProcessor::self()->p_runExtStep = true; // Run Extra Step when current Processor Step is finished
-    //Simulator::self()->runExtraStep( get_cycles().get() );
+    m_pIOPIN->set_nodeVoltage( up? 5:0);
 }
 
-void PICComponentPin::update_pullup( bool pullup )
-{
-    if( !m_isInput ) return;
-    
-    //qDebug() << "PICComponentPin::update_pullup "<< m_id << pullup;
-
-    if( pullup )                         // Activate pullup
-    {
-        eSource::setImp( 1e5 );
-        m_voltOut = m_voltHigh;
-    }
-    else                                 // Deactivate pullup
-    {
-        eSource::setImp( high_imp );
-        m_voltOut = m_voltLow;
-    }
-    if( !(m_ePin[0]->isConnected()) ) 
-    {
-        m_pIOPIN->set_nodeVoltage( pullup ? 5:0);
-        return;
-    }
-    m_ePin[0]->stampCurrent( m_voltOut/m_imp );
-
-    Simulator::self()->runExtraStep( get_cycles().get() );
-}
-
-void PICComponentPin::update_state( bool state )
-{
-    //qDebug() << "PICComponentPin::update_state "<< m_id << state << m_openColl;
-    if( !(m_ePin[0]->isConnected()) ) return;
-    if( m_isInput )  return;
-
-    if( state == m_state ) return;
-    m_state = state;
-
-    if( m_openColl )
-    {
-        if( state ) eSource::setImp( high_imp );
-        else        eSource::setImp( 40 );
-
-        eSource::stamp();
-    }
-    else
-    {
-        eSource::setOut( state );
-        eSource::stampOutput();
-    }
-    Simulator::self()->runExtraStep( get_cycles().get() );
-}
 
 #include "moc_piccomponentpin.cpp"

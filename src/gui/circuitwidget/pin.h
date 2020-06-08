@@ -69,9 +69,7 @@ class MAINMODULE_EXPORT Pin : public QObject, public QGraphicsItem, public ePin
         void moveBy( int dx, int dy );
 
         void reset();
-        
-        //void findNodePins();
-        //void findConnectedPins();
+
         void registerPins( eNode* enode );
         void registerPinsW( eNode* enode );
         

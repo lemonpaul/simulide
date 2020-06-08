@@ -41,10 +41,19 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
     Q_PROPERTY( bool Animate          READ animate    WRITE setAnimate    DESIGNABLE true USER true )
     Q_PROPERTY( double Font_Scale     READ fontScale  WRITE setFontScale  DESIGNABLE true USER true )
     Q_PROPERTY( int  Auto_Backup_Secs READ autoBck    WRITE setAutoBck    DESIGNABLE true USER true )
+    Q_PROPERTY( Langs Language        READ lang       WRITE setLang       DESIGNABLE true USER true )
+    Q_ENUMS( Langs )
 
     public:
         Circuit( qreal x, qreal y, qreal width, qreal height, QGraphicsView*  parent );
         ~Circuit();
+
+        enum Langs {
+            English = 0,
+            French,
+            Russian,
+            Spanish
+        };
 
  static Circuit* self() { return m_pSelf; }
         
@@ -71,6 +80,12 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
 
         int autoBck();
         void setAutoBck( int secs );
+
+        Langs lang() { return m_lang; }
+        void setLang( Langs lang );
+
+        QString loc();
+        void setLoc( QString loc );
         
         void removeItems();
         void removeComp( Component* comp );
@@ -93,6 +108,7 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
 
         void newconnector( Pin*  startpin );
         void closeconnector( Pin* endpin );
+        void deleteNewConnector();
         void updateConnectors();
         Connector* getNewConnector() { return new_connector; }
 
@@ -147,6 +163,8 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         void convertSubCircs();
 
  static Circuit*  m_pSelf;
+
+        Langs m_lang;
  
         QDomDocument m_domDoc;
         QDomDocument m_copyDoc;

@@ -130,14 +130,18 @@ bool EditorWindow::save()
 bool EditorWindow::saveAs()
 {
     CodeEditor* ce = getCodeEditor();
-    QFileInfo fi = QFileInfo(ce->getFilePath());
-    QString ext = fi.suffix();
+
+    QFileInfo fi = QFileInfo( ce->getFilePath() );
+    QString ext  = fi.suffix();
+    QString path = fi.absolutePath();
+    if( path == "" ) path = m_lastDir;
+    //qDebug() << "EditorWindow::saveAs" << path;
 
     QString extensions = "";
     if( ext == "" ) extensions = tr("All files")+" (*);;Arduino (*.ino);;Asm (*.asm);;GcBasic (*.gcb)";
     else            extensions = "."+ext+"(*."+ext+");;"+tr("All files")+" (*.*)";
 
-    QString fileName = QFileDialog::getSaveFileName( this, tr("Save Document As"), m_lastDir, extensions );
+    QString fileName = QFileDialog::getSaveFileName( this, tr("Save Document As"), path, extensions );
     if( fileName.isEmpty() ) return false;
 
     m_fileList.replace( m_docWidget->currentIndex(), fileName );

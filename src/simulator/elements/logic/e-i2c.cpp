@@ -294,7 +294,7 @@ void eI2C::setEnabled( bool en )
         m_clockPin->setOut( false );
         m_clockPin->setImp( high_imp );
     }
-    qDebug() << "eI2C::setEnabled"<<m_enabled<<m_master;
+    //qDebug() << "eI2C::setEnabled"<<m_enabled<<m_master;
 }
 
 void eI2C::setMaster( bool m )

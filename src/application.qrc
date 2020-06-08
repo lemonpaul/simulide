@@ -66,6 +66,9 @@
         <file alias="diode.png">../src/icons/components/diode.png</file>
         <file alias="probe.png">../src/icons/components/probe.png</file>
         <file alias="resistor.png">../src/icons/components/resistor.png</file>
+        <file alias="varresistor.png">../src/icons/components/varresistor.png</file>
+        <file alias="termistor.png">../src/icons/components/termistor.png</file>
+        <file alias="ldr.png">../src/icons/components/ldr.png</file>
         <file alias="voltage.png">../src/icons/components/voltage.png</file>
         <file alias="ic2.png">../src/icons/components/ic2.png</file>
         <file alias="subc.png">../src/icons/components/subc.png</file>
@@ -93,7 +96,6 @@
         <file alias="hd44780.png">../src/icons/components/hd44780.png</file>
         <file alias="ssd1306.png">../src/icons/components/ssd1306.png</file>
         <file alias="mosfet.png">../src/icons/components/mosfet.png</file>
-        <file alias="steeper.png">../src/icons/components/steeper.png</file>
         <file alias="clock.png">../src/icons/components/clock.png</file>
         <file alias="resistordip.png">../src/icons/components/resistordip.png</file>
         <file alias="ledbar.png">../src/icons/components/ledbar.png</file>
@@ -102,7 +104,9 @@
         <file alias="voltimeter.png">../src/icons/components/voltimeter.png</file>
         <file alias="amperimeter.png">../src/icons/components/amperimeter.png</file>
         <file alias="frequencimeter.png">../src/icons/components/frequencimeter.png</file>
+        <file alias="dcmotor.png">../src/icons/components/dcmotor.png</file>
         <file alias="servo.png">../src/icons/components/servo.png</file>
+        <file alias="steeper.png">../src/icons/components/steeper.png</file>
         <file alias="relay-spst.png">../src/icons/components/relay-spst.png</file>
         <file alias="voltreg.png">../src/icons/components/voltreg.png</file>
         <file alias="bjt.png">../src/icons/components/bjt.png</file>
@@ -142,6 +146,8 @@
         <file alias="leonardo.png">../src/icons/components/leonardo.png</file>
         <file alias="mega.png">../src/icons/components/mega.png</file>
         <file alias="sr04.png">../src/icons/components/sr04.png</file>
+        
+        <file alias="shield_uno.png">../src/icons/components/shield_uno.png</file>
         
         <file alias="blanc.png">../src/icons/components/blanc.png</file>
         <file alias="font2.png">../src/icons/font/font2.png</file>

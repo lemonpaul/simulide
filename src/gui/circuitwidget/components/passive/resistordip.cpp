@@ -133,6 +133,7 @@ void ResistorDip::setResist( double r )
     bool pauseSim = Simulator::self()->isRunning();
     if( pauseSim )  Simulator::self()->pauseSim();
     
+    if( r == 0 ) r = 0.001;
     Component::setValue( r );       // Takes care about units multiplier
     
     setRes( m_value*m_unitMult );

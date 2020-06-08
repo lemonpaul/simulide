@@ -51,7 +51,8 @@ class AvrProcessor : public BaseProcessor
 
         int getRamValue( int address );
 
-        QVector<int> eeprom();
+        virtual QVector<int> eeprom();
+        virtual void setEeprom( QVector<int> eep );
         
         avr_t* getCpu() { return m_avrProcessor; }
         void setCpu( avr_t* avrProc ) { m_avrProcessor = avrProc; }

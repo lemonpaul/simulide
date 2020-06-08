@@ -49,8 +49,8 @@ class MAINMODULE_EXPORT Chip : public Component, public eElement
         virtual void addPin( QString id, QString type, QString label,
                              int pos, int xpos, int ypos, int angle );
         
-        //virtual void updatePin( QString id, QString type, QString label,
-        //                     int pos, int xpos, int ypos, int angle );
+        virtual void updatePin( QString id, QString type, QString label,
+                                int pos, int xpos, int ypos, int angle ){;}
 
         virtual void initChip();
 

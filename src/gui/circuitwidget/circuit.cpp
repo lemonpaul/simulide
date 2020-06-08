@@ -29,6 +29,8 @@
 #include "node.h"
 #include "utils.h"
 
+#include <QCoreApplication>
+
 static const char* Circuit_properties[] = {
     QT_TRANSLATE_NOOP("App::Property","Speed"),
     QT_TRANSLATE_NOOP("App::Property","ReactStep"),
@@ -96,6 +98,35 @@ Circuit::~Circuit()
         if( !file.exists() ) return;
         QFile::remove( m_backupPath ); // Remove backup file
     }
+}
+
+void Circuit::setLang( Langs lang )
+{
+    if( lang == m_lang ) return;
+    m_lang = lang;
+
+    MainWindow::self()->settings()->setValue( "language", loc() );
+}
+
+QString Circuit::loc()
+{
+    QString locale = "_en";
+    if     ( m_lang == French )  locale = "fr";
+    else if( m_lang == Russian ) locale = "ru";
+    else if( m_lang == Spanish ) locale = "es";
+
+    return locale;
+}
+
+void Circuit::setLoc( QString loc )
+{
+    Langs lang = English;
+
+    if     ( loc == "fr" ) lang = French;
+    else if( loc == "ru" ) lang = Russian;
+    else if( loc == "es" ) lang = Spanish;
+
+    m_lang = lang;
 }
 
 QString Circuit::getCompId( QString name )
@@ -958,6 +989,15 @@ void Circuit::closeconnector( Pin* endpin )
     new_connector->closeCon( endpin, /*connect=*/true );
 }
 
+void Circuit::deleteNewConnector()
+{
+    if( m_con_started )
+    {
+        new_connector->remove();
+        m_con_started = false;
+    }
+}
+
 void Circuit::updateConnectors()
 {
     for( Component* comp : m_conList )
@@ -1099,7 +1139,8 @@ void Circuit::createSubcircuit()
             if( property.isUser() )
             {
                 QString name = property.name();
-                
+                if( name.startsWith("_1") ) continue;  //BcdToDec 16Bits property breaks DomDocument
+
                 if( !name.contains( "Show" ) 
                  && !name.contains( "Unit" ) 
                  && !name.contains( "itemtype" ) )
@@ -1360,13 +1401,7 @@ void Circuit::mouseReleaseEvent( QGraphicsSceneMouseEvent* event )
     }
     else if( event->button() == Qt::RightButton )
     {
-        if( m_con_started )
-        {
-            event->accept();
-            new_connector->remove();
-            m_con_started = false;
-        }
-        else QGraphicsScene::mouseReleaseEvent( event );
+        if( !m_con_started ) QGraphicsScene::mouseReleaseEvent( event );
     }
 }
 
@@ -1476,7 +1511,8 @@ void Circuit::drawBackground ( QPainter*  painter, const QRectF & rect )
 {
     Q_UNUSED( rect );
     /*painter->setBrush(QColor( 255, 255, 255 ) );
-    painter->drawRect( m_scenerect );*/
+    painter->drawRect( m_scenerect );
+    return;*/
 
     painter->setBrush( QColor( 240, 240, 210 ) );
     painter->drawRect( m_scenerect );

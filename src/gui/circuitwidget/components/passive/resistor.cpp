@@ -99,3 +99,4 @@ void Resistor::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidg
 }
 
 #include "moc_resistor.cpp"
+

@@ -51,7 +51,8 @@ class PicProcessor : public BaseProcessor
 
         void uartIn( int uart, uint32_t value );
 
-        QVector<int> eeprom();
+        virtual QVector<int> eeprom();
+        virtual void setEeprom( QVector<int> eep );
         
         pic_processor* getCpu() { return m_pPicProcessor; }
 

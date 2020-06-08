@@ -603,7 +603,9 @@ QString SubPackage::pinEntry( Pin* pin, int pP, QString side )
 
 void SubPackage::loadPackage()
 {
-    const QString dir = m_pkgeFile;
+    QDir pkgDir = QFileInfo( Circuit::self()->getFileName() ).absoluteDir();
+    QString dir = pkgDir.absoluteFilePath( m_pkgeFile );
+    
     QString fileName = QFileDialog::getOpenFileName( 0l, tr("Load Package File"), dir,
                        tr("Packages (*.package);;All files (*.*)"));
 

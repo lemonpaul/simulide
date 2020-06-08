@@ -38,23 +38,33 @@ class MAINMODULE_EXPORT McuComponentPin : public QObject, public eSource
         virtual void resetState();
         void terminate();
 
+        void setDirection( bool out );
+        void setState( bool state );
+        void setOutput( bool state );
+        void setPullup(bool up );
+
+        virtual void pullupNotConnected( bool up )=0;
+        virtual void resetOutput();
+
         void move( int dx, int dy );
-        
-        void resetOutput();
-        
         int angle() { return m_angle;}
         
         QString ptype() { return m_type; }
+        QString id() { return m_id; }
 
     protected:
         McuComponent* m_mcuComponent;
+
+        double m_inputImp;
         
         bool m_attached;
         bool m_isInput;
         bool m_openColl;
+        bool m_state;
         
         char m_port;
         int  m_pinN;
+        int  m_pos;
 
         int m_pinType;
         int m_angle;
@@ -64,5 +74,4 @@ class MAINMODULE_EXPORT McuComponentPin : public QObject, public eSource
 };
 
 #endif
-
 

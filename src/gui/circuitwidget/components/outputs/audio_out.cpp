@@ -103,12 +103,14 @@ AudioOut::AudioOut( QObject* parent, QString type, QString id )
     m_dataSize = 2*refreshPeriod*sampleRate/1000;
     
     m_dataBuffer = new char[ m_dataSize ];
-    m_audioOutput->setBufferSize( m_dataSize );
+    m_audioOutput->setBufferSize( 2*m_dataSize );
+
+    //qDebug() << "AudioOut::AudioOut" << m_audioOutput->notifyInterval();
     
-    m_audioOutput->setNotifyInterval( refreshPeriod ); 
+    //m_audioOutput->setNotifyInterval( refreshPeriod );
     
-    connect( m_audioOutput, SIGNAL( notify() ),
-             this,          SLOT(   OnAudioNotify() ));
+    //connect( m_audioOutput, SIGNAL( notify() ),
+    //         this,          SLOT(   OnAudioNotify() ));
 
     resetState();
 }

@@ -53,3 +53,4 @@ class MAINMODULE_EXPORT Resistor : public Component, public eResistor
 };
 
 #endif
+

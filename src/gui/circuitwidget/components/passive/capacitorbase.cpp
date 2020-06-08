@@ -66,7 +66,7 @@ double CapacitorBase::capac() { return m_value; }
 
 void CapacitorBase::setCapac( double c ) 
 { 
-    if( c < 1e-12 ) c = 1e-12;
+    if( c == 0 ) c = 0.001;
     
     Component::setValue( c );       // Takes care about units multiplier
     eCapacitor::setCap( m_value*m_unitMult );

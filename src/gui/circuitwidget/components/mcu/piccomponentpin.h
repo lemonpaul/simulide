@@ -33,22 +33,13 @@ class PICComponentPin : public McuComponentPin
         PICComponentPin( McuComponent *mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
         ~PICComponentPin();
 
-        void attach( pic_processor *PicProcessor );
-        
-        void setVChanged();
-        void resetOutput();
-        
-        // GpSim Interface
-        void update_direction( bool out );
-        void update_state( bool state );
-        void update_pullup( bool pullup );
+        virtual void attach( pic_processor *PicProcessor );
+        virtual void setVChanged();
+
+        virtual void pullupNotConnected( bool up );
+        //virtual void resetOutput();
 
     protected:
-        char m_port;
-        int  m_pinN;
-        int  m_pos;
-
-        bool m_state;
 
         pic_processor* m_PicProcessor;
         IOPIN*         m_pIOPIN;

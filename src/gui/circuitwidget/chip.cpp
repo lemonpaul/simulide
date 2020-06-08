@@ -52,7 +52,7 @@ Chip::~Chip() {}
 void Chip::initChip()
 {
     //qDebug() << "Chip::initChip m_pkgeFile"<<m_pkgeFile;
-    m_initialized = true;
+
     m_error = 0;
 
     QDir circuitDir = QFileInfo( Circuit::self()->getFileName() ).absoluteDir();
@@ -102,6 +102,7 @@ void Chip::initChip()
     
     for( Pin* pin : m_pin )
     {
+        if( !pin ) continue;
         if( pin->connector() ) pin->connector()->remove();
         if( pin->scene() ) Circuit::self()->removeItem( pin );
         pin->reset();
@@ -176,6 +177,7 @@ void Chip::initChip()
         }
         node = node.nextSibling();
     }
+    m_initialized = true;
 }
 
 void Chip::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
@@ -203,49 +205,6 @@ void Chip::addPin( QString id, QString type, QString label, int pos, int xpos, i
     m_ePin[pos-1] = pin;
     m_pin[pos-1]  = pin;
 }
-
-/*void Chip::updatePin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
-{
-    Pin* pin = m_pin[pos-1]; // pos in package starts at 1
-
-    pin->setLabelText( label );
-    pin->setPos( QPoint(xpos, ypos) );
-    
-    int oldAngle = pin->pinAngle();
-    if( angle != oldAngle )
-    {
-        if     ( oldAngle == 0 )   m_rigPin.removeOne( pin );
-        else if( oldAngle == 90 )  m_topPin.removeOne( pin );
-        else if( oldAngle == 180 ) m_lefPin.removeOne( pin );
-        else if( oldAngle == 270 ) m_botPin.removeOne( pin );
-        
-        if     ( angle == 0 )   m_rigPin.append( pin );
-        else if( angle == 90 )  m_topPin.append( pin );
-        else if( angle == 180 ) m_lefPin.append( pin );
-        else if( angle == 270 ) m_botPin.append( pin );
-    }
-    
-    pin->setPinAngle( angle );
-    pin->setLabelPos();
-    
-    if( type == "inverted" ) pin->setInverted( true );
-    else                     pin->setInverted( false );
-    
-    if( type == "unused" )   pin->setUnused( true );
-    else                     pin->setUnused( false );
-
-    if( type == "null" )
-    {
-        pin->setVisible( false );
-        pin->setLabelText( "" );
-    }
-    else pin->setVisible( true );
-   
-    if( m_isLS ) pin->setLabelColor( QColor( 0, 0, 0 ) );
-    else                  pin->setLabelColor( QColor( 250, 250, 200 ) );
-    
-    pin->isMoved();
-}*/
 
 bool Chip::logicSymbol()
 {

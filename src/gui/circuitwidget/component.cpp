@@ -66,7 +66,10 @@ Component::Component( QObject* parent, QString type, QString id )
 
         if( li )
         {
-            if( type == "Subcircuit" )
+            if( (type == "Subcircuit")
+              ||(type == "AVR")
+              ||(type == "PIC")
+              ||(type == "Arduino") )
             {
                 QString name = id;
                 name = name.split( "-" ).first();
@@ -396,6 +399,11 @@ void Component::setValue( double val)
             index++;
             m_unitMult = m_unitMult/1000;
             val = val*1000;
+        }
+        if( index > 8 )
+        {
+            index = 8;
+            val = val/1000;
         }
         m_mult = multUnits.at( index );
         if( m_mult != " " ) m_mult.prepend( " " );

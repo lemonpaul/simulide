@@ -70,7 +70,7 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
         virtual RamTable* getRamTable() { return m_ramTable; }
 
         virtual QVector<int> eeprom()=0;
-        virtual void setEeprom( QVector<int> eep );
+        virtual void setEeprom( QVector<int> eep )=0;
         
         virtual void setRegisters();
 

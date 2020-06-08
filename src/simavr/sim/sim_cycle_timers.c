@@ -55,7 +55,8 @@ avr_cycle_timer_reset(
 	avr_cycle_timer_pool_t * pool = &avr->cycle_timers;
 	memset(pool, 0, sizeof(*pool));
 	// queue all slots into the free queue
-	for (int i = 0; i < MAX_CYCLE_TIMERS; i++) {
+    for( int i = 0; i < MAX_CYCLE_TIMERS; i++ )
+    {
 		avr_cycle_timer_slot_p t = &pool->timer_slots[i];
 		QUEUE(pool->timer_free, t);
 	}
@@ -72,6 +73,7 @@ avr_cycle_timer_return_sleep_run_cycles_limited(
 	//	this is not an error!..  unless you like deadlock.
 	avr_cycle_count_t run_cycle_count = ((avr->run_cycle_limit >= sleep_cycle_count) ?
 		sleep_cycle_count : avr->run_cycle_limit);
+
 	avr->run_cycle_count = run_cycle_count ? run_cycle_count : 1;
 
 	// sleep cycles are returned unbounded thus preserving original behavior.
@@ -85,14 +87,11 @@ avr_cycle_timer_reset_sleep_run_cycles_limited(
 	avr_cycle_timer_pool_t * pool = &avr->cycle_timers;
 	avr_cycle_count_t sleep_cycle_count = DEFAULT_SLEEP_CYCLES;
 
-	if(pool->timer) {
-		if(pool->timer->when > avr->cycle) {
-			sleep_cycle_count = pool->timer->when - avr->cycle;
-		} else {
-			sleep_cycle_count = 0;
-		}
+    if( pool->timer )
+    {
+        if(pool->timer->when > avr->cycle) sleep_cycle_count = pool->timer->when - avr->cycle;
+        else sleep_cycle_count = 0;
 	}
-
 	avr_cycle_timer_return_sleep_run_cycles_limited(avr, sleep_cycle_count);
 }
 
@@ -123,9 +122,10 @@ avr_cycle_timer_insert(
 
 	// find its place in the list
 	avr_cycle_timer_slot_p loop = pool->timer, last = NULL;
-	while (loop) {
-		if (loop->when > when)
-			break;
+    while( loop )
+    {
+        if( loop->when > when ) break;
+
 		last = loop;
 		loop = loop->next;
 	}
@@ -144,7 +144,8 @@ avr_cycle_timer_register(
 	// remove it if it was already scheduled
 	avr_cycle_timer_cancel(avr, timer, param);
 
-	if (!pool->timer_free) {
+    if (!pool->timer_free)
+    {
 		AVR_LOG(avr, LOG_ERROR, "CYCLE: %s: pool is full (%d)!\n", __func__, MAX_CYCLE_TIMERS);
 		return;
 	}
@@ -172,8 +173,10 @@ avr_cycle_timer_cancel(
 
 	// find its place in the list
 	avr_cycle_timer_slot_p t = pool->timer, last = NULL;
-	while (t) {
-		if (t->timer == timer && t->param == param) {
+    while (t)
+    {
+        if (t->timer == timer && t->param == param)
+        {
 			DETACH(pool->timer, last, t);
 			QUEUE(pool->timer_free, t);
 			break;
@@ -198,8 +201,10 @@ avr_cycle_timer_status(
 
 	// find its place in the list
 	avr_cycle_timer_slot_p t = pool->timer;
-	while (t) {
-		if (t->timer == timer && t->param == param) {
+    while (t)
+    {
+        if (t->timer == timer && t->param == param)
+        {
 			return 1 + (t->when - avr->cycle);
 		}
 		t = t->next;
@@ -218,7 +223,8 @@ avr_cycle_timer_process(
 {
 	avr_cycle_timer_pool_t * pool = &avr->cycle_timers;
 
-	if (pool->timer) do {
+    if (pool->timer) do
+    {
 		avr_cycle_timer_slot_p t = pool->timer;
 		avr_cycle_count_t when = t->when;
 
@@ -228,7 +234,8 @@ avr_cycle_timer_process(
 		// detach from active timers
 		pool->timer = t->next;
 		t->next = NULL;
-		do {
+        do
+        {
 			avr_cycle_count_t w = t->timer(avr, when, t->param);
 			// make sure the return value is either zero, or greater
 			// than the last one to prevent infinite loop here

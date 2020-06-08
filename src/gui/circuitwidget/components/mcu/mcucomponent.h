@@ -26,6 +26,8 @@
 #include "memdata.h"
 #include <QtSerialPort/QSerialPort>
 
+#include "shield.h"
+
 class BaseProcessor;
 class McuComponentPin;
 
@@ -94,7 +96,12 @@ class MAINMODULE_EXPORT McuComponent : public Chip, public MemData
         
         virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
-        virtual void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )=0;
+        virtual void addPin( QString id, QString type, QString label,
+                             int pos, int xpos, int ypos, int angle )=0;
+
+        virtual void updatePin( QString id, QString type, QString label,
+                                int pos, int xpos, int ypos, int angle );
+
         virtual void attachPins()=0;
 
         BaseProcessor* m_processor;
@@ -109,5 +116,9 @@ class MAINMODULE_EXPORT McuComponent : public Chip, public MemData
         QString m_lastFirmDir;  // Last firmware folder used
 
         QList<McuComponentPin*> m_pinList;
+
+        Shield* m_shield;
+
+    friend class Shield;
 };
 #endif

@@ -80,7 +80,8 @@ Inductor::~Inductor(){}
 double Inductor::induc() { return m_value; }
 
 void Inductor::setInduc( double i ) 
-{     
+{
+    if( i == 0 ) i = 0.001;
     Component::setValue( i );       // Takes care about units multiplier
     eInductor::setInd( m_value*m_unitMult );
 }

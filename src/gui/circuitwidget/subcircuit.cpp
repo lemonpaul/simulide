@@ -58,6 +58,9 @@
 #include "e-source.h"
 #include "e-volt_reg.h"
 
+//#include "mcucomponent.h"
+//#include "hd44780.h"
+
 Component* SubCircuit::construct( QObject* parent, QString type, QString id )
 { 
     SubCircuit* subCircuit = new SubCircuit( parent, type,  id ); 
@@ -88,6 +91,8 @@ SubCircuit::SubCircuit( QObject* parent, QString type, QString id )
 
     QString compName = m_id.split("-").first(); // for example: "atmega328-1" to: "atmega328"
     QString dataFile = ComponentSelector::self()->getXmlFile( compName );
+
+    qDebug()<<"SubCircuit::SubCircuit"<<dataFile;
 
     if( dataFile == "" )
     {
@@ -223,6 +228,16 @@ void SubCircuit::initSubcircuit()
 
             eElement* ecomponent = 0l;
 
+            /*if( type == "eHd44780" )
+            {
+                Hd44780* hd = new Hd44780( this, "Hd44780", "Hd44780-"+Circuit::self()->newSceneId() );
+                hd->setParentItem( this );
+                hd->setPos( 0,0 );
+                Circuit::self()->addItem( hd );
+                Circuit::self()->compList()->removeOne( hd );
+                ecomponent = hd;
+
+            }*/
             if( type == "eResistor" )  
             {
                 eResistor* eresistor = new eResistor( id.toStdString() );
@@ -312,7 +327,7 @@ void SubCircuit::initSubcircuit()
                 }
                 ecomponent = elatchd;
             }
-            else if( type == "eBinCounter" )
+            else if( (type == "eCounter") || (type == "eBinCounter") )
             {
                 int maxValue = 1;
                 if( element.hasAttribute("maxValue") ) maxValue  = element.attribute( "maxValue" ).toInt();
@@ -526,6 +541,16 @@ void SubCircuit::initSubcircuit()
                     eCapacitor* ecapacitor = static_cast<eCapacitor*>(ecomponent);
                     ecapacitor->setCap( element.attribute( "capacitance" ).toDouble() );
                 }
+                if( element.hasAttribute("inputHighV") )
+                {
+                    eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                    elogicdevice->setInputHighV( element.attribute( "inputHighV" ).toDouble() );
+                }
+                if( element.hasAttribute("inputLowV") )
+                {
+                    eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
+                    elogicdevice->setInputLowV( element.attribute( "inputLowV" ).toDouble() );
+                }
                 if( element.hasAttribute("outHighV") )
                 {
                     eLogicDevice* elogicdevice = static_cast<eLogicDevice*>(ecomponent);
@@ -645,7 +670,7 @@ void SubCircuit::initSubcircuit()
 }
 
 void SubCircuit::connectEpin( ePin* epin, QString connetTo )
-{//qDebug() << "\nSubCircuit::connectEpin"<<QString::fromStdString( epin->getId() ) << connetTo << m_numpins;
+{
     if( connetTo.startsWith("eNode") )
     {
         int eNodeNum = connetTo.remove("eNode").toInt();
@@ -702,8 +727,9 @@ void SubCircuit::connectEpin( ePin* epin, QString connetTo )
 
 void SubCircuit::initialize()
 {
-    for( int i=0; i<m_numpins; i++ )        // get eNode for each package pin
-    {                                       // and assing to connected subcircuit ePins
+    //qDebug() << "SubCircuit::initialize()";
+    for( int i=0; i<m_numpins; i++ )        // create internal enodes for not connected package pins
+    {
         eNode* enod = m_ePin[i]->getEnode();
         
         if( enod ) continue;
@@ -723,22 +749,23 @@ void SubCircuit::initialize()
                 //qDebug() << "SubCircuit::initialize() New eNode:" << QString::fromStdString( m_ePin[i]->getId() );
             }
         }
-        //qDebug() << "SubCircuit::initialize() Pin"<< QString::fromStdString( m_ePin[i]->getId() )<< enod->itemId();
+        //qDebug() << "SubCircuit::initialize() Pin"<< QString::fromStdString( m_ePin[i]->getId() );//<< enod->itemId();
     }
 }
 
 void SubCircuit::attach()
 {
+    qDebug() << "SubCircuit::attach()";
     for( int i=0; i<m_numpins; i++ )        // get eNode for each package pin
     {                                       // and assing to connected subcircuit ePins
         eNode* enod = m_ePin[i]->getEnode();
         if( !enod ) continue;
 
-        //qDebug() << "SubCircuit::initialize() Pin"<< QString::fromStdString( m_ePin[i]->getId() )<< enod->itemId();
+        qDebug() << "SubCircuit::attach() Pin"<< QString::fromStdString( m_ePin[i]->getId() )<< enod->itemId();
         for( ePin* epin : m_pinConections[i] )
         {
             //if( epin->getEnode() ) break;
-            //qDebug() << "SubCircuit::stamp()"<< QString::fromStdString( epin->getId() )<<enod;
+            qDebug() << "SubCircuit::attach()"<< QString::fromStdString( epin->getId() )<<enod;
             epin->setEnode(enod);
         }
     }
@@ -765,7 +792,7 @@ void SubCircuit::setLogicSymbol( bool ls )
 
 void SubCircuit::clear()
 {
-    for( int i=0; i<m_numpins; i++ )
+    for( int i=0; i<m_pinConections.size(); i++ )
     {
         for( ePin* epin : m_pinConections[i] ) epin->setEnode(0l);
     }

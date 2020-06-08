@@ -143,7 +143,7 @@ void PlotterWidget::step()
     m_rArea->printData();
 }
 
-void PlotterWidget::setData( int channel, int data )
+void PlotterWidget::setData( int channel, double data )
 {
     channel--;
     if( data == m_data[channel] ) return;
@@ -152,18 +152,21 @@ void PlotterWidget::setData( int channel, int data )
     vf = vf/100;
     QString volt;
     volt.setNum( vf );
-    if( !volt.contains(".") ) volt.append(".00");
+
+    if     ( !volt.contains(".") )                  volt.append(".00");
     else if( volt.split(".").last().length() == 1 ) volt.append("0");
+
     volt.append( " V" );
     m_chanLabel[channel]->setText( volt );   // Update volt Label
-    if( data>m_maxVolt || data<m_minVolt ) data = 1e9;
+
+    //if( data>m_maxVolt || data<m_minVolt ) data = 1e9;
     m_data[channel] = data;
     //setRenderData( channel, data );
 }
 
-void PlotterWidget::setRenderData( int channel, int data )
+void PlotterWidget::setRenderData( int channel, double data )
 {
-    int renderData = data*1000/(m_maxVolt-m_minVolt)-m_offset;
+    double renderData = data*1000/(m_maxVolt-m_minVolt)-m_offset;
     renderData /= m_numTracks;
 
     if( m_numTracks == 2 )

@@ -113,6 +113,16 @@ void MainWindow::writeSettings()
     FileWidget::self()->writeSettings();
 }
 
+QString MainWindow::loc()
+{
+    return Circuit::self()->loc();
+}
+
+void MainWindow::setLoc(QString loc )
+{
+    Circuit::self()->setLoc( loc );
+}
+
 int MainWindow::autoBck()
 {
     return m_autoBck;

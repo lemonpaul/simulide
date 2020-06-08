@@ -593,6 +593,22 @@
         <source>Package File</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>RPM Nominal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volt Nominal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max Resistance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Min Resistance</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Arduino</name>
@@ -1266,6 +1282,17 @@ a DomDocument</translation>
     </message>
 </context>
 <context>
+    <name>DcMotor</name>
+    <message>
+        <source>Dc Motor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Outputs</source>
+        <translation type="unfinished">Salidas</translation>
+    </message>
+</context>
+<context>
     <name>DecToBcd</name>
     <message>
         <source>Dec. To Bcd</source>
@@ -1877,6 +1904,17 @@ Quiere guardar los cambios?</translation>
     <message>
         <source>Logic/Memory</source>
         <translation>Logica/Memoria</translation>
+    </message>
+</context>
+<context>
+    <name>Ldr</name>
+    <message>
+        <source>LDR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="unfinished">Pasivos</translation>
     </message>
 </context>
 <context>
@@ -2809,6 +2847,17 @@ Quiere guardar los cambios?
     </message>
 </context>
 <context>
+    <name>Termistor</name>
+    <message>
+        <source>Termistor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="unfinished">Pasivos</translation>
+    </message>
+</context>
+<context>
     <name>TextComponent</name>
     <message>
         <source>Text</source>
@@ -2817,6 +2866,17 @@ Quiere guardar los cambios?
     <message>
         <source>Other</source>
         <translation>Otros</translation>
+    </message>
+</context>
+<context>
+    <name>VarResistor</name>
+    <message>
+        <source>Variable Resistor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="unfinished">Pasivos</translation>
     </message>
 </context>
 <context>

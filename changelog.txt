@@ -76,6 +76,15 @@ New Features:
     - PcLink Feature deleted.
     - Serial Port: Auto Open property.
     
+  SR1:
+    - Mcu Logic Symbol enabled.
+    - Some AVR Logic Symbols (Sergey Roenko)
+    - Mcu Help Files enabled.
+    - Some AVR Help files (Sergey Roenko)
+    - Gui French translation (Pascal Cotret)
+    - Change Language: Circuit->Properties.
+  
+    
 Bug Fixes:
   RC1:
     - Crash hovering some external object over circuit canvas.
@@ -171,7 +180,41 @@ Bug Fixes:
     - Pic18F4420 missing data file.
     - Servo: Redraw probrems.
     
-New Components:
+  SR1:
+    - Mosfet animation not updating after Power-Off.
+    - Editor: SaveAs should take current file instead of last file.
+    - Editor: SaveAs+Modify+Compile takes old fileName.
+    - Crash Setting values < 1 pico 
+    - Passive Components: should not accept value = 0.
+    - Atmega32u4: Pwm not working.
+    - Atmega32u4: Duplicated Pin D4. (Sergey Roenko)
+    - Atmega64: Wrong Pin20, should be reset. (Sergey Roenko)
+    - Mcu eeprom: error loading data files.
+    - Pic mcu: error reading opencollector pins as input.
+    
+  SR2:
+    - Atmega32u4: Fast PWM on pin OC1C doesn't work for timer 1.
+    - Audio Output: cracking sounds.
+    - Volt. Regulator not working in some cases.
+    - PIC16F505 wrong package.
+    - Counter not working in Subcircuits.
+    - Crash deleting a subcircuit that fails to load .subcircuit file.
+    - Gates sometimes fail to restart after power-off (inverter oscillator example).
+    - SubPackage->LoadPackage fails to set proper default path in some cases.
+    - Logic Devices: Input HighV & LowV not working in Subcircuits.
+    - Windows can only reach 80% simulation speed.
+    - Windows cancel wire by right-click shows context menu.
+    - Drag & drop files not workingin windows.
+    - Editor: some grammatical errors.
+    - Frequencimeter: Wrong value at Circuit speed > 1 MHz.
+    - Plotter not showing small signals properly ( < 0.1 V ).
+    - Mcu: Setting Pin direction can miss previous Pin state.
+    - Mcu: Pullups not working depending on Pin direction set order.
+    - BcdToDec not working in subcircuits.
+    - Editor: asm type not recognized after modify and save.
+    
+    
+    New Components:
   RC1:
   RC2:
   RC3:
@@ -211,4 +254,19 @@ New Components:
         Ternary_AND, Ternary_Buffer, Ternary_Multiplexer, Ternary_NAND
         Ternary_NOR, Ternary_NOT. Ternary_OR
         
-        
+  SR2:
+    - IC74 (Sergey Roenko)
+        74C925, 74C926, 74C927, 74HC51, 74HC594, 74HC597, 74HC4016, 74LS54, 74XX45, 
+        74XX46, 74XX48, 74XX49, 74XX54, 74XX55, 74XX56, 74XX57, 74XX64, 74XX65, 
+        74XX68, 74XX69, 74XX70, 74XX72, 74XX82, 74XX83, 74XX114, 74XX141, 74XX145, 
+        74XX156, 74XX159, 74XX168, 74XX169, 74XX171, 74XX180, 74XX240, 74XX242, 
+        74XX243, 74XX244, 74XX246, 74XX248, 74XX249, 74XX276, 74XX280, 74XX295, 
+        74XX299, 74XX323, 74XX365, 74XX366, 74XX367, 74XX368, 74XX376, 74XX378, 
+        74XX379, 74XX395, 74XX540, 74XX541, 74XX591, 74XX682, 74XX684.
+      
+    - ICCD (Sergey Roenko)
+        CD4085, CD4502, CD4503, CD4522, CD4526, CD4539, MC14495, MM74C922, MM74C923, 
+        TC4467, TC4468, TC4469.
+      
+    - Keys (Sergey Roenko)
+        L293.

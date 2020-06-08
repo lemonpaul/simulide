@@ -21,14 +21,14 @@
 
 <package name="atmega16m1" pins="32" width="11" height="11">
 
-    <pin side="left" pos="2"  type="bidir" id="PD2" label="D2"/>
-    <pin side="left" pos="3"  type="bidir" id="PD3" label="D3"/>
-    <pin side="left" pos="4"  type="bidir" id="PC1" label="C1"/>
-    <pin side="left" pos="5"  type="vcc"   id="VCC" label="Vcc"/>
-    <pin side="left" pos="6"  type="gnd"   id="GND" label="Gnd"/>
-    <pin side="left" pos="7"  type="bidir" id="PC2" label="C2"/>
-    <pin side="left" pos="8"  type="bidir" id="PC3" label="C3"/>
-    <pin side="left" pos="9"  type="bidir" id="PB0" label="B0"/>
+    <pin side="left" pos="2"  type="bidir" id="PD2"  label="D2"/>
+    <pin side="left" pos="3"  type="bidir" id="PD3"  label="D3"/>
+    <pin side="left" pos="4"  type="bidir" id="PC1"  label="C1"/>
+    <pin side="left" pos="5"  type="vcc"   id="VCC"  label="Vcc"/>
+    <pin side="left" pos="6"  type="gnd"   id="GND0" label="Gnd"/>
+    <pin side="left" pos="7"  type="bidir" id="PC2"  label="C2"/>
+    <pin side="left" pos="8"  type="bidir" id="PC3"  label="C3"/>
+    <pin side="left" pos="9"  type="bidir" id="PB0"  label="B0"/>
 
     <pin side="bottom" pos="2"  type="bidir" id="PB1"  label="B1"/>
     <pin side="bottom" pos="3"  type="bidir" id="PE1"  label="E1"/>
@@ -42,7 +42,7 @@
     <pin side="right" pos="9"  type="adc8"  id="PC4"  label="C4"/>
     <pin side="right" pos="8"  type="adc9"  id="PC5"  label="C5"/>
     <pin side="right" pos="7"  type="avcc"  id="AVCC" label="AVcc"/>
-    <pin side="right" pos="6"  type="gnd"   id="GND"  label="AGnd"/>
+    <pin side="right" pos="6"  type="gnd"   id="GND1" label="AGnd"/>
     <pin side="right" pos="5"  type="aref"  id="AREF" label="Aref"/>
     <pin side="right" pos="4"  type="adc10" id="PC6"  label="C6"/>
     <pin side="right" pos="3"  type="bidir" id="PB3"  label="B3"/>

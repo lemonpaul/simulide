@@ -93,18 +93,36 @@ void Frequencimeter::resetState()
 
 void Frequencimeter::updateStep()
 {
-    if( m_step > 1e6 ) resetState();
+    double spus = Simulator::self()->stepsPerus();
+    uint64_t stepsPerS = spus*1e6;
+
+    if( m_step > stepsPerS ) resetState();
     if( m_numMax < 2 ) return;
     m_numMax--;
     
-    double freq = 1e6/(double)(m_totalP/m_numMax);
+    double freq = stepsPerS/(double)(m_totalP/m_numMax);
     //qDebug() <<"Frequencimeter::simuClockStep"<<m_totalP<<m_numMax<<m_totalP/m_numMax;
     if( m_freq != freq )
     {
         m_freq = freq;
-        if     ( freq >= 10000 ) m_display.setText( QString::number( freq, 'f', 0 )+" Hz" );
-        else if( freq >= 1000 )  m_display.setText( QString::number( freq, 'f', 1 )+" Hz" );
-        else                     m_display.setText( QString::number( freq, 'f', 2 )+" Hz" );
+
+        int Fdecs = 1;
+        QString unit = "  Hz";
+
+        if( freq > 999 )
+        {
+            freq /= 1e3;
+            unit = " KHz";
+
+            if( freq > 999 )
+            {
+                freq /= 1e3;
+                unit = " MHz";
+            }
+        }
+        if     ( freq < 10 )  Fdecs = 3;
+        else if( freq < 100 ) Fdecs = 2;
+        m_display.setText(QString::number( freq, 'f', Fdecs )+unit );
     }
     m_totalP = 0;
     m_numMax = 0;

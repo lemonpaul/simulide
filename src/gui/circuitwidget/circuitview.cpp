@@ -149,6 +149,9 @@ void CircuitView::dragEnterEvent(QDragEnterEvent *event)
     if( id.startsWith( file ) )
     {
         id.replace( file, "" ).replace("\r\n", "" );
+#ifdef _WIN32
+        if( id.startsWith( "/" )) id.remove( 0, 1 );
+#endif
         QString loId = id.toLower();
 
         if( loId.endsWith( ".jpg")
@@ -257,7 +260,8 @@ void CircuitView::contextMenuEvent(QContextMenuEvent* event)
 {
     QGraphicsView::contextMenuEvent( event );
 
-    if( !event->isAccepted() && !m_circuit->is_constarted() )
+    if( m_circuit->is_constarted() ) m_circuit->deleteNewConnector();
+    else if( !event->isAccepted() )
     {
         QPointF eventPos = mapToScene( event->globalPos() ) ;
         m_eventpoint = mapToScene( event->pos()  );

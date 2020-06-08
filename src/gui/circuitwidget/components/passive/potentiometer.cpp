@@ -160,6 +160,7 @@ void Potentiometer::resChanged( int res ) // Called when dial is rotated
 
 void Potentiometer::setRes( double res ) // Called when property resistance is changed
 {
+    if( res == 0 ) res = 0.001;
     Component::setValue( res );       // Takes care about units multiplier
     m_resist = m_value*m_unitMult;
     

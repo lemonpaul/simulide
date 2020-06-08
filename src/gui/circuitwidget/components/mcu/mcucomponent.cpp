@@ -50,7 +50,7 @@ McuComponent::McuComponent( QObject* parent, QString type, QString id )
             , MemData()
 {
     Q_UNUSED( McuComponent_properties );
-    
+
     qDebug() << "        Initializing"<<m_id<<"...";
     
     m_canCreate = false;
@@ -165,6 +165,62 @@ void McuComponent::initChip()
     }
 }
 
+void McuComponent::updatePin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
+{
+    Pin* pin = 0l;
+    for( int i = 0; i < m_pinList.size(); i++ )
+    {
+        McuComponentPin* mcuPin = m_pinList[i];
+        QString pinId = mcuPin->id();
+
+        if( id == pinId )
+        {
+            pin = mcuPin->pin();
+            break;
+        }
+    }
+    if( !pin )
+    {
+        qDebug() <<"McuComponent::updatePin Pin Not Found:"<<id<<type<<label;
+        return;
+    }
+
+    pin->setLabelText( label );
+    pin->setPos( QPoint(xpos, ypos) );
+
+    if     ( angle == 0 )   m_rigPin.append( pin );
+    else if( angle == 90 )  m_topPin.append( pin );
+    else if( angle == 180 ) m_lefPin.append( pin );
+    else if( angle == 270 ) m_botPin.append( pin );
+
+    pin->setPinAngle( angle );
+    pin->setLabelPos();
+
+    type = type.toLower();
+
+    if( type == "gnd"
+     || type == "vdd"
+     || type == "vcc"
+     || type == "unused"
+     || type == "nc" ) pin->setUnused( true );
+    else               pin->setUnused( false );
+
+    if( type == "inverted" ) pin->setInverted( true );
+    else                     pin->setInverted( false );
+
+    if( type == "null" )
+    {
+        pin->setVisible( false );
+        pin->setLabelText( "" );
+    }
+    else pin->setVisible( true );
+
+    if( m_isLS ) pin->setLabelColor( QColor( 0, 0, 0 ) );
+    else         pin->setLabelColor( QColor( 250, 250, 200 ) );
+
+    pin->isMoved();
+}
+
 double McuComponent::freq()
 { 
     return m_freq; 
@@ -260,6 +316,13 @@ void McuComponent::slotOpenSerial()
     Component* ser = Circuit::self()->createItem( "SerialPort", "SerialPort-"+Circuit::self()->newSceneId());
     ser->setPos( pos());
     Circuit::self()->addItem( ser );
+
+    /*m_shield = new Shield( this, "Shield1", "shield1");
+    m_shield->setBackground( ":/shield_uno.png");
+    m_shield->setPos( 0,0  );
+    Circuit::self()->addItem( m_shield );
+    Circuit::self()->compList()->removeOne( m_shield );
+    m_shield->setParentItem( this );*/
 }
 
 void McuComponent::slotOpenTerm()
@@ -341,7 +404,7 @@ QVector<int> McuComponent::eeprom()
 
 void McuComponent::loadData()
 {
-    QVector<int> data;
+    QVector<int> data = m_processor->eeprom();
 
     bool resize = false;
     if( !m_processor->getLoadStatus() ) resize = true; // No eeprom initialized yet
@@ -358,30 +421,24 @@ void McuComponent::saveData()
 
 void McuComponent::setLogicSymbol( bool ls )
 {
-    return;
-    if( m_initialized && (m_isLS == ls) ) return;
+    if( !m_initialized ) return;
+    if( m_isLS == ls ) return;
     //qDebug() <<"SubCircuit::setLogicSymbol"<<ls<<m_pkgeFile;
 
     bool pauseSim = Simulator::self()->isRunning();
     if( pauseSim ) Simulator::self()->pauseSim();
 
-    Circuit::self()->saveState();
+    if(  ls && m_pkgeFile.endsWith(".package"))    m_pkgeFile.replace( ".package", "_LS.package" );
+    if( !ls && m_pkgeFile.endsWith("_LS.package")) m_pkgeFile.replace( "_LS.package", ".package" );
 
-    for( McuComponentPin* mcupin : m_pinList )
+    m_error = 0;
+    Chip::initChip();
+
+    if( m_error == 0 )
     {
-        Pin* pin = mcupin->pin();
-        if( pin->connector() ) pin->connector()->remove();
-        delete mcupin;
+        Circuit::self()->saveState();
+        Circuit::self()->update();
     }
-    m_pinList.clear();
-
-    //clear();
-    m_ePin.clear();
-    m_pin.clear();
-    m_ePin.resize( m_numpins );
-    m_pin.resize( m_numpins );
-
-    //Chip::setLogicSymbol( ls );
 
     if( pauseSim ) Simulator::self()->runContinuous();
 }
