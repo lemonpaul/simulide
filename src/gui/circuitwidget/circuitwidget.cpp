@@ -145,6 +145,11 @@ void CircuitWidget::createToolBars()
 
 bool CircuitWidget::newCircuit()
 {
+    if (Simulator::self()->isPaused())
+    {
+        Simulator::self()->resumeSim();
+        powerCircAct->setEnabled(true);
+    }
     powerCircOff();
     
     if( MainWindow::self()->windowTitle().endsWith('*') )

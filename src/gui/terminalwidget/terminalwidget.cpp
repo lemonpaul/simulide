@@ -176,7 +176,6 @@ void TerminalWidget::close()
 
 void TerminalWidget::closeEvent(QCloseEvent* event)
 {
-    qDebug()<< "TerminalWidget::closeEvent";
     QWidget::closeEvent( event );
 }
 
