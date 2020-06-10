@@ -327,7 +327,6 @@ void McuComponent::slotOpenSerial()
 
 void McuComponent::slotOpenTerm()
 {
-    emit closeSerials();
     Component* ser = Circuit::self()->createItem( "SerialTerm", "SerialTerm-"+Circuit::self()->newSceneId());
     ser->setPos( pos());
     Circuit::self()->addItem( ser );

@@ -168,15 +168,11 @@ TerminalWidget::TerminalWidget( QWidget* parent, SerialTerm* ser )
 }
 TerminalWidget::~TerminalWidget() { }
 
-void TerminalWidget::close()
-{
-    qDebug()<< "TerminalWidget::close";
-    QWidget::close();
-}
-
 void TerminalWidget::closeEvent(QCloseEvent* event)
 {
-    QWidget::closeEvent( event );
+    event->accept();
+    hide();
+    emit closeTerminal();
 }
 
 void TerminalWidget::onTextChanged()

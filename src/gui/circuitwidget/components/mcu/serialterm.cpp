@@ -60,6 +60,9 @@ SerialTerm::SerialTerm( QObject* parent, QString type, QString id )
     connect( McuComponent::self(), SIGNAL( closeSerials()),
                              this, SLOT(   slotClose()) );
 
+    connect( &m_serialWidget, SIGNAL( closeTerminal()),
+                             this, SLOT(   slotClose()) );
+
     Simulator::self()->addToUpdateList( this );
 }
 
@@ -87,7 +90,6 @@ void SerialTerm::setUart( int uart )
 
 void SerialTerm::slotClose()
 {
-    m_serialWidget.close();
     Circuit::self()->removeComp( this );
 }
 

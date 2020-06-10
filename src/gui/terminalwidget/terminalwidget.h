@@ -38,13 +38,13 @@ class MAINMODULE_EXPORT TerminalWidget : public QWidget
 
         int uart() { return m_uart+1; }
         void setUart( int uart );
-
+    signals:
+        void closeTerminal();
     public slots:
         void uartChanged( int uart );
-        void close();
 
     protected:
-        virtual void closeEvent( QCloseEvent* event );
+        void closeEvent( QCloseEvent* event );
 
     private slots:
         void onTextChanged();
