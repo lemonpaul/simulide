@@ -1,4 +1,4 @@
-# SimulIDE 0.3.10
+# SimulIDE
 
 Electronic Circuit Simulator
 
