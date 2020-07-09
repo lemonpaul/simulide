@@ -110,10 +110,12 @@ void Circuit::setLang( Langs lang )
 
 QString Circuit::loc()
 {
-    QString locale = "_en";
-    if     ( m_lang == French )  locale = "fr";
-    else if( m_lang == Russian ) locale = "ru";
-    else if( m_lang == Spanish ) locale = "es";
+    QString locale = "en";
+    if     ( m_lang == French )    locale = "fr";
+    else if( m_lang == German )    locale = "de";
+    else if( m_lang == Russian )   locale = "ru";
+    else if( m_lang == Spanish )   locale = "es";
+    else if( m_lang == Pt_Brasil ) locale = "pt_BR";
 
     return locale;
 }
@@ -122,9 +124,11 @@ void Circuit::setLoc( QString loc )
 {
     Langs lang = English;
 
-    if     ( loc == "fr" ) lang = French;
-    else if( loc == "ru" ) lang = Russian;
-    else if( loc == "es" ) lang = Spanish;
+    if     ( loc == "fr" )    lang = French;
+    else if( loc == "de" )    lang = German;
+    else if( loc == "ru" )    lang = Russian;
+    else if( loc == "es" )    lang = Spanish;
+    else if( loc == "pt_BR" ) lang = Pt_Brasil;
 
     m_lang = lang;
 }

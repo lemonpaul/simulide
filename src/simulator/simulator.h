@@ -116,6 +116,7 @@ class MAINMODULE_EXPORT Simulator : public QObject
     signals:
         void pauseDebug();
         void resumeDebug();
+        void rateChanged();
         
     private:
  static Simulator* m_pSelf;

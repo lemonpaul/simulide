@@ -170,9 +170,8 @@ TerminalWidget::~TerminalWidget() { }
 
 void TerminalWidget::closeEvent(QCloseEvent* event)
 {
-    event->accept();
-    hide();
-    emit closeTerminal();
+    m_serComp->slotClose();
+    QWidget::closeEvent( event );
 }
 
 void TerminalWidget::onTextChanged()

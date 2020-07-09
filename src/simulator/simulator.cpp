@@ -433,6 +433,7 @@ int Simulator::simuRateChanged( int rate )
     if( m_isrunning )
     {
         pauseSim();
+        emit rateChanged();
         resumeSim();
     }
 

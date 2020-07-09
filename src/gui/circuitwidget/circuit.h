@@ -51,8 +51,10 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         enum Langs {
             English = 0,
             French,
+            German,
             Russian,
-            Spanish
+            Spanish,
+            Pt_Brasil
         };
 
  static Circuit* self() { return m_pSelf; }

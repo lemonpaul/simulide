@@ -552,22 +552,6 @@
         <source>Package File</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>RPM Nominal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Volt Nominal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Max Resistance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Min Resistance</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>Arduino</name>
@@ -1028,10 +1012,6 @@ Do you want to save your changes?
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>     ERROR!!! Compilation Faliled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Uploading: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -1066,11 +1046,15 @@ Error:  Mcu Deleted while Debugging!!
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Debbuger Started </source>
+        <source>     ERROR!!! Compilation Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Debbuger Stopped </source>
+        <source>Debugger Started </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debugger Stopped </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1185,17 +1169,6 @@ to DomDocument</source>
     </message>
     <message>
         <source>Logic/Other Logic</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DcMotor</name>
-    <message>
-        <source>Dc Motor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Outputs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1783,17 +1756,6 @@ Do you want to save your changes?
     </message>
 </context>
 <context>
-    <name>Ldr</name>
-    <message>
-        <source>LDR</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Passive</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>Led</name>
     <message>
         <source>Led</source>
@@ -1970,7 +1932,7 @@ to DomDocument</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>.data (*.data);;.bin (*.data);;All files (*.*)</source>
+        <source>.data (*.data);;.bin (*.bin);;All files (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2527,17 +2489,6 @@ Do you want to save your changes?
     </message>
 </context>
 <context>
-    <name>Termistor</name>
-    <message>
-        <source>Termistor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Passive</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>TextComponent</name>
     <message>
         <source>Text</source>
@@ -2545,17 +2496,6 @@ Do you want to save your changes?
     </message>
     <message>
         <source>Other</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>VarResistor</name>
-    <message>
-        <source>Variable Resistor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Passive</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
