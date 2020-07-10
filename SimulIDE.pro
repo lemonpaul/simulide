@@ -178,24 +178,15 @@ runLrelease.commands = lrelease ../resources/translations/*.ts;
 QMAKE_EXTRA_TARGETS += runLrelease
 POST_TARGETDEPS     += runLrelease
 
-# copy2dest.commands = \
-# $(MKDIR)    $$TARGET_PREFIX/share/simulide/data ; \
-# $(MKDIR)    $$TARGET_PREFIX/share/simulide/examples ; \
-# $(MKDIR)    $$TARGET_PREFIX/share/simulide/translations ; \
-# $(COPY_DIR) ../resources/data              $$TARGET_PREFIX/share/simulide ; \
-# $(COPY_DIR) ../resources/examples          $$TARGET_PREFIX/share/simulide ; \
-# $(COPY_DIR) ../resources/icons             $$TARGET_PREFIX/share ; \
-# $(MOVE)     ../resources/translations/*.qm $$TARGET_PREFIX/share/simulide/translations ;
+QM_FILES_INSTALL_PATH = /usr/share/$$TARGET/translations
 
-QM_FILES_INSTALL_PATH = $$PREFIX/share/$$TARGET/translations
-
-data.path = $$PREFIX/share/$$TARGET
+data.path = /usr/share/$$TARGET
 data.files = ../resources/data
-examples.path = $$PREFIX/share/$$TARGET
+examples.path = /usr/share/$$TARGET
 examples.files = ../resources/examples
-icons.path = $$PREFIX/share
+icons.path = /usr/share
 icons.files = ../resources/icons
-target.path = $$PREFIX/bin
+target.path = /usr/bin
 INSTALLS += data
 INSTALLS += examples
 INSTALLS += icons
