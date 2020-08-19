@@ -100,9 +100,10 @@ void Arduino::remove()
     delete ledPin1;
 
     delete m_groundEnode;
+    delete m_boardLedBuffer;
 
     McuComponent::remove();
-
+    if( m_boardLedEnode ) Simulator::self()->remFromEnodeList( m_boardLedEnode, true );
     Simulator::self()->remFromEnodeList( m_bufferEnode, true );
     Simulator::self()->remFromUpdateList( m_boardLed );
 }

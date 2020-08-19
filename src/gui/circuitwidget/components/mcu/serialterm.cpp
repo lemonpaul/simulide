@@ -53,8 +53,6 @@ SerialTerm::SerialTerm( QObject* parent, QString type, QString id )
 
     m_area = QRect( 0, 0, 0, 0 );
 
-    m_serialWidget.setWindowFlags ( Qt::WindowStaysOnTopHint | Qt::WindowTitleHint
-                                  | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint );
     m_serialWidget.show();
 
     connect( McuComponent::self(), SIGNAL( closeSerials()),

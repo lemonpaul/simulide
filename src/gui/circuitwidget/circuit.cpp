@@ -1511,6 +1511,44 @@ void Circuit::keyReleaseEvent( QKeyEvent* event )
     QGraphicsScene::keyReleaseEvent( event );
 }
 
+
+void Circuit::dropEvent( QGraphicsSceneDragDropEvent* event )
+{
+    QString type = event->mimeData()->html();
+    QString id   = event->mimeData()->text();
+
+    QString file = "file://";
+    if( id.startsWith( file ) )
+    {
+        id.replace( file, "" ).replace("\r\n", "" );
+#ifdef _WIN32
+        if( id.startsWith( "/" )) id.remove( 0, 1 );
+#endif
+        QString loId = id.toLower();
+
+        if( loId.endsWith( ".jpg")
+         || loId.endsWith( ".png")
+         || loId.endsWith( ".gif"))
+        {
+            file = id;
+            type = "Image";
+            id   = "Image";
+            Component* enterItem = createItem( type, id+"-"+newSceneId() );
+            if( enterItem )
+            {
+                saveState();
+
+                enterItem->setBackground( file );
+
+                QPoint cPos = QCursor::pos()-CircuitView::self()->mapToGlobal( QPoint(0,0));
+                enterItem->setPos( CircuitView::self()->mapToScene( cPos ) );
+                addItem( enterItem );
+            }
+        }
+        else CircuitWidget::self()->loadCirc( id );
+    }
+}
+
 void Circuit::drawBackground ( QPainter*  painter, const QRectF & rect )
 {
     Q_UNUSED( rect );

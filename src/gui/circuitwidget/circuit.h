@@ -150,6 +150,7 @@ class MAINMODULE_EXPORT Circuit : public QGraphicsScene
         void mouseMoveEvent( QGraphicsSceneMouseEvent* event );
         void keyPressEvent ( QKeyEvent * event );
         void keyReleaseEvent( QKeyEvent* event );
+        void dropEvent( QGraphicsSceneDragDropEvent* event );
 
     private:
         void loadDomDoc( QDomDocument* doc );

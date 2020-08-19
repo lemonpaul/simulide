@@ -237,7 +237,7 @@ void CircMatrix::factorMatrix( int n, int group  )
             for( k=0; k<j; k++ ) q -= a[i][k]*a[k][j];
 
             a[i][j] = q;
-            double x = std::abs( q );
+            double x = fabs( q );
             
             //qDebug() <<"is"<<x<<">="<<largest<<( x >= largest );
             if( x >= largest )
