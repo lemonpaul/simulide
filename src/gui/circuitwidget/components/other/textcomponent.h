@@ -28,6 +28,8 @@ class MAINMODULE_EXPORT TextComponent : public Component
 
  static Component* construct( QObject* parent, QString type, QString id );
  static LibraryItem *libraryItem();
+
+        virtual QList<propGroup_t> propGroups() override;
  
         int  margin();
         void setMargin( int margin );
@@ -50,9 +52,10 @@ class MAINMODULE_EXPORT TextComponent : public Component
         qreal opac();
         void setOpac( qreal op );
 
+        bool eventFilter( QObject* object, QEvent* event );
+
         void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
-    signals:
 
     public slots:
         void updateGeometry(int, int, int);

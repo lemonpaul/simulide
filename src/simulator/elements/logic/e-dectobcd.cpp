@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
  *   Copyright (C) 2012 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
@@ -17,62 +17,52 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-
 #include "e-dectobcd.h"
+#include "simulator.h"
 
-eDecToBcd::eDecToBcd( std::string id )
+eDecToBcd::eDecToBcd( QString id )
          : eLogicDevice( id )
 {
     m_16Bits = false;
+    m_bits = 10;
 }
-eDecToBcd::~eDecToBcd()
-{ 
-}
+eDecToBcd::~eDecToBcd() {}
 
 void eDecToBcd::stamp()
 {
-    for( int i=0; i<15; i++ )
+    for( int i=0; i<15; ++i )
     {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedFast(this);
+        eNode* enode = m_input[i]->getEpin(0)->getEnode();
+        if( enode ) enode->voltChangedCallback( this );
     }
-    m_address = -1;
+    m_bcd = -1;
 
     eLogicDevice::stamp();
 }
 
-void eDecToBcd::setVChanged()
+void eDecToBcd::voltChanged()
 {
     eLogicDevice::updateOutEnabled();
-    
-    int address = 0;
 
-    int msBit = 9;
-    if( m_16Bits ) msBit = 15;
-    
-    for( int i=0; i<msBit; i++ )
-    {
-        if( eLogicDevice::getInputState( i ) ) address = i+1;
-    }
-    if( address == m_address ) return;
-    m_address = address;
-    
-    for( int i=0; i<4; i++ )
-    {
-        eLogicDevice::setOut( i, address & 1 );
-        address >>= 1;
-    }
+    int i;
+    for( i=m_bits-2; i>=0; --i )
+        if( eLogicDevice::getInputState( i ) ) break;
+
+    m_bcd = i+1;
+
+    Simulator::self()->addEvent( m_propDelay, this );
+}
+
+void eDecToBcd::runEvent()
+{
+    for( int i=0; i<4; ++i ) m_output[i]->setTimedOut( m_bcd & (1<<i) );
 }
 
 void eDecToBcd::set_16bits( bool set )
 {
     m_16Bits = set;
-}
 
-void eDecToBcd::createPins()
-{
-    eLogicDevice::createPins( 15, 4 );
+    if( m_16Bits ) m_bits = 16;
+    else           m_bits = 10;
 }
-
 

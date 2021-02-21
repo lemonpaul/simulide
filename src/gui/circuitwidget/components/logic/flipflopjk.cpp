@@ -18,6 +18,9 @@
  ***************************************************************************/
 
 #include "flipflopjk.h"
+#include "circuitwidget.h"
+#include "simulator.h"
+#include "circuit.h"
 #include "pin.h"
 
 
@@ -38,45 +41,64 @@ LibraryItem* FlipFlopJK::libraryItem()
 
 FlipFlopJK::FlipFlopJK( QObject* parent, QString type, QString id )
           : LogicComponent( parent, type, id )
-          , eFlipFlopJK( id.toStdString() )
+          , eFlipFlopJK( id )
 {
-    m_width  = 4;
-    m_height = 6;
+    m_width  = 3;
+    m_height = 4;
     
     QStringList pinList;
 
     pinList // Inputs:
             << "IL01 J"
-            << "IL05 K"
-            << "IU02S"
+            << "IL03 K"
+            << "IU01S"
             << "ID02R"
-            << "IL03>"
+            << "IL02>"
             
             // Outputs:
-            << "OR01Q "
-            << "OR05!Q "
+            << "OR01Q"
+            << "OR03!Q"
             ;
     init( pinList );
     
     eLogicDevice::createInput( m_inPin[0] );                  // Input J
-
     eLogicDevice::createInput( m_inPin[1] );                  // Input K
-
     eLogicDevice::createInput( m_inPin[2] );                  // Input S
-
     eLogicDevice::createInput( m_inPin[3] );                  // Input R
     
-    eLogicDevice::createClockPin( m_inPin[4] );           // Input Clock
+    m_trigPin = m_inPin[4];
+    eLogicDevice::createClockPin( m_trigPin );            // Input Clock
     
     eLogicDevice::createOutput( m_outPin[0] );               // Output Q
-
     eLogicDevice::createOutput( m_outPin[1] );               // Output Q'
 
     setSrInv( true );                         // Invert Set & Reset pins
     setClockInv( false );                       //Don't Invert Clock pin
-
+    setTrigger( Clock );
 }
 FlipFlopJK::~FlipFlopJK(){}
 
+QList<propGroup_t> FlipFlopJK::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Clock_Inverted", tr("Clock Inverted"),""} );
+    mainGroup.propList.append( {"S_R_Inverted", tr("Set / Reset Inverted"),""} );
+    mainGroup.propList.append( {"Trigger", tr("Trigger Type"),"enum"} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
+
+void FlipFlopJK::setTrigger( Trigger trigger )
+{
+    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
+
+    int trig = static_cast<int>( trigger );
+    eLogicDevice::seteTrigger( trig );
+    LogicComponent::setTrigger( trigger );
+
+    Circuit::self()->update();
+}
 
 #include "moc_flipflopjk.cpp"

@@ -21,9 +21,8 @@
 #define EDITORWINDOW_H
 
 #include <QtGui>
-
-#include "codeeditorwidget.h"
 #include "findreplacedialog.h"
+#include "compiler.h"
 
 class EditorWindow : public QWidget
 {
@@ -49,10 +48,10 @@ class EditorWindow : public QWidget
         bool save();
         
     private slots:
+        void openRecentFile();
         void newFile();
         void open();
         bool saveAs();
-        void about();
         void closeTab(int);
         void documentWasModified();
         void tabContextMenu( const QPoint & eventpoint );
@@ -74,8 +73,15 @@ class EditorWindow : public QWidget
         void upload();
         void findReplaceDialog();
 
+    protected:
+        void dropEvent( QDropEvent* event );
+        void dragEnterEvent( QDragEnterEvent* event);
+
     private:
  static EditorWindow*  m_pSelf;
+
+        enum { MaxRecentFiles = 10 };
+        void updateRecentFileActions();
         void createWidgets();
         void createActions();
         void createToolBars();
@@ -84,15 +90,20 @@ class EditorWindow : public QWidget
         void enableFileActs( bool enable );
         void enableDebugActs( bool enable );
         void setStepActs();
-        void keyPressEvent(QKeyEvent *event);
+        void keyPressEvent( QKeyEvent* event );
 
         bool maybeSave();
-        bool saveFile(const QString &fileName);
+        bool saveFile( const QString &fileName );
         
-        QString strippedName(const QString &fullFileName);
+        QString strippedName( const QString &fullFileName );
         
         QGridLayout* baseWidgetLayout;
         QTabWidget*  m_docWidget;
+
+        QMenu        m_fileMenu;
+        OutPanelText m_outPane;
+        Compiler     m_compiler;
+
         
         FindReplaceDialog* findRepDiaWidget;
         
@@ -102,31 +113,32 @@ class EditorWindow : public QWidget
         QToolBar* m_editorToolBar;
         QToolBar* m_debuggerToolBar;
 
-        QAction *newAct;
-        QAction *openAct;
-        QAction *saveAct;
-        QAction *saveAsAct;
-        QAction *exitAct;
-        QAction *aboutAct;
-        QAction *aboutQtAct;
-        QAction *undoAct;
-        QAction *redoAct;
+        QAction* recentFileActs[MaxRecentFiles];
+        QAction* newAct;
+        QAction* openAct;
+        QAction* saveAct;
+        QAction* saveAsAct;
+        QAction* exitAct;
+        QAction* aboutAct;
+        QAction* aboutQtAct;
+        QAction* undoAct;
+        QAction* redoAct;
 
-        QAction *cutAct;
-        QAction *copyAct;
-        QAction *pasteAct;
+        QAction* cutAct;
+        QAction* copyAct;
+        QAction* pasteAct;
         
-        QAction *debugAct;
+        QAction* debugAct;
         
-        QAction *stepAct;
-        QAction *stepOverAct;
-        QAction *runAct;
-        QAction *pauseAct;
-        QAction *resetAct;
-        QAction *stopAct;
-        QAction *compileAct;
-        QAction *loadAct;
-        QAction *findQtAct;
+        QAction* stepAct;
+        QAction* stepOverAct;
+        QAction* runAct;
+        QAction* pauseAct;
+        QAction* resetAct;
+        QAction* stopAct;
+        QAction* compileAct;
+        QAction* loadAct;
+        QAction* findQtAct;
 };
 
 #endif

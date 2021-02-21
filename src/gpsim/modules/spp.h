@@ -31,10 +31,10 @@ class SppSignalSource;
 class PicPSP_PortRegister;
 class PicTrisRegister;
 
-class SPPCON : public sfr_register, public TriggerObject
+class SPPCON : public SfrReg, public TriggerObject
 {
     public:
-      SPPCON(Processor *pCpu, const char *pName, const char *pDesc);
+      SPPCON(Processor *pCpu, const char *pName );
       virtual void put(uint new_value);
       virtual void put_value(uint new_value);
       void set_spp(SPP *_spp) { spp = _spp; }
@@ -43,10 +43,10 @@ class SPPCON : public sfr_register, public TriggerObject
       SPP        *spp;
 };
 
-class SPPCFG : public sfr_register, public TriggerObject
+class SPPCFG : public SfrReg, public TriggerObject
 {
     public:
-      SPPCFG(Processor *pCpu, const char *pName, const char *pDesc);
+      SPPCFG(Processor *pCpu, const char *pName );
       virtual void put(uint new_value);
       virtual void put_value(uint new_value);
       void set_spp(SPP *_spp) { spp = _spp; }
@@ -55,10 +55,10 @@ class SPPCFG : public sfr_register, public TriggerObject
       SPP *spp;
 };
 
-class SPPEPS : public sfr_register, public TriggerObject
+class SPPEPS : public SfrReg, public TriggerObject
 {
     public:
-      SPPEPS(Processor *pCpu, const char *pName, const char *pDesc);
+      SPPEPS(Processor *pCpu, const char *pName );
       virtual void put(uint new_value);
       virtual void put_value(uint new_value);
       void set_spp(SPP *_spp) { spp = _spp; }
@@ -67,10 +67,10 @@ class SPPEPS : public sfr_register, public TriggerObject
       SPP *spp;
 };
 
-class SPPDATA : public sfr_register, public TriggerObject
+class SPPDATA : public SfrReg, public TriggerObject
 {
     public:
-      SPPDATA(Processor *pCpu, const char *pName, const char *pDesc);
+      SPPDATA(Processor *pCpu, const char *pName );
       virtual void put(uint new_value);
       virtual uint get();
       virtual void put_value(uint new_value);
@@ -83,6 +83,8 @@ class SPPDATA : public sfr_register, public TriggerObject
 class SPP : public TriggerObject
 {
     public:
+        SPP( Processor* cpu ) : TriggerObject( cpu ){ }
+        ~SPP();
 
       void initialize( PIR_SET *pir_set, PicPSP_PortRegister *port_set, 
             PicTrisRegister *port_tris,
@@ -96,9 +98,6 @@ class SPP : public TriggerObject
       void cfg_write(uint data);
       void enabled(bool state);
       virtual void callback();
-      
-      SPP() { }
-      ~SPP();
 
       enum {
             SPPEN        = 1<<0,                // SPPCON

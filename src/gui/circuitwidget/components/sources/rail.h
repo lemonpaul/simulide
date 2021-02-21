@@ -29,33 +29,30 @@ class MAINMODULE_EXPORT Rail : public Component, public eElement
 {
     Q_OBJECT
     Q_PROPERTY( double   Voltage   READ volt    WRITE setVolt    DESIGNABLE true USER true )
-    Q_PROPERTY( QString  Unit      READ unit    WRITE setUnit    DESIGNABLE true USER true )
-    Q_PROPERTY( bool     Show_Volt READ showVal WRITE setShowVal DESIGNABLE true USER true )
 
     public:
         Rail( QObject* parent, QString type, QString id );
         ~Rail();
 
         static Component* construct( QObject* parent, QString type, QString id );
-        static LibraryItem *libraryItem();
+        static LibraryItem* libraryItem();
 
-        double volt() const      { return m_voltHight; }
+        virtual QList<propGroup_t> propGroups() override;
+
+        double volt();
         void setVolt( double v );
-        
-        void setUnit( QString un );
+        virtual void setUnit( QString un ) override;
 
-        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
+        virtual void remove() override;
 
-    public slots:
-        virtual void remove();
+        virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
-    protected:
+    private:
+        void updateOutput();
         double m_voltHight;
-        
-        bool m_changed;
 
-        Pin     *m_outpin;
-        eSource *m_out;
+        Pin*     m_outpin;
+        eSource* m_out;
 };
 
 

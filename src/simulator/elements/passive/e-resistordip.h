@@ -25,14 +25,14 @@
 class MAINMODULE_EXPORT eResistorDip : public eElement
 {
     public:
-        eResistorDip( std::string id );
+        eResistorDip( QString id );
         ~eResistorDip();
 
         virtual void setRes( double resist );
         
         virtual void setSize( int size ) { m_size = size; }
         
-        virtual void initEpins();
+        //virtual void initEpins();
 
     protected:
         double m_resist;

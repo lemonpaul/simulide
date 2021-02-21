@@ -20,8 +20,6 @@
 #ifndef AVRCOMPONENTPIN_H
 #define AVRCOMPONENTPIN_H
 
-#include <stdint.h>
-
 #include "mcucomponentpin.h"
 
 //simavr includes
@@ -29,6 +27,7 @@
 #include "sim_irq.h"
 #include "sim_io.h"
 #include "avr_adc.h"
+#include "avr_acomp.h"
 #include "avr_ioport.h"
 #include "avr_timer.h"
 
@@ -40,15 +39,17 @@ class AVRComponentPin : public McuComponentPin
         AVRComponentPin( McuComponent *mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
         ~AVRComponentPin();
 
-        virtual void attach( avr_t* AvrProcessor );
-        virtual void setVChanged();
-        virtual void resetState();
+        virtual void initialize() override;
+        virtual void stamp() override;
+        virtual void voltChanged() override;
 
-        virtual void pullupNotConnected( bool up );
-        //virtual void resetOutput();
+        virtual void attachPin( avr_t* AvrProcessor );
+        virtual void setState( bool state ) override;
+
+        virtual void pullupNotConnected( bool up ) override;
+        virtual void setTimedImp( double imp ) override;
 
         void adcread();
-        void enableIO( bool en );
 
         static void ddr_hook( struct avr_irq_t* irq, uint32_t value, void* param )
         {
@@ -58,37 +59,43 @@ class AVRComponentPin : public McuComponentPin
 
             ptrAVRComponentPin->setDirection( value>0 );
         }
-
-        static void port_hook( struct avr_irq_t* irq, uint32_t value, void* param )
-        {
-            Q_UNUSED(irq);
-            // get the pointer out of param and asign it to AVRComponentPin*
-            AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
-
-            ptrAVRComponentPin->setState( value>0 );
-        }
-        
         static void port_reg_hook( struct avr_irq_t* irq, uint32_t value, void* param )
         {
             Q_UNUSED(irq);
             // get the pointer out of param and asign it to AVRComponentPin*
             AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
-
-            ptrAVRComponentPin->setPullup( value>0 );
+            ptrAVRComponentPin->setState( value>0 );
+        }
+        static void pwm_pin_hook( struct avr_irq_t* irq, uint32_t value, void* param )
+        {
+            Q_UNUSED(irq);
+            // get the pointer out of param and asign it to AVRComponentPin*
+            AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
+            ptrAVRComponentPin->enableIO( (value==0) );
+        }
+        static void pwm_out_hook( struct avr_irq_t* irq, uint32_t value, void* param )
+        {
+            Q_UNUSED(irq);
+            // get the pointer out of param and asign it to AVRComponentPin*
+            AVRComponentPin* ptrAVRComponentPin = reinterpret_cast<AVRComponentPin*> (param);
+            ptrAVRComponentPin->m_enableIO = true;
+            ptrAVRComponentPin->setState( value>0 );
+            ptrAVRComponentPin->m_enableIO = false;
         }
 
     protected:
-        //void setPullup( uint32_t value );
+        int  m_channelAdc;
+        int  m_channelAin;
 
-        int  m_channel;
-
+ static QString m_lastid;
+ static uint64_t m_lastCycle;
         //from simavr
         avr_t*     m_avrProcessor;
-        avr_irq_t* m_PortChangeIrq;
         avr_irq_t* m_PortRegChangeIrq;
         avr_irq_t* m_DdrRegChangeIrq;
         avr_irq_t* m_Write_stat_irq;
         avr_irq_t* m_Write_adc_irq;
+        avr_irq_t* m_Write_acomp_irq;
 };
 
 #endif

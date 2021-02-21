@@ -85,12 +85,16 @@ static const struct mcu_t {
 	},
 	.timer0 = {
 		.name = '0',
-		.wgm = { AVR_IO_REGBIT(TCCR0A, WGM00), AVR_IO_REGBIT(TCCR0A, WGM01), AVR_IO_REGBIT(TCCR0B, WGM02) },
+        .wgm = { AVR_IO_REGBIT( TCCR0A, WGM00 )
+               , AVR_IO_REGBIT( TCCR0A, WGM01 )
+               , AVR_IO_REGBIT( TCCR0B, WGM02 ) },
 		.wgm_op = {
-			[0] = AVR_TIMER_WGM_NORMAL8(),
-			[2] = AVR_TIMER_WGM_CTC(),
-			[3] = AVR_TIMER_WGM_FASTPWM8(),
-			[7] = AVR_TIMER_WGM_OCPWM(),
+            [0] = WGM_NORMAL8(),
+            [1] = WGM_FCPWM_8(),
+            [2] = WGM_CTC_OC(),
+            [3] = WGM_FASTPWM_8(),
+            [5] = WGM_FCPWM_OC(),
+            [7] = WGM_FASTPWM_OC(),
 		},
 		.cs = { AVR_IO_REGBIT(TCCR0B, CS00), AVR_IO_REGBIT(TCCR0B, CS01), AVR_IO_REGBIT(TCCR0B, CS02) },
 		.cs_div = { 0, 0, 3 /* 8 */, 6 /* 64 */, 8 /* 256 */, 10 /* 1024 */ },
@@ -105,6 +109,8 @@ static const struct mcu_t {
 		.comp = {
 			[AVR_TIMER_COMPA] = {
 				.r_ocr = OCR0A,
+                .com = AVR_IO_REGBITS(TCCR0A, COM0A0, 0x3),
+				.com_pin = AVR_IO_REGBIT(PORTB, 0),
 				.interrupt = {
 					.enable = AVR_IO_REGBIT(TIMSK0, OCIE0A),
 					.raised = AVR_IO_REGBIT(TIFR0, OCF0A),
@@ -113,6 +119,8 @@ static const struct mcu_t {
 			},
 			[AVR_TIMER_COMPB] = {
 				.r_ocr = OCR0B,
+                .com = AVR_IO_REGBITS(TCCR0A, COM0B0, 0x3),
+				.com_pin = AVR_IO_REGBIT(PORTB, 1),
 				.interrupt = {
 					.enable = AVR_IO_REGBIT(TIMSK0, OCIE0B),
 					.raised = AVR_IO_REGBIT(TIFR0, OCF0B),

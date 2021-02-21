@@ -31,7 +31,7 @@ LibraryItem* Image::libraryItem()
 {
     return new LibraryItem(
             tr( "Image" ),
-            tr( "Other" ),
+            tr( "Graphical" ),
             "image.png",
             "Image",
             Image::construct);
@@ -41,13 +41,23 @@ Image::Image( QObject* parent, QString type, QString id )
      : Shape( parent, type, id )
 {
     Q_UNUSED( Image_properties );
+
     m_BackGround = "";
     m_image = QPixmap( ":/saveimage.png" );
     m_hSize = 80;
     m_vSize = 80;
     m_area = QRectF( -40, -40, 80, 80 );
+
+    m_movie = 0l;
 }
 Image::~Image(){}
+
+QList<propGroup_t> Image::propGroups()
+{
+    QList<propGroup_t> pg = Shape::propGroups();
+    pg.first().propList.prepend( {"Image_File", tr("Image File"),""} );
+    return pg;
+}
 
 void Image::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 {
@@ -57,6 +67,7 @@ void Image::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
         event->accept();
         QMenu* menu = new QMenu();
         contextMenu( event, menu );
+        Component::contextMenu( event, menu );
         menu->deleteLater();
     }
 }
@@ -64,11 +75,10 @@ void Image::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 void Image::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu )
 {
     QAction* loadAction = menu->addAction( QIcon(":/load.png"),tr("Load Image") );
-    connect( loadAction, SIGNAL(triggered()), this, SLOT(slotLoad()) );
+    connect( loadAction, SIGNAL(triggered()),
+                   this, SLOT(slotLoad()), Qt::UniqueConnection );
 
     menu->addSeparator();
-
-    Component::contextMenu( event, menu );
 }
 
 void Image::slotLoad()
@@ -86,12 +96,35 @@ void Image::slotLoad()
     setBackground( fileName );
 }
 
+void Image::updateGif( const QRect &rect )
+{
+    m_image = m_movie->currentPixmap();
+    update();
+}
+
 void Image::setBackground( QString bck )
 {
     if( bck.isEmpty() ) return;
 
     QDir circuitDir = QFileInfo( Circuit::self()->getFileName() ).absoluteDir();
-    QString absPath = circuitDir.absoluteFilePath(bck);
+    QString absPath = circuitDir.absoluteFilePath( bck );
+
+    if( bck.endsWith(".gif") )
+    {
+        if( m_movie ) delete m_movie;
+
+        m_movie = new QMovie( bck );
+        m_movie->setParent( this );
+
+        if( m_movie->isValid() )
+        {
+            m_movie->setCacheMode( QMovie::CacheAll );
+            connect( m_movie, SIGNAL( updated(const QRect &) ),
+                     this, SLOT( updateGif(const QRect &) ), Qt::UniqueConnection );
+            m_movie->start();
+        }
+        else qDebug() << "Image::setBackground : not a valid Gif animation";
+    }
 
     if( m_image.load( absPath ) )
     {

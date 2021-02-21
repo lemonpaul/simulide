@@ -38,7 +38,7 @@ LibraryItem* BcdToDec::libraryItem()
 
 BcdToDec::BcdToDec( QObject* parent, QString type, QString id )
         : LogicComponent( parent, type, id )
-        , eBcdToDec( id.toStdString() )
+        , eBcdToDec( id )
 {
     m_width  = 4;
     m_height = 11;
@@ -81,16 +81,22 @@ BcdToDec::BcdToDec( QObject* parent, QString type, QString id )
     for( int i=0; i<4; i++ )
         eLogicDevice::createInput( m_inPin[i] );
         
-    for( int i=0; i<16; i++ )
-    {
-        eLogicDevice::createOutput( m_outPin[i] );
-    }
-    for( int i=10; i<16; i++ )
-    {
-        m_outPin[i]->setVisible( false );
-    }
+    for( int i=0; i<16; ++i ) eLogicDevice::createOutput( m_outPin[i] );
+    for( int i=10; i<16; ++i ) m_outPin[i]->setVisible( false );
+
 }
 BcdToDec::~BcdToDec(){}
+
+QList<propGroup_t> BcdToDec::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Inverted", tr("Invert Outputs"),""} );
+    mainGroup.propList.append( {"_16_Bits", tr("16 Bits"),""} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
 
 bool BcdToDec::_16bits()
 {
@@ -101,23 +107,21 @@ void BcdToDec::set_16bits( bool set )
 {
     m_16Bits = set;
 
+    int height = m_height;
     if( set )
     {
-        for( int i=10; i<16; i++ )
-        {
-            m_outPin[i]->setVisible( true );
-        }
-        m_area = QRect( -(m_width/2)*8, -(m_height/2)*8, m_width*8, 17*8 );
+        for( int i=10; i<16; ++i ) m_outPin[i]->setVisible( true );
+        height = 17;
     }
     else
     {
-        for( int i=10; i<16; i++ )
+        for( int i=10; i<16; ++i )
         {
             m_outPin[i]->setVisible( false );
             if( m_outPin[i]->isConnected() ) m_outPin[i]->connector()->remove();
         }
-        m_area = QRect( -(m_width/2)*8, -(m_height/2)*8, m_width*8, m_height*8 );
     }
+    m_area = QRect( -(m_width/2)*8, -(m_height/2)*8, m_width*8, height*8 );
     Circuit::self()->update();
 }
 

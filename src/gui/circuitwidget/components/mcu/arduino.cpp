@@ -19,54 +19,43 @@
 
 #include "arduino.h"
 #include "mainwindow.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "e-resistor.h"
 #include "itemlibrary.h"
 #include "utils.h"
 
-#include "hd44780.h"
+//#include "hd44780.h"
 
-#include "avr_twi.h"
+//#include "avr_twi.h"
 
 LibraryItem* Arduino::libraryItem()
 {
     return new LibraryItem(
         tr("Arduino"),
         tr("Micro"),   
-        "arduinoUnoIcon.png",
+        "arduino.png",
         "Arduino",
         Arduino::construct );
 }
 
 Component* Arduino::construct( QObject* parent, QString type, QString id )
-{ 
-    if( m_canCreate ) 
+{
+    Arduino* ard = new Arduino( parent, type,  id );
+    if( m_error > 0 )
     {
-        Arduino* ard = new Arduino( parent, type,  id );
-        if( m_error > 0 )
-        {
-            Circuit::self()->compList()->removeOne( ard );
-            ard->deleteLater();
-            ard = 0l;
-            m_error = 0;
-            m_pSelf = 0l;
-            m_canCreate = true;
-        }
-        return ard;
+        Circuit::self()->compList()->removeOne( ard );
+        ard->deleteLater();
+        ard = 0l;
+        m_error = 0;
+        m_pSelf = 0l;
     }
-    MessageBoxNB( tr("Error")
-                , tr("Only 1 Mcu allowed\n to be in the Circuit.") );
-
-    return 0l;
+    return ard;
 }
 
 Arduino::Arduino( QObject* parent, QString type, QString id )
        : AvrCompBase( parent, type, id )
 {
-    m_pSelf = this;
-
-    m_processor = AvrProcessor::self();
-    
     setLabelPos( 100,-21, 0); // X, Y, Rot
     
     initChip();
@@ -74,14 +63,10 @@ Arduino::Arduino( QObject* parent, QString type, QString id )
     {
         initBoard();
         setFreq( 16 );
-        //initBootloader();
-        
         qDebug() <<"     ..."<<m_id<<"OK\n";
     }
-    else
-    {
-        qDebug() <<"     ..."<<m_id<<"Error!!!\n";
-    }
+    else qDebug() <<"     ..."<<m_id<<"Error!!!\n";
+
     setTransformOriginPoint( togrid( boundingRect().center()) );
 }
 Arduino::~Arduino() 
@@ -99,7 +84,6 @@ void Arduino::remove()
     ledPin1->setEnode( 0l );
     delete ledPin1;
 
-    delete m_groundEnode;
     delete m_boardLedBuffer;
 
     McuComponent::remove();
@@ -108,7 +92,7 @@ void Arduino::remove()
     Simulator::self()->remFromUpdateList( m_boardLed );
 }
 
-void Arduino::attach()
+void Arduino::stamp()
 {
     eNode* enod = m_pb5Pin->getEnode();
     
@@ -120,10 +104,11 @@ void Arduino::attach()
     }
     else if( enod != m_boardLedEnode ) // Connected to external eNode: Delete boardLed eNode
     {
+        //Simulator::self()->remFromEnodeList( m_boardLedEnode, true );
         m_boardLedEnode = enod;
     }
     else return;                       // Already connected to boardLed eNode: Do nothing
-
+    //qDebug() << "Arduino::initialize() Pin 13"<<enod->itemId() ;
     m_boardLedBuffer->getEpin( "input0" )->setEnode(enod);
 }
 
@@ -136,7 +121,7 @@ void Arduino::initBoard()
     m_bufferEnode = new eNode( m_id+"-Lnod");
 
     // Create Led Buffer
-    m_boardLedBuffer = new eGate( (m_id+"boardLedBuffer").toStdString(), 0 );
+    m_boardLedBuffer = new eGate( m_id+"boardLedBuffer", 0 );
     m_boardLedBuffer->createPins( 1, 1 );
     m_boardLedBuffer->getEpin( "output0" )->setEnode( m_bufferEnode );
 
@@ -154,6 +139,8 @@ void Arduino::initBoard()
 
     if( objectName().contains("Mega") ) m_boardLed->setPos( 35+12, 125+105 );
     else                                m_boardLed->setPos( 35, 125 );
+    
+    m_boardLedEnode = 0l;
 
     for( int i=0; i<m_numpins; i++ )                      // Create Pins
     {
@@ -172,7 +159,7 @@ void Arduino::initBoard()
         QString type  = mcuPin->ptype();
         if     ( pinId.contains( "GND" ) )                   // Gnd Pins
         {    
-            mcuPin->setImp( 0.01 ); 
+            mcuPin->setImp( 0.01 );
         }
         else if( pinId.contains( "V3V" ) )                  // 3.3V Pins
         {
@@ -204,16 +191,6 @@ void Arduino::initBoard()
             mcuPin->setVoltLow( 5 );
         }
     }
-}
-
-void Arduino::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
-{
-    Component::paint( p, option, widget );
-
-    int ox = m_area.x();
-    int oy = m_area.y();
-
-    p->drawPixmap( ox, oy, QPixmap( m_BackGround ));
 }
 
 #include "moc_arduino.cpp"

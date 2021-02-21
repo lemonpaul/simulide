@@ -20,26 +20,27 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
-//#include <QtGui>
-
-#include "ramtable.h"
+#include "e-element.h"
+#include "ramtablewidget.h"
 #include "terminalwidget.h"
 
-class RamTable;
+class BaseDebugger;
 
-class MAINMODULE_EXPORT BaseProcessor : public QObject
+class MAINMODULE_EXPORT BaseProcessor : public QObject, public eElement
 {
     Q_OBJECT
     public:
-        BaseProcessor( QObject* parent=0 );
+        BaseProcessor( McuComponent* parent );
         ~BaseProcessor();
         
  static BaseProcessor* self() { return m_pSelf; }
+
+        virtual void stamp() override;
+        virtual void runEvent() override;
  
         QString getFileName();
 
         virtual void    setDevice( QString device );
-        virtual QString getDevice();
         
         virtual void setDataFile( QString datafile );
 
@@ -47,17 +48,20 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
         virtual bool getLoadStatus() { return m_loadStatus; }
         virtual void terminate();
 
-        virtual void setSteps( double steps );
-        virtual void step()=0;
-        virtual void stepOne()=0;
+        virtual void setFreq( double freq );
         virtual void stepCpu()=0;
         virtual void reset()=0;
+
         virtual int  pc()=0;
+        virtual uint64_t cycle()=0;
+        virtual int  status();
+
+        void stepOne( int line );
         
         virtual void hardReset( bool reset );
-        virtual int getRamValue( QString name );
-        virtual int getRamValue( int address )=0;
-        virtual int getRegAddress( QString name );
+        virtual int  getRamValue( QString name );
+        virtual int  getRamValue( int address )=0;
+        virtual int  getRegAddress( QString name );
         virtual void addWatchVar( QString name, int address, QString type );
         virtual void updateRamValue( QString name );
 
@@ -67,14 +71,17 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
         virtual void initialized();
         virtual QStringList getRegList() { return m_regList; }
         
-        virtual RamTable* getRamTable() { return m_ramTable; }
+        virtual RamTable* getRamTable() { return &m_ramTable; }
 
         virtual QVector<int> eeprom()=0;
         virtual void setEeprom( QVector<int> eep )=0;
         
         virtual void setRegisters();
 
-        bool p_runExtStep;
+        void setDebugging( bool d ) { m_debugging = d; }
+        void setDebugger( BaseDebugger* deb );
+
+        void setMain() { m_pSelf = this; }
 
     signals:
         void uartDataOut( int uart, int value );
@@ -83,28 +90,33 @@ class MAINMODULE_EXPORT BaseProcessor : public QObject
     protected:
  static BaseProcessor* m_pSelf;
         
-        virtual int  validate( int address )=0;
-        
-        void runSimuStep();
+        virtual int validate( int address )=0;
 
         QString m_symbolFile;
         QString m_dataFile;
         QString m_device;
-        
-        double m_mcuStepsPT;
-        int  m_msimStep;
-        double m_nextCycle;
+        QString m_statusReg;
 
-        RamTable* m_ramTable;
+        double m_stepPS;
+
+        RamTable m_ramTable;
+
         QStringList m_regList;
-        QHash<QString, int> m_regsTable;     // int max 32 bits
-        QHash<QString, float> m_floatTable;  // float 32 bits
+
+        QHash<QString, int>     m_regsTable;   // int max 32 bits
         QHash<QString, QString> m_typeTable;
 
         QVector<int> m_eeprom;
 
         bool m_resetStatus;
         bool m_loadStatus;
+
+        McuComponent* m_mcu;
+
+        BaseDebugger* m_debugger;
+        bool m_debugging;
+        bool m_debugStep;
+        int  m_prevLine;
 };
 
 

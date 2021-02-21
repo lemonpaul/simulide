@@ -31,9 +31,7 @@ class TopWidget : public QWidget
         TopWidget();
         ~TopWidget();
 
-        void setupWidget( QWidget* intWidget );
-
-        QVBoxLayout* verticalLayout;
+        QHBoxLayout* mainLayout;
 };
 #endif
 

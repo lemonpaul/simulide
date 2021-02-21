@@ -36,13 +36,13 @@ enum {
 	IOPORT_IRQ_DIRECTION_ALL,
 	IOPORT_IRQ_REG_PORT,
 	IOPORT_IRQ_REG_PIN,
-	IOPORT_IRQ_PIN0_SRC_IMP,IOPORT_IRQ_PIN1_SRC_IMP,IOPORT_IRQ_PIN2_SRC_IMP,IOPORT_IRQ_PIN3_SRC_IMP,
-	IOPORT_IRQ_PIN4_SRC_IMP,IOPORT_IRQ_PIN5_SRC_IMP,IOPORT_IRQ_PIN6_SRC_IMP,IOPORT_IRQ_PIN7_SRC_IMP,
+    //IOPORT_IRQ_PIN0_SRC_IMP,IOPORT_IRQ_PIN1_SRC_IMP,IOPORT_IRQ_PIN2_SRC_IMP,IOPORT_IRQ_PIN3_SRC_IMP,
+    //IOPORT_IRQ_PIN4_SRC_IMP,IOPORT_IRQ_PIN5_SRC_IMP,IOPORT_IRQ_PIN6_SRC_IMP,IOPORT_IRQ_PIN7_SRC_IMP,
 	IOPORT_IRQ_COUNT
 };
 
 #define AVR_IOPORT_OUTPUT 0x100
-#define AVR_IOPORT_INTRN_PULLUP_IMP 100000L
+//#define AVR_IOPORT_INTRN_PULLUP_IMP 100000L
 
 // add port name (uppercase) to get the real IRQ
 #define AVR_IOCTL_IOPORT_GETIRQ(_name) AVR_IOCTL_DEF('i','o','g',(_name))
@@ -52,7 +52,7 @@ enum {
 // to PORT/PIN/DDR and return the corresponding IRQ(s) if it matches
 typedef struct avr_ioport_getirq_t {
 	avr_regbit_t bit;	// bit wanted
-	avr_irq_t * irq[8];	// result, terminated by NULL if < 8
+    avr_irq_t* irq[8];	// result, terminated by NULL if < 8
 } avr_ioport_getirq_t;
 
 #define AVR_IOCTL_IOPORT_GETIRQ_REGBIT AVR_IOCTL_DEF('i','o','g','r')
@@ -107,7 +107,7 @@ typedef struct avr_ioport_t {
 	avr_io_addr_t r_pin;
 
 	avr_int_vector_t pcint;	// PCINT vector
-	avr_io_addr_t r_pcint;		// pcint 8 pins mask
+    avr_io_addr_t r_pcint;	// pcint 8 pins mask
 
 	// this represent the default IRQ value when
 	// the port is set as input.

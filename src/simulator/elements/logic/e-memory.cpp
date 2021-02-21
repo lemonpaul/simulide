@@ -18,127 +18,122 @@
  ***************************************************************************/
 
 #include "e-memory.h"
-#include "e-node.h"
-#include <QDebug>
+#include "simulator.h"
 
-eMemory::eMemory( std::string id )
+eMemory::eMemory( QString id )
        : eLogicDevice( id )
 {
     m_persistent = false;
     m_addrBits = 8;
     m_dataBits = 8;
+    m_dataBytes = 1;
     
     m_dataPinState.resize( 8 );
     m_ram.resize(256);
     
-    resetState();
+    initialize();
 }
 eMemory::~eMemory(){}
 
-void eMemory::stamp()                 // Called at Simulation Start
+void eMemory::stamp()                   // Called at Simulation Start
 {
-    for( int i=0; i<2+m_addrBits; i++ )                 // Initialize control pins
+    for( int i=0; i<2+m_addrBits; ++i ) // Initialize control pins
     {
-        eNode* enode =  m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedFast( this );
+        eNode* enode =  m_input[i]->getEpin(0)->getEnode();
+        if( enode ) enode->voltChangedCallback( this );
     }
     eLogicDevice::stamp();
 }
 
-void eMemory::resetState()
+void eMemory::initialize()
 {
     m_we = true;
     m_cs = true;
     m_oe = false;
+    m_oeNext = false;
     
     double imp = 1e28;
-    for( int i=0; i<m_numOutputs; i++ )
+    for( int i=0; i<m_numOutputs; ++i )
     {
         m_dataPinState[i] = false;
         m_output[i]->setImp( imp );
     }
     if( !m_persistent ) m_ram.fill( 0 );
     
-    eLogicDevice::resetState();
+    eLogicDevice::initialize();
 }
 
-void eMemory::setVChanged()        // Some Pin Changed State, Manage it
+void eMemory::voltChanged()        // Some Pin Changed State, Manage it
 {
-    bool CS = eLogicDevice::getInputState(1);
-    //qDebug()<< QString::fromStdString( m_elmId ) << m_cs << CS;
-
+    bool CS = getInputState( 1 );
     bool csTrig = false;
+    m_read = false;
 
     if( CS != m_cs )
     {
         if( CS && !m_cs ) csTrig = true;
         m_cs = CS;
         
-        if( !CS )
+        if( !CS && m_oe ) // Deactivate
         {
-            m_oe = false;
-            double imp = 1e28;
-            for( int i=0; i<m_numOutputs; i++ ) m_output[i]->setImp( imp );
+            m_oeNext = false;
+            Simulator::self()->addEvent( m_propDelay, this );
         }
     }
     if( !CS ) return;
 
-    bool WE = eLogicDevice::getInputState(0);
-    bool oe = eLogicDevice::outputEnabled() && !WE;
-    //qDebug() << WE << oe;
+    bool WE = getInputState( 0 );
+    bool oe = outputEnabled() && !WE;
     
-    if( oe != m_oe )
+    if( oe != m_oe ) m_oeNext = oe;
+
+    m_address = 0;
+    for( int i=0; i<m_addrBits; ++i )        // Get Address
     {
-        m_oe = oe;
-        eLogicDevice::setOutputEnabled( oe );
+        bool  state = getInputState(i+2);
+        if( state ) m_address += pow( 2, i );
     }
-    int address = 0;
-    for( int i=0; i<m_addrBits; i++ )                              // Get Address
-    {
-        bool  state = eLogicDevice::getInputState(i+2);
-        
-        if( state ) address += pow( 2, i );
-        
-    }
-    //qDebug() << "address " << address;
-    bool weTrig = false;
-    if( WE && !m_we ) weTrig = true;
+
+    bool weTrig = WE && !m_we;
     m_we = WE;
-    if( WE )                                                    // Write
+    if( WE )                                // Write
     {
-        if( csTrig || weTrig)
+        if( csTrig || weTrig)  // Write action triggered
         {
             int value = 0;
-
-            for( int i=0; i<m_numOutputs; i++ )
+            for( int i=0; i<m_numOutputs; ++i )
             {
-                int volt = m_output[i]->getEpin()->getVolt();
-
-                bool  state = m_dataPinState[i];
+                int  volt  = m_output[i]->getEpin(0)->getVolt();
+                bool state = m_dataPinState[i];
 
                 if     ( volt > m_inputHighV ) state = true;
                 else if( volt < m_inputLowV )  state = false;
 
                 m_dataPinState[i] = state;
-                //qDebug() << "Bit " << i << state;
                 if( state ) value += pow( 2, i );
             }
-            //qDebug()<< QString::fromStdString( m_elmId ) << "Writting " << address << value;
-            m_ram[address] = value;
+            m_ram[m_address] = value;
         }
-    }
-    else                                                         // Read
+    }else                                  // Read
     {
-        int value = m_ram[address];
-        //qDebug()<< QString::fromStdString( m_elmId ) << "Reading " << address << value;
-        for( int i=0; i<m_numOutputs; i++ )
-        {
-            bool pinState =  value & 1;
-            m_output[i]->setOut( pinState );
-            m_output[i]->stampOutput();
-            //qDebug() << "Bit " << i << pinState;
-            value >>= 1;
-        }
+        m_read = true;
+        Simulator::self()->addEvent( m_propDelay, this );
+    }
+}
+
+void eMemory::runEvent()
+{
+    if( m_oeNext != m_oe )
+    {
+        setOutputEnabled( m_oeNext );
+        m_oe = m_oeNext;
+    }
+
+    if( m_read )
+    {
+        int value = m_ram[m_address];
+        for( int i=0; i<m_numOutputs; ++i )
+            m_output[i]->setTimedOut( value & (1<<i) );
     }
 }
 
@@ -155,7 +150,6 @@ QVector<int> eMemory::mem()
         QVector<int> null;
         return null;
     }
-    //qDebug() << m_ram.size() <<"Ram:\n" << m_ram;
     return m_ram;
 }
 
@@ -181,6 +175,10 @@ void eMemory::setDataBits( int bits )
 {
     if( bits == 0 ) bits = 8;
     m_dataBits = bits;
+
+    int bytes = bits/8;
+    if( bits%8 ) bytes++;
+    m_dataBytes = bytes;
     
     m_dataPinState.resize( bits );
 }

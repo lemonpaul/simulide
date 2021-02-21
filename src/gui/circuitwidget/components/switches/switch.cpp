@@ -46,9 +46,19 @@ Switch::Switch( QObject* parent, QString type, QString id )
     SetupSwitches( 1, 1 );
 
     connect( m_button, SIGNAL( clicked() ),
-             this,     SLOT  ( onbuttonclicked() ));
+             this,     SLOT  ( onbuttonclicked() ), Qt::UniqueConnection);
 }
 Switch::~Switch(){}
+
+QList<propGroup_t> Switch::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Norm_Close", tr("Normally Closed"),""} );
+    mainGroup.propList.append( {"DT", tr("Double Throw"),""} );
+    mainGroup.propList.append( {"Poles", tr("Poles"),""} );
+    mainGroup.propList.append( {"Key", tr("Key"),""} );
+    return {mainGroup};
+}
 
 void Switch::stamp()
 {
@@ -71,6 +81,8 @@ void Switch::keyEvent( QString key, bool pressed )
 
 void Switch::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
+    if( m_hidden ) return;
+
     Component::paint( p, option, widget );
     MechContact::paint( p, option, widget );
 }

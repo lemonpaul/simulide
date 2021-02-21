@@ -27,7 +27,7 @@ static const char* ADC_properties[] = {
 
 Component* ADC::construct( QObject* parent, QString type, QString id )
 {
-        return new ADC( parent, type, id );
+    return new ADC( parent, type, id );
 }
 
 LibraryItem* ADC::libraryItem()
@@ -42,7 +42,7 @@ LibraryItem* ADC::libraryItem()
 
 ADC::ADC( QObject* parent, QString type, QString id )
    : LogicComponent( parent, type, id )
-   , eADC( id.toStdString() )
+   , eADC( id )
 {
     Q_UNUSED( ADC_properties );
     
@@ -59,8 +59,21 @@ ADC::ADC( QObject* parent, QString type, QString id )
     m_inPin[0]->setLabelColor( QColor( 0, 0, 0 ) );
                           
     eLogicDevice::createInput( m_inPin[0] );
+
+    setLabelPos(-16,-80, 0);
 }
-ADC::~ADC(){
+ADC::~ADC(){}
+
+QList<propGroup_t> ADC::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Num_Bits", tr("Size"),"Bits"} );
+    mainGroup.propList.append( {"Vref", tr("Reference Voltage"),"V"} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    for( int i=0;i<4; ++i ) pg.first().propList.removeFirst(); //remove Inputs.
+    pg.prepend( mainGroup );
+    return pg;
 }
 
 void ADC::setNumOuts( int outs )
@@ -81,7 +94,7 @@ void ADC::setNumOuts( int outs )
 
         eLogicDevice::createOutput( m_outPin[i] );
     }
-    m_maxAddr = pow( 2, m_numOutputs )-1;
+    m_maxValue = pow( 2, m_numOutputs )-1;
 
     m_height = outs+1;
     m_area = QRect( -(m_width/2)*8, -m_height*8+8, m_width*8, m_height*8 );

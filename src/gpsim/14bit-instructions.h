@@ -33,181 +33,154 @@ class instruction;  // forward declaration for the include files that follow
 
 
 //---------------------------------------------------------
-class ADDFSR : public instruction 
+class ADDFSR : public Instruction
 {
-
-public:
-  ADDFSR(Processor *new_cpu, uint new_opcode,const char *, uint address);
-  virtual bool isBase() { return true;}
-  virtual void execute();
-  virtual char *name(char *,int);
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {
-    return new ADDFSR(new_cpu,new_opcode,"addfsr", address);
-  }
-protected:
-  uint 	m_fsr;
-  int 		m_lit;
-  Indirect_Addressing14 *ia;
+    public:
+      ADDFSR(Processor *new_cpu, uint new_opcode,const char *, uint address);
+      virtual bool isBase() { return true;}
+      virtual void execute();
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      {
+        return new ADDFSR(new_cpu,new_opcode,"addfsr", address);
+      }
+    protected:
+      uint 	m_fsr;
+      int 	m_lit;
+      Indirect_Addressing14 *ia;
 };
-
-//---------------------------------------------------------
 
 class ADDLW : public Literal_op
 {
-
-public:
-  ADDLW(Processor *new_cpu, uint new_opcode, uint address);
-  virtual void execute(void);
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-    {return new ADDLW(new_cpu,new_opcode, address);}
-
+    public:
+      ADDLW(Processor *new_cpu, uint new_opcode, uint address);
+      virtual void execute(void);
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+        {return new ADDLW(new_cpu,new_opcode, address);}
 };
 
-//---------------------------------------------------------
 class ADDWFC : public Register_op
 {
-public:
-
-  ADDWFC(Processor *new_cpu, uint new_opcode, uint address);
-  virtual void execute();
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {return new ADDWFC(new_cpu,new_opcode,address);}
+    public:
+      ADDWFC(Processor *new_cpu, uint new_opcode, uint address);
+      virtual void execute();
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      {return new ADDWFC(new_cpu,new_opcode,address);}
 };
 
-//---------------------------------------------------------
-class BRA : public instruction
+class BRA : public Instruction
 {
-public:
-  int destination_index;
-  uint absolute_destination_index;
+    public:
+      int destination_index;
+      uint absolute_destination_index;
 
-  BRA(Processor *new_cpu, uint new_opcode, uint address);
-  virtual void execute();
-  virtual char *name(char *,int);
-  virtual bool isBase() { return true;}
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {return new BRA(new_cpu,new_opcode,address);}
+      BRA(Processor *new_cpu, uint new_opcode, uint address);
+      virtual void execute();
+      virtual char *name(char *,int);
+      virtual bool isBase() { return true;}
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      {return new BRA(new_cpu,new_opcode,address);}
 };
 
-//---------------------------------------------------------
-class BRW : public instruction
+class BRW : public Instruction
 {
-public:
-  int destination_index;
-  uint current_address;
+    public:
+      int destination_index;
+      uint current_address;
 
-  BRW(Processor *new_cpu, uint new_opcode, uint address);
-  virtual void execute();
-  virtual char *name(char *,int);
-  virtual bool isBase() { return true;}
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {return new BRW(new_cpu,new_opcode,address);}
+      BRW(Processor *new_cpu, uint new_opcode, uint address);
+      virtual void execute();
+      virtual char *name(char *,int);
+      virtual bool isBase() { return true;}
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      {return new BRW(new_cpu,new_opcode,address);}
 };
 
-//---------------------------------------------------------
 class ASRF : public Register_op
 {
-public:
-
-  ASRF(Processor *new_cpu, uint new_opcode, uint address);
-  virtual void execute();
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {return new ASRF(new_cpu,new_opcode,address);}
+    public:
+      ASRF(Processor *new_cpu, uint new_opcode, uint address);
+      virtual void execute();
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      {return new ASRF(new_cpu,new_opcode,address);}
 };
 
-//---------------------------------------------------------
-class CALLW : public instruction
+class CALLW : public Instruction
 {
-public:
-  CALLW(Processor *new_cpu, uint new_opcode, uint address);
-  virtual bool isBase() { return true;}
-  virtual void execute();
-  virtual char *name(char *,int);
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {
-    return new CALLW(new_cpu,new_opcode,address);
-  }
+    public:
+      CALLW(Processor *new_cpu, uint new_opcode, uint address);
+      virtual bool isBase() { return true;}
+      virtual void execute();
+      virtual char *name(char *,int);
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      { return new CALLW(new_cpu,new_opcode,address); }
 };
 
-//---------------------------------------------------------
 class LSLF : public Register_op
 {
-public:
-
-  LSLF(Processor *new_cpu, uint new_opcode, uint address);
-  virtual void execute();
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {return new LSLF(new_cpu,new_opcode,address);}
+    public:
+      LSLF(Processor *new_cpu, uint new_opcode, uint address);
+      virtual void execute();
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      {return new LSLF(new_cpu,new_opcode,address);}
 };
 
-//---------------------------------------------------------
 class LSRF : public Register_op
 {
-public:
-
-  LSRF(Processor *new_cpu, uint new_opcode, uint address);
-  virtual void execute();
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {return new LSRF(new_cpu,new_opcode,address);}
+    public:
+      LSRF(Processor *new_cpu, uint new_opcode, uint address);
+      virtual void execute();
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      {return new LSRF(new_cpu,new_opcode,address);}
 };
 
-//---------------------------------------------------------
-class MOVIW : public instruction
+class MOVIW : public Instruction
 {
-public:
+    public:
+      MOVIW(Processor *new_cpu, uint new_opcode, uint address);
+      virtual void execute();
+      virtual bool isBase() { return true;}
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      {return new MOVIW(new_cpu,new_opcode,address);}
+      virtual char *name(char *,int);
 
-  MOVIW(Processor *new_cpu, uint new_opcode, uint address);
-  virtual void execute();
-  virtual bool isBase() { return true;}
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {return new MOVIW(new_cpu,new_opcode,address);}
-  virtual char *name(char *,int);
-
-  enum {
-	PREINC,
-	PREDEC,
-	POSTINC,
-	POSTDEC,
-	DELTA
-  };
-protected:
-  uint 	m_fsr;
-  int 		m_lit;
-  uint 	m_op;
-  Indirect_Addressing14 *ia;
+      enum {
+        PREINC,
+        PREDEC,
+        POSTINC,
+        POSTDEC,
+        DELTA
+      };
+    protected:
+      uint 	m_fsr;
+      int 		m_lit;
+      uint 	m_op;
+      Indirect_Addressing14 *ia;
 };
 
-
-//---------------------------------------------------------
-class MOVWI : public instruction
+class MOVWI : public Instruction
 {
-public:
+    public:
 
-  MOVWI(Processor *new_cpu, uint new_opcode, uint address);
-  virtual void execute();
-  virtual bool isBase() { return true;}
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
-  {return new MOVWI(new_cpu,new_opcode,address);}
-  virtual char *name(char *,int);
+      MOVWI(Processor *new_cpu, uint new_opcode, uint address);
+      virtual void execute();
+      virtual bool isBase() { return true;}
+      static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+      {return new MOVWI(new_cpu,new_opcode,address);}
+      virtual char *name(char *,int);
 
-  enum {
-	PREINC,
-	PREDEC,
-	POSTINC,
-	POSTDEC,
-	DELTA
-  };
-protected:
-  uint 	m_fsr;
-  int 		m_lit;
-  uint 	m_op;
-  Indirect_Addressing14 *ia;
+      enum {
+        PREINC,
+        PREDEC,
+        POSTINC,
+        POSTDEC,
+        DELTA
+      };
+    protected:
+      uint 	m_fsr;
+      int 		m_lit;
+      uint 	m_op;
+      Indirect_Addressing14 *ia;
 };
-
-
-
-//---------------------------------------------------------
 
 class MOVLB : public Literal_op
 {
@@ -215,12 +188,9 @@ public:
   MOVLB(Processor *new_cpu, uint new_opcode, uint address);
   virtual void execute();
   virtual char *name(char *return_str,int len);
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+  static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
   {return new MOVLB(new_cpu,new_opcode,address);}
-
 };
-
-//---------------------------------------------------------
 
 class MOVLP : public Literal_op
 {
@@ -228,74 +198,56 @@ public:
   MOVLP(Processor *new_cpu, uint new_opcode, uint address);
   virtual void execute();
   virtual char *name(char *return_str,int len);
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+  static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
   {return new MOVLP(new_cpu,new_opcode,address);}
-
 };
 
-//---------------------------------------------------------
-class RESET : public instruction
+class RESET : public Instruction
 {
 public:
-
   RESET(Processor *new_cpu, uint new_opcode, uint address);
   virtual void execute();
   virtual bool isBase() { return true;}
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+  static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
   {return new RESET(new_cpu,new_opcode,address);}
-
 };
 
 
-//---------------------------------------------------------
-class RETFIE : public instruction
+class RETFIE : public Instruction
 {
 public:
-
   RETFIE(Processor *new_cpu, uint new_opcode, uint address);
   virtual void execute(void);
   virtual bool isBase() { return true;}
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+  static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
     {return new RETFIE(new_cpu,new_opcode,address);}
-
 };
 
-
-//---------------------------------------------------------
-class RETURN : public instruction
+class RETURN : public Instruction
 {
 public:
-
   RETURN(Processor *new_cpu, uint new_opcode, uint address);
   virtual void execute(void);
   virtual bool isBase() { return true;}
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+  static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
     {return new RETURN(new_cpu,new_opcode,address);}
-
 };
-
-//---------------------------------------------------------
 
 class SUBLW : public Literal_op
 {
-
 public:
-
   SUBLW(Processor *new_cpu, uint new_opcode, uint address);
   virtual void execute(void);
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+  static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
     {return new SUBLW(new_cpu,new_opcode,address);}
-
 };
 
-//---------------------------------------------------------
 class SUBWFB : public Register_op
 {
 public:
-
   SUBWFB(Processor *new_cpu, uint new_opcode, uint address);
   virtual void execute();
-  static instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
+  static Instruction *construct(Processor *new_cpu, uint new_opcode, uint address)
   {return new SUBWFB(new_cpu,new_opcode,address);}
 };
 

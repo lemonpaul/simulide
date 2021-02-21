@@ -19,6 +19,7 @@
 
 #include "subpackage.h"
 #include "itemlibrary.h"
+#include "circuitwidget.h"
 #include "circuit.h"
 #include "simuapi_apppath.h"
 #include "utils.h"
@@ -58,19 +59,40 @@ SubPackage::SubPackage( QObject* parent, QString type, QString id )
     m_fakePin = false;
     m_movePin = false;
     m_isLS    = true;
+    m_graphical = true;
+    m_boardMode = false;
     
     m_lsColor = QColor( 210, 210, 255 );
     m_icColor = QColor( 40, 40, 120 );
     m_color = m_lsColor;
     
     m_area  = QRect(0, 0, m_width*8, m_height*8);
+
+    m_boardModeAction = new QAction( tr("Board Mode"), this );
+    m_boardModeAction->setCheckable(true);
+    m_boardMode = false;
     
     setAcceptHoverEvents(true);
+
+    setZValue( -1 );
     
     m_pkgeFile = SIMUAPI_AppPath::self()->RODataFolder().absolutePath();
-    if( m_lastPkg == "" ) m_lastPkg = m_pkgeFile;
+    //if( m_lastPkg == "" ) m_lastPkg = m_pkgeFile;
+
+    connect( CircuitWidget::self(), SIGNAL( saving()),
+                              this, SLOT( savingCirc() ), Qt::UniqueConnection );
 }
 SubPackage::~SubPackage(){}
+
+QList<propGroup_t> SubPackage::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Width", tr("Width"),"Grid Cells"} );
+    mainGroup.propList.append( {"Height", tr("Height"),"Grid Cells"} );
+    mainGroup.propList.append( {"Package_File", tr("Package File"),""} );
+    mainGroup.propList.append( {"Background", tr("Background"),""} );
+    return {mainGroup};
+}
 
 void SubPackage::hoverMoveEvent( QGraphicsSceneHoverEvent* event ) 
 {
@@ -142,27 +164,8 @@ void SubPackage::mousePressEvent( QGraphicsSceneMouseEvent* event )
         pin->setLabelColor( QColor( Qt::black ) );
         pin->setLabelPos();
 
-        if( m_angle == 0 )
-        {
-            m_rigPin.append( pin );
-            qSort( m_rigPin.begin(), m_rigPin.end(), lessPinY );
-            //for( Pin* pin : m_rigPin ) qDebug() << pin->pinId();
-        }
-        else if( m_angle == 90 )
-        {
-            m_topPin.append( pin );
-            qSort( m_topPin.begin(), m_topPin.end(), lessPinX );
-        }
-        else if( m_angle == 180 )
-        {
-            m_lefPin.append( pin );
-            qSort( m_lefPin.begin(), m_lefPin.end(), lessPinY );
-        }
-        else if( m_angle == 270 )
-        {
-            m_botPin.append( pin );
-            qSort( m_botPin.begin(), m_botPin.end(), lessPinX );
-        }
+        m_pins.append( pin );
+
         m_eventPin = pin;
         editPin();
         Circuit::self()->update();
@@ -172,11 +175,6 @@ void SubPackage::mousePressEvent( QGraphicsSceneMouseEvent* event )
         event->accept();
         ungrabMouse();
         setCursor( Qt::OpenHandCursor );
-        
-        if     ( m_angle == 0 )   qSort( m_rigPin.begin(), m_rigPin.end(), lessPinY );
-        else if( m_angle == 90 )  qSort( m_topPin.begin(), m_topPin.end(), lessPinX );
-        else if( m_angle == 180 ) qSort( m_lefPin.begin(), m_lefPin.end(), lessPinY );
-        else if( m_angle == 270 ) qSort( m_botPin.begin(), m_botPin.end(), lessPinX );
         
         m_changed = true;
         m_movePin = false;
@@ -190,29 +188,45 @@ void SubPackage::mouseMoveEvent( QGraphicsSceneMouseEvent* event )
     if( m_movePin && m_eventPin )
     {
         event->accept();
+
+        int pinLenth = m_eventPin->length();
+
+        int Xmax = m_area.width();
+        int Ymax = m_area.height();
+        int pinX = m_eventPin->pos().x();
+        int pinY = m_eventPin->pos().y();
+        //qDebug() << "SubPackage::mouseMoveEvent" << pinX<<pinY<<Xmax<<Ymax;
+
         QPointF delta = toCompGrid(event->scenePos()) - toCompGrid(event->lastScenePos());
         
         int deltaX = delta.x();
         int deltaY = delta.y();
-        bool deltaH  = fabs( deltaX ) > 0;
-        bool deltaV  = fabs( deltaY ) > 0;
-        
-        if( ((m_angle == 0)||(m_angle == 180)) && deltaV )   
+
+        if(( m_angle == 0 )    // Right
+         ||( m_angle == 180 )) // Left
         {
-            m_eventPin->moveBy( 0, deltaY );
-            if     ( m_eventPin->y() < 8 )            m_eventPin->setY( 8 );
-            else if( m_eventPin->y() > m_height*8-8 ) m_eventPin->setY( m_height*8-8 );
-            m_eventPin->setLabelPos();
-            m_eventPin->isMoved();
+            if( (pinY >= Ymax) && (deltaY>0) ) return;
+            if( (pinY <= 0)    && (deltaY<0) ) return;
+            //if( pinLenth > 1 ) deltaX = 0;
+            else
+            {
+                if( (pinX >= Xmax+pinLenth)&& (deltaX>0) ) return;
+                if( (pinX <= -pinLenth)&& (deltaX<0) ) return;
+            }
         }
-        else if( ((m_angle == 90)||(m_angle == 270)) && deltaH )  
+        else if(( m_angle == 90 )   // Top
+              ||( m_angle == 270 )) // Bottom
         {
-            m_eventPin->moveBy( deltaX, 0 );
-            if     ( m_eventPin->x() < 8 )          m_eventPin->setX( 8 );
-            else if( m_eventPin->x() > m_width*8-8) m_eventPin->setX( m_width*8-8 );
-            m_eventPin->setLabelPos();
-            m_eventPin->isMoved();
+            if( (pinX >= Xmax) && (deltaX>0) ) return;
+            if( (pinX <= 0)    && (deltaX<0) ) return;
+            //if( pinLenth > 1 ) deltaY = 0;
+            else
+            {
+                if( (pinY >= Ymax) && (deltaY>0) ) return;
+                if( (pinY <= 0) && (deltaY<0) ) return;
+            }
         }
+        m_eventPin->moveBy( deltaX, deltaY );
     }
     else Component::mouseMoveEvent( event );
 }
@@ -224,49 +238,21 @@ void SubPackage::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 
     m_eventPin = 0l;
 
-    if( xPos == 0 && yPos >= 8 && yPos <= m_height*8-8 ) // Left
+    for( Pin* pin : m_pins )
     {
-        for( Pin* pin : m_lefPin )
-        {
-            if( pin->y() == yPos )
-            {
-                m_eventPin = pin;
-                break;
-            }
-        }
-    }
-    else if( xPos == m_width*8 && yPos >= 8 && yPos <= m_height*8-8 ) // Right
-    {
-        for( Pin* pin : m_rigPin )
-        {
-            if( pin->y() == yPos )
-            {
-                m_eventPin = pin;
-                break;
-            }
-        }
-    }
-    else if( yPos == 0 && xPos >= 8 && xPos <= m_width*8-8 ) // Top
-    {
-        for( Pin* pin : m_topPin )
-        {
-            if( pin->x() == xPos )
-            {
-                m_eventPin = pin;
-                break;
-            }
-        }
-    }
-    else if( yPos == m_height*8 && xPos >= 8 && xPos <= m_width*8-8 ) // Bottom
-    {
-        for( Pin* pin : m_botPin )
-        {
-            if( pin->x() == xPos )
-            {
-                m_eventPin = pin;
-                break;
-            }
-        }
+        int xPin = pin->x();
+        int yPin = pin->y();
+        int angle = pin->pinAngle();
+
+        if     ( angle == 0 )   xPin -= 8; // Right
+        else if( angle == 180 ) xPin += 8; // Left
+        else if( angle == 90 )  yPin += 8; // Top
+        else if( angle == 270 ) yPin -= 8; // Bottom
+
+        //qDebug() << "\nSubPackage::contextMenuEvent" <<pin->y()<<yPos<<pin->x()<< xPos<<angle;
+        //qDebug() << "SubPackage::contextMenuEvent" <<abs(yPin-yPos) << abs(xPin-xPos);
+        if(( abs(yPin-yPos)<4 ) && ( abs(xPin-xPos)<4 ) )
+        { m_eventPin = pin; break; }
     }
     event->accept();
     QMenu* menu = new QMenu();
@@ -279,27 +265,90 @@ void SubPackage::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu
     if( m_eventPin )
     {
         QAction* moveAction = menu->addAction( QIcon(":/hflip.png"),tr("Move Pin ")+m_eventPin->getLabelText() );
-        connect( moveAction, SIGNAL(triggered()), this, SLOT( movePin() ) );
+        connect( moveAction, SIGNAL( triggered()), this, SLOT( movePin() ), Qt::UniqueConnection );
 
         QAction* editAction = menu->addAction( QIcon(":/rename.png"),tr("Edit Pin ")+m_eventPin->getLabelText() );
-        connect( editAction, SIGNAL(triggered()), this, SLOT( editPin() ) );
+        connect( editAction, SIGNAL( triggered()), this, SLOT( editPin() ), Qt::UniqueConnection );
 
         QAction* deleteAction = menu->addAction( QIcon(":/remove.png"),tr("Delete Pin ")+m_eventPin->getLabelText() );
-        connect( deleteAction, SIGNAL(triggered()), this, SLOT( deletePin() ) );
+        connect( deleteAction, SIGNAL( triggered()), this, SLOT( deleteEventPin() ), Qt::UniqueConnection );
 
         menu->exec( event->screenPos() );
     }
     else
     {
         QAction* loadAction = menu->addAction( QIcon(":/open.png"),tr("Load Package") );
-        connect( loadAction, SIGNAL(triggered()), this, SLOT( loadPackage() ) );
+        connect( loadAction, SIGNAL( triggered()), this, SLOT( loadPackage() ), Qt::UniqueConnection );
 
         QAction* saveAction = menu->addAction( QIcon(":/save.png"),tr("Save Package") );
-        connect( saveAction, SIGNAL(triggered()), this, SLOT( slotSave() ) );
+        connect( saveAction, SIGNAL(triggered()), this, SLOT( slotSave() ), Qt::UniqueConnection );
 
         menu->addSeparator();
 
+        m_boardModeAction->setChecked( m_boardMode );
+        menu->addAction( m_boardModeAction );
+        connect( m_boardModeAction, SIGNAL( triggered()),
+                              this, SLOT( boardMode() ), Qt::UniqueConnection );
+
+        QAction* mainCompAction = menu->addAction( QIcon(":/subcl.png"),tr("Select Main Component") );
+        connect( mainCompAction, SIGNAL( triggered()),
+                           this, SLOT( mainComp() ), Qt::UniqueConnection );
+
         Component::contextMenu( event, menu );
+    }
+}
+
+void SubPackage::mainComp()
+{
+    Component::m_selMainCo = true;
+}
+
+void SubPackage::boardMode()
+{
+    m_boardMode = m_boardModeAction->isChecked();
+    setBoardMode();
+}
+
+void SubPackage::setBoardMode()
+{
+    QList<Component*>* compList = Circuit::self()->conList();
+    for( Component* comp : *compList )
+    {
+        Connector* con =static_cast<Connector*>( comp );
+        if( con ) con->setVisib( !m_boardMode );
+    }
+    compList = Circuit::self()->compList();
+    for( Component* comp : *compList )
+    {
+        if( comp->itemType() == "Package" ) continue;
+
+        if( m_boardMode )
+        {
+            comp->setCircPos( comp->pos() );
+            comp->setCircRot( comp->rotation() );
+            if( comp->boardRot() != -1e+6 )
+            {
+                comp->setPos( comp->boardPos()+ this->pos() );
+                comp->setRotation( comp->boardRot() );
+            }
+        }else
+        {
+            comp->setBoardPos( comp->pos()-this->pos() );
+            comp->setBoardRot( comp->rotation() );
+            comp->setPos( comp->circPos() );
+            comp->setRotation( comp->circRot() );
+        }
+        comp->setHidden( m_boardMode );
+    }
+    Circuit::self()->update();
+}
+
+void SubPackage::savingCirc()
+{
+    if( m_boardMode )
+    {
+        m_boardMode = false;
+        setBoardMode();
     }
 }
 
@@ -316,76 +365,28 @@ void SubPackage::remove()
         if     ( ret == QMessageBox::Save ) slotSave();
         else if( ret == QMessageBox::Cancel ) return;
     }
-    for( Pin* pin : m_rigPin )
+    for( Pin* pin : m_pins )
     {
-        if( !pin ) continue;
-        
-        if( pin && pin->isConnected())
-        {
-            Connector* con = pin->connector();
-            if( con ) con->remove();
-        }
-    }
-    for( Pin* pin : m_topPin )
-    {
-        if( !pin ) continue;
-        
-        if( pin && pin->isConnected())
-        {
-            Connector* con = pin->connector();
-            if( con ) con->remove();
-        }
-    }
-    for( Pin* pin : m_lefPin )
-    {
-        if( !pin ) continue;
-        
-        if( pin && pin->isConnected())
-        {
-            Connector* con = pin->connector();
-            if( con ) con->remove();
-        }
-    }
-    for( Pin* pin : m_botPin )
-    {
-        if( !pin ) continue;
-        
-        if( pin && pin->isConnected())
-        {
-            Connector* con = pin->connector();
-            if( con ) con->remove();
-        }
+        if( pin->connector() ) pin->connector()->remove();
     }
     Circuit::self()->compRemoved( true );
 }
 
-int SubPackage::width()
-{
-    return m_width;
-}
+int SubPackage::width() { return m_width; }
 
 void SubPackage::setWidth( int width )
 {
     if( m_width == width ) return;
     m_changed = true;
-    
-    int minTopWidth = 2;
-    int minBotWidth = 2;
-    if( !m_topPin.isEmpty() ) minTopWidth = m_topPin.last()->x()/8+1;
-    if( !m_botPin.isEmpty() ) minBotWidth = m_botPin.last()->x()/8+1;
-    //qDebug() <<m_topPin.last()->x()<< minTopWidth << minBotWidth;
 
-    if( width < minTopWidth ) width = minTopWidth;
-    if( width < minBotWidth ) width = minBotWidth;
-    
     m_width = width;
     m_area = QRect(0, 0, m_width*8, m_height*8);
     
-    for( Pin* pin : m_rigPin )
+    /*for( Pin* pin : m_rigPin )
     {
         pin->setX( m_width*8+8 );
         pin->setLabelPos();
-    }
+    }*/
     Circuit::self()->update();
 }
 
@@ -399,22 +400,14 @@ void SubPackage::setHeight( int height )
     if( m_height == height ) return;
     m_changed = true;
     
-    int minRigHeight = 2;
-    int minLefHeight = 2;
-    if( !m_rigPin.isEmpty() ) minRigHeight = m_rigPin.last()->y()/8+1;
-    if( !m_lefPin.isEmpty() ) minLefHeight = m_lefPin.last()->y()/8+1;
-
-    if( height < minRigHeight ) height = minRigHeight;
-    if( height < minLefHeight ) height = minLefHeight;
-    
     m_height = height;
     m_area = QRect( 0, 0, m_width*8, m_height*8 );
     
-    for( Pin* pin : m_botPin )
+    /*for( Pin* pin : m_botPin )
     {
         pin->setY( m_height*8+8 );
         pin->setLabelPos();
-    }
+    }*/
     Circuit::self()->update();
 }
 
@@ -432,10 +425,12 @@ void SubPackage::movePin()
 void SubPackage::editPin()
 {
     if( !m_eventPin ) return;
+    m_angle = m_eventPin->pinAngle();
+
     EditDialog* editDialog = new EditDialog( this, m_eventPin, 0l );
 
     connect( editDialog, SIGNAL( finished(int) ),
-                   this, SLOT( editFinished(int) ) );
+                   this, SLOT( editFinished(int) ), Qt::UniqueConnection );
 
     editDialog->exec();
     editDialog->deleteLater();
@@ -446,43 +441,17 @@ void SubPackage::editFinished( int r )
     if( m_changed ) Circuit::self()->saveState();
 }
 
-void SubPackage::deletePin()
+void SubPackage::deleteEventPin()
 {
     if( !m_eventPin ) return;
     m_changed = true;
-    
-    int angle = m_eventPin->pinAngle();
-    
-    if( angle == 0 )   
-    {
-        m_rigPin.removeOne( m_eventPin );
-        qSort( m_rigPin.begin(), m_rigPin.end(), lessPinY );
-    }
-    else if( angle == 90 )  
-    {
-        m_topPin.removeOne( m_eventPin );
-        qSort( m_topPin.begin(), m_topPin.end(), lessPinX );
-    }
-    else if( angle == 180 ) 
-    {
-        m_lefPin.removeOne( m_eventPin );
-        qSort( m_lefPin.begin(), m_lefPin.end(), lessPinY );
-    }
-    else if( angle == 270 ) 
-    {
-        m_botPin.removeOne( m_eventPin );
-        qSort( m_botPin.begin(), m_botPin.end(), lessPinX );
-    }
-       
-    if( m_eventPin->isConnected() ) m_eventPin->connector()->remove();
-    if( m_eventPin->scene() ) Circuit::self()->removeItem( m_eventPin );
-    m_eventPin->reset();
-    delete m_eventPin;
+
+    m_pins.removeOne( m_eventPin );
+    deletePin( m_eventPin );
     m_eventPin = 0l;
     
     Circuit::self()->update();
 }
-
 
 void SubPackage::setPinId( QString id )
 {
@@ -510,6 +479,28 @@ void SubPackage::unusePin( bool unuse )
     m_changed = true;
 }
 
+void SubPackage::pointPin( bool point )
+{
+    int length = 8;
+    if( point ) length = 1;
+    int oldLength = m_eventPin->length();
+    if( length == oldLength ) return;
+
+    int deltaL = 8;
+    if( oldLength > 1 ) deltaL = -8;
+
+    m_eventPin->setLength( length );
+
+    if     ( m_angle == 180 ) m_eventPin->moveBy(-deltaL, 0 );// Left
+    else if( m_angle == 0 )   m_eventPin->moveBy( deltaL, 0 );// Right
+    else if( m_angle == 90 )  m_eventPin->moveBy( 0,-deltaL );// Top
+    else if( m_angle == 270 ) m_eventPin->moveBy( 0, deltaL );// Bottom
+
+    m_eventPin->setFlag( QGraphicsItem::ItemStacksBehindParent, !point );
+    Circuit::self()->update();
+    m_changed = true;
+}
+
 QString SubPackage::package()
 {
     return m_pkgeFile;
@@ -522,7 +513,6 @@ void SubPackage::setPackage( QString package )
     Chip::initChip();
     
     setLogicSymbol( m_isLS );
-
     Circuit::self()->update();
 }
 
@@ -539,27 +529,8 @@ void SubPackage::setLogicSymbol( bool ls )
         m_color = m_icColor;
         labelColor = QColor( 250, 250, 200 );
     }
+    for( Pin* pin : m_pins ) pin->setLabelColor( labelColor );
 
-    for( Pin* pin : m_lefPin )
-    {
-        if( !pin ) continue;
-        pin->setLabelColor( labelColor );
-    }
-    for( Pin* pin : m_botPin )
-    {
-        if( !pin ) continue;
-        pin->setLabelColor( labelColor );
-    }
-    for( Pin* pin : m_rigPin )
-    {
-        if( !pin ) continue;
-        pin->setLabelColor( labelColor );
-    }
-    for( Pin* pin : m_topPin )
-    {
-        if( !pin ) continue;
-        pin->setLabelColor( labelColor );
-    }
     Circuit::self()->update();
 }
 
@@ -572,58 +543,64 @@ void SubPackage::slotSave()
     const QString dir = pkgeFile;
     QString fileName = QFileDialog::getSaveFileName( 0l, tr("Save Package"), dir,
                                                      tr("Packages (*.package);;All files (*.*)"));
-    if (fileName.isEmpty()) return;
+    if( fileName.isEmpty() ) return;
 
     savePackage( fileName );
 }
 
-QString SubPackage::pinEntry( Pin* pin, int pP, QString side )
+QString SubPackage::pinEntry( Pin* pin, int pP )
 {
     QString label = pin->getLabelText();
     QString id    = pin->pinId().split( "-" ).last().replace( " ", "" );
     QString paPin = QString::number( pP );
     
-    QString pos = "";
-    if     ( side == "left"   ) pos = QString::number( (int)pin->y()/8 );
-    else if( side == "bottom" ) pos = QString::number( (int)pin->x()/8 );
-    else if( side == "right"  ) pos = QString::number( (int)pin->y()/8 );
-    else if( side == "top"    ) pos = QString::number( (int)pin->x()/8 );
+    QString xpos   = QString::number( pin->x() );
+    QString ypos   = QString::number( pin->y() );
+    QString angle  = QString::number( pin->pinAngle() );
+    QString length = QString::number( pin->length() );
     
     QString type = "";
-    if( pin->inverted() )
-    {
-        type = "inverted";
-        //if( !id.startsWith( "!" ) ) id = "!"+id;
-    }
-    else if( pin->unused() ) type = "unused";
+    if     ( pin->inverted() ) type = "inverted";
+    else if( pin->unused() )   type = "unused";
     
-    return "    <pin side=\""+side+"\" pos=\""+pos+"\"  type=\""+type+"\" id=\""+id+"\"  label=\""+label+"\" /><!-- packagePin"+paPin+" -->\n";
-    //pP++;
+    return "    <pin type=\""+type
+            +"\" xpos=\""+xpos
+            +"\" ypos=\""+ypos
+            +"\" angle=\""+angle
+            +"\" length=\""+length
+            +"\" id=\""+id
+            +"\" label=\""+label
+            +"\" /><!-- packagePin"+paPin+" -->\n";
 }
 
 void SubPackage::loadPackage()
 {
-    QDir pkgDir = QFileInfo( Circuit::self()->getFileName() ).absoluteDir();
-    QString dir = pkgDir.absoluteFilePath( m_pkgeFile );
-    
+    Circuit::self()->saveState();
+
+    QDir pkgDir;
+    QString dir;
+
+    if( m_lastPkg == "" )
+    {
+        pkgDir = QFileInfo( Circuit::self()->getFileName() ).absoluteDir();
+        dir = pkgDir.absoluteFilePath( m_pkgeFile );
+    }
+    else
+    {
+        pkgDir = QFileInfo( m_lastPkg ).absoluteDir();
+        dir = pkgDir.absolutePath();
+    }
+
     QString fileName = QFileDialog::getOpenFileName( 0l, tr("Load Package File"), dir,
                        tr("Packages (*.package);;All files (*.*)"));
 
-    if (fileName.isEmpty()) return; // User cancels loading
+    if( fileName.isEmpty() ) return; // User cancels loading
 
     setPackage( fileName );
-
-    qSort( m_rigPin.begin(), m_rigPin.end(), lessPinY );
-    qSort( m_topPin.begin(), m_topPin.end(), lessPinX );
-    qSort( m_lefPin.begin(), m_lefPin.end(), lessPinY );
-    qSort( m_botPin.begin(), m_botPin.end(), lessPinX );
 
     QDir pdir = QFileInfo( Circuit::self()->getFileName() ).absoluteDir();
     m_pkgeFile = pdir.relativeFilePath( fileName );
     m_lastPkg = fileName;
-
-    Circuit::self()->saveState();
-    Circuit::self()->update();
 }
 
 void SubPackage::savePackage( QString fileName )
@@ -645,38 +622,25 @@ void SubPackage::savePackage( QString fileName )
     QApplication::setOverrideCursor(Qt::WaitCursor);
     
     QString name = m_id.split("-").first();
-    int pins = m_topPin.size()+m_botPin.size()+m_lefPin.size()+m_rigPin.size();
+    int pins = m_pins.size();
 
     out << "<!DOCTYPE SimulIDE>\n\n";
     out << "<!-- This file was generated by SimulIDE -->\n\n";
-    out << "<package name=\""+name+"\" pins=\""+QString::number(pins)+"\" width=\""+QString::number(m_width)+"\" height=\""+QString::number(m_height)+"\" >\n\n";
+    out << "<packageB name=\""+name
+           +"\" pins=\"" +QString::number( pins )
+           +"\" width=\"" +QString::number( m_width )
+           +"\" height=\"" +QString::number( m_height )
+           +"\" background=\"" +m_BackGround
+           +"\" >\n\n";
     
     int pP = 1;
-    for( Pin* pin : m_lefPin )
+    for( Pin* pin : m_pins )
     {
-        out << pinEntry( pin, pP, "left" );
+        out << pinEntry( pin, pP);
         pP++;
     }
     out << "    \n";
-    for( Pin* pin : m_botPin )
-    {
-        out << pinEntry( pin, pP, "bottom" );
-        pP++;
-    }
-    out << "    \n";
-    for( Pin* pin : m_rigPin )
-    {
-        out << pinEntry( pin, pP, "right" );
-        pP++;
-    }
-    out << "    \n";
-    for( Pin* pin : m_topPin )
-    {
-        out << pinEntry( pin, pP, "top" );
-        pP++;
-    }
-    out << "    \n";
-    out << "</package>\n";
+    out << "</packageB>\n";
 
     file.close();
     QApplication::restoreOverrideCursor();
@@ -710,9 +674,6 @@ void SubPackage::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWi
 EditDialog::EditDialog( SubPackage* pack, Pin* eventPin, QWidget* parent )
           : QDialog( parent, Qt::WindowCloseButtonHint )
 {
-    /*setWindowFlags( windowFlags() | Qt::CustomizeWindowHint );
-    setWindowFlags( windowFlags() | Qt::WindowSystemMenuHint );
-    setWindowFlags( windowFlags() | Qt::WindowCloseButtonHint );*/
     m_package = pack;
 
     m_nameLabel = new QLabel( tr("Pin Name:") );
@@ -736,6 +697,9 @@ EditDialog::EditDialog( SubPackage* pack, Pin* eventPin, QWidget* parent )
     m_unuseCheckBox  = new QCheckBox(tr("Unused Pin"));
     m_unuseCheckBox->setChecked( eventPin->unused() );
 
+    m_pointCheckBox = new QCheckBox(tr("Point Pin"));
+    m_pointCheckBox->setChecked( (eventPin->length() < 7) );
+
     QDialogButtonBox* bb = new QDialogButtonBox( QDialogButtonBox::Ok );
     QPushButton* okBtn = bb->button(QDialogButtonBox::Ok);
     okBtn->setAutoDefault(true);
@@ -746,27 +710,32 @@ EditDialog::EditDialog( SubPackage* pack, Pin* eventPin, QWidget* parent )
     layout->addLayout( idLayout );
     layout->addWidget( m_invertCheckBox );
     layout->addWidget( m_unuseCheckBox );
+    layout->addWidget( m_pointCheckBox );
     layout->addWidget( bb );
 
     setLayout( layout );
     setWindowTitle( tr("Edit Pin ")+eventPin->getLabelText() );
 
-    connect( bb, SIGNAL(accepted()), this, SLOT(accept()));
-
-    connect( m_invertCheckBox, SIGNAL( toggled( bool ) ),
-                         this, SLOT( invertPin( bool ) ) );
-
-    connect( m_unuseCheckBox,  SIGNAL( toggled( bool ) ),
-                        pack,  SLOT( unusePin( bool ) ) );
+    connect( bb, SIGNAL(accepted()),
+           this, SLOT(accept()), Qt::UniqueConnection);
 
     connect( m_nameLineEdit, SIGNAL( textChanged( QString ) ),
-                       pack, SLOT( setPinName( QString ) ) );
+                       pack, SLOT( setPinName( QString ) ), Qt::UniqueConnection );
 
     connect( m_idLineEdit, SIGNAL( textEdited( QString ) ),
-                     pack, SLOT( setPinId( QString ) ) );
+                     pack, SLOT( setPinId( QString ) ), Qt::UniqueConnection );
 
     connect( m_idLineEdit, SIGNAL( textEdited( QString ) ),
-                     pack, SLOT( setPinId( QString ) ) );
+                     pack, SLOT( setPinId( QString ) ), Qt::UniqueConnection );
+
+    connect( m_invertCheckBox, SIGNAL( toggled( bool ) ),
+                         this, SLOT( invertPin( bool ) ), Qt::UniqueConnection );
+
+    connect( m_unuseCheckBox,  SIGNAL( toggled( bool ) ),
+                        pack,  SLOT( unusePin( bool ) ), Qt::UniqueConnection );
+
+    connect( m_pointCheckBox,  SIGNAL( toggled( bool ) ),
+                        pack,  SLOT( pointPin( bool ) ), Qt::UniqueConnection );
 }
 
 void EditDialog::invertPin( bool invert )

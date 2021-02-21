@@ -25,17 +25,15 @@
 class MAINMODULE_EXPORT eMux : public eLogicDevice
 {
     public:
-
-        eMux( std::string id  );
+        eMux( QString id  );
         ~eMux();
 
-        virtual void stamp();
-        virtual void setVChanged();
-        
-        void createPins();
-                             
-    protected:           
-        
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
+
+    protected:
+        bool m_out;
 };
 
 

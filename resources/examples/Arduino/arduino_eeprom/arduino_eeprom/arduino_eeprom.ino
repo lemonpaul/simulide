@@ -42,7 +42,7 @@ void setup()
     lcd.print(" Val=");
     lcd.print( val );
     lcd.print("   \n");
-    delay(100);
+    delay(1000);
   } 
   lcd.setCursor( 0, 0 );
   lcd.print("END...\n");

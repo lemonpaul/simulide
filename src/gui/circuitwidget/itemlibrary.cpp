@@ -25,9 +25,11 @@
 //BEGIN Item includes
 #include "amperimeter.h"
 #include "adc.h"
+#include "aip31068_i2c.h"
 #include "arduino.h"
 #include "audio_out.h"
 #include "avrcomponent.h"
+#include "battery.h"
 #include "bcdto7s.h"
 #include "bcdtodec.h"
 #include "bincounter.h"
@@ -38,6 +40,7 @@
 #include "clock.h"
 #include "currsource.h"
 #include "dac.h"
+#include "dcmotor.h"
 #include "dectobcd.h"
 #include "demux.h"
 #include "diode.h"
@@ -53,27 +56,31 @@
 #include "gate_xor.h"
 #include "ground.h"
 #include "hd44780.h"
+#include "ili9341.h"
 #include "image.h"
 #include "i2cram.h"
 #include "i2ctoparallel.h"
-//#include "inbus.h"
 #include "inductor.h"
 #include "keypad.h"
+#include "ky023.h"
+#include "ky040.h"
 #include "ks0108.h"
 #include "latchd.h"
+#include "ldr.h"
 #include "led.h"
 #include "ledbar.h"
 #include "ledmatrix.h"
 #include "line.h"
 #include "lm555.h"
 #include "logicinput.h"
+#include "max72xx_matrix.h"
+#include "mcu.h"
 #include "memory.h"
 #include "mosfet.h"
 #include "mux.h"
 #include "mux_analog.h"
 #include "op_amp.h"
 #include "oscope.h"
-//#include "outbus.h"
 #include "piccomponent.h"
 #include "pcd8544.h"
 #include "probe.h"
@@ -84,6 +91,7 @@
 #include "relay-spst.h"
 #include "resistor.h"
 #include "resistordip.h"
+#include "scripted.h"
 #include "serialport.h"
 #include "serialterm.h"
 #include "servo.h"
@@ -92,12 +100,17 @@
 #include "shiftreg.h"
 #include "sr04.h"
 #include "ssd1306.h"
+#include "strain.h"
+#include "rtd.h"
 #include "stepper.h"
 #include "subcircuit.h"
 #include "subpackage.h"
 #include "switch.h"
 #include "switchdip.h"
+#include "thermistor.h"
 #include "textcomponent.h"
+#include "tunnel.h"
+#include "varresistor.h"
 #include "voltimeter.h"
 #include "volt_reg.h"
 #include "voltsource.h"
@@ -134,18 +147,27 @@ void ItemLibrary::loadItems()
     addItem( WaveGen::libraryItem() );
     addItem( VoltSource::libraryItem() );
     addItem( CurrSource::libraryItem() );
+    addItem( Battery::libraryItem() );
     addItem( Rail::libraryItem() );
     addItem( Ground::libraryItem() );
     // Switches
     addItem( Push::libraryItem() );
     addItem( Switch::libraryItem() );
-    //addItem( ToggleSwitch::libraryItem() );
     addItem( SwitchDip::libraryItem() );
     addItem( RelaySPST::libraryItem() );
+    addItem( KeyPad::libraryItem() );
     // Passive
+    addItem( new LibraryItem( tr("Resistors"),tr("Passive"), "resistors.png","", 0l ) );
     addItem( Resistor::libraryItem() );
     addItem( ResistorDip::libraryItem() );
     addItem( Potentiometer::libraryItem() );
+    addItem( VarResistor::libraryItem() );
+    addItem( new LibraryItem( tr("Resistive Sensors"),tr("Passive"), "resistorsensors.png","", 0l ) );
+    addItem( Ldr::libraryItem() );
+    addItem( Thermistor::libraryItem() );
+    addItem( RTD::libraryItem() );
+    addItem( Strain::libraryItem() );
+
     addItem( Capacitor::libraryItem() );
     addItem( elCapacitor::libraryItem() );
     addItem( Inductor::libraryItem() );
@@ -157,16 +179,22 @@ void ItemLibrary::loadItems()
     addItem( BJT::libraryItem() );
     addItem( MuxAnalog::libraryItem() );
     // Outputs
+    addItem( new LibraryItem( tr("Leds"),tr("Outputs"), "leds.png","", 0l ) );
     addItem( Led::libraryItem() );
     addItem( LedBar::libraryItem() );
-    addItem( LedMatrix::libraryItem() );
-    addItem( WS2812::libraryItem() );
     addItem( SevenSegment::libraryItem() );
-    addItem( KeyPad::libraryItem() );
+    addItem( LedMatrix::libraryItem() );
+    addItem( Max72xx_matrix::libraryItem() );
+    addItem( WS2812::libraryItem() );
+    addItem( new LibraryItem( tr("Displays"),tr("Outputs"), "displays.png","", 0l ) );
     addItem( Hd44780::libraryItem() );
+    addItem( Aip31068_i2c::libraryItem() );
     addItem( Pcd8544::libraryItem() );
     addItem( Ks0108::libraryItem() );
     addItem( Ssd1306::libraryItem() );
+    addItem( Ili9341::libraryItem() );
+    addItem( new LibraryItem( tr("Motors"),tr("Outputs"), "motors.png","", 0l ) );
+    addItem( DcMotor::libraryItem() );
     addItem( Stepper::libraryItem() );
     addItem( Servo::libraryItem() );
     addItem( AudioOut::libraryItem() );
@@ -174,8 +202,12 @@ void ItemLibrary::loadItems()
     addItem( PICComponent::libraryItem() );
     addItem( AVRComponent::libraryItem() );
     addItem( Arduino::libraryItem() );
+    //addItem( new LibraryItem( tr("Arduino"),tr("Micro"), "arduino.png","", 0l ) );
     addItem( new LibraryItem( tr("Sensors"),tr("Micro"), "1to2.png","", 0l ) );
     addItem( SR04::libraryItem() );
+    addItem( new LibraryItem( tr("Perifericals"),tr("Micro"), "perif.png","", 0l ) );
+    addItem( KY023::libraryItem() );
+    addItem( KY040::libraryItem() );
     addItem( SerialPort::libraryItem() );
     addItem( SerialTerm::libraryItem() );
     // Logic
@@ -188,13 +220,16 @@ void ItemLibrary::loadItems()
     addItem( AndGate::libraryItem() );
     addItem( OrGate::libraryItem() );
     addItem( XorGate::libraryItem() );
-    addItem( Function::libraryItem() );
+
     addItem( FlipFlopD::libraryItem() );
     addItem( FlipFlopJK::libraryItem() );
     addItem( BinCounter::libraryItem() );
     addItem( FullAdder::libraryItem() );
     addItem( LatchD::libraryItem() );
     addItem( ShiftReg::libraryItem() );
+    addItem( Function::libraryItem() );
+    addItem( Scripted::libraryItem() );
+
     addItem( Mux::libraryItem() );
     addItem( Demux::libraryItem() );
     addItem( BcdToDec::libraryItem() );
@@ -208,16 +243,25 @@ void ItemLibrary::loadItems()
     addItem( I2CRam::libraryItem() );
     addItem( I2CToParallel::libraryItem() );
     addItem( Lm555::libraryItem() );
+
+
+
     // Subcircuits
     addItem( SubCircuit::libraryItem() );
+
     // Other
     addItem( Image::libraryItem() );
     addItem( TextComponent::libraryItem() );
     addItem( Rectangle::libraryItem() );
     addItem( Ellipse::libraryItem() );
     addItem( Line::libraryItem() );
+    addItem( Tunnel::libraryItem() );
 
     addItem( SubPackage::libraryItem() );
+    addItem( new LibraryItem( tr("AVRs"),tr("NEW_MCU"), "ic2.png","", 0l ) );
+    addItem( new LibraryItem( tr("PICs"),tr("NEW_MCU"), "ic2.png","", 0l ) );
+    addItem( new LibraryItem( tr("I51"),tr("NEW_MCU"), "ic2.png","", 0l ) );
+    addItem( Mcu::libraryItem() );
 }
 
 void ItemLibrary::addItem( LibraryItem* item )
@@ -249,7 +293,7 @@ void ItemLibrary::addItem( LibraryItem* item )
         {
             AppIface* item = qobject_cast<AppIface*>( plugin );
 
-            item->initialize();
+            item->initialize() override;
             if( item && !(m_plugins.contains(pluginName)) )
             {
                 m_plugins.append(pluginName);
@@ -295,7 +339,7 @@ LibraryItem* ItemLibrary::libraryItem(const QString type ) const
 }
 
 
-// CLASS LIBRAYITEM *********************************************************
+// CLASS LIBRARYITEM *********************************************************
 
 LibraryItem::LibraryItem( const QString &name,
                           const QString &category,
@@ -307,49 +351,9 @@ LibraryItem::LibraryItem( const QString &name,
     m_category  = category;
     m_iconfile  = iconName;
     m_type      = type;
-    m_help      = "Sorry... no Help Available";
     createItem  = _createItem;
 
 }
 
 LibraryItem::~LibraryItem() { }
 
-QString* LibraryItem::help() 
-{
-    if( m_help == "Sorry... no Help Available" )
-    {
-        m_help = getHelpFile( m_type );
-    }
-    return &m_help; 
-}
-
-QString LibraryItem::getHelpFile( QString name )
-{
-    QString help = "";
-
-    //QString locale   = "_"+QLocale::system().name().split("_").first();
-    QString locale = "_"+Circuit::self()->loc();
-
-    name= name.toLower().replace( " ", "" );
-    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+locale+"/"+name+locale+".txt" );
-
-    if( dfPath == "" )
-        dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+name+".txt" );
-
-    if( dfPath != "" )
-    {
-        QFile file( dfPath );
-
-        if( file.open(QFile::ReadOnly | QFile::Text) ) // Get Text from Help File
-        {
-            QTextStream s1( &file );
-            s1.setCodec("UTF-8");
-
-            help = s1.readAll();
-
-            file.close();
-        }
-        else qDebug() << "LibraryItem::getHelpFile ERROR"<<dfPath;
-    }
-    return help;
-}

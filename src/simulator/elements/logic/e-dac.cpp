@@ -18,44 +18,42 @@
  ***************************************************************************/
 
 #include <math.h>
-//#include <QDebug>
 
 #include "e-dac.h"
+#include "simulator.h"
 
-eDAC::eDAC( std::string id )
+eDAC::eDAC( QString id )
     : eLogicDevice( id )
 {
 }
-eDAC::~eDAC()
-{ 
-}
+eDAC::~eDAC() {}
 
 void eDAC::stamp()
 {
-    for( int i=0; i<m_numInputs; i++ )
+    for( int i=0; i<m_numInputs; ++i )
     {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedFast(this);
+        eNode* enode = m_input[i]->getEpin(0)->getEnode();
+        if( enode ) enode->voltChangedCallback( this );
     }
     m_output[0]->setOut( true );
-    m_address = -1;
+    m_value = -1;
+    Simulator::self()->addEvent( 1, 0l );
 }
 
-void eDAC::setVChanged()
+void eDAC::voltChanged()
 {
-    int address = 0;
+    m_value = 0;
 
-    for( int i=0; i<m_numInputs; i++ )
-    {
-        if( getInputState( i ) ) address += pow( 2, m_numInputs-1-i );
-    }
-    if( address == m_address ) return;
-    m_address = address;
+    for( int i=0; i<m_numInputs; ++i )
+        if( getInputState( i ) ) m_value += pow( 2, m_numInputs-1-i );
 
-    double v = m_maxVolt*address/m_maxAddr;
+    Simulator::self()->addEvent( m_propDelay, this );
+}
 
-    qDebug() << "eDAC::setVChanged" << v << address<<m_maxAddr<<m_maxVolt;
-    
+void eDAC::runEvent()
+{
+    double v = m_maxVolt*m_value/m_maxValue;
+
     m_output[0]->setVoltHigh( v );
     m_output[0]->stampOutput();
 }

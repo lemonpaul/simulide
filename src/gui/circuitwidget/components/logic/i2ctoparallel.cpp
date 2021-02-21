@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "i2ctoparallel.h"
+#include "itemlibrary.h"
 #include "pin.h"
 
 Component* I2CToParallel::construct( QObject* parent, QString type, QString id )
@@ -37,7 +38,7 @@ LibraryItem* I2CToParallel::libraryItem()
 
 I2CToParallel::I2CToParallel( QObject* parent, QString type, QString id )
              : LogicComponent( parent, type, id )
-             , eI2C( id.toStdString() )
+             , eI2CSlave( id )
 {
     m_width  = 4;
     m_height = 9;
@@ -69,27 +70,40 @@ I2CToParallel::I2CToParallel( QObject* parent, QString type, QString id )
     eLogicDevice::createInput( m_inPin[3] );                 // Input A1
     eLogicDevice::createInput( m_inPin[4] );                 // Input A2
     
-    for( int i=0; i<8; i++ ) 
-    {
-        eLogicDevice::createOutput( m_outPin[i] );
-    }
-    
+    for( int i=0; i<8; ++i ) eLogicDevice::createOutput( m_outPin[i] );
+
     m_cCode = 0b01010000;
 }
 I2CToParallel::~I2CToParallel(){}
 
+QList<propGroup_t> I2CToParallel::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Control_Code", tr("Control_Code"),""} );
+    mainGroup.propList.append( {"Frequency", tr("I2C Frequency"),"KHz"} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
+
 void I2CToParallel::stamp()                     // Called at Simulation Start
 {
-    eI2C::stamp();
+    eI2CSlave::stamp();
     
-    for( int i=2; i<5; i++ )                  // Initialize address pins
+    for( int i=2; i<5; ++i )                  // Initialize address pins
     {
         eNode* enode =  m_inPin[i]->getEnode();
-        if( enode ) enode->addToChangedFast( this );
+        if( enode ) enode->voltChangedCallback( this );
+    }
+    for( int i=0; i<8; ++i )
+    {
+        m_output[i]->setOut( true );
+        m_output[i]->setImp( 1e5 );
     }
 }
 
-void I2CToParallel::setVChanged()             // Some Pin Changed State, Manage it
+void I2CToParallel::voltChanged()             // Some Pin Changed State, Manage it
 {
     bool A0 = eLogicDevice::getInputState( 1 );
     bool A1 = eLogicDevice::getInputState( 2 );
@@ -102,48 +116,47 @@ void I2CToParallel::setVChanged()             // Some Pin Changed State, Manage 
     
     m_address = address;
     
-    eI2C::setVChanged();                               // Run I2C Engine
-    
-    //if( m_state == I2C_READING ) m_phase = 0;
-    //if( m_state == I2C_STOPPED ) m_phase = 3;
+    eI2CSlave::voltChanged();                               // Run I2C Engine
 }
 
-void I2CToParallel::readByte()           // Reading from I2C to Parallel
+void I2CToParallel::readByte()           // Reading from I2C, Writting to Parallel
 {
     int value = m_rxReg;
                                       //qDebug() << "Reading " << value;
-    for( int i=0; i<8; i++ )
+    for( int i=0; i<8; ++i )
     {
         bool pinState =  value & 1;
+        double imp = pinState? 1e5 : 40;
+
         m_output[i]->setOut( pinState );
-        m_output[i]->stampOutput();
+        m_output[i]->setImp( imp );
                                   //qDebug() << "Bit " << i << pinState;
         value >>= 1;
     }
-    eI2C::readByte();
+    eI2CSlave::readByte();
 }
 
-/*void I2CToParallel::writeByte()         // Writting to I2C from Parallel
+void I2CToParallel::writeByte()         // Writting to I2C from Parallel (master is reading)
 {
-    for( int i=0; i<8; i++ )
+    int value = 0;
+    for( int i=0; i<8; ++i )
     {
-        int value = 0;
-        int volt = m_output[i]->getEpin()->getVolt();
+        double volt = m_output[i]->getVolt();
         
-        bool  state = m_dataPinState[i];
+        bool state = false;// = m_dataPinState[i];
         
         if     ( volt > m_inputHighV ) state = true;
-        else if( volt < m_inputLowV )  state = false;
+        //else if( volt < m_inputLowV )  state = false;
         
-        m_dataPinState[i] = state;
+        //m_dataPinState[i] = state;
         //qDebug() << "Bit " << i << state;
         if( state ) value += pow( 2, i );
     }
     m_txReg = value;
     //qDebug() << "I2CToParallel::writeByte Address:"<<" Value"<< m_txReg;
 
-    eI2C::writeByte();
-}*/
+    eI2CSlave::writeByte();
+}
 
 int I2CToParallel::cCode()
 {

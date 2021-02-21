@@ -18,8 +18,10 @@
  ***************************************************************************/
 
 #include "sevensegment.h"
+#include "circuitwidget.h"
 #include "itemlibrary.h"
 #include "connector.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "pin.h"
 
@@ -38,7 +40,7 @@ LibraryItem* SevenSegment::libraryItem()
 {
     return new LibraryItem(
         tr( "7 Segment" ),
-        tr( "Outputs" ),
+        tr( "Leds" ),
         "seven_segment.png",
         "Seven Segment",
         SevenSegment::construct );
@@ -46,9 +48,11 @@ LibraryItem* SevenSegment::libraryItem()
 
 SevenSegment::SevenSegment( QObject* parent, QString type, QString id )
             : Component( parent, type, id )
-            , eElement( id.toStdString() )
+            , eElement( id )
 {
     Q_UNUSED( SevenSegment_properties );
+
+    m_graphical = true;
 
     setLabelPos( 20,-44, 0 );
 
@@ -60,7 +64,6 @@ SevenSegment::SevenSegment( QObject* parent, QString type, QString id )
     m_threshold  = 2.4;
     m_maxCurrent = 0.02;
     m_resistance = 1;
-    m_area = QRect( -16, -24-1, 32, 48+2 );
 
     m_ePin.resize(8);
     m_pin.resize(8);
@@ -88,6 +91,22 @@ SevenSegment::SevenSegment( QObject* parent, QString type, QString id )
 }
 SevenSegment::~SevenSegment() { }
 
+QList<propGroup_t> SevenSegment::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Vertical_Pins", tr("Vertical Pins"),""} );
+    mainGroup.propList.append( {"NumDisplays", tr("Size"),"Displays"} );
+    mainGroup.propList.append( {"Color", tr("Color"),"enum"} );
+
+    propGroup_t elecGroup { tr("Electric") };
+    elecGroup.propList.append( {"CommonCathode", tr("Common Cathode"),""} );
+    elecGroup.propList.append( {"Threshold", tr("Threshold"),"V"} );
+    elecGroup.propList.append( {"MaxCurrent", tr("Max Current"),"A"} );
+    elecGroup.propList.append( {"Resistance", tr("Resistance"),"Ω"} );
+
+    return {mainGroup, elecGroup};
+}
+
 int SevenSegment::numDisplays()
 {
     return m_numDisplays;
@@ -110,11 +129,9 @@ void SevenSegment::setNumDisplays( int displays )
     if( displays < 1 ) displays = 1;
     if( displays == m_numDisplays ) return;
 
-    if( m_verticalPins ) m_area = QRect( -18, -24-1, displays*32+4, 48+2 );
-    else                 m_area = QRect( -16, -24-1, displays*32, 48+2 );
+    if( Simulator::self()->isRunning() )  CircuitWidget::self()->powerCircOff();
 
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    m_area = QRect( -18, -24-4, 32*displays+4, 48+8 );
 
     if( displays > m_numDisplays )
     {
@@ -131,7 +148,6 @@ void SevenSegment::setNumDisplays( int displays )
     setThreshold( m_threshold );
     setMaxCurrent( m_maxCurrent );
 
-    if( pauseSim ) Simulator::self()->runContinuous();
     Circuit::self()->update();
 }
 
@@ -150,12 +166,9 @@ bool SevenSegment::isCommonCathode()
 
 void SevenSegment::setCommonCathode( bool isCommonCathode )
 {
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    if( Simulator::self()->isRunning() )  CircuitWidget::self()->powerCircOff();
 
     m_commonCathode = isCommonCathode;
-
-    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 bool SevenSegment::verticalPins()
@@ -180,10 +193,7 @@ void SevenSegment::setVerticalPins( bool v )
             m_pin[i]->setPos( -16+8*(i-5), 24+8 );
             m_pin[i]->setRotation( -90 );
         }
-        m_area = QRect( -18, -24-1, 32*m_numDisplays+4, 48+2 );
-    }
-    else
-    {
+    }else{
         for( int i=0; i<7; i++ )
         {
             m_pin[i]->setPos( -16-8, -24+i*8 );
@@ -191,8 +201,8 @@ void SevenSegment::setVerticalPins( bool v )
         }
         m_pin[7]->setPos( -8, 24+8 );
         m_pin[7]->setRotation( -90 );
-        m_area = QRect( -16, -24-1, 32*m_numDisplays, 48+2 );
     }
+    m_area = QRect( -18, -24-4, 32*m_numDisplays+4, 48+8 );
     
     for( int i=0; i<8; i++ ) m_pin[i]->isMoved();
     Circuit::self()->update();
@@ -243,27 +253,22 @@ void SevenSegment::setMaxCurrent( double current )
 
 void SevenSegment::attach()
 {
-    for( int i=0; i<8; i++ ) m_enode[i] = m_ePin[i]->getEnode(); // Get eNode of pin i
-
-    for( int i=0; i<m_numDisplays; i++ )
+    for( int i=0; i<8; ++i ) m_enode[i] = m_ePin[i]->getEnode(); // Get eNode of pin i
+    for( int i=0; i<m_numDisplays; ++i )
     {
         eNode* commonEnode = m_commonPin[i]->getEnode();     // Get eNode of common
 
         int pin;
-        if( m_commonCathode )
+        for( int j=0; j<8; ++j )
         {
-            for( int j=0; j<8; j++ )
+            pin = i*8+j;
+            if( m_commonCathode )
             {
-                pin = i*8+j;
                 m_cathodePin[pin]->setEnode( commonEnode );
                 m_anodePin[pin]->setEnode( m_enode[j] );
             }
-        }
-        else
-        {
-            for( int j=0; j<8; j++ )
+            else
             {
-                pin = i*8+j;
                 m_anodePin[pin]->setEnode( commonEnode );
                 m_cathodePin[pin]->setEnode( m_enode[j] );
             }
@@ -278,7 +283,7 @@ void SevenSegment::deleteDisplay( int dispNumber )
     pin->reset();
     delete pin;
 
-    for( int i=0; i<8; i++ ) Circuit::self()->removeComp( m_segment[dispNumber*8+i] );
+    for( int i=0; i<8; ++i ) Circuit::self()->removeComp( m_segment[dispNumber*8+i] );
 }
 
 void SevenSegment::createDisplay( int dispNumber )
@@ -286,7 +291,6 @@ void SevenSegment::createDisplay( int dispNumber )
     int x = 32*dispNumber;
     QString nodid;
     QString pinid;
-    //LedSmd* segment[8];
 
     // Pin common
     nodid = m_id;
@@ -341,7 +345,7 @@ void SevenSegment::paint( QPainter* p, const QStyleOptionGraphicsItem* option, Q
 
     Component::paint( p, option, widget );
 
-    p->drawRect( boundingRect() );
+    p->drawRect( m_area );
 }
 
 #include "moc_sevensegment.cpp"

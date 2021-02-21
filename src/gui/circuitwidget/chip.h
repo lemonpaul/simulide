@@ -23,6 +23,7 @@
 #include "component.h"
 #include "e-element.h"
 
+class QDomElement;
 
 class MAINMODULE_EXPORT Chip : public Component, public eElement
 {
@@ -35,24 +36,22 @@ class MAINMODULE_EXPORT Chip : public Component, public eElement
         
         bool logicSymbol();
         virtual void setLogicSymbol( bool ls );
-
-        virtual void initEpins(){;}
+        virtual void setBackground( QString bck );
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
-    public slots:
-        virtual void remove();
-
     protected:
-        virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
-
         virtual void addPin( QString id, QString type, QString label,
-                             int pos, int xpos, int ypos, int angle );
-        
+                             int pos, int xpos, int ypos, int angle, int length=8);
+
         virtual void updatePin( QString id, QString type, QString label,
                                 int pos, int xpos, int ypos, int angle ){;}
 
+        void deletePin( Pin* pin );
+
         virtual void initChip();
+        virtual void initPackage_old( QDomElement root );
+        virtual void initPackage( QDomElement root );
 
         int m_numpins;
         int m_width;
@@ -67,10 +66,9 @@ class MAINMODULE_EXPORT Chip : public Component, public eElement
         QString m_pkgeFile;     // file containig package defs
         //QString m_dataFile;     // xml file containig entry
         
-        QList<Pin*> m_topPin;
-        QList<Pin*> m_botPin;
-        QList<Pin*> m_lefPin;
-        QList<Pin*> m_rigPin;
+        QList<Pin*> m_pins;
+
+        QPixmap* m_BackPixmap;
 };
 #endif
 

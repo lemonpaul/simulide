@@ -53,6 +53,8 @@ class MAINMODULE_EXPORT Connector : public Component
         void setEnodId( QString /*nodid*/ ){;}
         // END PROPERTIES-------------------------------
 
+        virtual void remove() override;
+
         void refreshPointList();
 
         Pin* startPin();
@@ -93,6 +95,8 @@ class MAINMODULE_EXPORT Connector : public Component
         void splitCon( int index, Pin* pin1, Pin* pin2 );
 
         void updateLines();
+
+        void setVisib(  bool vis );
         
         void setIsBus( bool bus );
         bool isBus();
@@ -103,7 +107,6 @@ class MAINMODULE_EXPORT Connector : public Component
         void selected(bool yes);
 
     public slots:
-        virtual void remove();
         virtual void move( QPointF delta );
         virtual void setSelected( bool selected );
 

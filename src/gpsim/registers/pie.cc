@@ -7,8 +7,8 @@
 #include "pir.h"
 #include "processor.h"
 
-PIE::PIE(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu,pName,pDesc), pir(0)
+PIE::PIE( Processor *pCpu, const char *pName )
+   : SfrReg( pCpu, pName ), pir(0)
 {
 }
 void PIE::setPir(PIR *pPir)

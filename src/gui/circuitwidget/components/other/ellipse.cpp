@@ -27,7 +27,7 @@ LibraryItem* Ellipse::libraryItem()
 {
     return new LibraryItem(
             tr( "Ellipse" ),
-            tr( "Other" ),
+            tr( "Graphical" ),
             "ellipse.png",
             "Ellipse",
             Ellipse::construct);
@@ -36,7 +36,6 @@ LibraryItem* Ellipse::libraryItem()
 Ellipse::Ellipse( QObject* parent, QString type, QString id )
        : Shape( parent, type, id )
 {
-
 }
 Ellipse::~Ellipse(){}
 

@@ -30,7 +30,7 @@ class MAINMODULE_EXPORT eOrGate : public eGate
 {
     public:
 
-        eOrGate( std::string id, int inputs );
+        eOrGate( QString id, int inputs );
         ~eOrGate();
 
     protected:

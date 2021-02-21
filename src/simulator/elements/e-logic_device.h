@@ -20,22 +20,14 @@
 #ifndef ELOGICDEVICE_H
 #define ELOGICDEVICE_H
 
-#include <string>
-#include <math.h>
-
 #include "e-source.h"
 #include "e-pin.h"
-
-#define CLow    0
-#define Rising  1
-#define CHigh   2
-#define Falling 3
 
 class MAINMODULE_EXPORT eLogicDevice : public eElement
 {
     public:
 
-        eLogicDevice( std::string id );
+        eLogicDevice( QString id );
         ~eLogicDevice();
 
         int  numInps() const            { return m_numInputs; }
@@ -62,7 +54,7 @@ class MAINMODULE_EXPORT eLogicDevice : public eElement
         double outImp() const            { return m_outImp; }
         void  setOutImp( double imp );
 
-        bool clockInv() const            { return m_clockPin->isInverted(); }
+        bool clockInv() const            { return m_clockSource->isInverted(); }
         void setClockInv( bool inv );
 
         bool inverted() { return m_inverted; }
@@ -70,35 +62,41 @@ class MAINMODULE_EXPORT eLogicDevice : public eElement
 
         bool invertInps() { return m_invInputs; }
         void setInvertInps( bool invert );
+
+        int eTrigger() { return m_etrigger; }
+        virtual void seteTrigger( int trigger );
         
         void setOutputEnabled( bool enabled );
         void updateOutEnabled();
 
-        void initEpins(){;}
-        //ePin* getEpin( int pin );
+        virtual uint64_t propDelay() { return m_propDelay; }
+        virtual void     setPropDelay( uint64_t pd ) { m_propDelay = pd; }
+
+        uint64_t riseTime() { return m_timeLH; }
+        void setRiseTime( uint64_t time );
+
+        uint64_t fallTime() { return m_timeHL; }
+        void setFallTime( uint64_t time );
+
         virtual ePin* getEpin( QString pinName );
 
         int getClockState();
         bool outputEnabled();
-        bool inputEnabled();
 
-        virtual void stamp();
-        virtual void resetState();
+        virtual void stamp() override;
+        virtual void initialize() override;
 
         virtual void createPins( int inputs, int outputs );
-        void setClockPin( eSource* clockPin) { m_clockPin = clockPin; }
+        void setClockPin( eSource* clockSource) { m_clockSource = clockSource; }
         void setInput( int n, eSource* input );
         void createClockPin();
         void createOutEnablePin();
-        void createInEnablePin();
 
     protected:
         void createClockPin( ePin* epin );
         void createClockeSource( ePin* epin );
         void createOutEnablePin( ePin* epin );
         void createOutEnableeSource( ePin* epin );
-        void createInEnablePin( ePin* epin );
-        void createInEnableeSource( ePin* epin );
         void createInput( ePin* epin );
         void createOutput( ePin* epin );
         
@@ -116,21 +114,25 @@ class MAINMODULE_EXPORT eLogicDevice : public eElement
         double m_outHighV;
         double m_outLowV;
 
+        uint64_t m_propDelay; // Propagation delay
+        uint64_t m_timeLH; // Time for Output voltage to switch from 10% to 90%
+        uint64_t m_timeHL; // Time for Output voltage to switch from 90% to 10%
+
         double m_inputImp;
         double m_outImp;
 
         int m_numInputs;
         int m_numOutputs;
 
+        int m_etrigger;
+
         bool m_clock;
         bool m_outEnable;
-        bool m_inEnable;
         bool m_inverted;
         bool m_invInputs;
 
-        eSource* m_clockPin;
-        eSource* m_outEnablePin;
-        eSource* m_inEnablePin;
+        eSource* m_outEnSource;
+        eSource* m_clockSource;
 
         std::vector<eSource*> m_output;
         std::vector<eSource*> m_input;

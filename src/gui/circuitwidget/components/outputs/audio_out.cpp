@@ -18,10 +18,10 @@
  ***************************************************************************/
 
 #include "audio_out.h"
-#include "simulator.h"
 #include "connector.h"
 #include "itemlibrary.h"
 #include "pin.h"
+#include "simulator.h"
 
 static const char* AudioOut_properties[] = {
     QT_TRANSLATE_NOOP("App::Property","Impedance"),
@@ -44,7 +44,7 @@ LibraryItem* AudioOut::libraryItem()
 
 AudioOut::AudioOut( QObject* parent, QString type, QString id )
         : Component( parent, type, id )
-        , eResistor( id.toStdString() )
+        , eResistor( id )
 {
     Q_UNUSED( AudioOut_properties );
     
@@ -68,7 +68,6 @@ AudioOut::AudioOut( QObject* parent, QString type, QString id )
     m_pin[1]->setLabelColor( QColor( 0, 0, 0 ) );
     m_ePin[1] = m_pin[1];
 
-    //m_idLabel->setText( QString("") );
     m_idLabel->setPos(-12,-24);
     setLabelPos(-20,-36, 0);
     
@@ -100,25 +99,19 @@ AudioOut::AudioOut( QObject* parent, QString type, QString id )
     }  
     m_audioOutput = new QAudioOutput( m_deviceinfo, m_format );   
     
-    m_dataSize = 2*refreshPeriod*sampleRate/1000;
-    
-    m_dataBuffer = new char[ m_dataSize ];
-    m_audioOutput->setBufferSize( 2*m_dataSize );
+    m_dataSize = refreshPeriod*sampleRate/1000;
+    m_dataBuffer.resize( m_dataSize );
 
-    //qDebug() << "AudioOut::AudioOut" << m_audioOutput->notifyInterval();
-    
-    //m_audioOutput->setNotifyInterval( refreshPeriod );
-    
-    //connect( m_audioOutput, SIGNAL( notify() ),
-    //         this,          SLOT(   OnAudioNotify() ));
-
-    resetState();
+    initialize();
 }
+AudioOut::~AudioOut(){}
 
-AudioOut::~AudioOut()
+QList<propGroup_t> AudioOut::propGroups()
 {
-    delete m_dataBuffer;
-    //qDebug() << "AudioOut::~AudioOut deleting" << QString::fromStdString( m_elmId );
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Buzzer", tr("Buzzer"),""} );
+    mainGroup.propList.append( {"Impedance", tr("Impedance"),"Ω"} );
+    return {mainGroup};
 }
 
 void AudioOut::stamp()
@@ -126,73 +119,59 @@ void AudioOut::stamp()
     if( m_deviceinfo.isNull() ) return;
     
     if( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() )
-        Simulator::self()->addToSimuClockList( this );
+        Simulator::self()->addEvent( 1, this );
     
     eResistor::stamp();
 }
 
-void AudioOut::resetState()
+void AudioOut::initialize()
 {
     if( m_deviceinfo.isNull() ) return;
-    m_counter = 0;
     m_dataCount = 0;
     
     m_auIObuffer = m_audioOutput->start();
 }
 
-void AudioOut::simuClockStep()
+void AudioOut::runEvent()
 {
-    m_counter++;
-    double stepsPerUs = Simulator::self()->stepsPerus();
-    if( m_counter == 25*stepsPerUs )
+    double voltPN = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
+
+    int outVal = 128;
+
+    if( m_buzzer)
     {
-        m_counter = 0;
-
-        double voltPN = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
-        if( voltPN > 5 ) voltPN = 5;
-
-        char outVal = 0;
-
-        if( m_buzzer)
+        if( voltPN > 2.5 )
         {
-            if( voltPN> 2.5 )
-            {
-                int stepsPC = stepsPerUs*1e6/600;
-                double time = Simulator::self()->step();
-                time = remainder( time, stepsPC );
-                time = qDegreesToRadians( time*360/stepsPC );
+            double stepsPC = 1e12/1000;
+            double time = Simulator::self()->circTime();
+            time = remainder( time, stepsPC );
+            time = qDegreesToRadians( time*360/stepsPC );
 
-                outVal = sin( time )*51/2;
-            }
-        }
-        else outVal = voltPN*51;
-
-        m_dataBuffer[ m_dataCount ] = outVal;
-        m_dataCount++;
-
-        if( m_dataCount == m_dataSize )
-        {
-            //qDebug() << m_dataCount;
-            m_dataCount = 0;
-            m_auIObuffer->write( (const char*)m_dataBuffer, m_dataSize );
+            outVal += sin( time )*128;
         }
     }
-}
+    else outVal += voltPN*51;
 
-void AudioOut::OnAudioNotify()
-{
-    //qDebug() << "AudioOut::OnAudioNotify()"<<m_dataCount;
-    m_auIObuffer->write( (const char*)m_dataBuffer, m_dataCount );
-    m_dataCount = 0;
-}
+    if     ( outVal > 255 ) outVal = 255;
+    else if( outVal < 0 )   outVal = 0;
 
-void AudioOut::remove()
-{
-    Simulator::self()->remFromSimuClockList( this );
-    
-    if( m_ePin[0]->isConnected() ) (static_cast<Pin*>(m_ePin[0]))->connector()->remove();
-    if( m_ePin[1]->isConnected() ) (static_cast<Pin*>(m_ePin[1]))->connector()->remove();
-    Component::remove();
+    m_dataBuffer[ m_dataCount ] = (char)outVal;
+    m_dataCount++;
+
+    if( m_dataCount == m_dataSize )
+    {
+        m_dataCount = 0;
+        m_auIObuffer->write( m_dataBuffer.data(), m_dataSize );
+    }
+    double realSpeed = Simulator::self()->realSpeed();
+    if( realSpeed < 1e-6 )
+    {
+        realSpeed = Simulator::self()->stepsPerSec();
+        realSpeed *= Simulator::self()->stepSize();
+        realSpeed /= 1e8; // 1e12/10000
+    }
+    double nextEvent = realSpeed*25*1e2;//(realSpeed/10000)*25*1e6
+    Simulator::self()->addEvent( nextEvent, this ); // 25 us
 }
 
 QPainterPath AudioOut::shape() const

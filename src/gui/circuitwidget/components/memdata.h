@@ -20,6 +20,7 @@
 #ifndef MEMDATA_H
 #define MEMDATA_H
 
+class MemTable;
 
 class MAINMODULE_EXPORT MemData
 {
@@ -30,7 +31,11 @@ class MAINMODULE_EXPORT MemData
         void loadData( QVector<int>* toData , bool resize=false, int bits=8 );
         void saveData( QVector<int> data, int bits=8 );
 
-    private:
+    public slots:
+        virtual void showTable( int dataSize=256, int wordBytes=1 );
+
+    protected:
+        MemTable* m_memTable;
 };
 
 #endif

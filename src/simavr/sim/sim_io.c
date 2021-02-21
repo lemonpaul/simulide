@@ -149,15 +149,12 @@ avr_register_io_write(
 	avr->io[a].w.c = writep;
 }
 
-avr_irq_t *
-avr_io_getirq(
-		avr_t * avr,
-		uint32_t ctl,
-		int index)
+avr_irq_t* avr_io_getirq( avr_t* avr, uint32_t ctl, int index )
 {
-	avr_io_t * port = avr->io_port;
-	while (port) {
-		if (port->irq && port->irq_ioctl_get == ctl && port->irq_count > index)
+    avr_io_t* port = avr->io_port;
+    while( port )
+    {
+        if( port->irq && port->irq_ioctl_get == ctl && port->irq_count > index )
 			return port->irq + index;
 		port = port->next;
 	}
@@ -171,10 +168,11 @@ avr_iomem_getirq(
 		const char * name,
 		int index)
 {
-	if (index > 8)
-		return NULL;
+    if( index > 8 ) return NULL;
+
 	avr_io_addr_t a = AVR_DATA_TO_IO(addr);
-	if (avr->io[a].irq == NULL) {
+    if( avr->io[a].irq == NULL )
+    {
 		/*
 		 * Prepare an array of names for the io IRQs. Ideally we'd love to have
 		 * a proper name for these, but it's not possible at this time.
@@ -182,11 +180,10 @@ avr_iomem_getirq(
 		char names[9 * 20];
 		char * d = names;
 		const char * namep[9];
-		for (int ni = 0; ni < 9; ni++) {
-			if (ni < 8)
-				sprintf(d, "=avr.io.%04x.%d", addr, ni);
-			else
-				sprintf(d, "8=avr.io.%04x.all", addr);
+        for( int ni=0; ni<9; ni++ )
+        {
+            if (ni < 8) sprintf(d, "=avr.io.%04x.%d", addr, ni);
+            else        sprintf(d, "8=avr.io.%04x.all", addr);
 			namep[ni] = d;
 			d += strlen(d) + 1;
 		}
@@ -196,7 +193,8 @@ avr_iomem_getirq(
 			avr->io[a].irq[i].flags |= IRQ_FLAG_FILTERED;
 	}
 	// if given a name, replace the default one...
-	if (name) {
+    if (name)
+    {
 		int l = strlen(name);
 		char n[l + 10];
 		sprintf(n, "avr.io.%s", name);

@@ -18,56 +18,51 @@
  ***************************************************************************/
 
 #include "e-latch_d.h"
+#include "simulator.h"
 
-eLatchD::eLatchD( std::string id, int channels )
+eLatchD::eLatchD( QString id, int channels )
        : eLogicDevice( id )
 {
-    //setNumChannels( channels );
+    m_oldst = 0;
 }
-eLatchD::~eLatchD()
-{ 
-}
+eLatchD::~eLatchD(){}
 
 void eLatchD::stamp()
 {
-    if( !m_clockPin )
+    m_oldst = false;
+    if( m_etrigger != Trig_Clk )
     {
-        //qDebug() << "eLatchD::initialize !m_clockPin";
-        for( uint i=0; i<m_input.size(); i++ )
+        for( uint i=0; i<m_input.size(); ++i )
         {
-            eNode* enode = m_input[i]->getEpin()->getEnode();
-            if( enode ) enode->addToChangedFast(this);
+            eNode* enode = m_input[i]->getEpin(0)->getEnode();
+            if( enode ) enode->voltChangedCallback( this );
         }
     }
     eLogicDevice::stamp();
 }
 
-/*void eLatchD::setInverted( bool inverted )
-{
-    for( int i=0; i>m_numOutputs; i++ )
-        m_output[i]->setInverted( inverted );
-}*/
-
-void eLatchD::setVChanged()
+void eLatchD::voltChanged()
 {
     eLogicDevice::updateOutEnabled();
-    
-    if( m_inEnablePin )
-    {
-        if( !eLogicDevice::inputEnabled() ) return;
-    }
-    if( !m_clockPin || (eLogicDevice::getClockState()==Rising) )
-    {
-        for( int i=0; i<m_numOutputs; i++ )
-        {
-            bool state = getInputState( i );
-            bool out   = m_output[i]->out();
-            if( m_output[i]->isInverted() ) out = !out;
 
-            if( out != state ) eLogicDevice::setOut( i, state );
-        }
+    if( getClockState() == Clock_Allow )
+    {
+        m_state = 0;
+        for( int i=0; i<m_numOutputs; ++i )
+            if( getInputState( i ) ) m_state |= 1<<i;
     }
+    Simulator::self()->addEvent( m_propDelay, this );
 }
 
-void eLatchD::setNumChannels( int channels ) { createPins( channels, channels); }
+void eLatchD::runEvent()
+{
+    for( int i=0; i<m_numOutputs; ++i )
+    {
+        bool state = m_state & (1<<i);
+        bool oldst = m_oldst & (1<<i);
+
+        if( state != oldst )  m_output[i]->setTimedOut( state );
+    }
+    m_oldst = m_state;
+}
 

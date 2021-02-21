@@ -24,16 +24,14 @@
 #include "e-node.h"
 #include "simulator.h"
 
-eDiode::eDiode( std::string id ) 
+eDiode::eDiode( QString id )
       : eResistor( id )
 {
     m_imped = 0.6;
     m_threshold = 0.7;
     m_zenerV = 0;
 }
-eDiode::~eDiode()
-{ 
-}
+eDiode::~eDiode(){}
 
 void eDiode::stamp()
 {
@@ -53,7 +51,7 @@ void eDiode::stamp()
     eResistor::stamp();
 }
 
-void eDiode::resetState()
+void eDiode::initialize()
 {
     m_resist = high_imp;
     m_admit = 0;
@@ -61,10 +59,12 @@ void eDiode::resetState()
     m_voltPN  = 0;
     m_deltaV  = 0;
     m_current = 0;
+    m_lastC   = 0;
 }
 
-void eDiode::setVChanged()
+void eDiode::voltChanged()
 {
+    m_converged = false;
     m_voltPN = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
 
     double deltaR = m_imped;
@@ -97,9 +97,16 @@ void eDiode::setVChanged()
         double current = deltaV/m_resist;
         //qDebug() <<"eDiode::setVChanged current: "<< current;
         if( deltaR == high_imp ) current = 0;
+        if( current == m_lastC )
+        {
+            //m_converged = true;
+            return;
+        }
+        m_lastC = current;
 
         m_ePin[0]->stampCurrent( current );
         m_ePin[1]->stampCurrent(-current );
+        //Simulator::self()->addEvent( 0, 0l );
     }
 }
 
@@ -120,7 +127,7 @@ void eDiode::setRes( double resist )
 
     if( resist == 0 ) resist = 0.1;
     m_imped = resist;
-    setVChanged();
+    voltChanged();
 
     if( pauseSim ) Simulator::self()->resumeSim();
 }

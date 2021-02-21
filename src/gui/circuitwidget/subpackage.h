@@ -27,9 +27,10 @@ class LibraryItem;
 class MAINMODULE_EXPORT SubPackage : public Chip
 {
     Q_OBJECT
-    Q_PROPERTY( QString  Package_File   READ package  WRITE setPackage  DESIGNABLE true  USER true )
-    Q_PROPERTY( int      Width     READ width    WRITE setWidth    DESIGNABLE true USER true )
-    Q_PROPERTY( int      Height    READ height   WRITE setHeight   DESIGNABLE true USER true )
+    Q_PROPERTY( QString  Package_File  READ package    WRITE setPackage  DESIGNABLE true  USER true )
+    Q_PROPERTY( int      Width         READ width      WRITE setWidth    DESIGNABLE true USER true )
+    Q_PROPERTY( int      Height        READ height     WRITE setHeight   DESIGNABLE true USER true )
+    Q_PROPERTY( QString  Background    READ backGround WRITE setBackground DESIGNABLE true USER true )
     
     public:
 
@@ -39,6 +40,8 @@ class MAINMODULE_EXPORT SubPackage : public Chip
     static Component* construct( QObject* parent, QString type, QString id );
     static LibraryItem *libraryItem();
         
+        virtual QList<propGroup_t> propGroups() override;
+
         int width();
         void setWidth( int width );
         
@@ -47,26 +50,30 @@ class MAINMODULE_EXPORT SubPackage : public Chip
         
         QString  package();
         void setPackage( QString package );
-        
-        virtual void setLogicSymbol( bool ls );
-        
+
         void savePackage( QString fileName );
+
+        virtual void setLogicSymbol( bool ls );
+        virtual void remove() override;
         
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
     public slots:
-        virtual void remove();
-        void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
+        virtual void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
         void invertPin( bool invert );
         void setPinId( QString id );
         void setPinName( QString name );
+        void boardMode();
+        void savingCirc();
+        void mainComp();
     
     private slots:
         void loadPackage();
         void movePin();
         void editPin();
-        void deletePin();
+        void deleteEventPin();
         void unusePin( bool unuse );
+        void pointPin( bool point );
         void slotSave();
         void editFinished( int r );
         
@@ -80,11 +87,12 @@ class MAINMODULE_EXPORT SubPackage : public Chip
         virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event );
 
     private:
-        QString pinEntry( Pin* pin, int pP, QString side );
+        QString pinEntry( Pin* pin, int pP );
+
+        void setBoardMode();
 
  static QString m_lastPkg;
-    
-        bool m_changed;
+
         bool m_movePin;
         bool m_fakePin; // Data for drawing pin when hovering
         
@@ -93,7 +101,14 @@ class MAINMODULE_EXPORT SubPackage : public Chip
         int m_p1Y;
         int m_p2X;
         int m_p2Y;
-        
+
+        bool m_circPosSaved;
+        bool m_boardMode;
+        QAction* m_boardModeAction;
+        //bool m_hideGrComp;
+        //bool m_parentGrComp;
+        //QAction* m_hideAction;
+
         Pin* m_eventPin;
 };
 
@@ -118,6 +133,7 @@ private:
 
     QCheckBox* m_invertCheckBox;
     QCheckBox* m_unuseCheckBox;
+    QCheckBox* m_pointCheckBox;
 };
 
 #endif

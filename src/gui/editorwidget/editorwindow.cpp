@@ -17,24 +17,32 @@
  *                                                                         *
  ***************************************************************************/
 
-//#include <QtGui>
-
 #include "editorwindow.h"
 #include "mainwindow.h"
+#include "simulator.h"
 #include "filebrowser.h"
+#include "compiler.h"
 #include "utils.h"
 
 EditorWindow*  EditorWindow::m_pSelf = 0l;
 
 EditorWindow::EditorWindow( QWidget* parent )
             : QWidget( parent )
+            , m_fileMenu( this )
+            , m_outPane( this )
+            , m_compiler( this, &m_outPane )
 {
     m_pSelf = this;
+
+    setAcceptDrops( true );
     
     createWidgets();
     createActions();
+    updateRecentFileActions();
     createToolBars();
     readSettings();
+
+    /// m_compiler.loadCompiler( "/home/user/gcbcompiler.xml");
 }
 EditorWindow::~EditorWindow(){}
 
@@ -66,15 +74,35 @@ void EditorWindow::keyPressEvent( QKeyEvent* event )
     }
 }
 
+void EditorWindow::dragEnterEvent( QDragEnterEvent* event)
+{
+    event->accept();
+}
+
+void EditorWindow::dropEvent( QDropEvent* event )
+{
+    QString id = event->mimeData()->text();
+
+    QString file = "file://";
+    if( id.startsWith( file ) )
+    {
+        id.replace( file, "" ).replace("\r\n", "" );
+#ifdef _WIN32
+        if( id.startsWith( "/" )) id.remove( 0, 1 );
+#endif
+        loadFile( id );
+    }
+}
+
 void EditorWindow::newFile()
 {
-    CodeEditorWidget* baseWidget = new CodeEditorWidget( this );
+    CodeEditor* codeEditor = new CodeEditor( this, &m_outPane );
+
+    m_docWidget->addTab( codeEditor, "New" );
+    m_docWidget->setCurrentWidget( codeEditor );
     
-    m_docWidget->addTab( baseWidget, "New" );
-    m_docWidget->setCurrentWidget( baseWidget );
-    
-    connect( baseWidget->m_codeEditor->document(), SIGNAL( contentsChanged()),
-             this,                                 SLOT(   documentWasModified()));
+    connect( codeEditor->document(), SIGNAL( contentsChanged()),
+             this,                   SLOT(   documentWasModified()), Qt::UniqueConnection);
             
     m_fileList << "New";
     enableFileActs( true ); 
@@ -110,7 +138,16 @@ void EditorWindow::loadFile( const QString &fileName )
     m_docWidget->setTabText( index, strippedName(fileName) );
     enableFileActs( true );   // enable file actions
     //if( ce->hasDebugger() )
-        enableDebugActs( true );
+    enableDebugActs( true );
+
+    QSettings* settings = MainWindow::self()->settings();
+    QStringList files = settings->value("recentFileList").toStringList();
+    files.removeAll( fileName );
+    files.prepend( fileName );
+    while( files.size() > MaxRecentFiles ) files.removeLast();
+    settings->setValue("recentFileList", files );
+    updateRecentFileActions();
+
     QApplication::restoreOverrideCursor();
 }
 
@@ -124,7 +161,7 @@ bool EditorWindow::save()
 {
     QString file = getCodeEditor()->getFilePath();
     if( file.isEmpty() ) return saveAs();
-    else                 return saveFile(file);
+    else                 return saveFile( file );
 }
 
 bool EditorWindow::saveAs()
@@ -135,7 +172,6 @@ bool EditorWindow::saveAs()
     QString ext  = fi.suffix();
     QString path = fi.absolutePath();
     if( path == "" ) path = m_lastDir;
-    //qDebug() << "EditorWindow::saveAs" << path;
 
     QString extensions = "";
     if( ext == "" ) extensions = tr("All files")+" (*);;Arduino (*.ino);;Asm (*.asm);;GcBasic (*.gcb)";
@@ -168,7 +204,7 @@ bool EditorWindow::saveFile(const QString &fileName)
     ce->setFile( fileName );
     QApplication::restoreOverrideCursor();
     
-    ce->document()->setModified(false);
+    ce->document()->setModified( false );
     documentWasModified();
 
     m_docWidget->setTabText( m_docWidget->currentIndex(), strippedName(fileName) );
@@ -245,10 +281,10 @@ void EditorWindow::tabContextMenu( const QPoint &eventpoint )
     
     QMenu* menu = new QMenu();
     QAction* setCompilerAction = menu->addAction(QIcon(":/copy.png"),tr("Set Compiler Path"));
-    connect( setCompilerAction, SIGNAL( triggered()), this, SLOT(setCompiler()) );
+    connect( setCompilerAction, SIGNAL( triggered()), this, SLOT(setCompiler()), Qt::UniqueConnection );
 
     QAction* reloadAction = menu->addAction(QIcon(":/reload.png"),tr("Reload"));
-    connect( reloadAction, SIGNAL( triggered()), this, SLOT(reload()) );
+    connect( reloadAction, SIGNAL( triggered()), this, SLOT(reload()), Qt::UniqueConnection );
 
     menu->exec( mapToGlobal(eventpoint) );
     menu->deleteLater();
@@ -256,7 +292,7 @@ void EditorWindow::tabContextMenu( const QPoint &eventpoint )
 
 void EditorWindow::tabChanged( int tab )
 {
-    qDebug() << "EditorWindow::tabChanged" << m_docWidget->currentIndex() << tab;
+    //qDebug() << "EditorWindow::tabChanged" << m_docWidget->currentIndex() << tab;
 }
 
 void EditorWindow::setCompiler()
@@ -271,13 +307,18 @@ void EditorWindow::createWidgets()
     baseWidgetLayout->setSpacing(0);
     baseWidgetLayout->setContentsMargins(0, 0, 0, 0);
     baseWidgetLayout->setObjectName("gridLayout");
-    
+
     m_editorToolBar = new QToolBar( this );
     baseWidgetLayout->addWidget( m_editorToolBar );
     
     m_debuggerToolBar = new QToolBar( this );
     m_debuggerToolBar->setVisible( false );
     baseWidgetLayout->addWidget( m_debuggerToolBar );
+
+    QSplitter* splitter0 = new QSplitter( this );
+    splitter0->setObjectName("splitter0");
+    splitter0->setOrientation( Qt::Vertical );
+    baseWidgetLayout->addWidget( splitter0 );
     
     m_docWidget = new QTabWidget( this );
     m_docWidget->setObjectName("docWidget");
@@ -288,15 +329,19 @@ void EditorWindow::createWidgets()
     QString fontSize = QString::number( int(10*fontScale) );
     m_docWidget->tabBar()->setStyleSheet("QTabBar { font-size:"+fontSize+"px; }");
     //m_docWidget->setMovable( true );
-    baseWidgetLayout->addWidget( m_docWidget );
+    ///baseWidgetLayout->addWidget( m_docWidget );
+    splitter0->addWidget( m_docWidget );
+
+    splitter0->addWidget( &m_outPane );
+    splitter0->setSizes( {300, 100} );
     
     connect( m_docWidget, SIGNAL( tabCloseRequested(int)), 
-             this,        SLOT(   closeTab(int)));
+             this,        SLOT(   closeTab(int)), Qt::UniqueConnection);
              
     connect( m_docWidget, SIGNAL( customContextMenuRequested(const QPoint &)), 
-             this,        SLOT(   tabContextMenu(const QPoint &)));
+             this,        SLOT(   tabContextMenu(const QPoint &)), Qt::UniqueConnection);
                         
-    connect( m_docWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    connect( m_docWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)), Qt::UniqueConnection);
     
     setLayout( baseWidgetLayout );
     
@@ -306,47 +351,55 @@ void EditorWindow::createWidgets()
 
 void EditorWindow::createActions()
 {
+    for( int i=0; i<MaxRecentFiles; i++ )
+    {
+        recentFileActs[i] = new QAction( this );
+        recentFileActs[i]->setVisible( false );
+        connect( recentFileActs[i], SIGNAL( triggered() ),
+                 this,              SLOT( openRecentFile() ), Qt::UniqueConnection);
+    }
+
     newAct = new QAction(QIcon(":/new.png"), tr("&New\tCtrl+N"), this);
     newAct->setStatusTip(tr("Create a new file"));
-    connect( newAct, SIGNAL(triggered()), this, SLOT(newFile()));
+    connect( newAct, SIGNAL(triggered()), this, SLOT(newFile()), Qt::UniqueConnection);
 
     openAct = new QAction(QIcon(":/open.png"), tr("&Open...\tCtrl+O"), this);
     openAct->setStatusTip(tr("Open an existing file"));
-    connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
+    connect(openAct, SIGNAL(triggered()), this, SLOT(open()), Qt::UniqueConnection);
 
     saveAct = new QAction(QIcon(":/save.png"), tr("&Save\tCtrl+S"), this);
     saveAct->setStatusTip(tr("Save the document to disk"));
     saveAct->setEnabled(false);
-    connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
+    connect(saveAct, SIGNAL(triggered()), this, SLOT(save()), Qt::UniqueConnection);
 
     saveAsAct = new QAction(QIcon(":/saveas.png"),tr("Save &As...\tCtrl+Shift+S"), this);
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
     saveAsAct->setEnabled(false);
-    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
+    connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()), Qt::UniqueConnection);
 
     exitAct = new QAction(QIcon(":/exit.png"),tr("E&xit"), this);
     exitAct->setStatusTip(tr("Exit the application"));
-    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
+    connect(exitAct, SIGNAL(triggered()), this, SLOT(close()), Qt::UniqueConnection);
 
     cutAct = new QAction(QIcon(":/cut.png"), tr("Cu&t\tCtrl+X"), this);
     cutAct->setStatusTip(tr("Cut the current selection's contents to the clipboard"));
     cutAct->setEnabled(false);
-    connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()));
+    connect(cutAct, SIGNAL(triggered()), this, SLOT(cut()), Qt::UniqueConnection);
 
     copyAct = new QAction(QIcon(":/copy.png"), tr("&Copy\tCtrl+C"), this);
     copyAct->setStatusTip(tr("Copy the current selection's contents to the clipboard"));
     copyAct->setEnabled(false);
-    connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
+    connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()), Qt::UniqueConnection);
 
     pasteAct = new QAction(QIcon(":/paste.png"), tr("&Paste\tCtrl+V"), this);
     pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current selection"));
     pasteAct->setEnabled(false);
-    connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()));
+    connect(pasteAct, SIGNAL(triggered()), this, SLOT(paste()), Qt::UniqueConnection);
 
     undoAct = new QAction(QIcon(":/undo.png"), tr("Undo\tCtrl+Z"), this);
     undoAct->setStatusTip(tr("Undo the last action"));
     undoAct->setEnabled(false);
-    connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()));
+    connect(undoAct, SIGNAL(triggered()), this, SLOT(undo()), Qt::UniqueConnection);
 
     redoAct = new QAction(QIcon(":/redo.png"), tr("Redo\tCtrl+Shift+Z"), this);
     redoAct->setStatusTip(tr("Redo the last action"));
@@ -356,64 +409,53 @@ void EditorWindow::createActions()
     runAct =  new QAction(QIcon(":/runtobk.png"),tr("Run To Breakpoint"), this);
     runAct->setStatusTip(tr("Run to next breakpoint"));
     runAct->setEnabled(false);
-    connect(runAct, SIGNAL(triggered()), this, SLOT(run()));
+    connect(runAct, SIGNAL(triggered()), this, SLOT(run()), Qt::UniqueConnection);
 
     stepAct = new QAction(QIcon(":/step.png"),tr("Step"), this);
     stepAct->setStatusTip(tr("Step debugger"));
     stepAct->setEnabled(false);
-    connect( stepAct, SIGNAL(triggered()), this, SLOT(step()) );
+    connect( stepAct, SIGNAL(triggered()), this, SLOT(step()), Qt::UniqueConnection );
 
     stepOverAct = new QAction(QIcon(":/rotateCW.png"),tr("StepOver"), this);
     stepOverAct->setStatusTip(tr("Step Over"));
     stepOverAct->setEnabled(false);
     stepOverAct->setVisible(false);
-    connect( stepOverAct, SIGNAL(triggered()), this, SLOT(stepOver()) );
+    connect( stepOverAct, SIGNAL(triggered()), this, SLOT(stepOver()), Qt::UniqueConnection );
 
     pauseAct = new QAction(QIcon(":/pause.png"),tr("Pause"), this);
     pauseAct->setStatusTip(tr("Pause debugger"));
     pauseAct->setEnabled(false);
-    connect( pauseAct, SIGNAL(triggered()), this, SLOT(pause()) );
+    connect( pauseAct, SIGNAL(triggered()), this, SLOT(pause()), Qt::UniqueConnection );
 
     resetAct = new QAction(QIcon(":/reset.png"),tr("Reset"), this);
     resetAct->setStatusTip(tr("Reset debugger"));
     resetAct->setEnabled(false);
-    connect( resetAct, SIGNAL(triggered()), this, SLOT(reset()) );
+    connect( resetAct, SIGNAL(triggered()), this, SLOT(reset()), Qt::UniqueConnection );
 
     stopAct = new QAction(QIcon(":/stop.png"),tr("Stop Debugger"), this);
     stopAct->setStatusTip(tr("Stop debugger"));
     stopAct->setEnabled(false);
-    connect( stopAct, SIGNAL(triggered()), this, SLOT(stop()) );
+    connect( stopAct, SIGNAL(triggered()), this, SLOT(stop()), Qt::UniqueConnection );
 
     compileAct = new QAction(QIcon(":/compile.png"),tr("Compile"), this);
     compileAct->setStatusTip(tr("Compile Source"));
     compileAct->setEnabled(false);
-    connect( compileAct, SIGNAL(triggered()), this, SLOT(compile()) );
+    connect( compileAct, SIGNAL(triggered()), this, SLOT(compile()), Qt::UniqueConnection );
     
     loadAct = new QAction(QIcon(":/load.png"),tr("UpLoad"), this);
     loadAct->setStatusTip(tr("Load Firmware"));
     loadAct->setEnabled(false);
-    connect( loadAct, SIGNAL(triggered()), this, SLOT(upload()) );
+    connect( loadAct, SIGNAL(triggered()), this, SLOT(upload()), Qt::UniqueConnection );
 
-    /*aboutAct = new QAction(QIcon(":/info.png"),tr("&About"), this);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
-    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));*/
-
-    /*aboutQtAct = new QAction(QIcon(":/info.png"),tr("About &Qt"), this);
-    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));*/
-
-    //connect(m_codeEditor, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
-    //connect(m_codeEditor, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
-    
     findQtAct = new QAction(QIcon(":/find.png"),tr("Find Replace"), this);
     findQtAct->setStatusTip(tr("Find Replace"));
     findQtAct->setEnabled(false);
-    connect(findQtAct, SIGNAL(triggered()), this, SLOT(findReplaceDialog()));
+    connect(findQtAct, SIGNAL(triggered()), this, SLOT(findReplaceDialog()), Qt::UniqueConnection);
     
     debugAct =  new QAction(QIcon(":/play.png"),tr("Debug"), this);
     debugAct->setStatusTip(tr("Start Debugger"));
     debugAct->setEnabled(false);
-    connect(debugAct, SIGNAL(triggered()), this, SLOT(debug()));
+    connect(debugAct, SIGNAL(triggered()), this, SLOT(debug()), Qt::UniqueConnection);
 }
 
 void EditorWindow::enableStepOver( bool en )
@@ -423,9 +465,7 @@ void EditorWindow::enableStepOver( bool en )
 
 CodeEditor* EditorWindow::getCodeEditor()
 {
-    CodeEditorWidget* actW = dynamic_cast<CodeEditorWidget*>(m_docWidget->currentWidget());
-    if( actW )return actW->m_codeEditor;
-    else      return 0l;
+    return (CodeEditor*)m_docWidget->currentWidget();
 }
 
 void EditorWindow::closeTab( int index )
@@ -435,16 +475,16 @@ void EditorWindow::closeTab( int index )
 
     m_fileList.removeAt(index);
 
-    if( m_fileList.isEmpty() )
+    if( m_fileList.isEmpty() )  // disable file actions
     {
-        enableFileActs( false ); // disable file actions
+        enableFileActs( false );
         enableDebugActs( false );
     }
     if( m_debuggerToolBar->isVisible() ) stop();
 
-    CodeEditorWidget* actW = dynamic_cast<CodeEditorWidget*>( m_docWidget->widget(index));
+    CodeEditor* doc = (CodeEditor*)m_docWidget->currentWidget();
     m_docWidget->removeTab( index );
-    delete actW;
+    delete doc;
 
     int last = m_docWidget->count()-1;
     if( index > last ) m_docWidget->setCurrentIndex( last );
@@ -471,27 +511,27 @@ void EditorWindow::debug()
         stepOverAct->setEnabled( true );
         resetAct->setEnabled( true );
         pauseAct->setEnabled( false );
+
+        Simulator::self()->addToUpdateList( &m_outPane );
     }
 }
 
 void EditorWindow::run()
 { 
     setStepActs();
-    QTimer::singleShot( 10, getCodeEditor(), SLOT( run()) );
+    QTimer::singleShot( 10, getCodeEditor(), SLOT( runToBreak() ) );
 }
 
 void EditorWindow::step()    
 { 
     setStepActs();
     QTimer::singleShot( 10, getCodeEditor(), SLOT( step()) );
-    //getCodeEditor()->step( false ); 
 }
 
 void EditorWindow::stepOver()
 {
     setStepActs();
     QTimer::singleShot( 10, getCodeEditor(), SLOT( stepOver()) );
-    //getCodeEditor()->step( true ); 
 }
 
 void EditorWindow::setStepActs()
@@ -522,11 +562,14 @@ void EditorWindow::stop()
     getCodeEditor()->stopDebbuger();
     m_debuggerToolBar->setVisible( false );
     m_editorToolBar->setVisible( true);
+
+    Simulator::self()->remFromUpdateList( &m_outPane );
 }
 
 void EditorWindow::compile() 
 { 
     getCodeEditor()->compile();
+    /// m_compiler.compile( getCodeEditor()->getFilePath() );
 }
 
 void EditorWindow::upload()  
@@ -548,18 +591,20 @@ void EditorWindow::findReplaceDialog()
 
 void EditorWindow::createToolBars()
 {
+    for( int i=0; i<MaxRecentFiles; i++ ) m_fileMenu.addAction( recentFileActs[i] );
+    QToolButton* fileButton = new QToolButton( this );
+    fileButton->setStatusTip( tr("Last Circuits") );
+    fileButton->setMenu( &m_fileMenu );
+    fileButton->setIcon( QIcon(":/lastfiles.png") );
+    fileButton->setPopupMode( QToolButton::InstantPopup );
+    m_editorToolBar->addWidget( fileButton );
+
     m_editorToolBar->addAction(newAct);
     m_editorToolBar->addAction(openAct);
     m_editorToolBar->addAction(saveAct);
     m_editorToolBar->addAction(saveAsAct);
     m_editorToolBar->addSeparator();
 
-    /*m_editorToolBar->addAction(cutAct);
-    m_editorToolBar->addAction(copyAct);
-    m_editorToolBar->addAction(pasteAct);
-    m_editorToolBar->addSeparator();
-    m_editorToolBar->addAction(undoAct);
-    m_editorToolBar->addAction(redoAct);*/
     m_editorToolBar->addAction(findQtAct);
     m_editorToolBar->addSeparator();
     
@@ -578,6 +623,29 @@ void EditorWindow::createToolBars()
     m_debuggerToolBar->addAction(stopAct);
 }
 
+void EditorWindow::openRecentFile()
+{
+    QAction* action = qobject_cast<QAction*>( sender() );
+    if( action ) loadFile( action->data().toString() );
+}
+
+void EditorWindow::updateRecentFileActions()
+{
+    QSettings* settings = MainWindow::self()->settings();
+    QStringList files = settings->value("recentFileList").toStringList();
+
+    int numRecentFiles = qMin( files.size(), (int)MaxRecentFiles );
+
+    for( int i=0; i<numRecentFiles; i++ )
+    {
+        QString text = tr("&%1 %2").arg(i + 1).arg( strippedName( files[i] ) );
+        recentFileActs[i]->setText(text);
+        recentFileActs[i]->setData( files[i] );
+        recentFileActs[i]->setVisible( true );
+    }
+    for( int i=numRecentFiles; i<MaxRecentFiles; i++ ) recentFileActs[i]->setVisible(false);
+}
+
 void EditorWindow::readSettings()
 {
     QSettings* settings = MainWindow::self()->settings();
@@ -594,15 +662,9 @@ void EditorWindow::writeSettings()
     settings->setValue( "lastDir", m_lastDir );
 }
 
-QString EditorWindow::strippedName(const QString &fullFileName)
+QString EditorWindow::strippedName( const QString &fullFileName )
 {
-    return QFileInfo(fullFileName).fileName();
+    return QFileInfo( fullFileName ).fileName();
 }
 
-void EditorWindow::about()
-{
-   /*QMessageBox::about(this, tr("About Application"),
-            tr(""));*/
-            ;
-}
 #include  "moc_editorwindow.cpp"

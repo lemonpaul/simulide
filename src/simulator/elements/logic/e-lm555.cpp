@@ -17,17 +17,15 @@
  *                                                                         *
  ***************************************************************************/
 
-//#include <QDebug>
-#include <sstream>
-
 #include "e-lm555.h"
 #include "e-source.h"
+#include "simulator.h"
 
-eLm555::eLm555( std::string id )
-      : eElement( id )
+eLm555::eLm555( QString id )
+      : eLogicDevice( id )
 {
     setNumEpins(8);
-    resetState();
+    initialize();
 }
 eLm555::~eLm555()
 { 
@@ -38,7 +36,7 @@ eLm555::~eLm555()
 
 void eLm555::stamp()
 {
-    for( int i=0; i<8; i++ )
+    for( int i=0; i<8; ++i )
     {
         if( i == 2 ) continue; // Output
         if( i == 6 ) continue; // Discharge
@@ -47,93 +45,87 @@ void eLm555::stamp()
     }
 }
 
-void eLm555::resetState()
+void eLm555::initialize()
 {
     m_outState = false;
-    m_volt = 0;
+
+    m_voltLast = 0;
+    m_voltNegLast = 0;
+    m_voltHightLast = 0;
+    m_disImpLast = cero_doub;
 }
 
-void eLm555::setVChanged()
+void eLm555::voltChanged()
 {
+    bool changed = false;
     double voltPos = m_ePin[7]->getVolt();
-    double voltNeg = m_ePin[0]->getVolt();
-    double volt = voltPos - voltNeg;
+    m_voltNeg = m_ePin[0]->getVolt();
+    m_volt    = voltPos - m_voltNeg;
     
     double reftTh = m_ePin[4]->getVolt();
     double reftTr = reftTh/2;
     
-    if( volt != m_volt )
-    {
-        m_volt = volt;
-        m_cv->setVoltHigh( volt*2/3 );
-        m_cv->stampOutput();
-    }
+    if( m_voltLast != m_volt ) changed = true;
+
     double voltTr = m_ePin[1]->getVolt();
     double voltTh = m_ePin[5]->getVolt();
     
     double voltRst = m_ePin[3]->getVolt();
     
-    bool reset = ( voltRst < (voltNeg+0.7) );
+    bool reset = ( voltRst < (m_voltNeg+0.7) );
     bool th    = ( voltTh > reftTh );
     bool tr    = ( reftTr > voltTr );
     
     bool outState = m_outState;
     
-    if( reset )
-    {
-        outState = false;
-    }
-    else if( tr )
-    {
-        outState =  true;
-    }
-    else if( !tr && th )
-    {
-        outState =  false;
-    }
+    if     ( reset )     outState = false;
+    else if( tr )        outState =  true;
+    else if( !tr && th ) outState =  false;
+
     //qDebug() << "eLm555::setVChanged" << outState<<"th"<<th<<"tr"<<tr;
     if( outState != m_outState )
     {
         m_outState = outState;
-        
-        double voltHight = voltNeg;
+        m_voltHight = m_voltNeg;
+
         if( outState ) 
         {
-            voltHight = voltPos - 1.7;
-            if( voltHight < voltNeg ) voltHight = voltNeg;
-            m_dis->setVoltHigh( voltNeg );
-            m_dis->setImp( high_imp );
+            m_voltHight = voltPos - 1.7;
+            if( m_voltHight < m_voltNeg ) m_voltHight = m_voltNeg;
+            m_disImp = high_imp;
         }
-        else
-        {
-            m_dis->setVoltHigh( voltNeg );
-            m_dis->setImp( 1 );
-        }
-        m_output->setVoltHigh( voltHight );
-        m_output->stampOutput();
+        else m_disImp = 1;
+
+        changed = true;
+
         //qDebug() << "eLm555::setVChanged" << outState<<reset<<th<<tr;
     }
+    if( changed ) Simulator::self()->addEvent( m_propDelay, this );
 }
 
-void eLm555::initEpins()
-{//qDebug() << "eLm555::initEpins";
-    setNumEpins(8); 
-    
-    std::stringstream ss;
-    ss << m_elmId << "-out-eSource";
-    m_output = new eSource( ss.str(), m_ePin[2] );
-    m_output->setImp( 10 );
-    m_output->setOut( true );
-    
-    std::stringstream ss1;
-    ss1 << m_elmId << "-cv-eSource";
-    m_cv = new eSource( ss1.str(), m_ePin[4] );
-    m_cv->setImp( 10 );
-    m_cv->setOut( true );
-    
-    std::stringstream ss2;
-    ss2 << m_elmId << "-dis-eSource";
-    m_dis = new eSource( ss2.str(), m_ePin[6] );
-    m_dis->setImp( high_imp );
-    m_dis->setOut( false );
+void eLm555::runEvent()
+{
+    if( m_voltLast != m_volt )
+    {
+        m_cv->setVoltHigh( m_volt*2/3 );
+        m_cv->stampOutput();
+        m_voltLast = m_volt;
+    }
+    if( m_voltNegLast != m_voltNeg )
+    {
+        m_dis->setVoltHigh( m_voltNeg );
+        m_dis->stampOutput();
+        m_voltNegLast = m_voltNeg;
+    }
+    if( m_voltHightLast != m_voltHight )
+    {
+        m_output->setVoltHigh( m_voltHight );
+        m_output->stampOutput();
+        m_voltHightLast = m_voltHight;
+    }
+    if( m_disImpLast != m_disImp )
+    {
+        m_dis->setImp( m_disImp );
+        m_disImpLast = m_disImp;
+    }
 }

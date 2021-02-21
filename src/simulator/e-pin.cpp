@@ -16,16 +16,13 @@
  *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
  *                                                                         *
  ***************************************************************************/
- 
-//#include <iostream>
 
 #include "e-pin.h"
 #include "e-node.h"
 #include "circuit.h"
 
-//#include <QDebug>
 
-ePin::ePin( std::string id, int index )
+ePin::ePin( QString id, int index )
 {
     m_id    = id;
     m_index = index;
@@ -72,7 +69,8 @@ void ePin::setEnodeComp( eNode* enode )
     m_enodeCon = enode;
     int enodeConNum = 0;
     if( enode ) enodeConNum = enode->getNodeNumber();
-    if( m_connected ) m_enode->pinChanged( this, enodeConNum );
+    if( m_connected )
+        m_enode->pinChanged( this, enodeConNum );
 }
 
 void ePin::stampCurrent( double data )
@@ -85,7 +83,8 @@ void ePin::stampAdmitance( double data )
 {
     if( m_connected )
     {
-        if( !m_enodeCon ) data = 1e-12;
+        if( !m_enodeCon )
+            data = 1e-12;
         m_enode->stampAdmitance( this, data );
     }
 }
@@ -108,9 +107,9 @@ bool ePin::inverted() { return m_inverted; }
 
 void ePin::setInverted( bool inverted ){ m_inverted = inverted; }
 
-std::string ePin::getId() { return m_id; }
+QString ePin::getId() { return m_id; }
 
-void ePin::setId( std::string id )
+void ePin::setId( QString id )
 {
     //Circuit::self()->removePin( m_id );
     Circuit::self()->updatePin( this, id );

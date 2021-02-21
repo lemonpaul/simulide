@@ -52,87 +52,110 @@ WaveGen::WaveGen( QObject* parent, QString type, QString id )
     m_lastVout = 0;
     m_type = Sine;
     
-    setQuality( 4 );
+    setSteps( 100 );
     setDuty( 50 );
     
     connect( this, SIGNAL( freqChanged() )
-           , this, SLOT( updateValues() ));
+           , this, SLOT( updateValues() ), Qt::UniqueConnection );
 }
 WaveGen::~WaveGen(){}
 
-void WaveGen::simuClockStep()
+QList<propGroup_t> WaveGen::propGroups()
 {
-    m_step++;
-    
-    if(( m_qSteps > 0 )
-    &&( remainder( m_step, m_qSteps )!= 0 )) 
-    {
-        if( m_step < m_stepsPC ) return;
-    }
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Wave_Type", tr("Wave Type"),"enum"} );
+    mainGroup.propList.append( {"Freq", tr("Frequency"),"Hz"} );
+    mainGroup.propList.append( {"Duty", tr("Duty"),"\%"} );
+    mainGroup.propList.append( {"Always_On", tr("Always On"),""} );
+
+    propGroup_t elecGroup { tr("Electric") };
+    elecGroup.propList.append( {"Voltage", tr("Amplitude"),"main"} );
+    elecGroup.propList.append( {"Volt_Base", tr("Base Voltage"),"V"} );
+
+    propGroup_t timeGroup { tr("Edges") };
+    timeGroup.propList.append( {"Tr_ps", tr("Rise Time"),"ps"} );
+    timeGroup.propList.append( {"Tf_ps", tr("Fall Time"),"ps"} );
+
+    return {mainGroup, elecGroup, timeGroup};
+}
+
+void WaveGen::runEvent()
+{
+    m_time = fmod( Simulator::self()->circTime(), m_fstepsPC );
+
+    //if( m_time == 0 ) return;
     
     if     ( m_type == Sine )     genSine();
     else if( m_type == Saw )      genSaw();
     else if( m_type == Triangle ) genTriangle();
     else if( m_type == Square )   genSquare();
     else if( m_type == Random )   genRandom();
-    
-    if( m_step >= m_stepsPC ) m_step = 0;
-    
-    if( m_vOut == m_lastVout ) return;
-    m_lastVout = m_vOut;
-    
-    m_out->setVoltHigh( m_voltHight*m_vOut+m_voltBase );
-    m_out->stampOutput();
+
+    if( m_vOut != m_lastVout )
+    {
+        m_lastVout = m_vOut;
+
+        if( m_type == Square ) m_out->setTimedOut( m_vOut );
+        else
+        {
+            m_out->setVoltHigh( m_voltHight*m_vOut+m_voltBase );
+            m_out->stampOutput();
+        }
+    }
+
+    m_remainder += m_fstepsPC-(double)m_stepsPC;
+    uint64_t remainerInt = m_remainder;
+    m_remainder -= remainerInt;
+
+    if( m_isRunning )
+        Simulator::self()->addEvent( m_nextStep+remainerInt, this );
 }
 
 void WaveGen::genSine()
 {
-    double time = Simulator::self()->step();
-    time = remainder( time, m_stepsPC );
-    time = qDegreesToRadians( time*360/m_stepsPC );
+    m_time = qDegreesToRadians( (double)m_time*360/m_fstepsPC );
+    m_vOut = sin( m_time )/2+0.5;
 
-    m_vOut = sin( time )/2+0.5;
+    m_nextStep = m_qSteps;
 }
 
 void WaveGen::genSaw()
 {
-    if( m_step >= m_stepsPC )
-    {
-        m_vOut = 0;
-        m_step = 0;
-        return;
-    }
-    m_vOut = (double)m_step/m_stepsPC;
+    m_vOut = m_time/m_fstepsPC;
+
+    m_nextStep = m_qSteps;
 }
 
 void WaveGen::genTriangle()
 {
-    int halfW = m_stepsPC/2;
-    
-    if( m_step >= halfW )
+    if( m_time >= m_halfW )
     {
-        m_vOut = 1-(double)(m_step-halfW)/halfW;
+        m_vOut = 1-(m_time-m_halfW)/(m_fstepsPC-m_halfW);
     }
-    else m_vOut = (double)m_step/halfW;
+    else m_vOut = m_time/m_halfW;
+
+    m_nextStep = m_qSteps;
 }
 
 void WaveGen::genSquare()
 {
-    if( m_step >= m_halfW )
+    if( m_vOut == 1 )
     {
         m_vOut = 0;
+        m_nextStep = m_fstepsPC-m_halfW;
     }
-    else m_vOut = 1;
+    else
+    {
+        m_vOut = 1;
+        m_nextStep = m_halfW;
+    }
 }
 
 void WaveGen::genRandom()
 {
-    if ( m_step >= m_stepsPC )
-    {
-        m_step = 0;
-        m_vOldOut = m_vOut = (double)rand()/(double)RAND_MAX;
-    }
-    else m_vOut = m_vOldOut;
+    m_vOut = (double)rand()/(double)RAND_MAX;
+
+    m_nextStep = m_halfW;
 }
 
 void WaveGen::updateStep()
@@ -147,7 +170,7 @@ void WaveGen::updateStep()
 void WaveGen::updateValues()
 {
     setDuty( m_duty );
-    setQuality( m_quality );
+    setSteps( m_steps );
 }
 
 double WaveGen::duty()
@@ -157,29 +180,30 @@ double WaveGen::duty()
 
 void WaveGen::setDuty( double duty )
 {
+    if( duty > 100 ) duty = 100;
     m_duty = duty;
     
-    m_halfW = m_stepsPC*m_duty/100;
+    m_halfW = m_fstepsPC*m_duty/100;
 }
 
-int WaveGen::quality()
+int WaveGen::steps()
 {
-    return m_quality;
+    return m_steps;
 }
 
-void WaveGen::setQuality( int q )
+void WaveGen::setSteps(int steps )
 {
-    if( q > 5 ) q = 5;
-    if( q < 1 ) q = 1;
-    
-    m_quality = q;
-    int range = m_stepsPC/100;
-    m_qSteps  = (5-q)*range;
+    if( steps < 10 ) steps = 10;
+    m_steps = steps;
+
+    m_qSteps  = m_stepsPC/steps;
     //qDebug()<<"WaveGen::setQuality"<<m_stepsPC<<q <<m_qSteps;
 }
 
 void WaveGen::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
+    if( m_hidden ) return;
+
     Component::paint( p, option, widget );
 
     if (  m_isRunning )

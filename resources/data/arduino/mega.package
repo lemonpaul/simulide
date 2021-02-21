@@ -19,7 +19,7 @@
 <!-- *                                                                         * -->
 <!-- *************************************************************************** -->
 
-<package name="arduinoUno" pins="82" width="20" height="41">
+<package name="arduinoUno" pins="82" width="20" height="41" background="mega_board.png">
 
     <pin side="left" pos="6"  type="bidir,scl" id="PD0"  label=" 21 SCL "/>
     <pin side="left" pos="7"  type="bidir,sda" id="PD1"  label=" 20 SDA "/>

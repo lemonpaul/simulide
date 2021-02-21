@@ -27,7 +27,7 @@ Highlighter::Highlighter( QTextDocument* parent )
 { 
     m_multiline = false;
     
-    multiLineCommentFormat.setForeground( Qt::red );
+    multiLineCommentFormat.setForeground( QColor( 250, 90, 90 ) );
     multiLineCommentFormat.setFontItalic( true );
 
     commentStartExpression = QRegExp( "/\\*" );
@@ -98,7 +98,7 @@ void Highlighter::readSintaxFile( const QString &fileName )
                 for( QString exp : words )
                 {
                     if( exp.startsWith("\"")) // RegExp
-                        exp = exp.remove(0, 1).remove( exp.lastIndexOf("\""), 1);
+                        exp = exp.remove(0, 1).remove( exp.lastIndexOf("\"")-1, 1);
                     else exp = "\\b"+exp+"\\b";
                     addRule( format, exp );
                 }

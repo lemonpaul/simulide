@@ -21,14 +21,14 @@
 #define EPIN_H
 
 //Have to use #include <QtCore/QtGlobal> for Q_DECL_EXPORT?
-#include <string>
+#include <QString>
 
 class eNode;
 
 class MAINMODULE_EXPORT ePin
 {
     public:
-        ePin( std::string id, int index );
+        ePin( QString id, int index );
         ~ePin();
 
         bool isConnected();
@@ -50,14 +50,14 @@ class MAINMODULE_EXPORT ePin
 
         void reset();
         
-        std::string getId();
-        void setId( std::string id );
+        QString getId();
+        void setId( QString id );
 
     protected:
         eNode* m_enode;
         eNode* m_enodeCon;
 
-        std::string m_id;
+        QString m_id;
         int m_index;
 
         bool m_connected;

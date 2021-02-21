@@ -46,16 +46,12 @@ LibraryItem* OpAmp::libraryItem()
 
 OpAmp::OpAmp( QObject* parent, QString type, QString id )
      : Component( parent, type, id )
-     , eOpAmp( id.toStdString() )
+     , eOpAmp( id )
 {
     Q_UNUSED( OpAmp_properties );
     
     m_area = QRect( -18, -8*2, 36, 8*2*2 );
     setLabelPos(-16,-32, 0);
-    
-    setGain( 1000 );
-    m_voltPos = 5;
-    m_voltNeg = 0;
     
     m_pin.resize( 5 );
     
@@ -79,7 +75,7 @@ OpAmp::OpAmp( QObject* parent, QString type, QString id )
     m_pin[2] = new Pin( 0, QPoint(16+8,0), newId, 2, this );
     m_ePin[2] = m_pin[2];
     newId.append("-eSource");
-    m_output = new eSource( newId.toStdString(), m_ePin[2] );
+    m_output = new eSource( newId, m_ePin[2] );
     //m_output->setImp( 40 );
     m_output->setOut( true );
     
@@ -99,8 +95,18 @@ OpAmp::OpAmp( QObject* parent, QString type, QString id )
     
     setPowerPins( false );
 }
-OpAmp::~OpAmp()
+OpAmp::~OpAmp(){}
+
+QList<propGroup_t> OpAmp::propGroups()
 {
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Gain", tr("Gain"),""} );
+
+    propGroup_t supGroup { tr("Supply") };
+    supGroup.propList.append( {"Volt_Pos", tr("V+"),"V"} );
+    supGroup.propList.append( {"Volt_Neg", tr("V-"),"V"} );
+    supGroup.propList.append( {"Power_Pins", tr("Supply Pins"),""} );
+    return {mainGroup, supGroup};
 }
 
 void OpAmp::setPowerPins( bool set )

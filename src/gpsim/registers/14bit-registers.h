@@ -28,19 +28,16 @@ class InvalidRegister;   // Forward reference
 #ifndef __14_BIT_REGISTERS_H__
 #define __14_BIT_REGISTERS_H__
 
-
 class _14bit_processor;
-
-#include "breakpoints.h"
 
 #include "rcon.h"
 #include "intcon.h"
 #include "pir.h"
 
-class stimulus;  // forward reference
+////class stimulus;  // forward reference
 class IOPIN;
 class source_stimulus;
-//class Stimulus_Node;
+////class Stimulus_Node;
 class PORTB;
 class pic_processor;
 
@@ -49,10 +46,10 @@ class pic_processor;
 //---------------------------------------------------------
 // BORCON register
 //
-class BORCON : public sfr_register
+class BORCON : public  SfrReg
 {
     public:
-      BORCON(Processor *, const char *pName, const char *pDesc=0);
+      BORCON(Processor *, const char *pName =0);
 
       void put(uint new_value);
       void put_value(uint new_value);
@@ -61,10 +58,10 @@ class BORCON : public sfr_register
 //---------------------------------------------------------
 // BSR register
 //
-class BSR : public sfr_register
+class BSR : public  SfrReg
 {
     public:
-      BSR(Processor *, const char *pName, const char *pDesc=0);
+      BSR(Processor *, const char *pName =0);
 
       uint register_page_bits;
 
@@ -75,10 +72,10 @@ class BSR : public sfr_register
 //---------------------------------------------------------
 // FSR register
 //
-class FSR : public sfr_register
+class FSR : public  SfrReg
 {
     public:
-      FSR(Processor *, const char *pName, const char *pDesc=0);
+      FSR(Processor *, const char *pName =0);
       virtual void put(uint new_value);
       virtual void put_value(uint new_value);
       virtual uint get();
@@ -108,7 +105,7 @@ class FSR_12 : public FSR
 //
 class RCON;
 
-class Status_register : public sfr_register
+class StatusReg : public  SfrReg
 {
     public:
 
@@ -140,21 +137,16 @@ class Status_register : public sfr_register
       uint write_mask;    // Bits that instructions can modify
       RCON *rcon;
 
-      Status_register(Processor *, const char *pName, const char *pDesc=0);
+      StatusReg(Processor *, const char *pName =0);
       void reset(RESET_TYPE r);
 
       void set_rcon(RCON *p_rcon) { rcon = p_rcon;}
 
       virtual void put(uint new_value);
 
-      inline uint get()
-      {
-        return(value.get());
-      }
+      inline uint get() { return(value.get()); }
 
-      // Special member function to control just the Z bit
-
-      inline void put_Z(uint new_z)
+      inline void put_Z(uint new_z) // Special member function to control just the Z bit
       {
         value.put((value.get() & ~STATUS_Z) | ((new_z) ? STATUS_Z : 0));
       }
@@ -164,8 +156,7 @@ class Status_register : public sfr_register
         return( ( (value.get() & STATUS_Z) == 0) ? 0 : 1);
       }
 
-      // Special member function to control just the C bit
-      void put_C(uint new_c)
+      void put_C(uint new_c) // Special member function to control just the C bit
       {
         value.put((value.get() & ~STATUS_C) | ((new_c) ? STATUS_C : 0));
       }
@@ -175,14 +166,12 @@ class Status_register : public sfr_register
         return( ( (value.get() & STATUS_C) == 0) ? 0 : 1);
       }
 
-      // Special member function to set Z, C, and DC
-
-      inline void put_Z_C_DC(uint new_value, uint src1, uint src2)
+      inline void put_Z_C_DC(uint new_value, uint src1, uint src2) // Special member function to set Z, C, and DC
       {
-        value.put((value.get() & ~ (STATUS_Z | STATUS_C | STATUS_DC)) |
-                  ((new_value & 0xff)   ? 0 : STATUS_Z)   |
-                  ((new_value & 0x100)  ? STATUS_C : 0)   |
-                  (((new_value ^ src1 ^ src2)&0x10) ? STATUS_DC : 0));
+        value.put( (value.get() & ~ (STATUS_Z | STATUS_C | STATUS_DC))
+                 | ((new_value & 0xff)           ? 0         : STATUS_Z)
+                 | ((new_value & 0x100)          ? STATUS_C  : 0)
+                 | (((new_value^src1^src2)&0x10) ? STATUS_DC : 0));
 
       }
 
@@ -207,38 +196,26 @@ class Status_register : public sfr_register
 
       inline uint get_PD()
       {
-        if (rcon)
-            return (rcon->get_PD());
-        else
-        {
-            return( ( (value.get() & STATUS_PD) == 0) ? 0 : 1);
-        }
+        if (rcon) return (rcon->get_PD());
+        else      return( ( (value.get() & STATUS_PD) == 0) ? 0 : 1);
       }
 
       inline void put_TO(uint new_to)
       {
-        if (rcon)
-            rcon->put_TO(new_to);
-        else
-        {
-            value.put((value.get() & ~STATUS_TO) | ((new_to) ? STATUS_TO : 0));
-        }
+        if (rcon) rcon->put_TO(new_to);
+        else      value.put((value.get() & ~STATUS_TO) | ((new_to) ? STATUS_TO : 0));
       }
 
       inline uint get_TO()
       {
-        if (rcon)
-            return(rcon->get_TO());
-        else
-        {
-            return( ( (value.get() & STATUS_TO) == 0) ? 0 : 1);
-        }
+        if (rcon) return(rcon->get_TO());
+        else      return( ( (value.get() & STATUS_TO) == 0) ? 0 : 1);
       }
 
       // Special member function to set Z, C, DC, OV, and N for the 18cxxx family
 
-      // Special member function to control just the N bit
-      void put_N_Z(uint new_value)
+
+      void put_N_Z(uint new_value) // Special member function to control just the N bit
       {
         value.put((value.get() & ~(STATUS_Z | STATUS_N)) |
                   ((new_value & 0xff )  ? 0 : STATUS_Z)   |
@@ -273,11 +250,9 @@ class Status_register : public sfr_register
                   ((new_value & 0x80)   ? STATUS_N : 0));
       }
 
-      // Special member function to control just the FSR mode
-      void put_FSR0_mode(uint new_value)
+      void put_FSR0_mode(uint new_value) // Special member function to control just the FSR mode
       {
-        value.put((value.get() & ~(STATUS_FSR0_MODE)) |
-                  (new_value & 0x03 ));
+        value.put((value.get() & ~(STATUS_FSR0_MODE)) | (new_value & 0x03 ));
       }
 
       uint get_FSR0_mode(uint new_value)
@@ -287,22 +262,15 @@ class Status_register : public sfr_register
 
       void put_FSR1_mode(uint new_value)
       {
-        value.put((value.get() & ~(STATUS_FSR1_MODE)) |
-                  (new_value & 0x03 ));
+        value.put((value.get() & ~(STATUS_FSR1_MODE)) | (new_value & 0x03 ));
       }
 
-      uint get_FSR1_mode(uint new_value)
-      {
-        return( (value.get()>>STATUS_FSR1_BIT) & 0x03);
-      }
+      //uint get_FSR1_mode(uint new_value) { return( (value.get()>>STATUS_FSR1_BIT) & 0x03); }
 };
 
 
-#include "gpsim_time.h"
-
 //---------------------------------------------------------
-// Stack
-//
+
 class Stack
 {
     public:
@@ -319,7 +287,7 @@ class Stack
       virtual bool stack_overflow();
       virtual bool stack_underflow();
       virtual uint pop();
-      virtual void reset(RESET_TYPE r) {pointer = 0;};  // %%% FIX ME %%% reset may need to change
+      virtual void reset(RESET_TYPE r) {pointer = 0;}  // %%% FIX ME %%% reset may need to change
       // because I'm not sure how the stack is affected by a reset.
       virtual bool set_break_on_overflow(bool clear_or_set);
       virtual bool set_break_on_underflow(bool clear_or_set);
@@ -331,25 +299,24 @@ class Stack
       Processor *cpu;
 };
 
-class STKPTR : public sfr_register
+class STKPTR : public  SfrReg
 {
     public:
-
       enum {
             STKUNF = 1<<6,
             STKOVF = 1<<7
       };
-      STKPTR(Processor *, const char *pName, const char *pDesc=0);
+      STKPTR(Processor *, const char *pName =0);
 
       Stack *stack;
       void put_value(uint new_value);
       void put(uint new_value);
 };
 
-class TOSL : public sfr_register
+class TOSL : public  SfrReg
 {
     public:
-      TOSL(Processor *, const char *pName, const char *pDesc=0);
+      TOSL(Processor *, const char *pName =0);
 
       Stack *stack;
 
@@ -359,10 +326,10 @@ class TOSL : public sfr_register
       virtual uint get_value();
 };
 
-class TOSH : public sfr_register
+class TOSH : public  SfrReg
 {
     public:
-      TOSH(Processor *, const char *pName, const char *pDesc=0);
+      TOSH(Processor *, const char *pName =0);
 
       Stack *stack;
 
@@ -395,11 +362,11 @@ class Stack14E : public Stack
 //---------------------------------------------------------
 // W register
 
-class WREG : public sfr_register
+class WREG : public  SfrReg
 {
     public:
 
-      WREG(Processor *, const char *pName, const char *pDesc=0);
+      WREG(Processor *, const char *pName =0);
       ~WREG();
 };
 
@@ -408,19 +375,19 @@ class WREG : public sfr_register
 //---------------------------------------------------------
 // INDF
 
-class INDF : public sfr_register
+class INDF : public  SfrReg
 {
     public:
       uint fsr_mask;
       uint base_address_mask1;
       uint base_address_mask2;
 
-      INDF(Processor *, const char *pName, const char *pDesc=0);
+      INDF(Processor *, const char *pName =0);
       void put(uint new_value);
       virtual void put_value(uint new_value);
       uint get();
       uint get_value();
-      virtual void initialize();
+      virtual void initialize() override;
 };
 
 //---------------------------------------------------------
@@ -430,7 +397,7 @@ class INDF : public sfr_register
 // This class coordinates the indirect addressing on the 18cxxx
 // parts. Each of the registers comprising the indirect addressing
 // subsystem: FSRnL,FSRnH, INDFn, POSTINCn, POSTDECn, PREINCn, and
-// PLUSWn are each individually defined as sfr_registers AND included
+// PLUSWn are each individually defined as  SfrRegs AND included
 // in the Indirect_Addressing class. So accessing these registers
 // is the same as accessing any register: through the core cpu's
 // register memory. The only difference for these registers is that
@@ -441,10 +408,10 @@ class Indirect_Addressing14;   // Forward reference
 //---------------------------------------------------------
 // FSR registers
 
-class FSRL14 : public sfr_register
+class FSRL14 : public  SfrReg
 {
     public:
-      FSRL14(Processor *, const char *pName, const char *pDesc, Indirect_Addressing14 *pIAM);
+      FSRL14(Processor *, const char *pName , Indirect_Addressing14 *pIAM);
       void put(uint new_value);
       void put_value(uint new_value);
 
@@ -452,10 +419,10 @@ class FSRL14 : public sfr_register
       Indirect_Addressing14  *iam;
 };
 
-class FSRH14 : public sfr_register
+class FSRH14 : public  SfrReg
 {
      public:
-      FSRH14(Processor *, const char *pName, const char *pDesc, Indirect_Addressing14 *pIAM);
+      FSRH14(Processor *, const char *pName , Indirect_Addressing14 *pIAM);
 
       void put(uint new_value);
       void put_value(uint new_value);
@@ -464,10 +431,10 @@ class FSRH14 : public sfr_register
       Indirect_Addressing14  *iam;
 };
 
-class INDF14 : public sfr_register
+class INDF14 : public  SfrReg
 {
      public:
-      INDF14(Processor *, const char *pName, const char *pDesc, Indirect_Addressing14 *pIAM);
+      INDF14(Processor *, const char *pName , Indirect_Addressing14 *pIAM);
 
       void put(uint new_value);
       void put_value(uint new_value);
@@ -511,7 +478,7 @@ class Indirect_Addressing14
       uint get();
       uint get_value();
       void put_fsr(uint new_fsr);
-      uint get_fsr_value(){return (fsr_value & 0xfff);};
+      uint get_fsr_value(){return (fsr_value & 0xfff);}
       void update_fsr_value();
 
       /* bool is_indirect_register(uint reg_address)
@@ -537,7 +504,7 @@ class Indirect_Addressing14
 //---------------------------------------------------------
 // PCL - Program Counter Low
 //
-class PCL : public sfr_register
+class PCL : public  SfrReg
 {
     public:
 
@@ -547,13 +514,13 @@ class PCL : public sfr_register
       virtual uint get_value();
       virtual void reset(RESET_TYPE r);
 
-      PCL(Processor *, const char *pName, const char *pDesc=0);
+      PCL(Processor *, const char *pName =0);
 };
 
 //---------------------------------------------------------
 // PCLATH - Program Counter Latch High
 //
-class PCLATH : public sfr_register
+class PCLATH : public  SfrReg
 {
     public:
       void put(uint new_value);
@@ -561,37 +528,36 @@ class PCLATH : public sfr_register
       uint get();
 
 
-      PCLATH(Processor *, const char *pName, const char *pDesc=0);
+      PCLATH(Processor *, const char *pName =0);
 };
 
 //---------------------------------------------------------
 // PCON - Power Control/Status Register
 //
-class PCON : public sfr_register
+class PCON : public  SfrReg
 {
     public:
 
       enum {
-        BOR = 1<<0,   // clear on Brown Out Reset
-        POR = 1<<1,    // clear on Power On Reset
-        RI  = 1<<2,           // clear on Reset instruction
-        RMCLR = 1<<3,  // clear if hardware MCLR occurs
+        BOR    = 1<<0, // clear on Brown Out Reset
+        POR    = 1<<1, // clear on Power On Reset
+        RI     = 1<<2, // clear on Reset instruction
+        RMCLR  = 1<<3, // clear if hardware MCLR occurs
         SBOREN = 1<<4, //  Software BOR Enable bit
-        ULPWUE = 1<<5,  // Ultra Low-Power Wake-up Enable bit
-        STKUNF = 1<<6,  // Stack undeflow
-        STKOVF = 1<<7   // Stack overflow
+        ULPWUE = 1<<5, // Ultra Low-Power Wake-up Enable bit
+        STKUNF = 1<<6, // Stack undeflow
+        STKOVF = 1<<7  // Stack overflow
       };
 
       uint valid_bits;
 
       void put(uint new_value);
 
-      PCON(Processor *, const char *pName, const char *pDesc=0,
-                            uint bitMask=0x03);
+      PCON(Processor *, const char *pName =0, uint bitMask=0x03);
 };
 
 class OSCCON;
-class OSCTUNE : public  sfr_register
+class OSCTUNE : public   SfrReg
 {
     public:
 
@@ -600,19 +566,19 @@ class OSCTUNE : public  sfr_register
       uint valid_bits;
 
       enum {
-        TUN0 = 1<<0,
-        TUN1 = 1<<1,
-        TUN2 = 1<<2,
-        TUN3 = 1<<3,
-        TUN4 = 1<<4,
-        TUN5 = 1<<5,
-        PLLEN= 1<<6,
-        INTSRC=1<<7
+        TUN0   = 1<<0,
+        TUN1   = 1<<1,
+        TUN2   = 1<<2,
+        TUN3   = 1<<3,
+        TUN4   = 1<<4,
+        TUN5   = 1<<5,
+        PLLEN  = 1<<6,
+        INTSRC = 1<<7
       };
       OSCCON *osccon;
 
-      OSCTUNE(Processor *pCpu, const char *pName, const char *pDesc)
-        : sfr_register(pCpu,pName,pDesc), valid_bits(6), osccon(0)
+      OSCTUNE( Processor* pCpu, const char *pName )
+        :  SfrReg( pCpu, pName ), valid_bits(6), osccon(0)
       { }
 };
 
@@ -620,7 +586,7 @@ class OSCTUNE : public  sfr_register
 //  111111 - Max freq
 //  100000 - no adjustment
 //  000000 - mix freq
-class OSCCAL : public  sfr_register
+class OSCCAL : public   SfrReg
 {
     public:
 
@@ -628,14 +594,14 @@ class OSCCAL : public  sfr_register
       void set_freq(float base_freq);
       float base_freq;
 
-      OSCCAL(Processor *pCpu, const char *pName, const char *pDesc, uint bitMask)
-        : sfr_register(pCpu,pName,pDesc), base_freq(0.)
+      OSCCAL(Processor *pCpu, const char *pName, uint bitMask)
+        :  SfrReg( pCpu, pName ), base_freq(0.)
       {
           mValidBits=bitMask;  // Can't use initialiser for parent class members
       }
 };
 
-class OSCCON : public  sfr_register,  public TriggerObject
+class OSCCON : public   SfrReg,  public TriggerObject
 {
     public:
       virtual void put(uint new_value);
@@ -662,7 +628,7 @@ class OSCCON : public  sfr_register,  public TriggerObject
       bool         has_iofs_bit;
       bool               is_sleeping;
       
-      OSCTUNE *osctune;
+      OSCTUNE* osctune;
 
       enum MODE
       {
@@ -691,8 +657,8 @@ class OSCCON : public  sfr_register,  public TriggerObject
         IDLEN = 1<<7
       };
 
-      OSCCON(Processor *pCpu, const char *pName, const char *pDesc)
-        : sfr_register(pCpu,pName,pDesc), write_mask(0x71), 
+      OSCCON( Processor* pCpu, const char *pName )
+        :  SfrReg( pCpu, pName ), write_mask(0x71),
             clock_state(OST), future_cycle(0), config_irc(false), config_ieso(true),
             config_xosc(false), has_iofs_bit(false), is_sleeping(false), osctune(0)
       { }
@@ -709,18 +675,18 @@ class OSCCON_1 : public OSCCON
       virtual uint64_t irc_por_time(); // time to stable intrc after power on reset
       virtual uint64_t irc_lh_time();
 
-      OSCCON_1(Processor *pCpu, const char *pName, const char *pDesc)
-        : OSCCON(pCpu,pName,pDesc)
+      OSCCON_1(Processor *pCpu, const char *pName )
+        : OSCCON( pCpu, pName  )
       { }
 };
 
-class OSCCON2 : public  sfr_register
+class OSCCON2 : public   SfrReg
 {
     public:
       void put(uint new_value);
       void set_osccon(OSCCON *new_osccon) { osccon = new_osccon;}
-      OSCCON2(Processor *pCpu, const char *pName, const char *pDesc)
-        : sfr_register(pCpu,pName,pDesc) , write_mask(0x1c), osccon(0)
+      OSCCON2(Processor *pCpu, const char *pName )
+        :  SfrReg(pCpu,pName  ) , write_mask(0x1c), osccon(0)
             {;}
 
       uint write_mask;
@@ -748,8 +714,8 @@ class OSCCON_HS : public OSCCON
        virtual void callback();
        virtual void por_wake();
 
-       OSCCON_HS(Processor *pCpu, const char *pName, const char *pDesc) :
-           OSCCON(pCpu, pName, pDesc), osccon2(0), minValPLL(5) {}
+       OSCCON_HS(Processor *pCpu, const char *pName ) :
+           OSCCON( pCpu, pName ), osccon2(0), minValPLL(5) {}
 
        OSCCON2  *osccon2;
 
@@ -778,9 +744,8 @@ class OSCCON_HS2 : public OSCCON
        virtual void callback();
        virtual void por_wake();
 
-       OSCCON_HS2(Processor *pCpu, const char *pName, const char *pDesc) :
-           OSCCON(pCpu, pName, pDesc) { write_mask = 0x70;}
-
+       OSCCON_HS2(Processor *pCpu, const char *pName ) :
+           OSCCON(pCpu, pName  ) { write_mask = 0x70;}
 
        enum {
             HFIOFS  = 1<<0,
@@ -792,7 +757,7 @@ class OSCCON_HS2 : public OSCCON
        };
 };
 
-class OSCSTAT : public  sfr_register
+class OSCSTAT : public   SfrReg
 {
     public:
       void put(uint new_value){;}
@@ -808,8 +773,8 @@ class OSCSTAT : public  sfr_register
             PLLR   = 1<<6,
             T1OSCR = 1<<7
       };
-      OSCSTAT(Processor *pCpu, const char *pName, const char *pDesc)
-        : sfr_register(pCpu,pName,pDesc) {}
+      OSCSTAT(Processor *pCpu, const char *pName )
+        :  SfrReg(pCpu,pName  ) {}
 };
 
 /*
@@ -837,12 +802,12 @@ class OSCCON_2 : public  OSCCON
         SPLLEN = 1<<7
       };
 
-      OSCCON_2(Processor *pCpu, const char *pName, const char *pDesc)
-        : OSCCON(pCpu,pName,pDesc),
+      OSCCON_2(Processor *pCpu, const char *pName )
+        : OSCCON(pCpu,pName  ),
            oscstat(0) {}
 };
 
-class WDTCON : public  sfr_register
+class WDTCON : public   SfrReg
 {
     public:
 
@@ -856,20 +821,20 @@ class WDTCON : public  sfr_register
         SWDTEN = 1<<0
       };
 
-      WDTCON(Processor *pCpu, const char *pName, const char *pDesc, uint bits)
-        : sfr_register(pCpu,pName,pDesc), valid_bits(bits) { }
+      WDTCON(Processor *pCpu, const char *pName , uint bits)
+        :  SfrReg(pCpu,pName  ), valid_bits(bits) { }
         
       virtual void put(uint new_value);
       virtual void reset(RESET_TYPE r);
 };
 
 // Interrupt-On-Change GPIO Register
-class IOC :  public sfr_register
+class IOC :  public  SfrReg
 {
     public:
 
-     IOC(Processor *pCpu, const char *pName, const char *pDesc, uint _valid_bits = 0xff)
-        : sfr_register(pCpu,pName,pDesc)
+     IOC(Processor *pCpu, const char *pName , uint _valid_bits = 0xff)
+        :  SfrReg(pCpu,pName  )
       {
           mValidBits=_valid_bits;
       }
@@ -886,8 +851,8 @@ class IOCxF : public IOC
 {
     public:
 
-      IOCxF(Processor *pCpu, const char *pName, const char *pDesc, uint _valid_bits = 0xff)
-        : IOC(pCpu,pName,pDesc, _valid_bits), intcon(0)
+      IOCxF(Processor *pCpu, const char *pName , uint _valid_bits = 0xff)
+        : IOC(pCpu,pName  , _valid_bits), intcon(0)
       {
       }
 
@@ -901,7 +866,7 @@ class IOCxF : public IOC
 class PicPortRegister;
 // WPU set weak pullups on pin by pin basis
 //
-class WPU  : public  sfr_register
+class WPU  : public   SfrReg
 {
     public:
       PicPortRegister *wpu_gpio;
@@ -910,8 +875,8 @@ class WPU  : public  sfr_register
       void put(uint new_value);
       void set_wpu_pu(bool pullup_enable);
 
-      WPU(Processor *pCpu, const char *pName, const char *pDesc, PicPortRegister* gpio, uint mask=0x37)
-        : sfr_register(pCpu,pName,pDesc), wpu_gpio(gpio), wpu_pu(false)
+      WPU(Processor *pCpu, const char *pName , PicPortRegister* gpio, uint mask=0x37)
+        :  SfrReg(pCpu,pName  ), wpu_gpio(gpio), wpu_pu(false)
       {
           mValidBits=mask;  // Can't use initialiser for parent class members
       }
@@ -919,10 +884,10 @@ class WPU  : public  sfr_register
 
 class CPSCON1;
 class T1CON_G;
-class CPS_stimulus;
+////class CPS_stimulus;
 
 // Capacitance Sensing Control Register 0
-class CPSCON0  : public  sfr_register,  public TriggerObject
+class CPSCON0  : public   SfrReg,  public TriggerObject
 {
     public:
 
@@ -944,7 +909,7 @@ class CPSCON0  : public  sfr_register,  public TriggerObject
       void callback();
       virtual void callback_print();
 
-      CPSCON0(Processor *pCpu, const char *pName, const char *pDesc=0);
+      CPSCON0(Processor *pCpu, const char *pName =0);
       ~CPSCON0();
 
       TMR0        *m_tmr0;
@@ -953,22 +918,22 @@ class CPSCON0  : public  sfr_register,  public TriggerObject
     private:
       uint         chan;
       PinModule         *pin[16];
-      double        DAC_voltage;
-      double        FVR_voltage;
-      uint64_t        future_cycle;
-      int                period;
-      CPS_stimulus  *cps_stimulus;
+      double  DAC_voltage;
+      double  FVR_voltage;
+      uint64_t future_cycle;
+      int      period;
+      ////CPS_stimulus  *cps_stimulus;
 };
 
 // Capacitance Sensing Control Register 1
-class CPSCON1  : public  sfr_register
+class CPSCON1  : public SfrReg
 {
     public:
 
       void put(uint new_value);
 
-      CPSCON1(Processor *pCpu, const char *pName, const char *pDesc)
-        : sfr_register(pCpu, pName, pDesc), m_cpscon0(0)
+      CPSCON1(Processor *pCpu, const char *pName )
+        :  SfrReg(pCpu, pName  ), m_cpscon0(0)
       {
             mValidBits = 0x03;
       }
@@ -976,7 +941,7 @@ class CPSCON1  : public  sfr_register
       CPSCON0        *m_cpscon0;
 };
 
-class CPS_stimulus : public stimulus
+/*class CPS_stimulus : public stimulus
 {
     public:
 
@@ -985,12 +950,12 @@ class CPS_stimulus : public stimulus
         CPSCON0 *m_cpscon0;
 
         virtual void   set_nodeVoltage(double v);
-};
+};*/
 
 class SR_MODULE;
 
 // SR LATCH CONTROL 0 REGISTER
-class SRCON0  : public  sfr_register
+class SRCON0  : public   SfrReg
 {
     public:
       enum {
@@ -1007,7 +972,7 @@ class SRCON0  : public  sfr_register
 
       };
 
-        SRCON0(Processor *pCpu, const char *pName, const char *pDesc, SR_MODULE *_sr_module);
+        SRCON0(Processor *pCpu, const char *pName , SR_MODULE *_sr_module);
         void put(uint new_value);
 
     private:
@@ -1016,7 +981,7 @@ class SRCON0  : public  sfr_register
 
 //  SR LATCH CONTROL 1 REGISTER
 //
-class SRCON1  : public  sfr_register
+class SRCON1  : public   SfrReg
 {
     public:
       enum {
@@ -1030,7 +995,7 @@ class SRCON1  : public  sfr_register
           SRSPE   = 1<<7    // Latch Peripheral Set Enable bit
       };
 
-        SRCON1(Processor *pCpu, const char *pName, const char *pDesc, SR_MODULE *m_sr_module);
+        SRCON1(Processor *pCpu, const char *pName , SR_MODULE *m_sr_module);
         void put(uint new_value);
         void set_ValidBits(uint validbits) { mValidBits = validbits;}
 
@@ -1089,7 +1054,7 @@ class SR_MODULE: public TriggerObject
         bool                    m_SRNQsource_active;
 };
 
-class LVDCON_14 : public  sfr_register, public TriggerObject
+class LVDCON_14 : public   SfrReg, public TriggerObject
 {
     public:
       uint valid_bits;
@@ -1102,7 +1067,7 @@ class LVDCON_14 : public  sfr_register, public TriggerObject
         IRVST = 1<<5,
       };
 
-      LVDCON_14(Processor *, const char *pName, const char *pDesc=0);
+      LVDCON_14(Processor *, const char *pName =0);
       void check_lvd();
       uint         write_mask;
       InterruptSource *IntSrc;

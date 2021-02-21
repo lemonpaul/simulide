@@ -29,10 +29,8 @@ class LibraryItem;
 class MAINMODULE_EXPORT Inductor : public Component, public eInductor
 {
     Q_OBJECT
-    Q_PROPERTY( double Inductance  READ induc    WRITE setInduc   DESIGNABLE true USER true )
-    Q_PROPERTY( QString  Unit      READ unit     WRITE setUnit    DESIGNABLE true USER true )
-    Q_PROPERTY( bool     Show_Ind  READ showVal  WRITE setShowVal DESIGNABLE true USER true )
-    
+    Q_PROPERTY( double Inductance READ induc WRITE setInduc DESIGNABLE true USER true )
+
     public:
 
         Inductor( QObject* parent, QString type, QString id );
@@ -41,18 +39,16 @@ class MAINMODULE_EXPORT Inductor : public Component, public eInductor
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
+        virtual QList<propGroup_t> propGroups() override;
+
         double induc();
         void  setInduc( double c );
         
         void setUnit( QString un );
 
+        virtual void remove() override;
+
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-
-    public slots:
-        void remove();
-
-    private:
-        //QGraphicsSimpleTextItem* m_labelcurr;
 };
 
 #endif

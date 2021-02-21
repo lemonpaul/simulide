@@ -19,7 +19,7 @@
 <!-- *                                                                         * -->
 <!-- *************************************************************************** -->
 
-<package name="arduinoUno" pins="28" width="20" height="28">
+<package name="arduinoUno" pins="28" width="20" height="28" background="leo_board.png">
 
     <pin side="left" pos="2"  type="bidir" id="PD2"  label=" 0  RX "/>
     <pin side="left" pos="3"  type="bidir" id="PD3"  label=" 1  TX "/>

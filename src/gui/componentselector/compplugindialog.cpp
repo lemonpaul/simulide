@@ -37,7 +37,7 @@ CompPluginDialog::CompPluginDialog( QWidget *parent )
     m_initialized = false;
 
     connect( m_compList, SIGNAL( itemChanged( QListWidgetItem* )),
-                   this, SLOT( slotItemChanged( QListWidgetItem* )));
+                   this, SLOT( slotItemChanged( QListWidgetItem* )), Qt::UniqueConnection );
 }
 
 CompPluginDialog::~CompPluginDialog()

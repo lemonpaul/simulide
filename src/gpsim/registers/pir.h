@@ -37,17 +37,17 @@ class INTCON;
 //---------------------------------------------------------
 // PIR Peripheral Interrupt register base class for PIR1 & PIR2
 
-class PIR : public sfr_register
+class PIR : public  SfrReg
 {
     protected:
       INTCON  *intcon;
       PIE     *pie;
-      sfr_register *ipr;
+       SfrReg *ipr;
     public:
       int valid_bits;
       int writable_bits;
      
-      PIR(Processor *pCpu, const char *pName, const char *pDesc,
+      PIR(Processor *pCpu, const char *pName  ,
           INTCON *, PIE *, int _valid_bits);
       // The PIR base class supports no PIR bits directly
       virtual void clear_sspif(){}
@@ -107,7 +107,7 @@ class PIR : public sfr_register
 
       void set_intcon(INTCON *);
       void set_pie(PIE *);
-      void set_ipr(sfr_register *);
+      void set_ipr( SfrReg *);
 };
 
 /*---------------------------------------------------------
@@ -201,7 +201,7 @@ class PIR1v1 : public PIR
       virtual void clear_rcif();
      
 
-      PIR1v1(Processor *pCpu, const char *pName, const char *pDesc,
+      PIR1v1(Processor *pCpu, const char *pName  ,
              INTCON *, PIE *);
 };
 
@@ -279,8 +279,7 @@ class PIR1v2 : public PIR
       }
       virtual void clear_rcif();
      
-      PIR1v2(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR1v2(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 //---------------------------------------------------------
@@ -316,8 +315,7 @@ class PIR1v3 : public PIR
       virtual void set_ccpif() { put(get() | CCP1IF); }
 
      
-      PIR1v3(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR1v3(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 //---------------------------------------------------------
@@ -354,10 +352,8 @@ class PIR1v4 : public PIR
       virtual void set_eeif() { put(get() | EEIF); }
 
      
-      PIR1v4(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR1v4(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
-
 
 
 //---------------------------------------------------------
@@ -379,8 +375,7 @@ class PIR2v1 : public PIR
           put(get() | CCP2IF);
         }
 
-      PIR2v1(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR2v1(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 //---------------------------------------------------------
@@ -408,34 +403,17 @@ class PIR2v2 : public PIR
         OSCFIF  = 1<<7                /* 18f14k22 */
     };
 
-      virtual void set_eccp1if()
-        {
-          put(get() | ECCP1IF);
-        }
-
-      virtual void set_ccpif()    /* RP - needs to define set_ccpif too! */
-        {
-          put(get() | CCP2IF);
-        }
-
-      virtual void set_tmr3if()
-        {
-          put(get() | TMR3IF);
-        }
-
-      virtual void set_lvdif()
-        {
-          put(get() | LVDIF);
-        }
-
+      virtual void set_eccp1if() { put(get() | ECCP1IF); }
+      virtual void set_ccpif() { put(get() | CCP2IF); } /* RP - needs to define set_ccpif too! */
+      virtual void set_tmr3if() { put(get() | TMR3IF); }
+      virtual void set_lvdif() { put(get() | LVDIF); }
       virtual void set_bclif();
       virtual void set_eeif();
       virtual void set_cmif();
       virtual void set_c1if(){ set_cmif();}
       virtual void set_c2if(){ set_cmif();}
 
-      PIR2v2(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR2v2(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 //---------------------------------------------------------
@@ -458,19 +436,13 @@ class PIR2v3 : public PIR
         OSFIF   = 1<<7
     };
 
-
-      virtual void set_ccpif() 
-        {
-          put(get() | CCP2IF);
-        }
-
+      virtual void set_ccpif() { put(get() | CCP2IF); }
       virtual void set_bclif();
       virtual void set_eeif();
       virtual void set_c1if();
       virtual void set_c2if();
 
-      PIR2v3(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR2v3(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 //---------------------------------------------------------
@@ -495,19 +467,10 @@ class PIR2v4 : public PIR
     };
 
 
-      virtual void set_ccpif(){
-          put(get() | CCP2IF);
-        }
-      virtual void set_tmr3if() {
-          put(get() | TMR3IF);
-        }
-      virtual void set_hlvdif() {
-          put(get() | HLVDIF);
-        }
-      virtual void set_oscfif() {
-          put(get() | OSCFIF);
-        }
-
+      virtual void set_ccpif(){ put(get() | CCP2IF); }
+      virtual void set_tmr3if() { put(get() | TMR3IF); }
+      virtual void set_hlvdif() { put(get() | HLVDIF); }
+      virtual void set_oscfif() { put(get() | OSCFIF); }
       virtual void set_bclif();
       virtual void set_eeif();
       virtual void set_usbif();
@@ -515,8 +478,7 @@ class PIR2v4 : public PIR
       virtual void set_c1if(){ set_cmif(); }
       virtual void set_c2if(){ set_cmif(); }
 
-      PIR2v4(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR2v4(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 //---------------------------------------------------------
@@ -545,8 +507,7 @@ class PIR2v5 : public PIR
       virtual void set_c2if() { put(get() | C2IF); }
       virtual void set_osfif() { put(get() | OSFIF); }
 
-      PIR2v5(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR2v5(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 //---------------------------------------------------------
@@ -573,26 +534,15 @@ class PIR3v1 : public PIR
           put(get() | CCP3IF);
         }
 
-      virtual void set_tmr2if()
-        {
-          put(get() | TMR4IF);
-        }
+      virtual void set_tmr2if() { put(get() | TMR4IF); }
       virtual void set_txif();
       virtual void set_rcif();
-
-      virtual uint get_txif()
-      {
-        return value.get() & TXIF;
-      }
+      virtual uint get_txif() { return value.get() & TXIF; }
       virtual void clear_txif();
-      uint get_rcif()
-      {
-        return value.get() & RCIF;
-      }
+      uint get_rcif() { return value.get() & RCIF; }
       virtual void clear_rcif();
      
-      PIR3v1(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR3v1(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 //---------------------------------------------------------
@@ -617,48 +567,16 @@ class PIR3v2 : public PIR
         IRXIF   = 1<<7
     };
 
-      virtual void set_rxb0if()
-        {
-          put(get() | RXB0IF);
-        }
+      virtual void set_rxb0if() { put(get() | RXB0IF); }
+      virtual void set_rxb1if() { put(get() | RXB1IF); }
+      virtual void set_txb0if() { put(get() | TXB0IF); }
+      virtual void set_txb1if() { put(get() | TXB1IF); }
+      virtual void set_txb2if() { put(get() | TXB2IF); }
+      virtual void set_errif()  { put(get() | ERRIF); }
+      virtual void set_wakif()  { put(get() | WAKIF); }
+      virtual void set_irxif()  { put(get() | IRXIF); }
 
-      virtual void set_rxb1if()
-        {
-          put(get() | RXB1IF);
-        }
-
-      virtual void set_txb0if()
-        {
-          put(get() | TXB0IF);
-        }
-
-      virtual void set_txb1if()
-        {
-          put(get() | TXB1IF);
-        }
-
-      virtual void set_txb2if()
-        {
-          put(get() | TXB2IF);
-        }
-
-      virtual void set_errif()
-        {
-          put(get() | ERRIF);
-        }
-
-      virtual void set_wakif()
-        {
-          put(get() | WAKIF);
-        }
-
-      virtual void set_irxif()
-        {
-          put(get() | IRXIF);
-        }
-
-      PIR3v2(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR3v2(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 class PIR3v3 : public PIR
@@ -676,8 +594,7 @@ class PIR3v3 : public PIR
         BCL2IF   = 1<<6,
         SSP2IF   = 1<<7
     };
-      PIR3v3(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR3v3(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 
@@ -701,8 +618,7 @@ class PIR4v1: public PIR
       virtual void set_ccp4if() { put(get() | CCP4IF); }
       virtual void set_ccp5if() { put(get() | CCP5IF); }
       
-      PIR4v1(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR4v1(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 class PIR5v1: public PIR
@@ -719,8 +635,7 @@ class PIR5v1: public PIR
       virtual void set_tmr5if() { put(get() | TMR5IF); }
       virtual void set_tmr6if() { put(get() | TMR6IF); }
       
-      PIR5v1(Processor *pCpu, const char *pName, const char *pDesc,
-             INTCON *, PIE *);
+      PIR5v1(Processor *pCpu, const char *pName, INTCON *, PIE *);
 };
 
 //------------------------------------------------------------------------
@@ -733,8 +648,8 @@ class PIR1v1822 : public PIR1v2
         TMR1GIF = 1<<7
       };
 
-    PIR1v1822(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-      : PIR1v2(pCpu,pName,pDesc,_intcon, _pie)
+    PIR1v1822( Processor *pCpu, const char *pName  ,INTCON *_intcon, PIE *_pie )
+      : PIR1v2( pCpu, pName ,_intcon, _pie)
     {
       valid_bits = TMR1IF | TMR2IF | CCP1IF | SSPIF | TXIF | RCIF | ADIF | TMR1GIF;
       writable_bits = TMR1IF | TMR2IF | CCP1IF | SSPIF | ADIF | TMR1GIF;
@@ -762,8 +677,8 @@ class PIR2v1822 : public PIR
         OSFIF   = 1<<7
       };
 
-    PIR2v1822(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-      : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+    PIR2v1822(Processor *pCpu, const char *pName,INTCON *_intcon, PIE *_pie)
+      : PIR( pCpu, pName,_intcon, _pie,0)
     {
       valid_bits = BCLIF | EEIF | C1IF | OSFIF;
       writable_bits = BCLIF | EEIF | C1IF | OSFIF;
@@ -841,8 +756,8 @@ class PIR3v178x : public PIR
             PSMC1SIF = 1<<0,
         };
 
-        PIR3v178x(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-          : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+        PIR3v178x(Processor *pCpu, const char *pName  ,INTCON *_intcon, PIE *_pie)
+          : PIR(pCpu,pName,_intcon, _pie,0)
         {
           writable_bits = valid_bits = CCP3IF;
         }
@@ -874,35 +789,21 @@ class PIR_SET
       {
       }
 
-      virtual int interrupt_status()
-      {
-        return 0;
-      }
+      virtual int interrupt_status() { return 0; }
 
       // uart stuff
-      virtual bool get_txif()
-      {
-        return false;
-      }
+      virtual bool get_txif() { return false; }
       virtual void set_txif() {}
       virtual void clear_txif() {}
-      virtual bool get_rcif()
-      {
-        return false;
-      }
+      virtual bool get_rcif() { return false; }
       virtual void set_rcif() {}
       virtual void clear_rcif() {}
             
       // ssp stuff
-      virtual bool get_sspif()
-      {
-        return false;
-      }
+      virtual bool get_sspif() { return false; }
       virtual void clear_sspif() {}
       virtual void set_sspif() {}
       virtual void set_bclif() {}
-     
-
       virtual void set_sppif() {}
       virtual void set_pspif() {}
       virtual void set_cmif() {}

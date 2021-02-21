@@ -34,78 +34,78 @@ License along with this library; if not, see
 // Set pin direction
 class TristateControl : public SignalControl
 {
-    public:
-      TristateControl(CWG *_cwg, PinModule *_pin) : m_cwg(_cwg), m_pin(_pin){ }
-      ~TristateControl() { }
-      
-      void set_pin_direction(char _direction) { direction = _direction;}
-      virtual char getState() { return direction; }
-      virtual void release()  { m_cwg->releasePin(m_pin); }
-      
-    private:
-      CWG *m_cwg;
-      PinModule *m_pin;
-      char        direction;
+public:
+    TristateControl(CWG *_cwg, PinModule *_pin) : m_cwg(_cwg), m_pin(_pin){ }
+    ~TristateControl() { }
+
+    void set_pin_direction(char _direction) { direction = _direction;}
+    virtual char getState() { return direction; }
+    virtual void release()  { m_cwg->releasePin(m_pin); }
+
+private:
+    CWG *m_cwg;
+    PinModule *m_pin;
+    char        direction;
 };
 
 class CWGSignalSource : public SignalControl
 {
-    public:
-      CWGSignalSource(CWG *_cwg, PinModule *_pin)
+public:
+    CWGSignalSource(CWG *_cwg, PinModule *_pin)
         : m_cwg(_cwg),
-        m_state('?'), m_pin(_pin)
-      {
+          m_state('?'), m_pin(_pin)
+    {
         assert(m_cwg);
-      }
-      virtual ~CWGSignalSource() { }
+    }
+    virtual ~CWGSignalSource() { }
 
-      void setState(char _state) { m_state = _state; }
-      virtual char getState() { return m_state; }
-      virtual void release() {
+    void setState(char _state) { m_state = _state; }
+    virtual char getState() { return m_state; }
+    virtual void release() {
         Dprintf(("CWGSignalSource release\n"));
         m_cwg->releasePinSource(m_pin); }
 
-    private:
-      CWG *m_cwg;
-      char m_state;
-      PinModule *m_pin;
+private:
+    CWG *m_cwg;
+    char m_state;
+    PinModule *m_pin;
 };
 
 // Report state changes on incoming FLT pin
 class FLTSignalSink : public SignalSink
 {
-    public:
-      FLTSignalSink(CWG *_cwg)
+public:
+    FLTSignalSink(CWG *_cwg)
         : m_cwg(_cwg) { }
 
-      virtual void setSinkState(char new3State) {m_cwg->setState(new3State); }
-      virtual void release() {delete this; }
-      
-    private:
-      CWG *m_cwg;
+    virtual void setSinkState(char new3State) {m_cwg->setState(new3State); }
+    virtual void release() {delete this; }
+
+private:
+    CWG *m_cwg;
 };
 
 CWG::CWG(Processor *pCpu) :
-    cwg1con0(this, pCpu, "cwg1con0", "CWG Control Register 0"),
-    cwg1con1(this, pCpu, "cwg1con1", "CWG Control Register 1"),
-    cwg1con2(this, pCpu, "cwg1con2", "CWG Control Register 2"),
-    cwg1dbf(this, pCpu, "cwg1dbf", "CWG Falling Dead-Band Count Register"),
-    cwg1dbr(this, pCpu, "cwg1dbr", "CWG Rising Dead-Band Count Register"),
-        con0_value(0), con1_value(0), con2_value(0), shutdown_active(false),
-        cpu(pCpu),
-        pinA(0), pinB(0), Atri(0), Btri(0), Asrc(0), Bsrc(0), FLTsink(0),
-        pinAactive(false), pinBactive(false),
-        srcAactive(false), srcBactive(false),
-        active_next_edge(false),
-        FLTstate(false)
+    cwg1con0(this, pCpu, "cwg1con0" ),
+    cwg1con1(this, pCpu, "cwg1con1" ),
+    cwg1con2(this, pCpu, "cwg1con2" ),
+    cwg1dbf(this, pCpu, "cwg1dbf" ),
+    cwg1dbr(this, pCpu, "cwg1dbr" ),
+    con0_value(0), con1_value(0), con2_value(0), shutdown_active(false),
+    cpu(pCpu),
+    pinA(0), pinB(0), Atri(0), Btri(0), Asrc(0), Bsrc(0), FLTsink(0),
+    pinAactive(false), pinBactive(false),
+    srcAactive(false), srcBactive(false),
+    active_next_edge(false),
+    FLTstate(false)
+{
+    nco_state = false;
+    for(int i = 0; i<4; i++)
     {
-        nco_state = false;
-        for(int i = 0; i<4; i++)
-        {
-            pwm_state[i] = false;
-            clc_state[i] = false;
-        }
+        pwm_state[i] = false;
+        clc_state[i] = false;
     }
+}
 
 CWG::~CWG()
 {
@@ -262,52 +262,52 @@ void CWG::autoShutEvent(bool on)
         Dprintf(("CWG::autoShutEvent on A 0x%x\n", con1_value & (GxASDLA0|GxASDLA1)));
         switch(con1_value & (GxASDLA0|GxASDLA1))
         {
-            case 0:                // to inactive state
-                cwg1dbr.new_edge(false, 0.);
-                break;
+        case 0:                // to inactive state
+            cwg1dbr.new_edge(false, 0.);
+            break;
 
-            case GxASDLA0:           // pin tristated
-                cwg1dbr.kill_callback();
-                Atri->set_pin_direction('1');
-                pinA->updatePinModule();
-                break;
+        case GxASDLA0:           // pin tristated
+            cwg1dbr.kill_callback();
+            Atri->set_pin_direction('1');
+            pinA->updatePinModule();
+            break;
 
-            case GxASDLA1:                 // pin to 0
-                cwg1dbr.kill_callback();
-                    Asrc->setState('0');
-                    pinA->updatePinModule();
-                break;
+        case GxASDLA1:                 // pin to 0
+            cwg1dbr.kill_callback();
+            Asrc->setState('0');
+            pinA->updatePinModule();
+            break;
 
-            case GxASDLA0|GxASDLA1: // pin to 1
-                cwg1dbr.kill_callback();
-                    Asrc->setState('1');
-                    pinA->updatePinModule();
-                break;
+        case GxASDLA0|GxASDLA1: // pin to 1
+            cwg1dbr.kill_callback();
+            Asrc->setState('1');
+            pinA->updatePinModule();
+            break;
         }
         Dprintf(("CWG::autoShutEvent on B 0x%x\n", con1_value & (GxASDLB0|GxASDLB1)));
         switch(con1_value & (GxASDLB0|GxASDLB1))
         {
-            case 0:                // to inactive state
-                cwg1dbf.new_edge(true, 0.);
-                break;
+        case 0:                // to inactive state
+            cwg1dbf.new_edge(true, 0.);
+            break;
 
-            case GxASDLB0:           // pin tristated
-                cwg1dbf.kill_callback();
-                Btri->set_pin_direction('1');
-                pinB->updatePinModule();
-                break;
+        case GxASDLB0:           // pin tristated
+            cwg1dbf.kill_callback();
+            Btri->set_pin_direction('1');
+            pinB->updatePinModule();
+            break;
 
-            case GxASDLB1:                 // pin to 0
-                cwg1dbf.kill_callback();
-                    Bsrc->setState('0');
-                    pinB->updatePinModule();
-                break;
+        case GxASDLB1:                 // pin to 0
+            cwg1dbf.kill_callback();
+            Bsrc->setState('0');
+            pinB->updatePinModule();
+            break;
 
-            case GxASDLB0|GxASDLB1: // pin to 1
-                cwg1dbf.kill_callback();
-                    Bsrc->setState('1');
-                    pinB->updatePinModule();
-                break;
+        case GxASDLB0|GxASDLB1: // pin to 1
+            cwg1dbf.kill_callback();
+            Bsrc->setState('1');
+            pinB->updatePinModule();
+            break;
         }
         shutdown_active = true;
     }
@@ -384,11 +384,11 @@ void CWG::out_pwm(bool level, char index)
 {
     if (index >= 2) return;
     if ((level != pwm_state[index-1])
-         && (con0_value & GxEN)
-         && ((int)(con1_value & (GxIS0|GxIS1)) == index-1))
+            && (con0_value & GxEN)
+            && ((int)(con1_value & (GxIS0|GxIS1)) == index-1))
     {
         Dprintf(("CWG::out_pwm level=%d shutdown_active=%d con2=0x%x\n", level, shutdown_active, con2_value));
-           input_source(level);
+        input_source(level);
     }
     pwm_state[index-1] = level;
 }
@@ -397,11 +397,11 @@ void CWG::out_CLC(bool level, char index)
 {
     assert(index > 1);
     if ((level != clc_state[index-1])
-         && (con0_value & GxEN)
-         && ((int)(con1_value & (GxIS0|GxIS1)) == 3))
+            && (con0_value & GxEN)
+            && ((int)(con1_value & (GxIS0|GxIS1)) == 3))
     {
         Dprintf(("CWG::out_clc level=%d shutdown_active=%d con2=0x%x\n", level, shutdown_active, con2_value));
-           input_source(level);
+        input_source(level);
     }
     clc_state[index-1] = level;
 }
@@ -409,11 +409,11 @@ void CWG::out_CLC(bool level, char index)
 void CWG::out_NCO(bool level)
 {
     if ((level != nco_state)
-         && (con0_value & GxEN)
-         && ((int)(con1_value & (GxIS0|GxIS1)) == 2))
+            && (con0_value & GxEN)
+            && ((int)(con1_value & (GxIS0|GxIS1)) == 2))
     {
         Dprintf(("CWG::out_NCO level=%d shutdown_active=%d con2=0x%x\n", level, shutdown_active, con2_value));
-           input_source(level);
+        input_source(level);
     }
     nco_state = level;
 }
@@ -421,7 +421,7 @@ void CWG::out_NCO(bool level)
 void CWG::set_outA(bool level)
 {
     bool invert = con0_value & GxPOLA;
-    Dprintf(("CWG::set_outA now=%" PRINTF_GINT64_MODIFIER "d level=%d invert=%d out=%d\n", get_cycles().get(), level, invert, level^invert));
+    Dprintf(("CWG::set_outA now=%" PRINTF_GINT64_MODIFIER "d level=%d invert=%d out=%d\n", cpu->get_cycles()->get(), level, invert, level^invert));
     Asrc->setState((level^invert)?'1':'0');
     pinA->updatePinModule();
 }
@@ -429,7 +429,7 @@ void CWG::set_outA(bool level)
 void CWG::set_outB(bool level)
 {
     bool invert = con0_value & GxPOLB;
-    Dprintf(("CWG::set_outB now=%" PRINTF_GINT64_MODIFIER "d level=%d invert=%d out=%d\n", get_cycles().get(), level, invert, level^invert));
+    Dprintf(("CWG::set_outB now=%" PRINTF_GINT64_MODIFIER "d level=%d invert=%d out=%d\n", cpu->get_cycles()->get(), level, invert, level^invert));
     Bsrc->setState(level^invert?'1':'0');
     pinB->updatePinModule();
 }
@@ -443,11 +443,11 @@ void CWG4::out_pwm(bool level, char index)
 {
     if (index >= 4) return;
     if ((level != pwm_state[index-1])
-         && (con0_value & GxEN)
-         && ((int)(con1_value & (GxIS0|GxIS1|GxIS2)) == index-1))
+            && (con0_value & GxEN)
+            && ((int)(con1_value & (GxIS0|GxIS1|GxIS2)) == index-1))
     {
         Dprintf(("CWG4::out_pwm level=%d shutdown_active=%d con2=0x%x\n", level, shutdown_active, con2_value));
-           input_source(level);
+        input_source(level);
     }
     pwm_state[index-1] = level;
 }
@@ -455,18 +455,18 @@ void CWG4::out_pwm(bool level, char index)
 void CWG4::out_NCO(bool level)
 {
     if ((level != nco_state)
-         && (con0_value & GxEN)
-         && ((int)(con1_value & (GxIS0|GxIS1|GxIS2)) == 6))
+            && (con0_value & GxEN)
+            && ((int)(con1_value & (GxIS0|GxIS1|GxIS2)) == 6))
     {
         Dprintf(("CWG4::out_NCO level=%d shutdown_active=%d con2=0x%x\n", level, shutdown_active, con2_value));
-           input_source(level);
+        input_source(level);
     }
     nco_state = level;
 }
 
-CWGxCON0::CWGxCON0(CWG* pt, Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc), pt_cwg(pt), con0_mask(0xf9)
-    {}
+CWGxCON0::CWGxCON0(CWG* pt, Processor *pCpu, const char *pName )
+    : SfrReg( pCpu, pName ), pt_cwg(pt), con0_mask(0xf9)
+{}
 
 void CWGxCON0::put(uint new_value)
 {
@@ -477,9 +477,9 @@ void CWGxCON0::put(uint new_value)
     pt_cwg->cwg_con0(new_value);
 }
 
-CWGxCON1::CWGxCON1(CWG *pt, Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc), pt_cwg(pt), con1_mask(0xf3)
-    {}
+CWGxCON1::CWGxCON1(CWG *pt, Processor *pCpu, const char *pName )
+    : SfrReg(pCpu, pName), pt_cwg(pt), con1_mask(0xf3)
+{}
 
 void CWGxCON1::put(uint new_value)
 {
@@ -491,9 +491,9 @@ void CWGxCON1::put(uint new_value)
     pt_cwg->cwg_con1(new_value);
 }
 
-CWGxCON2::CWGxCON2(CWG *pt, Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc), pt_cwg(pt), con2_mask(0xc3)
-    {}
+CWGxCON2::CWGxCON2(CWG *pt, Processor *pCpu, const char *pName )
+    : SfrReg(pCpu,pName), pt_cwg(pt), con2_mask(0xc3)
+{}
 
 void CWGxCON2::put(uint new_value)
 {
@@ -505,26 +505,26 @@ void CWGxCON2::put(uint new_value)
     pt_cwg->cwg_con2(new_value);
 }
 
-CWGxDBF::CWGxDBF(CWG *pt, Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc), pt_cwg(pt), future_cycle(0),
-        next_level(false)
-    {}
+CWGxDBF::CWGxDBF(CWG *pt, Processor *pCpu, const char *pName )
+    : SfrReg(pCpu, pName),pt_cwg(pt), future_cycle(0),
+      next_level(false)
+{}
 void CWGxDBF::callback()
 {
-        Dprintf(("CWGxDBF::callback() %" PRINTF_GINT64_MODIFIER "d\n", get_cycles().get()));
-        pt_cwg->set_outB(next_level);
-        future_cycle = 0;
+    pt_cwg->set_outB(next_level);
+    future_cycle = 0;
 }
+
 void CWGxDBF::callback_print()
 {
-  cout << "CWGxDBF " << name() << " CallBack ID " << CallBackID << '\n';
+    cout << "CWGxDBF " << name_str << " CallBack ID " << CallBackID << '\n';
 }
+
 void CWGxDBF::kill_callback()
 {
     if (future_cycle)
     {
-        Dprintf(("CWGxDBF::kill_callback() clear future_cycle=%" PRINTF_GINT64_MODIFIER "d\n", future_cycle));
-        get_cycles().clear_break(future_cycle);
+        cpu->clear_break(future_cycle);
         future_cycle = 0;
     }
 }
@@ -536,32 +536,29 @@ void CWGxDBF::new_edge(bool level, double multi)
     */
     int delay = (value.get() * multi + 2)/4;
     next_level = level;
-    Dprintf(("CWGxDBF::new_edge now=%" PRINTF_GINT64_MODIFIER "d f=%.0f level=%d delay=%d\n", get_cycles().get(), ((Processor *)cpu)->get_frequency(), level, delay));
-    if (future_cycle)
+    if( future_cycle )
     {
-        Dprintf(("\t clear future_cycle=%" PRINTF_GINT64_MODIFIER "d\n", future_cycle));
-        get_cycles().clear_break(future_cycle);
+        cpu->clear_break(future_cycle);
         future_cycle = 0;
     }
     if (!delay || !level) pt_cwg->set_outB(next_level);
     else
     {
-        future_cycle = get_cycles().get() + delay;
-        get_cycles().set_break(future_cycle, this);
+        future_cycle = cpu->currentCycle() + delay;
+        cpu->setBreakAbs( future_cycle, this );
     }
 }
 
-CWGxDBR::CWGxDBR(CWG *pt, Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc), pt_cwg(pt), future_cycle(0),
-        next_level(false)
-    {}
+CWGxDBR::CWGxDBR(CWG *pt, Processor *pCpu, const char *pName )
+    : SfrReg(pCpu, pName), pt_cwg(pt), future_cycle(0),
+      next_level(false)
+{}
 
 void CWGxDBR::kill_callback()
 {
     if (future_cycle)
     {
-        Dprintf(("CWGxDBR::kill_callback() clear future_cycle=%" PRINTF_GINT64_MODIFIER "d\n", future_cycle));
-        get_cycles().clear_break(future_cycle);
+        cpu->clear_break(future_cycle);
         future_cycle = 0;
     }
 }
@@ -572,30 +569,28 @@ void CWGxDBR::new_edge(bool level, double multi)
     */
     int delay = (value.get() * multi + 2)/4;
     next_level = level;
-    Dprintf(("CWGxDBR::new_edge now=%" PRINTF_GINT64_MODIFIER "d f=%.0f level=%d delay=%d\n", get_cycles().get(), ((Processor *)cpu)->get_frequency(), level, delay));
+
     if (future_cycle)
     {
-        Dprintf(("clear future_cycle=%" PRINTF_GINT64_MODIFIER "d\n", future_cycle));
-        get_cycles().clear_break(future_cycle);
+        cpu->clear_break(future_cycle);
         future_cycle = 0;
     }
     if (!delay || !level) pt_cwg->set_outA(next_level);
     else
     {
-        future_cycle = get_cycles().get() + delay;
-        get_cycles().set_break(future_cycle, this);
+        future_cycle = cpu->currentCycle()+delay;
+        cpu->setBreakAbs( future_cycle, this );
     }
 }
 
 void CWGxDBR::callback()
 {
-    Dprintf(("CWGxDBR::callback() %" PRINTF_GINT64_MODIFIER "d\n", get_cycles().get()));
     pt_cwg->set_outA(next_level);
     future_cycle = 0;
 }
 
 void CWGxDBR::callback_print()
 {
-  cout << "CWGxDBR " << name() << " CallBack ID " << CallBackID << '\n';
+    cout << "CWGxDBR " << name_str << " CallBack ID " << CallBackID << '\n';
 }
 

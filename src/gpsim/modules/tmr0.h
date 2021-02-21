@@ -29,7 +29,7 @@ class CLC;
 
 //---------------------------------------------------------
 // TMR0 - Timer
-class TMR0 : public sfr_register, public TriggerObject, public SignalSink
+class TMR0 : public SfrReg, public TriggerObject, public SignalSink
 {
 public:
   uint 
@@ -48,7 +48,7 @@ public:
 
   virtual void callback();
 
-  TMR0(Processor *, const char *pName, const char *pDesc=0);
+  TMR0(Processor *, const char *pName );
 
   virtual void release();
 
@@ -61,7 +61,7 @@ public:
   virtual void increment();   // Used when tmr0 is attached to an external clock
   virtual void new_prescale();
   virtual uint get_prescale();
-  virtual uint max_counts() {return 256;};
+  virtual uint max_counts() {return 256;}
   virtual bool get_t0cs();
   virtual bool get_t0se();
   virtual void set_t0if();

@@ -29,49 +29,67 @@ ClockBase::ClockBase( QObject* parent, QString type, QString id )
          : LogicInput( parent, type, id )
 {
     Q_UNUSED( ClockBase_properties );
+
+    m_graphical = true;
     
     m_area = QRect( -14, -8, 22, 16 );
     
     m_isRunning = false;
+    m_alwaysOn  = false;
 
     m_stepsPC = 0;
     m_step = 0;
     setFreq( 1000 );
 
     Simulator::self()->addToUpdateList( this );
+
+    connect( Simulator::self(), &Simulator::rateChanged,
+             this,              &ClockBase::rateChanged, Qt::UniqueConnection );
 }
 ClockBase::~ClockBase(){}
 
 void ClockBase::stamp()
 {
     setFreq( m_freq );
+    if( !Simulator::self()->isPaused() ) m_changed = true;
 }
 
 void ClockBase::updateStep()
 {
     if( m_changed )
     {
-        if( m_isRunning ) Simulator::self()->addToSimuClockList( this );
+        if( m_isRunning )
+        {
+            Simulator::self()->cancelEvents( this );
+            Simulator::self()->addEvent( 1, this );
+        }
         else
         {
             m_out->setOut( false );
-            Simulator::self()->remFromSimuClockList( this );
+            Simulator::self()->addEvent( 0, NULL );
         }
-        LogicInput::updateStep();
+
+        //LogicInput::updateStep();
+        m_changed = false;
     }
 }
 
-double ClockBase::freq() { return m_freq; }
+void ClockBase::setAlwaysOn( bool on )
+{
+    m_alwaysOn = on;
+    setRunning( on );
+    m_button->setVisible( !on );
+}
 
 void ClockBase::setFreq( double freq )
 {
-    double stepsPerS = Simulator::self()->stepsPerus()*1e6;
+    //double stepsPerS = Simulator::self()->stepsPerus()*1e6*1e6;
 
-    m_stepsPC = stepsPerS/freq+0.5;
+    m_fstepsPC = 1e6*1e6/freq;
+    m_stepsPC  = m_fstepsPC;
     
-    if( m_stepsPC < 2 ) m_stepsPC = 2;
-    
-    m_freq = stepsPerS/m_stepsPC;
+    m_freq = freq;
+    m_remainder = 0;
     
     //qDebug() << "ClockBase::setFreq"<<freq<<m_freq<<m_stepsPC;
     
@@ -87,9 +105,11 @@ bool ClockBase::running() { return m_isRunning; }
 
 void ClockBase::setRunning( bool running )
 {
+    m_button->setChecked( running );
     m_isRunning = running;
     m_step = 0;
     m_changed = true;
+    update();
     //updateStep();
     //qDebug() << m_stepsPC << m_isRunning ;
 }
@@ -99,11 +119,24 @@ void ClockBase::onbuttonclicked()
     setRunning( !m_isRunning );
 }
 
-void ClockBase::remove()
+uint64_t ClockBase::riseTime()
 {
-    Simulator::self()->remFromSimuClockList( this );
+    return m_out->riseTime();
+}
 
-    LogicInput::remove();
+void ClockBase::setRiseTime( uint64_t time )
+{
+    m_out->setRiseTime( time );
+}
+
+uint64_t ClockBase::fallTime()
+{
+    return m_out->fallTime();
+}
+
+void ClockBase::setFallTime( uint64_t time )
+{
+    m_out->setFallTime( time );
 }
 
 #include "moc_clock-base.cpp"

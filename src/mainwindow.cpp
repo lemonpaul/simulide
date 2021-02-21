@@ -20,7 +20,6 @@
 #include "mainwindow.h"
 #include "appiface.h"
 #include "circuit.h"
-#include "propertieswidget.h"
 #include "componentselector.h"
 #include "editorwindow.h"
 #include "circuitwidget.h"
@@ -33,11 +32,14 @@ MainWindow* MainWindow::m_pSelf = 0l;
 
 MainWindow::MainWindow()
           : QMainWindow()
-          , m_settings( QStandardPaths::standardLocations( QStandardPaths::DataLocation).first()+"/simulide.ini",  QSettings::IniFormat, this )
+          , m_settings( QStandardPaths::standardLocations(
+                            QStandardPaths::DataLocation).first()
+                            +"/simulide.ini", QSettings::IniFormat, this )
 {
     setWindowIcon( QIcon(":/simulide.png") );
     m_pSelf   = this;
     m_circuit = 0l;
+    m_autoBck = 15;
     m_version = "SimulIDE-"+QString( APP_VERSION );
     
     this->setWindowTitle(m_version);
@@ -48,23 +50,24 @@ MainWindow::MainWindow()
 
     if( !pluginsDir.exists() ) pluginsDir.mkpath( userAddonPath );
 
-    m_fontScale = 1.0;
+    float scale = 1.0;
     if( m_settings.contains( "fontScale" ) ) 
     {
-        m_fontScale = m_settings.value( "fontScale" ).toFloat();
-        if( m_fontScale == 0 ) m_fontScale = 1;
+        scale = m_settings.value( "fontScale" ).toFloat();
     }
     else
     {
-        double dpiX = qApp->desktop()->logicalDpiX();
-        m_fontScale = dpiX/96.0;
+        float dpiX = qApp->desktop()->logicalDpiX();
+        scale = dpiX/96.0;
     }
+    setFontScale( scale );
     //qDebug()<<dpiX;
-    loadCircHelp();
     createWidgets();
     readSettings();
     
     loadPlugins();
+
+    applyStyle();
 
     QString backPath = m_settings.value( "backupPath" ).toString();
     if( !backPath.isEmpty() )
@@ -88,13 +91,14 @@ void MainWindow::closeEvent( QCloseEvent *event )
 
 void MainWindow::readSettings()
 {
-    restoreGeometry(                     m_settings.value( "geometry" ).toByteArray());
-    restoreState(                        m_settings.value( "windowState" ).toByteArray());
-    m_Centralsplitter->restoreState(     m_settings.value( "Centralsplitter/geometry" ).toByteArray());
+    restoreGeometry(                 m_settings.value( "geometry" ).toByteArray());
+    restoreState(                    m_settings.value( "windowState" ).toByteArray());
+    m_Centralsplitter->restoreState( m_settings.value( "Centralsplitter/geometry" ).toByteArray());
+    CircuitWidget::self()->splitter()->restoreState( m_settings.value( "Circsplitter/geometry" ).toByteArray());
 
-    int autoBck = 15;
-    if( m_settings.contains( "autoBck" )) autoBck = m_settings.value( "autoBck" ).toInt();
-    Circuit::self()->setAutoBck( autoBck );
+    m_autoBck = 15;
+    if( m_settings.contains( "autoBck" )) m_autoBck = m_settings.value( "autoBck" ).toInt();
+    Circuit::self()->setAutoBck( m_autoBck );
 }
 
 void MainWindow::writeSettings()
@@ -104,6 +108,7 @@ void MainWindow::writeSettings()
     m_settings.setValue( "geometry",  saveGeometry() );
     m_settings.setValue( "windowState", saveState() );
     m_settings.setValue( "Centralsplitter/geometry", m_Centralsplitter->saveState() );
+    m_settings.setValue( "Circsplitter/geometry", CircuitWidget::self()->splitter()->saveState() );
     
     QList<QTreeWidgetItem*> list = m_components->findItems( "", Qt::MatchStartsWith | Qt::MatchRecursive );
 
@@ -113,14 +118,45 @@ void MainWindow::writeSettings()
     FileWidget::self()->writeSettings();
 }
 
-QString MainWindow::loc()
+void MainWindow::setFontScale(float scale )
 {
-    return Circuit::self()->loc();
+    if     ( scale < 0.5 ) scale = 0.5;
+    else if( scale > 2 )   scale = 2;
+    m_fontScale = scale;
 }
 
-void MainWindow::setLoc(QString loc )
+QString MainWindow::loc()
 {
-    Circuit::self()->setLoc( loc );
+    QString locale = "en";
+    if     ( m_lang == French )    locale = "fr";
+    else if( m_lang == German )    locale = "de";
+    else if( m_lang == Italian )   locale = "it";
+    else if( m_lang == Russian )   locale = "ru";
+    else if( m_lang == Spanish )   locale = "es";
+    else if( m_lang == Pt_Brasil ) locale = "pt_BR";
+    else if( m_lang == Dutch )     locale = "nl";
+
+    return locale;
+}
+
+void MainWindow::setLoc( QString loc )
+{
+    Langs lang = English;
+    if     ( loc == "fr" )    lang = French;
+    else if( loc == "de" )    lang = German;
+    else if( loc == "it" )    lang = Italian;
+    else if( loc == "ru" )    lang = Russian;
+    else if( loc == "es" )    lang = Spanish;
+    else if( loc == "pt_BR" ) lang = Pt_Brasil;
+    else if( loc == "nl" )    lang = Dutch;
+
+    m_lang = lang;
+}
+
+void MainWindow::setLang( Langs lang )
+{
+    m_lang = lang;
+    settings()->setValue( "language", loc() );
 }
 
 int MainWindow::autoBck()
@@ -135,7 +171,7 @@ void MainWindow::setAutoBck( int secs )
 
 void MainWindow::setTitle( QString title )
 {
-    setWindowTitle(m_version+"  -  "+title);
+    setWindowTitle( m_version+"  -  "+title );
 }
 
 void MainWindow::about()
@@ -167,22 +203,25 @@ void MainWindow::createWidgets()
     m_sidepanel->tabBar()->setStyleSheet("QTabBar { font-size:"+fontSize+"px; }");
     m_Centralsplitter->addWidget( m_sidepanel );
 
+    m_componentWidget = new QWidget( this );
+    m_componentWidget->setObjectName( "componentWidget" );
+    m_componentWidgetLayout = new QVBoxLayout( m_componentWidget );
+    m_componentWidgetLayout->setSpacing(0);
+    m_componentWidgetLayout->setContentsMargins(0, 0, 0, 0);
+    m_componentWidgetLayout->setObjectName( "ramTabWidgetLayout" );
+
+    m_searchComponent = new QLineEdit( this );
+    m_searchComponent->setPlaceholderText( tr( "Search Components" ));
+    m_componentWidgetLayout->addWidget( m_searchComponent );
+    connect( m_searchComponent, SIGNAL( editingFinished() ),
+             this,               SLOT(  searchChanged()), Qt::UniqueConnection);
+
     m_components = new ComponentSelector( m_sidepanel );
     m_components->setObjectName( "components" );
-    m_sidepanel->addTab( m_components, tr("Components") );
+    m_componentWidgetLayout->addWidget( m_components );
 
-    m_ramTabWidget = new QWidget( this );
-    m_ramTabWidget->setObjectName( "ramTabWidget" );
-    m_ramTabWidgetLayout = new QGridLayout( m_ramTabWidget );
-    m_ramTabWidgetLayout->setSpacing(0);
-    m_ramTabWidgetLayout->setContentsMargins(0, 0, 0, 0);
-    m_ramTabWidgetLayout->setObjectName( "ramTabWidgetLayout" );
-    m_sidepanel->addTab( m_ramTabWidget, tr( "RamTable" ));
+    m_sidepanel->addTab( m_componentWidget, tr("Components") );
 
-    m_itemprop = new PropertiesWidget( this );
-    m_itemprop->setObjectName( "properties" );
-    m_sidepanel->addTab( m_itemprop,  tr( "Properties" ));
-    
     m_fileSystemTree = new FileWidget( this );
     m_fileSystemTree->setObjectName( "fileExplorer" );
     m_sidepanel->addTab( m_fileSystemTree, tr( "File explorer" ) );
@@ -204,13 +243,28 @@ void MainWindow::createWidgets()
     this->showMaximized();
 }
 
-void MainWindow::loadCircHelp()
+void MainWindow::searchChanged()
 {
-    QString locale   = "_"+QLocale::system().name().split("_").first();
-    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+locale+"/circuit"+locale+".txt" );
+    QString filter = m_searchComponent->text();
+    m_components->search( filter );
+}
+
+QString MainWindow::getHelpFile( QString name )
+{
+    QString help = "No help available";
+
+    if( m_help.contains( name )) return m_help.value( name );
+
+    //QString locale   = "_"+QLocale::system().name().split("_").first();
+    QString locale = loc();
+    if( loc() != "en" ) locale.prepend("_").append("/");
+    else locale = "";
+
+    name= name.toLower().replace( " ", "" );
+    QString dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+locale+name+locale+".txt" );
 
     if( dfPath == "" )
-        dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/circuit.txt" );
+        dfPath = SIMUAPI_AppPath::self()->availableDataFilePath( "help/"+name+".txt" );
 
     if( dfPath != "" )
     {
@@ -221,17 +275,14 @@ void MainWindow::loadCircHelp()
             QTextStream s1( &file );
             s1.setCodec("UTF-8");
 
-            m_circHelp = "";
-            m_circHelp.append(s1.readAll());
+            help = s1.readAll();
 
             file.close();
         }
+        else qDebug() << "LibraryItem::getHelpFile ERROR"<<dfPath;
     }
-}
-
-QString* MainWindow::circHelp()
-{
-    return &m_circHelp;
+    m_help[name] = help;
+    return help;
 }
 
 void MainWindow::loadPlugins()
@@ -344,14 +395,17 @@ void MainWindow::unLoadPugin( QString pluginName )
     }
 }
 
-void MainWindow::applyStile()
+void MainWindow::applyStyle()
 {
-    QFile file(":/simulide.qss");
-    file.open(QFile::ReadOnly);
+    QDir dataConfigDir(qApp->applicationDirPath());
+    dataConfigDir.cd("../share/simulide/data/config");
 
-    m_styleSheet = QLatin1String(file.readAll());
-
-    qApp->setStyleSheet( m_styleSheet );
+    QFile file(dataConfigDir.absoluteFilePath("simulide.qss"));
+    if( file.open(QFile::ReadOnly) )
+    {
+        m_styleSheet = QLatin1String(file.readAll());
+        qApp->setStyleSheet( m_styleSheet );
+    }
 }
 
 QSettings* MainWindow::settings() { return &m_settings; }

@@ -1,90 +1,111 @@
-<circuit noLinStep="10" reactStep="50" animate="0" noLinAcc="5" speed="1000000" type="simulide_0.1">
- 
-pic16f1825-14: 
-<item id="pic16f1825" itemtype="PIC" Show_id="true" valLabRot="0" rotation="0" Program="pwm_p16f1825.hex" valLabely="0" objectName="pic16f1825-14" valLabelx="0" Mhz="8" Ser_Port="false" y="-60" Ser_Monitor="false" labely="-15" x="-540" hflip="1" labelx="-11" labelrot="0" vflip="1"/>
- 
-Fuente Voltaje-13: 
-<item id="Fuente Voltaje-13" itemtype="Voltage Source" Show_id="false" valLabRot="0" rotation="0" valLabely="13" objectName="Fuente Voltaje-13" valLabelx="-24" Voltage="5" y="-108" Show_Volt="true" labely="-24" x="-516" hflip="1" labelx="-16" Unit=" V" labelrot="0" vflip="1"/>
- 
-Led-12: 
-<item id="Led-12" itemtype="Led" Show_id="false" valLabRot="0" rotation="-270" valLabely="0" objectName="Led-12" valLabelx="0" Grounded="false" y="68" labely="-24" x="-556" MaxCurrent="0.029999999999999999" hflip="1" labelx="-16" Threshold="2.3999999999999999" labelrot="0" Resistance="0.59999999999999998" vflip="1" Color="0"/>
- 
-Reistencia-11: 
-<item id="Reistencia-11" itemtype="Resistor" Show_res="true" Show_id="false" valLabRot="0" rotation="-90" valLabely="7" objectName="Reistencia-11" valLabelx="-11" y="108" labely="-24" x="-556" hflip="1" labelx="-12" Unit=" Ω" labelrot="0" Resistance="75" vflip="1"/>
- 
-Tierra-10: 
-<item objectName="Tierra-10" id="Tierra-10" Show_id="false" labelrot="0" vflip="1" y="156" hflip="1" x="-556" valLabelx="0" valLabely="0" labely="-24" valLabRot="0" rotation="0" labelx="-16" itemtype="Ground"/>
- 
-Reistencia-9: 
-<item id="Reistencia-9" itemtype="Resistor" Show_res="true" Show_id="false" valLabRot="0" rotation="-90" valLabely="8" objectName="Reistencia-9" valLabelx="-10" y="108" labely="-24" x="-484" hflip="1" labelx="-12" Unit=" Ω" labelrot="0" Resistance="75" vflip="1"/>
- 
-Led-8: 
-<item id="Led-8" itemtype="Led" Show_id="false" valLabRot="0" rotation="-270" valLabely="0" objectName="Led-8" valLabelx="0" Grounded="false" y="68" labely="-24" x="-484" MaxCurrent="0.029999999999999999" hflip="1" labelx="-16" Threshold="2.3999999999999999" labelrot="0" Resistance="0.59999999999999998" vflip="1" Color="0"/>
- 
-Tierra-7: 
-<item objectName="Tierra-7" id="Tierra-7" Show_id="false" labelrot="0" vflip="1" y="156" hflip="1" x="-484" valLabelx="0" valLabely="0" labely="-24" valLabRot="0" rotation="0" labelx="-16" itemtype="Ground"/>
- 
-Reistencia-6: 
-<item id="Reistencia-6" itemtype="Resistor" Show_res="true" Show_id="false" valLabRot="0" rotation="-90" valLabely="6" objectName="Reistencia-6" valLabelx="-12" y="108" labely="-24" x="-532" hflip="1" labelx="-12" Unit=" Ω" labelrot="0" Resistance="75" vflip="1"/>
- 
-Led-5: 
-<item id="Led-5" itemtype="Led" Show_id="false" valLabRot="0" rotation="-270" valLabely="0" objectName="Led-5" valLabelx="0" Grounded="false" y="68" labely="-24" x="-532" MaxCurrent="0.029999999999999999" hflip="1" labelx="-16" Threshold="2.3999999999999999" labelrot="0" Resistance="0.59999999999999998" vflip="1" Color="0"/>
- 
-Tierra-4: 
-<item objectName="Tierra-4" id="Tierra-4" Show_id="false" labelrot="0" vflip="1" y="156" hflip="1" x="-532" valLabelx="0" valLabely="0" labely="-24" valLabRot="0" rotation="0" labelx="-16" itemtype="Ground"/>
- 
-Reistencia-3: 
-<item id="Reistencia-3" itemtype="Resistor" Show_res="true" Show_id="false" valLabRot="0" rotation="-90" valLabely="7" objectName="Reistencia-3" valLabelx="-10" y="108" labely="-24" x="-508" hflip="1" labelx="-12" Unit=" Ω" labelrot="0" Resistance="75" vflip="1"/>
- 
-Led-2: 
-<item id="Led-2" itemtype="Led" Show_id="false" valLabRot="0" rotation="-270" valLabely="0" objectName="Led-2" valLabelx="0" Grounded="false" y="68" labely="-24" x="-508" MaxCurrent="0.029999999999999999" hflip="1" labelx="-16" Threshold="2.3999999999999999" labelrot="0" Resistance="0.59999999999999998" vflip="1" Color="0"/>
- 
-Tierra-1: 
-<item objectName="Tierra-1" id="Tierra-1" Show_id="false" labelrot="0" vflip="1" y="156" hflip="1" x="-508" valLabelx="0" valLabely="0" labely="-24" valLabRot="0" rotation="0" labelx="-16" itemtype="Ground"/>
- 
-Connector-15: 
-<item startpinid="Fuente Voltaje-13-outPin" id="Connector-15" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-15" valLabelx="0" enodeid="Circ_eNode-16" y="-108" endpinid="pic16f1825-14-RA0" pointList="-500,-108,-460,-108,-460,-44,-500,-44" labely="-24" x="-500" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-17: 
-<item startpinid="Tierra-10-Gnd" id="Connector-17" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-17" valLabelx="0" enodeid="Circ_eNode-18" y="140" endpinid="Reistencia-11-lPin" pointList="-556,140,-556,124" labely="-24" x="-556" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-19: 
-<item startpinid="Reistencia-11-rPin" id="Connector-19" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-19" valLabelx="0" enodeid="Circ_eNode-20" y="92" endpinid="Led-12-rPin" pointList="-556,92,-556,84" labely="-24" x="-556" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-21: 
-<item startpinid="Reistencia-9-rPin" id="Connector-21" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-21" valLabelx="0" enodeid="Circ_eNode-22" y="92" endpinid="Led-8-rPin" pointList="-484,92,-484,84" labely="-24" x="-484" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-23: 
-<item startpinid="Tierra-7-Gnd" id="Connector-23" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-23" valLabelx="0" enodeid="Circ_eNode-24" y="140" endpinid="Reistencia-9-lPin" pointList="-484,140,-484,124" labely="-24" x="-484" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-25: 
-<item startpinid="pic16f1825-14-RA2" id="Connector-25" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-25" valLabelx="0" enodeid="Circ_eNode-26" y="-28" endpinid="Led-8-lPin" pointList="-500,-28,-468,-28,-468,44,-484,44,-484,52" labely="-24" x="-500" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-27: 
-<item startpinid="Reistencia-6-rPin" id="Connector-27" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-27" valLabelx="0" enodeid="Circ_eNode-28" y="92" endpinid="Led-5-rPin" pointList="-532,92,-532,84" labely="-24" x="-532" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-29: 
-<item startpinid="Tierra-4-Gnd" id="Connector-29" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-29" valLabelx="0" enodeid="Circ_eNode-30" y="140" endpinid="Reistencia-6-lPin" pointList="-532,140,-532,124" labely="-24" x="-532" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-31: 
-<item startpinid="Led-5-lPin" id="Connector-31" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-31" valLabelx="0" enodeid="Circ_eNode-32" y="52" endpinid="pic16f1825-14-RC3" pointList="-532,52,-532,28,-556,28,-556,-4,-548,-4" labely="-24" x="-532" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-33: 
-<item startpinid="Reistencia-3-rPin" id="Connector-33" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-33" valLabelx="0" enodeid="Circ_eNode-34" y="92" endpinid="Led-2-rPin" pointList="-508,92,-508,84" labely="-24" x="-508" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-35: 
-<item startpinid="pic16f1825-14-RC1" id="Connector-35" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-35" valLabelx="0" enodeid="Circ_eNode-36" y="-12" endpinid="Led-2-lPin" pointList="-500,-12,-484,-12,-484,28,-508,28,-508,52" labely="-24" x="-500" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-37: 
-<item startpinid="Tierra-1-Gnd" id="Connector-37" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-37" valLabelx="0" enodeid="Circ_eNode-38" y="140" endpinid="Reistencia-3-lPin" pointList="-508,140,-508,124" labely="-24" x="-508" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-Connector-39: 
-<item startpinid="Led-12-lPin" id="Connector-39" itemtype="Connector" Show_id="false" valLabRot="0" rotation="0" valLabely="0" objectName="Connector-39" valLabelx="0" enodeid="Circ_eNode-40" y="52" endpinid="pic16f1825-14-RC5" pointList="-556,52,-556,44,-572,44,-572,-20,-548,-20" labely="-24" x="-556" hflip="1" labelx="-16" labelrot="0" vflip="1"/>
- 
-PlotterWidget-41: 
-<item acceptDrops="false" whatsThis="" visible="false" modal="false" windowIconText="" MinVolt="-500" layoutDirection="0" maximized="false" autoFillBackground="false" updatesEnabled="true" enabled="true" minimized="false" maximumSize="" palette="" rect="" accessibleDescription="" itemtype="Plotter" windowIcon="" MaxVolt="500" locale="" size="" minimumHeight="200" focus="false" windowOpacity="1" x="0" toolTipDuration="-1" width="664" isActiveWindow="true" windowModality="0" statusTip="" geometry="" windowTitle="" minimumWidth="200" sizeIncrement="" frameSize="" windowFilePath="" sizePolicy="" normalGeometry="" sizeHint="" maximumWidth="1000" inputMethodHints="0" pos="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumSize="" windowModified="false" frameGeometry="" objectName="PlotterWidget-41" maximumHeight="200" focusPolicy="0" baseSize="" mouseTracking="false" cursor="" minimumSizeHint="" accessibleName="" fullScreen="false" childrenRect="" styleSheet="" childrenRegion="" toolTip="" contextMenuPolicy="1" height="200" y="484"/>
- 
-SerialPortWidget-42: 
-<item acceptDrops="false" whatsThis="" visible="false" modal="false" windowIconText="" layoutDirection="0" maximized="false" autoFillBackground="false" updatesEnabled="true" enabled="true" minimized="false" maximumSize="" palette="" rect="" accessibleDescription="" itemtype="SerialPort" windowIcon="" locale="" size="" minimumHeight="0" focus="false" windowOpacity="1" x="0" toolTipDuration="-1" width="313" isActiveWindow="true" windowModality="0" statusTip="" geometry="" windowTitle="Configuracion" SettingsProp="ttyS0,0,3,0,0,0" minimumWidth="0" sizeIncrement="" frameSize="" windowFilePath="" sizePolicy="" normalGeometry="" sizeHint="" maximumWidth="450" inputMethodHints="0" pos="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumSize="" windowModified="false" frameGeometry="" objectName="SerialPortWidget-42" maximumHeight="170" focusPolicy="0" baseSize="" mouseTracking="false" cursor="" minimumSizeHint="" accessibleName="" fullScreen="false" childrenRect="" styleSheet="" childrenRegion="" toolTip="" contextMenuPolicy="1" height="141" y="0"/>
+<circuit type="simulide_0.4" Speed_sps="1000000" Speed_per="100" Simu_Step_nS="1000" noLinAcc="5" reactStep="50" animate="0">
+
+Unique  Id: Tierra-14: 
+Circuit Id: Tierra-1
+<item boardRot="-1000000" id="Tierra-1" labely="-24" hflip="1" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Ground" boardPos="-1e+06,-1e+06" Show_id="false" y="156" circPos="0,0" x="-508" mainComp="false" objectName="Tierra-14" labelx="-16" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Led-13: 
+Circuit Id: Led-2
+<item boardRot="-1000000" id="Led-2" labely="-24" hflip="1" Threshold="2.3999999999999999" rotation="-270" Resistance="0.59999999999999998" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Led" MaxCurrent="0.029999999999999999" boardPos="-1e+06,-1e+06" Show_id="false" y="68" Color="0" circPos="0,0" x="-508" mainComp="false" Grounded="false" objectName="Led-13" labelx="-16" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Reistencia-12: 
+Circuit Id: Reistencia-3
+<item boardRot="-1000000" id="Reistencia-3" labely="-24" hflip="1" rotation="-90" Resistance="75" circRot="8.3182235018832601e-312" valLabely="7" vflip="1" labelrot="0" itemtype="Resistor" boardPos="-1e+06,-1e+06" Show_id="false" y="108" circPos="0,0" x="-508" mainComp="false" objectName="Reistencia-12" labelx="-12" Unit=" Ω" valLabRot="0" valLabelx="-10" Show_res="true"/>
+
+Unique  Id: Tierra-11: 
+Circuit Id: Tierra-4
+<item boardRot="-1000000" id="Tierra-4" labely="-24" hflip="1" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Ground" boardPos="-1e+06,-1e+06" Show_id="false" y="156" circPos="0,0" x="-532" mainComp="false" objectName="Tierra-11" labelx="-16" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Led-10: 
+Circuit Id: Led-5
+<item boardRot="-1000000" id="Led-5" labely="-24" hflip="1" Threshold="2.3999999999999999" rotation="-270" Resistance="0.59999999999999998" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Led" MaxCurrent="0.029999999999999999" boardPos="-1e+06,-1e+06" Show_id="false" y="68" Color="0" circPos="0,0" x="-532" mainComp="false" Grounded="false" objectName="Led-10" labelx="-16" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Reistencia-9: 
+Circuit Id: Reistencia-6
+<item boardRot="-1000000" id="Reistencia-6" labely="-24" hflip="1" rotation="-90" Resistance="75" circRot="8.3182235018832601e-312" valLabely="6" vflip="1" labelrot="0" itemtype="Resistor" boardPos="-1e+06,-1e+06" Show_id="false" y="108" circPos="0,0" x="-532" mainComp="false" objectName="Reistencia-9" labelx="-12" Unit=" Ω" valLabRot="0" valLabelx="-12" Show_res="true"/>
+
+Unique  Id: Tierra-8: 
+Circuit Id: Tierra-7
+<item boardRot="-1000000" id="Tierra-7" labely="-24" hflip="1" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Ground" boardPos="-1e+06,-1e+06" Show_id="false" y="156" circPos="0,0" x="-484" mainComp="false" objectName="Tierra-8" labelx="-16" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Led-7: 
+Circuit Id: Led-8
+<item boardRot="-1000000" id="Led-8" labely="-24" hflip="1" Threshold="2.3999999999999999" rotation="-270" Resistance="0.59999999999999998" circRot="7.9337377611200708e-317" valLabely="0" vflip="1" labelrot="0" itemtype="Led" MaxCurrent="0.029999999999999999" boardPos="-1e+06,-1e+06" Show_id="false" y="68" Color="0" circPos="0,0" x="-484" mainComp="false" Grounded="false" objectName="Led-7" labelx="-16" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Reistencia-6: 
+Circuit Id: Reistencia-9
+<item boardRot="-1000000" id="Reistencia-9" labely="-24" hflip="1" rotation="-90" Resistance="75" circRot="8.3182235018832601e-312" valLabely="8" vflip="1" labelrot="0" itemtype="Resistor" boardPos="-1e+06,-1e+06" Show_id="false" y="108" circPos="0,0" x="-484" mainComp="false" objectName="Reistencia-6" labelx="-12" Unit=" Ω" valLabRot="0" valLabelx="-10" Show_res="true"/>
+
+Unique  Id: Tierra-5: 
+Circuit Id: Tierra-10
+<item boardRot="-1000000" id="Tierra-10" labely="-24" hflip="1" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Ground" boardPos="-1e+06,-1e+06" Show_id="false" y="156" circPos="0,0" x="-556" mainComp="false" objectName="Tierra-5" labelx="-16" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Reistencia-4: 
+Circuit Id: Reistencia-11
+<item boardRot="-1000000" id="Reistencia-11" labely="-24" hflip="1" rotation="-90" Resistance="75" circRot="0" valLabely="7" vflip="1" labelrot="0" itemtype="Resistor" boardPos="-1e+06,-1e+06" Show_id="false" y="108" circPos="0,0" x="-556" mainComp="false" objectName="Reistencia-4" labelx="-12" Unit=" Ω" valLabRot="0" valLabelx="-11" Show_res="true"/>
+
+Unique  Id: Led-3: 
+Circuit Id: Led-12
+<item boardRot="-1000000" id="Led-12" labely="-24" hflip="1" Threshold="2.3999999999999999" rotation="-270" Resistance="0.59999999999999998" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Led" MaxCurrent="0.029999999999999999" boardPos="-1e+06,-1e+06" Show_id="false" y="68" Color="0" circPos="0,0" x="-556" mainComp="false" Grounded="false" objectName="Led-3" labelx="-16" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Fuente Voltaje-2: 
+Circuit Id: Fuente Voltaje-13
+<item boardRot="-1000000" id="Fuente Voltaje-13" labely="-24" hflip="1" Voltage="5" rotation="0" circRot="1.4227715121469878e-316" valLabely="13" vflip="1" labelrot="0" itemtype="Voltage Source" boardPos="-1e+06,-1e+06" Show_id="false" y="-108" circPos="0,0" x="-516" mainComp="false" Show_Volt="true" objectName="Fuente Voltaje-2" labelx="-16" Unit=" V" valLabRot="0" valLabelx="-24"/>
+
+Unique  Id: pic16f1825-1: 
+Circuit Id: pic16f1825
+<item boardRot="-1000000" id="pic16f1825" Mhz="8" labely="-15" hflip="1" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="PIC" Auto_Load="false" boardPos="-1e+06,-1e+06" Show_id="true" y="-60" varList=",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,," circPos="0,0" x="-540" mainComp="false" Program="pwm_p16f1825.hex" objectName="pic16f1825-1" eeprom="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" labelx="-11" valLabRot="0" valLabelx="0" Logic_Symbol="false"/>
+
+Unique  Id: Connector-15: 
+Circuit Id: Connector-15
+<item boardRot="-1000000" enodeid="Circ_eNode-16" id="Connector-15" labely="-24" hflip="1" endpinid="pic16f1825-1-RA0" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="-108" startpinid="Fuente Voltaje-2-outPin" circPos="0,0" x="-500" mainComp="false" objectName="Connector-15" labelx="-16" pointList="-500,-108,-460,-108,-460,-44,-500,-44" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-17: 
+Circuit Id: Connector-17
+<item boardRot="-1000000" enodeid="Circ_eNode-18" id="Connector-17" labely="-24" hflip="1" endpinid="Reistencia-4-lPin" rotation="0" circRot="6.9533481350382117e-310" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="140" startpinid="Tierra-5-Gnd" circPos="0,0" x="-556" mainComp="false" objectName="Connector-17" labelx="-16" pointList="-556,140,-556,124" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-19: 
+Circuit Id: Connector-19
+<item boardRot="-1000000" enodeid="Circ_eNode-20" id="Connector-19" labely="-24" hflip="1" endpinid="Led-3-rPin" rotation="0" circRot="4.233735079514793e-316" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="92" startpinid="Reistencia-4-rPin" circPos="0,0" x="-556" mainComp="false" objectName="Connector-19" labelx="-16" pointList="-556,92,-556,84" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-21: 
+Circuit Id: Connector-21
+<item boardRot="-1000000" enodeid="Circ_eNode-22" id="Connector-21" labely="-24" hflip="1" endpinid="Led-7-rPin" rotation="0" circRot="9.8813129168249309e-324" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="92" startpinid="Reistencia-6-rPin" circPos="0,0" x="-484" mainComp="false" objectName="Connector-21" labelx="-16" pointList="-484,92,-484,84" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-23: 
+Circuit Id: Connector-23
+<item boardRot="-1000000" enodeid="Circ_eNode-24" id="Connector-23" labely="-24" hflip="1" endpinid="Reistencia-6-lPin" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="140" startpinid="Tierra-8-Gnd" circPos="0,0" x="-484" mainComp="false" objectName="Connector-23" labelx="-16" pointList="-484,140,-484,124" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-25: 
+Circuit Id: Connector-25
+<item boardRot="-1000000" enodeid="Circ_eNode-26" id="Connector-25" labely="-24" hflip="1" endpinid="Led-7-lPin" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="-28" startpinid="pic16f1825-1-RA2" circPos="0,0" x="-500" mainComp="false" objectName="Connector-25" labelx="-16" pointList="-500,-28,-468,-28,-468,44,-484,44,-484,52" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-27: 
+Circuit Id: Connector-27
+<item boardRot="-1000000" enodeid="Circ_eNode-28" id="Connector-27" labely="-24" hflip="1" endpinid="Led-10-rPin" rotation="0" circRot="2.1362080723786757e-306" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="92" startpinid="Reistencia-9-rPin" circPos="0,0" x="-532" mainComp="false" objectName="Connector-27" labelx="-16" pointList="-532,92,-532,84" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-29: 
+Circuit Id: Connector-29
+<item boardRot="-1000000" enodeid="Circ_eNode-30" id="Connector-29" labely="-24" hflip="1" endpinid="Reistencia-9-lPin" rotation="0" circRot="nan" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="140" startpinid="Tierra-11-Gnd" circPos="0,0" x="-532" mainComp="false" objectName="Connector-29" labelx="-16" pointList="-532,140,-532,124" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-31: 
+Circuit Id: Connector-31
+<item boardRot="-1000000" enodeid="Circ_eNode-32" id="Connector-31" labely="-24" hflip="1" endpinid="pic16f1825-1-RC3" rotation="0" circRot="8.214245707774187e-311" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="52" startpinid="Led-10-lPin" circPos="0,0" x="-532" mainComp="false" objectName="Connector-31" labelx="-16" pointList="-532,52,-532,28,-556,28,-556,-4,-548,-4" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-33: 
+Circuit Id: Connector-33
+<item boardRot="-1000000" enodeid="Circ_eNode-34" id="Connector-33" labely="-24" hflip="1" endpinid="Led-13-rPin" rotation="0" circRot="4.001931731314097e-322" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="92" startpinid="Reistencia-12-rPin" circPos="0,0" x="-508" mainComp="false" objectName="Connector-33" labelx="-16" pointList="-508,92,-508,84" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-35: 
+Circuit Id: Connector-35
+<item boardRot="-1000000" enodeid="Circ_eNode-36" id="Connector-35" labely="-24" hflip="1" endpinid="Led-13-lPin" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="-12" startpinid="pic16f1825-1-RC1" circPos="0,0" x="-500" mainComp="false" objectName="Connector-35" labelx="-16" pointList="-500,-12,-484,-12,-484,28,-508,28,-508,52" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-37: 
+Circuit Id: Connector-37
+<item boardRot="-1000000" enodeid="Circ_eNode-38" id="Connector-37" labely="-24" hflip="1" endpinid="Reistencia-12-lPin" rotation="0" circRot="2.1219957904712067e-314" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="140" startpinid="Tierra-14-Gnd" circPos="0,0" x="-508" mainComp="false" objectName="Connector-37" labelx="-16" pointList="-508,140,-508,124" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-39: 
+Circuit Id: Connector-39
+<item boardRot="-1000000" enodeid="Circ_eNode-40" id="Connector-39" labely="-24" hflip="1" endpinid="pic16f1825-1-RC5" rotation="0" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="52" startpinid="Led-3-lPin" circPos="0,0" x="-556" mainComp="false" objectName="Connector-39" labelx="-16" pointList="-556,52,-556,44,-572,44,-572,-20,-548,-20" valLabRot="0" valLabelx="0"/>
  
 </circuit>

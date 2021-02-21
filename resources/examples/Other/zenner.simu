@@ -1,33 +1,39 @@
-<circuit speed="1000000" animate="0" type="simulide_0.1" noLinAcc="5" reactStep="50" noLinStep="10">
- 
-Diode-5: 
-<item rotation="-90" valLabely="0" Show_id="true" itemtype="Diode" labelrot="90" id="Zener Diode 3.6 V&#xa;&#xa;To set a Diode as Zener&#xa;Just Change Zener Voltage &#xa;To other than 0." x="-244" labely="17" y="-108" vflip="1" objectName="Diode-5" valLabRot="0" labelx="42" valLabelx="0" Zener_Volt="3.6000000000000001" hflip="1" Threshold="0.69999999999999996"/>
- 
-Fixed Volt.-4: 
-<item valLabely="8" Show_id="false" rotation="0" vflip="1" Show_Volt="true" x="-396" id="Fixed Volt.-2" Unit=" V" objectName="Fixed Volt.-4" labelrot="0" hflip="1" y="-228" valLabelx="-16" Voltage="5" labely="-24" labelx="-64" valLabRot="0" itemtype="Fixed Voltage"/>
- 
-Resistor-3: 
-<item Show_res="true" valLabely="6" Show_id="false" rotation="0" vflip="1" x="-316" Resistance="10" id="Resistor-3" Unit=" kΩ" objectName="Resistor-3" labelrot="0" hflip="1" y="-228" valLabelx="-16" labely="-24" labelx="-12" valLabRot="0" itemtype="Resistor"/>
- 
-Ground (0 V)-2: 
-<item rotation="0" valLabely="0" Show_id="false" itemtype="Ground" labelrot="0" id="Ground (0 V)-4" x="-244" labely="-24" y="4" vflip="1" objectName="Ground (0 V)-2" valLabRot="0" labelx="-16" valLabelx="0" hflip="1"/>
- 
-Probe-1: 
-<item rotation="-45" valLabely="0" PlotterCh="0" Show_id="false" itemtype="Probe" labelrot="0" id="Probe-5" x="-228" labely="-24" y="-196" vflip="1" Show_volt="true" objectName="Probe-1" valLabRot="45" labelx="-16" valLabelx="16" hflip="1"/>
- 
-Connector-6: 
-<item startpinid="Fixed Volt.-4-outnod" valLabely="0" Show_id="false" rotation="0" vflip="1" x="-380" id="Connector-6" enodeid="Circ_eNode-7" objectName="Connector-6" pointList="-380,-228,-332,-228" labelrot="0" hflip="1" endpinid="Resistor-3-lPin" y="-228" valLabelx="0" labely="-24" labelx="-16" valLabRot="0" itemtype="Connector"/>
- 
-Connector-8: 
-<item startpinid="Resistor-3-rPin" valLabely="0" Show_id="false" rotation="0" vflip="1" x="-300" id="Connector-8" enodeid="Circ_eNode-9" objectName="Connector-8" pointList="-300,-228,-244,-228,-244,-124" labelrot="0" hflip="1" endpinid="Diode-5-rPin" y="-228" valLabelx="0" labely="-24" labelx="-16" valLabRot="0" itemtype="Connector"/>
- 
-Connector-10: 
-<item startpinid="Ground (0 V)-2-Gnd" valLabely="0" Show_id="false" rotation="0" vflip="1" x="-244" id="Connector-10" enodeid="Circ_eNode-11" objectName="Connector-10" pointList="-244,-12,-244,-92" labelrot="0" hflip="1" endpinid="Diode-5-lPin" y="-12" valLabelx="0" labely="-24" labelx="-16" valLabRot="0" itemtype="Connector"/>
- 
-PlotterWidget-65: 
-<item frameSize="" toolTipDuration="-1" maximumSize="" sizeHint="" pos="" baseSize="" maximumWidth="1000" normalGeometry="" maximized="false" minimumWidth="200" maximumHeight="200" windowFilePath="" windowModality="0" inputMethodHints="0" toolTip="" updatesEnabled="true" palette="" whatsThis="" autoFillBackground="false" minimized="false" itemtype="Plotter" windowOpacity="1" cursor="" styleSheet="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumHeight="200" isActiveWindow="true" minimumSize="" height="200" y="520" childrenRegion="" windowTitle="" contextMenuPolicy="1" x="0" focus="false" windowModified="false" mouseTracking="false" size="" accessibleName="" sizePolicy="" MinVolt="-500" childrenRect="" minimumSizeHint="" width="619" acceptDrops="false" windowIcon="" Tracks="1" objectName="PlotterWidget-65" windowIconText="" geometry="" rect="" locale="" modal="false" Scale="1" frameGeometry="" sizeIncrement="" focusPolicy="0" accessibleDescription="" layoutDirection="0" visible="false" fullScreen="false" MaxVolt="500" enabled="true" statusTip=""/>
- 
-SerialPortWidget-66: 
-<item frameSize="" toolTipDuration="-1" maximumSize="" sizeHint="" pos="" baseSize="" maximumWidth="450" normalGeometry="" maximized="false" minimumWidth="0" maximumHeight="170" windowFilePath="" SettingsProp="ttyS0,0,3,0,0,0" windowModality="0" inputMethodHints="0" toolTip="" updatesEnabled="true" palette="" whatsThis="" autoFillBackground="false" minimized="false" itemtype="SerialPort" windowOpacity="1" cursor="" styleSheet="" font="Sans Serif,9,-1,5,50,0,0,0,0,0" minimumHeight="0" isActiveWindow="true" minimumSize="" height="147" y="573" childrenRegion="" windowTitle="Configuracion" contextMenuPolicy="1" x="153" focus="false" windowModified="false" mouseTracking="false" size="" accessibleName="" sizePolicy="" childrenRect="" minimumSizeHint="" width="450" acceptDrops="false" windowIcon="" objectName="SerialPortWidget-66" windowIconText="" geometry="" rect="" locale="" modal="false" frameGeometry="" sizeIncrement="" focusPolicy="0" accessibleDescription="" layoutDirection="0" visible="false" fullScreen="false" enabled="true" statusTip=""/>
+<circuit type="simulide_0.4" Speed_sps="1000000" Speed_per="100" Simu_Step_nS="1000" noLinAcc="5" reactStep="50" animate="0">
+
+Unique  Id: Probe-5: 
+Circuit Id: Probe-5
+<item boardRot="-1000000" id="Probe-5" labely="-24" hflip="1" Threshold="2.5" rotation="-45" circRot="0" valLabely="0" vflip="1" labelrot="0" itemtype="Probe" boardPos="-1e+06,-1e+06" Show_id="false" y="-196" circPos="0,0" x="-228" mainComp="false" objectName="Probe-5" labelx="-16" Show_volt="true" valLabRot="45" valLabelx="16"/>
+
+Unique  Id: Ground (0 V)-4: 
+Circuit Id: Ground (0 V)-4
+<item boardRot="-1000000" id="Ground (0 V)-4" labely="-24" hflip="1" rotation="0" circRot="3.9525251667299724e-322" valLabely="0" vflip="1" labelrot="0" itemtype="Ground" boardPos="-1e+06,-1e+06" Show_id="false" y="4" circPos="0,0" x="-244" mainComp="false" objectName="Ground (0 V)-4" labelx="-16" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Resistor-3: 
+Circuit Id: Resistor-3
+<item boardRot="-1000000" id="Resistor-3" labely="-24" hflip="1" rotation="0" Resistance="10" circRot="9.4641012296171486e-312" valLabely="6" vflip="1" labelrot="0" itemtype="Resistor" boardPos="-1e+06,-1e+06" Show_id="false" y="-228" circPos="0,0" x="-316" mainComp="false" objectName="Resistor-3" labelx="-12" Unit=" kΩ" valLabRot="0" valLabelx="-16" Show_res="true"/>
+
+Unique  Id: Fixed Volt.-2: 
+Circuit Id: Fixed Volt.-2
+<item boardRot="-1000000" id="Fixed Volt.-2" labely="-24" hflip="1" Voltage="5" Out="false" rotation="0" circRot="0" valLabely="8" vflip="1" labelrot="0" itemtype="Fixed Voltage" boardPos="-1e+06,-1e+06" Show_id="false" y="-228" circPos="0,0" x="-396" mainComp="false" Show_Volt="true" objectName="Fixed Volt.-2" labelx="-64" Unit=" V" valLabRot="0" valLabelx="-16"/>
+
+Unique  Id: Diode-1: 
+Circuit Id: Zener Diode 3.6 V
+
+To set a Diode as Zener
+Just Change Zener Voltage 
+To other than 0.
+<item boardRot="-1000000" id="Zener Diode 3.6 V&#xa;&#xa;To set a Diode as Zener&#xa;Just Change Zener Voltage &#xa;To other than 0." labely="17" hflip="1" Threshold="0.69999999999999996" Zener_Volt="3.6000000000000001" rotation="-90" circRot="3.9525251667299724e-322" valLabely="0" vflip="1" labelrot="90" itemtype="Diode" boardPos="-1e+06,-1e+06" Show_id="true" y="-108" circPos="0,0" x="-244" mainComp="false" objectName="Diode-1" labelx="42" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-6: 
+Circuit Id: Connector-6
+<item boardRot="-1000000" enodeid="Circ_eNode-7" id="Connector-6" labely="-24" hflip="1" endpinid="Resistor-3-lPin" rotation="0" circRot="6.1895299303252139e+223" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="-228" startpinid="Fixed Volt.-2-outnod" circPos="0,0" x="-380" mainComp="false" objectName="Connector-6" labelx="-16" pointList="-380,-228,-332,-228" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-8: 
+Circuit Id: Connector-8
+<item boardRot="-1000000" enodeid="Circ_eNode-9" id="Connector-8" labely="-24" hflip="1" endpinid="Diode-1-rPin" rotation="0" circRot="nan" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="-228" startpinid="Resistor-3-rPin" circPos="0,0" x="-300" mainComp="false" objectName="Connector-8" labelx="-16" pointList="-300,-228,-244,-228,-244,-124" valLabRot="0" valLabelx="0"/>
+
+Unique  Id: Connector-10: 
+Circuit Id: Connector-10
+<item boardRot="-1000000" enodeid="Circ_eNode-11" id="Connector-10" labely="-24" hflip="1" endpinid="Diode-1-lPin" rotation="0" circRot="nan" valLabely="0" vflip="1" labelrot="0" itemtype="Connector" boardPos="-1e+06,-1e+06" Show_id="false" y="-12" startpinid="Ground (0 V)-4-Gnd" circPos="0,0" x="-244" mainComp="false" objectName="Connector-10" labelx="-16" pointList="-244,-12,-244,-92" valLabRot="0" valLabelx="0"/>
  
 </circuit>

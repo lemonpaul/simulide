@@ -41,30 +41,39 @@ LibraryItem* BinCounter::libraryItem()
 
 BinCounter::BinCounter(QObject *parent, QString type, QString id) 
           : LogicComponent( parent, type, id )
-          , eBinCounter( id.toStdString() )
+          , eBinCounter( id )
 {
     Q_UNUSED( BinCounter_properties );
     
-    m_width  = 4;
-    m_height = 4;
+    m_width  = 3;
+    m_height = 3;
 
     QStringList pinList;
     pinList
       << "IL01>"
-      << "IL03 R"
-      << "OR02Q "
+      << "IL02 R"
+      << "OR01Q"
     ;
     init( pinList );
     
-    eLogicDevice::createClockPin( m_inPin[0] );           // Input Clock
-    
-    eLogicDevice::createInput( m_inPin[1] );              // Input Reset
-    
-    eLogicDevice::createOutput( m_outPin[0] );               // Output Q
+    eLogicDevice::createClockPin( m_inPin[0] );      // Input Clock
+    eLogicDevice::createInput( m_inPin[1] );         // Input Reset
+    eLogicDevice::createOutput( m_outPin[0] );       // Output Q
 
     setResetInv( true );                             // Invert Reset Pin
 }
-
 BinCounter::~BinCounter(){}
+
+QList<propGroup_t> BinCounter::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Clock_Inverted", tr("Clock Inverted"),""} );
+    mainGroup.propList.append( {"Reset_Inverted", tr("Reset Inverted"),""} );
+    mainGroup.propList.append( {"Max_Value", tr("Count to"),""} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
 
 #include "moc_bincounter.cpp"

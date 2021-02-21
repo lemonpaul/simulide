@@ -23,12 +23,14 @@ License along with this library; if not, see
 *                                                               *
 *****************************************************************/
 
+#include <assert.h>
+
 #include "apfcon.h"
 #include "processor.h"
 
 // Alternate Pin function
-APFCON::APFCON(Processor *pCpu, const char *pName, const char *pDesc, unsigned int _mask)
-      : sfr_register(pCpu,pName,pDesc)
+APFCON::APFCON(Processor *pCpu, const char *pName, unsigned int _mask)
+      : SfrReg( pCpu, pName )
       , mValidBits(_mask)
 {
     for(int j=0; j<8; j++)

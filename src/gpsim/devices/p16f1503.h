@@ -71,8 +71,8 @@ class P16F1503 : public _14bit_e_processor
       ADCON0  	adcon0;
       ADCON1_16F 	adcon1;
       ADCON2_TRIG	adcon2;
-      sfr_register  adresh;
-      sfr_register  adresl;
+      SfrReg  adresh;
+      SfrReg  adresl;
       OSCCON_2  	*osccon;
       OSCTUNE 	osctune;
       OSCSTAT 	oscstat;
@@ -80,17 +80,17 @@ class P16F1503 : public _14bit_e_processor
       SSP1_MODULE 	ssp;
       APFCON	apfcon1;
       PWMxCON	pwm1con;
-      sfr_register  pwm1dcl;
-      sfr_register  pwm1dch;
+      SfrReg  pwm1dcl;
+      SfrReg  pwm1dch;
       PWMxCON	pwm2con;
-      sfr_register  pwm2dcl;
-      sfr_register  pwm2dch;
+      SfrReg  pwm2dcl;
+      SfrReg  pwm2dch;
       PWMxCON	pwm3con;
-      sfr_register  pwm3dcl;
-      sfr_register  pwm3dch;
+      SfrReg  pwm3dcl;
+      SfrReg  pwm3dch;
       PWMxCON	pwm4con;
-      sfr_register  pwm4dcl;
-      sfr_register  pwm4dch;
+      SfrReg  pwm4dcl;
+      SfrReg  pwm4dch;
       CWG4		cwg;
       NCO		nco;
       CLCDATA	clcdata;
@@ -99,13 +99,9 @@ class P16F1503 : public _14bit_e_processor
       OSC_SIM	frc;
       OSC_SIM	lfintosc;
       OSC_SIM	hfintosc;
-    /* RRR
-      ECCPAS        ccp1as;
-      PSTRCON       pstr1con;
-    */
 
       EEPROM_EXTND     *e;
-      sfr_register     vregcon;
+      SfrReg     vregcon;
       WPU              *m_wpua;
       IOC              *m_iocap;
       IOC              *m_iocan;
@@ -127,7 +123,7 @@ class P16F1503 : public _14bit_e_processor
       virtual uint program_memory_size() const { return 2048; }
       virtual uint register_memory_size () const { return 0x1000; }
       
-     P16F1503(const char *_name=0, const char *desc=0);
+     P16F1503(const char *_name=0 );
       ~P16F1503();
       
       virtual void create_iopin_map();
@@ -150,7 +146,7 @@ class P16LF1503 : public P16F1503
     public:
       static Processor *construct(const char *name);
       
-      P16LF1503(const char *_name=0, const char *desc=0);
+      P16LF1503(const char *_name=0 );
       ~P16LF1503(){;}
 };
 #endif 

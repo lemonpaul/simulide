@@ -43,7 +43,7 @@ LibraryItem* Lm555::libraryItem()
 
 Lm555::Lm555( QObject* parent, QString type, QString id )
      : Component( parent, type, id )
-     , eLm555( id.toStdString() )
+     , eLm555( id )
 {
     m_area = QRect( 0, 0, 8*4, 8*5 );
     m_color = QColor( 50, 50, 70 );
@@ -69,7 +69,7 @@ Lm555::Lm555( QObject* parent, QString type, QString id )
     m_pin[2]->setLabelText( "Out" );
     m_ePin[2] = m_pin[2];
     newId.append("-eSource");
-    m_output = new eSource( newId.toStdString(), m_ePin[2] );
+    m_output = new eSource( newId, m_ePin[2] );
     m_output->setImp( 10 );
     m_output->setOut( true );
     
@@ -85,7 +85,7 @@ Lm555::Lm555( QObject* parent, QString type, QString id )
     m_pin[4]->setLabelText( "CV" );
     m_ePin[4] = m_pin[4];
     newId.append("-eSource");
-    m_cv = new eSource( newId.toStdString(), m_ePin[4] );
+    m_cv = new eSource( newId, m_ePin[4] );
     m_cv->setImp( 10 );
     m_cv->setOut( true );
     
@@ -101,7 +101,7 @@ Lm555::Lm555( QObject* parent, QString type, QString id )
     m_pin[6]->setLabelText( "Dis" );
     m_ePin[6] = m_pin[6];
     newId.append("-eSource");
-    m_dis = new eSource( newId.toStdString(), m_ePin[6] );
+    m_dis = new eSource( newId, m_ePin[6] );
     m_dis->setImp( high_imp );
     m_dis->setOut( false );
     

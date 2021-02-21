@@ -34,7 +34,7 @@ LibraryItem* Servo::libraryItem()
 {
     return new LibraryItem(
         tr( "Servo" ),
-        tr( "Outputs" ),
+        tr( "Motors" ),
         "servo.png",
         "Servo",
         Servo::construct );
@@ -42,9 +42,11 @@ LibraryItem* Servo::libraryItem()
 
 Servo::Servo( QObject* parent, QString type, QString id )
      : LogicComponent( parent, type, id )
-     , eLogicDevice( id.toStdString() )
+     , eLogicDevice( id )
 {
     Q_UNUSED( Servo_properties );
+
+    m_graphical = true;
 
     m_width  = 10;
     m_height = 6;
@@ -71,11 +73,18 @@ Servo::Servo( QObject* parent, QString type, QString id )
     setLabelPos(-16,-40, 0);
     setShowId( true );
     
-    resetState();
+    initialize();
 
     Simulator::self()->addToUpdateList( this );
 }
 Servo::~Servo(){}
+
+QList<propGroup_t> Servo::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Speed", tr("Speed "),"sec/60º"} );
+    return {mainGroup};
+}
 
 void Servo::stamp()
 {
@@ -83,28 +92,28 @@ void Servo::stamp()
       & m_inPin[1]->isConnected()
       & m_inPin[2]->isConnected() )
     {
-        eNode* enode = m_input[0]->getEpin()->getEnode();  // Gnd pin
-        if( enode ) enode->addToChangedFast(this);
+        eNode* enode = m_input[0]->getEpin(0)->getEnode();  // Gnd pin
+        if( enode ) enode->voltChangedCallback( this );
 
-        enode = m_input[1]->getEpin()->getEnode();         // V+ pin
-        if( enode ) enode->addToChangedFast(this);
+        enode = m_input[1]->getEpin(0)->getEnode();         // V+ pin
+        if( enode ) enode->voltChangedCallback( this );
 
         eLogicDevice::stamp();
     }
 }
 
-void Servo::resetState()
+void Servo::initialize()
 {
     m_targetPos = 90;
     m_pulseStart = 0;
-    m_lastUpdate = Simulator::self()->step();
+    m_lastUpdate = Simulator::self()->circTime()/1e6;
     
-    eLogicDevice::resetState();
+    eLogicDevice::initialize();
 }
 
 void Servo::updateStep()
 {
-    uint64_t step = Simulator::self()->step()/Simulator::self()->stepsPerus();
+    uint64_t step = Simulator::self()->circTime()/1e6;
 
     if( m_targetPos != m_pos )
     {
@@ -123,26 +132,26 @@ void Servo::updateStep()
     update();
 }
 
-void Servo::setVChanged()
+void Servo::voltChanged()
 {
     int clkState = eLogicDevice::getClockState();
 
-    double stepsPerus = Simulator::self()->stepsPerus();
+    int time_us = Simulator::self()->circTime()/1e6;
     
     if(!(eLogicDevice::getInputState(0)-eLogicDevice::getInputState(1)))// not power
     {
         m_targetPos = 90;
         m_pulseStart = 0;
     }
-    else if( clkState == Rising )
+    else if( clkState == Clock_Rising )
     {
-        m_pulseStart = Simulator::self()->step()/stepsPerus;
+        m_pulseStart = time_us;
     }
-    else if( clkState == Falling )
+    else if( clkState == Clock_Falling )
     {
         if( m_pulseStart == 0 ) return;
         
-        int steps = Simulator::self()->step()/stepsPerus - m_pulseStart;
+        int steps = time_us - m_pulseStart;
         
         m_targetPos = (steps-1000)*180/1000;         // Map 1mS-2mS to 0-180ª
 
@@ -150,7 +159,7 @@ void Servo::setVChanged()
         else if( m_targetPos<0 )   m_targetPos = 0;
         
         m_pulseStart = 0;
-        //qDebug() << "Servo::setVChanged() m_targetPos" << m_targetPos;
+        //qDebug() << "Servo::voltChanged() m_targetPos" << m_targetPos;
     }
 }
 

@@ -38,11 +38,12 @@ class MAINMODULE_EXPORT Node : public Component
 
         //virtual void setChanged( bool changed );
 
-        void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
+        virtual void remove() override;
+
+        virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
     public slots:
         void inStateChanged( int rem=1 );
-        void remove();
         
     protected:
         void contextMenuEvent(QGraphicsSceneContextMenuEvent* event){;}

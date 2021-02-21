@@ -1,0 +1,257 @@
+/***************************************************************************
+ *   Copyright (C) 2018 by santiago González                               *
+ *   santigoro@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 3 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
+ ***************************************************************************/
+
+//#include <QDebug>
+
+#include <math.h>   // fabs(x,y)
+#include <ctime>
+
+#include "e-bjt.h"
+#include "e-node.h"
+#include "simulator.h"
+
+#define COLL m_ePin[0]
+#define EMIT m_ePin[1]
+#define BASE m_ePin[2]
+
+eBJT::eBJT( QString id )
+    : eResistor( id )
+{
+    m_ePin.resize(3);
+
+    m_gain = 100;
+    m_fast = false;
+    m_PNP = false;
+    m_BCdiodeOn = false;
+
+    vt = .025;
+    vdcoef = 1/vt;
+    leakage = 1e-13;
+    vcrit = vt*log( vt/(sqrt(2)*leakage) );
+
+    m_BEdiode = new ePN( m_elmId+"-BEdiode" );
+    m_BEdiode->setNumEpins(2);
+    setBEthr( 0.7 );
+
+    m_BCdiode = new eDiode( m_elmId+"-BCdiode" );
+    m_BCdiode->setNumEpins(2);
+}
+eBJT::~eBJT()
+{
+    delete m_BEdiode;
+    delete m_BCdiode;
+}
+
+void eBJT::initialize()
+{
+    m_accuracy = Simulator::self()->NLaccuracy();
+    if( m_accuracy > 0.00001 ) m_fast = true;
+    else                      m_fast = false;
+    m_lastOut = 0;
+    m_baseCurr = 0;
+    m_voltE = 0;
+    m_voltBE = 0;
+    m_Efollow = false;
+
+    iterations = 0;
+    lastvbc = 0;
+    lastvbe = 0;
+
+    srand(time(NULL));
+}
+
+void eBJT::attach()
+{
+    eNode* collNod = COLL->getEnode();// Collector
+    if( m_BCdiodeOn )
+    {
+        if( m_PNP ) m_BCdiode->getEpin( 0 )->setEnode( collNod );
+        else        m_BCdiode->getEpin( 1 )->setEnode( collNod );
+    }
+
+    eNode* emitNod = EMIT->getEnode();// Emitter
+    if( m_PNP ) m_BEdiode->getEpin( 0 )->setEnode( emitNod );
+    else        m_BEdiode->getEpin( 1 )->setEnode( emitNod );
+
+    eNode* baseNod = BASE->getEnode();// Base
+    if( m_PNP )
+    {
+        m_BEdiode->getEpin( 1 )->setEnode( baseNod );
+        if( m_BCdiodeOn ) m_BCdiode->getEpin( 1 )->setEnode( baseNod );
+    }
+    else
+    {
+        m_BEdiode->getEpin( 0 )->setEnode( baseNod );
+        if( m_BCdiodeOn ) m_BCdiode->getEpin( 0 )->setEnode( baseNod );
+    }
+}
+
+void eBJT::stamp()
+{
+    eNode* collNod = COLL->getEnode();// Collector
+    if( collNod ) collNod->addToNoLinList( this );
+
+    eNode* emitNod = EMIT->getEnode();// Emitter
+    if( emitNod ) emitNod->addToNoLinList( this );
+
+    eNode* baseNod = BASE->getEnode();// Base
+    if( baseNod ) baseNod->addToNoLinList( this );
+
+    eResistor::setAdmit( cero_doub );
+    eResistor::stamp();
+}
+
+void eBJT::voltChanged()
+{
+    double voltC = COLL->getVolt();
+    double voltE = EMIT->getVolt();
+    double voltB = BASE->getVolt();
+    double voltCE = voltC-voltE;
+    double voltBE = voltB-voltE;
+
+
+    double rgain = .5;
+    double beta = 100;
+    double fgain = beta/(beta+1);
+    double ic, ie, ib;
+    double vbc = voltB-voltC; // typically negative
+    double vbe = voltB-voltE; // typically positive
+    double pnp = 1;
+    if( m_PNP ) pnp = -1;
+
+    if( fabs(vbc-lastvbc) > .01 || fabs(vbe-lastvbe) > .01 )
+        m_converged = false;
+
+    double gmin = 0;
+
+    if( ++iterations > 100 )
+    {
+        // if we have trouble converging, put a conductance in parallel with all P-N junctions.
+        // Gradually increase the conductance value for each iteration.
+        gmin = exp(-9*log(10)*(1-iterations/3000.));
+        if (gmin > .1) gmin = .1;
+    }
+
+    vbc = pnp*limitStep( pnp*vbc, pnp*lastvbc );
+    vbe = pnp*limitStep( pnp*vbe, pnp*lastvbe );
+    lastvbc = vbc;
+    lastvbe = vbe;
+
+    double pcoef = vdcoef*pnp;
+    double expbc = exp( vbc*pcoef );
+    double expbe = exp( vbe*pcoef );
+    if (expbe < 1) expbe = 1;
+
+    ie = pnp*leakage*(-(expbe-1)+rgain*(expbc-1));
+    ic = pnp*leakage*(fgain*(expbe-1)-(expbc-1));
+    ib = -(ie+ic);
+
+
+
+    //ib = -( (fgain*(expbe-1)-(expbe-1) + rgain*(expbc-1)-(expbc-1)  );
+
+    //System.out.println("gain " + ic/ib);
+    //System.out.print("T " + vbc + " " + vbe + " " + ie + " " + ic + "\n");
+
+    double gDbe = -leakage*vdcoef*expbe;
+    double gDcb = -leakage*vdcoef*expbc;
+    double gDbc = -rgain*gDcb;
+    double gRce = -gDbe*fgain;
+
+
+    sim.stampMatrix(B, C, gDbc+gDcb - gmin); // BC
+    sim.stampMatrix(C, B, gRce+gDcb - gmin); // CB
+
+    sim.stampMatrix(B, E, gDbe+gRce - gmin); // BE
+    sim.stampMatrix(E, B, gDbe+gDbc - gmin); // EB
+
+    sim.stampMatrix(C, E,-gRce); //CE
+    sim.stampMatrix(E, C,-gDbc); //EC
+
+
+    // stamps from page 302 of Pillage.  Node 0 is the base,
+    // node 1 the collector, node 2 the emitter.  Also stamp
+    // minimum conductance (gmin) between b,e and b,c
+    //sim.stampMatrix(B, B,-gDbe-gDbc-gRce-gDcb + gmin*2);
+    sim.stampMatrix(B, C, gDbc+gDcb - gmin); // BC
+    sim.stampMatrix(B, E, gDbe+gRce - gmin); // BE
+
+    sim.stampMatrix(C, B, gRce+gDcb - gmin); // CB
+    //sim.stampMatrix(C, C,-gDcb + gmin);
+    sim.stampMatrix(C, E,-gRce); //CE
+
+    sim.stampMatrix(E, B, gDbe+gDbc - gmin); // EB
+    sim.stampMatrix(E, C,-gDbc);             // EC
+    //sim.stampMatrix(E, E,-gDbe + gmin);
+
+    // we are solving for v(k+1), not delta v, so we use formula 10.5.13, multiplying J by v(k)
+
+    sim.stampRightSide(B, -(ie+ic) - (gDbc+gDcb)*vbc - (gDbe+gRce)*vbe);
+    sim.stampRightSide(C, -ic + gRce*vbe + gDcb*vbc);
+    sim.stampRightSide(E, -ie + gDbe*vbe + gDbc*vbc);
+
+    /*if( m_Efollow )
+    {
+        COLL->stampCurrent( current );
+        EMIT->stampCurrent(-current );
+    }
+    else {
+
+        eResistor::setAdmit( admit );
+        eResistor::stamp();
+    }*/
+}
+
+double eBJT::limitStep( double vnew, double vold )
+{
+    if( vnew > vcrit && fabs(vnew-vold) > (2*vt) )
+    {
+        if( vold > 0 )
+        {
+            double arg = 1+(vnew-vold)/vt;
+            if( arg > 0 )  vnew = vold + vt*log( arg );
+            else           vnew = vcrit;
+        }
+        else vnew = vt * log( vnew/vt );
+    }
+    return vnew;
+}
+
+double eBJT::BEthr()
+{
+    return m_BEthr;
+}
+
+void eBJT::setBEthr( double thr )
+{
+    if( thr == 0 ) thr = 0.7;
+    m_BEdiode->setThreshold( thr );
+    m_BEthr = thr;
+}
+
+void eBJT::setBCd( bool bcd )
+{
+    if( !bcd )
+    {
+        m_BCdiode->getEpin( 0 )->setEnode( 0l );
+        m_BCdiode->getEpin( 1 )->setEnode( 0l );
+    }
+    m_BCdiodeOn = bcd;
+}
+

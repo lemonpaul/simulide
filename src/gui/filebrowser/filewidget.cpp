@@ -63,13 +63,13 @@ FileWidget::FileWidget( QWidget* parent )
     
     
     connect( m_bookmarks, SIGNAL( itemClicked( QListWidgetItem* )), 
-             this,        SLOT(   itemClicked( QListWidgetItem* )));
+             this,        SLOT(   itemClicked( QListWidgetItem* )), Qt::UniqueConnection);
              
     connect( m_cdUpButton,        SIGNAL(released()),
-             FileBrowser::self(), SLOT(  cdUp()));
+             FileBrowser::self(), SLOT(  cdUp()), Qt::UniqueConnection);
              
     connect( m_path, SIGNAL( editingFinished() ),
-             this,   SLOT(  pathChanged()));
+             this,   SLOT(  pathChanged()), Qt::UniqueConnection);
              
     int size = settings->beginReadArray("bookmarks");
     
@@ -162,7 +162,7 @@ void FileWidget::pathChanged()
     if( m_blocked ) return;        // Avoid circular call with setPath()
     
     QString path = m_path->text();
-    FileBrowser::self()->setPath( path );
+    m_fileBrowser->setPath( path );
 }
 
 void FileWidget::resizeToItems()

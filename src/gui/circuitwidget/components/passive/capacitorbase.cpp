@@ -28,7 +28,7 @@ static const char* CapacitorBase_properties[] = {
 
 CapacitorBase::CapacitorBase( QObject* parent, QString type, QString id )
              : Component( parent, type, id )
-             , eCapacitor( id.toStdString() )
+             , eCapacitor( id )
 {
     Q_UNUSED( CapacitorBase_properties );
     
@@ -61,6 +61,13 @@ CapacitorBase::CapacitorBase( QObject* parent, QString type, QString id )
     setLabelPos(-16,-24, 0);
 }
 CapacitorBase::~CapacitorBase(){}
+
+QList<propGroup_t> CapacitorBase::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Capacitance", tr("Capacitance"),"main"} );
+    return {mainGroup};
+}
 
 double CapacitorBase::capac() { return m_value; }
 

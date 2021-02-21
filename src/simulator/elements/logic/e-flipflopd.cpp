@@ -17,83 +17,68 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QDebug>
-
 #include "e-flipflopd.h"
+#include "simulator.h"
 #include "circuit.h"
 
-eFlipFlopD::eFlipFlopD( std::string id )
+eFlipFlopD::eFlipFlopD( QString id )
           : eLogicDevice( id )
 {
 }
-eFlipFlopD::~eFlipFlopD()
-{ 
-}
-
-void eFlipFlopD::createPins()
-{
-    createClockPin();
-    eLogicDevice::createPins( 3, 2 );          // Create Inputs, Outputs
-    
-    // Input 0 - D
-    // Input 1 - S
-    // Input 2 - R
-    // Input 3 - Clock
-    
-    // Output 1 - Q
-    // Output 2 - !Q
-}
+eFlipFlopD::~eFlipFlopD() {}
 
 void eFlipFlopD::stamp()
 {
-    eNode* enode = m_input[1]->getEpin()->getEnode();         // Set pin
-    if( enode ) enode->addToChangedFast(this);
+    eNode* enode = m_input[1]->getEpin(0)->getEnode();         // Set pin
+    if( enode ) enode->voltChangedCallback( this );
     
-    enode = m_input[2]->getEpin()->getEnode();              // Reset pin
-    if( enode ) enode->addToChangedFast(this);
-    
+    enode = m_input[2]->getEpin(0)->getEnode();              // Reset pin
+    if( enode ) enode->voltChangedCallback( this );
+
+    if( m_etrigger != Trig_Clk )
+    {
+        eNode* enode = m_input[0]->getEpin(0)->getEnode();
+        if( enode ) enode->voltChangedCallback( this );
+    }
     eLogicDevice::stamp();
 }
 
-void eFlipFlopD::setVChanged()
+void eFlipFlopD::voltChanged()
 {
     // Get Clk to don't miss any clock changes
-    bool clkRising = (eLogicDevice::getClockState() == Rising);
+    bool clkAllow = (getClockState() == Clock_Allow);
 
-    bool set   = eLogicDevice::getInputState( 1 );
-    bool reset = eLogicDevice::getInputState( 2 );
+    bool set   = getInputState( 1 );
+    bool reset = getInputState( 2 );
 
-    //qDebug() << "eFlipFlopD::setVChanged()"<<clkRising;
+    //qDebug() << "eFlipFlopD::voltChanged()"<<clkRising;
 
-    if(set && reset)
+    if( set || reset)
     {
-        eLogicDevice::setOut( 0, true );                           // Q
-        eLogicDevice::setOut( 1, true );                           // Q'
+        m_Q0 = set;         // Q
+        m_Q1 = reset;       // Q'
     }
-    else if( set )          // Master Set
+    else if( clkAllow )     // Allow operation
     {
-        eLogicDevice::setOut( 0, true );                           // Q
-        eLogicDevice::setOut( 1, false );                          // Q'
-    }
-    else if( reset )   // Master Reset
-    {
-        eLogicDevice::setOut( 0, false );                          // Q
-        eLogicDevice::setOut( 1, true );                           // Q'
-    }
-    else if( clkRising )                             // Clk Rising edge
-    {
-        bool D = eLogicDevice::getInputState( 0 );
+        bool D = getInputState( 0 );
 
-        eLogicDevice::setOut( 0, D );                              // Q
-        eLogicDevice::setOut( 1, !D );                             // Q'
+        m_Q0 =  D;          // Q
+        m_Q1 = !D;          // Q'
     }
+    Simulator::self()->addEvent( m_propDelay, this );
+}
+
+void eFlipFlopD::runEvent()
+{
+    m_output[0]->setTimedOut( m_Q0 );      // Q
+    m_output[1]->setTimedOut( m_Q1 );      // Q'
 }
 
 void eFlipFlopD::setSrInv( bool inv )
 {
     m_srInv = inv;
-    m_input[1]->setInverted( inv );                           // Set
-    m_input[2]->setInverted( inv );                           // Reset
+    m_input[1]->setInverted( inv ); // Set
+    m_input[2]->setInverted( inv ); // Reset
     
     Circuit::self()->update();
 }

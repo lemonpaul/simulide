@@ -39,32 +39,28 @@ class AudioOut : public Component, public eResistor
     static Component* construct( QObject* parent, QString type, QString id );
     static LibraryItem *libraryItem();
 
+        virtual QList<propGroup_t> propGroups() override;
+
         bool buzzer() { return m_buzzer; }
         void setBuzzer( bool buz ) { m_buzzer = buz; }
 
-        virtual void stamp();
-        virtual void resetState();
-        virtual void simuClockStep();
+        virtual void stamp() override;
+        virtual void initialize() override;
+        virtual void runEvent() override;
         
         virtual QPainterPath shape() const;
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-    
-    public slots:
-        void remove();
-        void OnAudioNotify();
         
     private:
         QAudioDeviceInfo m_deviceinfo;
         QAudioFormat     m_format;  
         
-        QAudioOutput*    m_audioOutput;
-        QIODevice*       m_auIObuffer;
-        
-        char* m_dataBuffer;
-        int    m_dataSize;
-        int    m_dataCount;
-        
-        int m_counter;
+        QAudioOutput* m_audioOutput;
+        QIODevice*    m_auIObuffer;
+        QByteArray    m_dataBuffer;
+
+        int   m_dataSize;
+        int   m_dataCount;
 
         bool m_buzzer;
 };

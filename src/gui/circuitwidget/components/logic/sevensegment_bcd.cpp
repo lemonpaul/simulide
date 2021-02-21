@@ -39,8 +39,10 @@ LibraryItem* SevenSegmentBCD::libraryItem()
 
 SevenSegmentBCD::SevenSegmentBCD( QObject* parent, QString type, QString id )
                : LogicComponent( parent, type, id )
-               , eBcdTo7S( id.toStdString() )
+               , eBcdTo7S( id )
 {
+    m_graphical = true;
+
     m_width  = 4;
     m_height = 6;
 
@@ -54,31 +56,33 @@ SevenSegmentBCD::SevenSegmentBCD( QObject* parent, QString type, QString id )
             ;
     init( pinList );
 
+    m_pin.resize( 4 );
     for( int i=0; i<m_numInPins; i++ )
+    {
         eLogicDevice::createInput( m_inPin[i] );
+        m_pin[i] = m_inPin[i];
+    }
+
+    setLabelPos(-16,-40, 0);
         
     Simulator::self()->addToUpdateList( this );
     
-    resetState();
+    initialize();
 }
 SevenSegmentBCD::~SevenSegmentBCD(){}
 
-void SevenSegmentBCD::resetState()
+QList<propGroup_t> SevenSegmentBCD::propGroups(){ QList<propGroup_t> pg; return pg;}
+
+void SevenSegmentBCD::initialize()
 {
-    for( int i=0; i<7; i++ ) m_outValue[i] = false;
+    m_digit = 16;
 }
 
 void SevenSegmentBCD::stamp()
 {
     eBcdTo7S::stamp();
 
-    m_outValue[0] = true;
-    m_outValue[1] = true;
-    m_outValue[2] = true;
-    m_outValue[3] = true;
-    m_outValue[4] = true;
-    m_outValue[5] = true;
-    m_outValue[6] = false;
+    m_digit = 0;
 }
 
 void SevenSegmentBCD::updateStep()
@@ -121,13 +125,15 @@ void SevenSegmentBCD::paint( QPainter *p, const QStyleOptionGraphicsItem *option
      pen.setColor( QColor( 250, 250, 100));
      p->setPen(pen);
 
-     if( m_outValue[0]) p->drawLine( x1+tk+ds, y1,    x2-tk+ds, y1    );
-     if( m_outValue[1]) p->drawLine( x2+ds,    y1+tk, x2,      -tk    );
-     if( m_outValue[2]) p->drawLine( x2,       tk,    x2-ds,    y2-tk );
-     if( m_outValue[3]) p->drawLine( x2-tk-ds, y2,    x1+tk-ds, y2    );
-     if( m_outValue[4]) p->drawLine( x1-ds,    y2-tk, x1,       tk    );
-     if( m_outValue[5]) p->drawLine( x1,      -tk,    x1+ds,    y1+tk );
-     if( m_outValue[6]) p->drawLine( x1+tk,    0,     x2-tk,    0     );
+     uint8_t value = m_values[m_digit];
+
+     if( value & 1  ) p->drawLine( x1+tk+ds, y1,    x2-tk+ds, y1    );
+     if( value & 2  ) p->drawLine( x2+ds,    y1+tk, x2,      -tk    );
+     if( value & 4  ) p->drawLine( x2,       tk,    x2-ds,    y2-tk );
+     if( value & 8  ) p->drawLine( x2-tk-ds, y2,    x1+tk-ds, y2    );
+     if( value & 16 ) p->drawLine( x1-ds,    y2-tk, x1,       tk    );
+     if( value & 32 ) p->drawLine( x1,      -tk,    x1+ds,    y1+tk );
+     if( value & 64 ) p->drawLine( x1+tk,    0,     x2-tk,    0     );
 
      /*if( m_point )
      {

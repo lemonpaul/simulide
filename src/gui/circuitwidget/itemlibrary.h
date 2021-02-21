@@ -22,7 +22,6 @@
 
 #include "component.h"
 
-//class QStringList;
 class LibraryItem;
 
 class MAINMODULE_EXPORT ItemLibrary
@@ -35,19 +34,10 @@ class MAINMODULE_EXPORT ItemLibrary
 
  static ItemLibrary* self() { return m_pSelf; }
 
-        /**
-         * Returns a list of items in the library
-         */
         const QList<LibraryItem*> items() const;
 
-
-        /**
-         * @return the LibraryItem for the item with the given type (id) const.
-         */
         LibraryItem*  libraryItem( const QString type ) const;
-        /**
-         * @return the LibraryItem for the item with the given name const.
-         */
+
         LibraryItem*  itemByName( const QString name ) const;
 
         void addItem( LibraryItem* item );
@@ -79,8 +69,6 @@ class MAINMODULE_EXPORT LibraryItem
         QString category() const { return m_category; }
         QString iconfile() const { return m_iconfile; }
         QString type()     const { return m_type; }
-        QString* help();
-        QString getHelpFile( QString name );
 
         createItemPtr createItemFnPtr() const { return createItem; }
 
@@ -89,7 +77,6 @@ class MAINMODULE_EXPORT LibraryItem
         QString m_category;
         QString m_iconfile;
         QString m_type;
-        QString m_help;
 
         createItemPtr createItem;
 };

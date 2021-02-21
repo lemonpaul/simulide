@@ -21,23 +21,24 @@
 
 #include "picprocessor.h"
 #include "mcucomponent.h"
-#include "simulator.h"
 #include "utils.h"
+#include "simulator.h"
 
 // GpSim includes
-#include "pic-processor.h"
 #include "uart.h"
 #include "pir.h"
 #include "eeprom.h"
 #include "hexutils.h"
 
-PicProcessor::PicProcessor( QObject* parent ) 
+PicProcessor::PicProcessor( McuComponent* parent )
             : BaseProcessor( parent )
             , m_hexLoader()
 {
-    m_pSelf = this;
+    //m_pSelf = this;
     m_pPicProcessor = 0l;
     m_loadStatus    = false;
+    m_statusReg = "STATUS";
+    // Staus Bits defined in PicProcessor::setDevice
 }
 PicProcessor::~PicProcessor(){}
 
@@ -60,8 +61,8 @@ bool PicProcessor::loadFirmware( QString fileN )
                                , tr("The file \"%1\" was not found.").arg(m_symbolFile) );
         return false;
     }
-    QByteArray symbolFile = m_symbolFile.toLocal8Bit();
-    QByteArray device     = m_device.toLocal8Bit();
+    QByteArray symbolFile = m_symbolFile.toUtf8();
+    QByteArray device     = m_device.toUtf8();
     
     m_loadStatus = false;
     
@@ -83,7 +84,7 @@ bool PicProcessor::loadFirmware( QString fileN )
     
     FILE* pFile  = fopen( symbolFile.constData(), "r" );
     int load = m_hexLoader.readihex16( m_pPicProcessor, pFile );
-    if( load == IntelHexProgramFileType::SUCCESS ) m_loadStatus = true;
+    if( load == HexLoader::SUCCESS ) m_loadStatus = true;
     
     if( !m_loadStatus )
     {
@@ -91,21 +92,16 @@ bool PicProcessor::loadFirmware( QString fileN )
                                , tr("Could not Load: \"%1\"").arg(m_symbolFile) );
         return false;
     }
-    //m_pPicProcessor->get_Vdd();
     m_pPicProcessor->set_Vdd( 5 );
+
     setEeprom( m_eeprom ); // Load EEPROM
 
-    int cpi = m_pPicProcessor->get_ClockCycles_per_Instruction();
-    m_ipc = 1/(double)cpi;
-    m_nextCycle  = m_mcuStepsPT/cpi;
-    if( m_nextCycle == 0 ) m_nextCycle = 1;
-
     //m_pPicProcessor->set_frequency( (double)McuComponent::self()->freq()*1e6 );
-    qDebug() <<"\nProcessor Ready:\n    Device    ="<<m_pPicProcessor->name().c_str();
-    qDebug() << "    Freq. MHz =" <<  McuComponent::self()->freq();
-    qDebug() << "    Int. OSC  =" << (m_pPicProcessor->get_int_osc() ? "true" : "false");
-    qDebug() << "    Use PLLx4 =" << (m_pPicProcessor->get_pplx4_osc() ? "true" : "false");
-    qDebug() << "    Cycs/Inst =" << cpi;
+    qDebug() << "\nProcessor Ready:";
+    qDebug() << "    Device    =" << m_pPicProcessor->name_str;
+    //qDebug() << "    Freq. MHz =" << freq;
+    qDebug() << "    Int. OSC  =" << (m_pPicProcessor->get_int_osc()? "true":"false");
+    qDebug() << "    Use PLLx4 =" << (m_pPicProcessor->get_pplx4_osc()? "true":"false");
 
     int address = getRegAddress( "OSCCAL" );
     if( address > 0 ) // Initialize Program Memory at 0x3FF for OSCCAL
@@ -113,61 +109,40 @@ bool PicProcessor::loadFirmware( QString fileN )
         qDebug() << "    OSCCAL    = true";
         m_pPicProcessor->init_program_memory_at_index(0x3FF, 0x3400);
     }
+
+    qDebug() << "    UARTs:";
     m_rcsta.resize(6);
     m_rcsta.fill(0);
     for( int i=0; i<6; i++ ) // Get UARTs
     {
         QString rc = "RCSTA";
-        if( i > 0) rc += QString::number(i);
+        if( i > 0 ) rc += QString::number(i);
         int address = getRegAddress( rc );
         if( address > 0 )
         {
             int uart = i;
             if( i > 0 ) uart--;  // Uart 0 and 1 are the same
-            qDebug() << "    UART"<<uart;
-            Register* rcsta = m_pPicProcessor->rma.get_register( address );
-            m_rcsta[uart] = dynamic_cast<_RCSTA*>(rcsta);
+            qDebug() << "      uart"<<uart;
+            _RCSTA* rcsta = dynamic_cast<_RCSTA*>(m_pPicProcessor->registers[address]);
+            m_rcsta[uart] = rcsta;
+            rcsta->m_picProc = this;
         }
     }
     initialized();
     return true;
 }
 
-void PicProcessor::step()                 // Run 1 step 
+int PicProcessor::pc()
 {
-    if( !m_loadStatus || m_resetStatus ) return;
-    
-    while( m_nextCycle >= 1 )
-    {
-        m_pPicProcessor->step_cycle();
-        m_nextCycle -= 1;
-        if( p_runExtStep )
-        {
-            Simulator::self()->runExtraStep( get_cycles().get() );
-            p_runExtStep = false;
-        }
-    }
-    m_nextCycle += m_mcuStepsPT*m_ipc;
+    if( !m_pPicProcessor ) return 0;
+    return m_pPicProcessor->pc->get_value();
 }
 
-void PicProcessor::stepOne() 
+void PicProcessor::setFreq( double freq ) // Instruction exec. freq
 {
-    m_pPicProcessor->step_cycle();
-    m_nextCycle -= 1;
-
-    while( m_nextCycle < 1 )
-    {
-        runSimuStep(); // 1 simu step = 1uS
-        m_nextCycle += McuComponent::self()->freq()*m_ipc;
-    }
+    BaseProcessor::setFreq( freq );
+    m_pPicProcessor->set_frequency( freq*1e6 );
 }
-
-void PicProcessor::stepCpu()
-{
-    m_pPicProcessor->step_cycle();
-}
-
-int PicProcessor::pc() { return m_pPicProcessor->pc->get_value(); }
 
 void PicProcessor::reset()
 {
@@ -175,18 +150,22 @@ void PicProcessor::reset()
 
     if( m_pPicProcessor->is_sleeping() ) m_pPicProcessor->exit_sleep();
     m_pPicProcessor->reset( POR_RESET ); // POR_RESET MCLR_RESET EXIT_RESET IO_RESET
+
+    if( m_resetStatus /*|| m_debugging*/ ) return;
+    Simulator::self()->addEvent( 1, this );
 }
 
 int PicProcessor::getRamValue( int address )
 { 
-    return m_pPicProcessor->rma[address].get_value();
+    if( !m_pPicProcessor) return 0;
+    return m_pPicProcessor->registers[address]->get_value();
 }
 
 int PicProcessor::validate( int address ) { return address; }
 
 void PicProcessor::uartIn( int uart, uint32_t value ) // Receive one byte on Uart
 {
-     if( !m_pPicProcessor) return;
+     if( !m_pPicProcessor ) return;
 
     _RCSTA* rcsta = m_rcsta[uart];
     if( rcsta )
@@ -199,19 +178,6 @@ void PicProcessor::uartIn( int uart, uint32_t value ) // Receive one byte on Uar
 
 QVector<int> PicProcessor::eeprom()
 {
-    //qDebug() <<"ROM size" << rom_size;
-
-    //m_hexLoader.writeihex8( m_pPicProcessor->eeprom->rom, rom_size, eepFile, 0xF00000 );
-
-    /*QString qrFile = "/home/user/eep.hex";
-    QByteArray rFile = qrFile.toLocal8Bit();
-    FILE* eepFile  = fopen( rFile.constData(), "r" );
-    //int loa = m_hexLoader.readihex16( m_pPicProcessor, eepFile );
-    int loa = m_hexLoader.readihex8( m_pPicProcessor->eeprom->rom, rom_size, eepFile, 0 );
-    if( loa == IntelHexProgramFileType::SUCCESS ) qDebug() << "eeprom loaded";
-    fclose( eepFile );
-
-    m_eeprom.resize( rom_size );*/
 
     if( m_pPicProcessor )
     {
@@ -244,6 +210,20 @@ void PicProcessor::setEeprom( QVector<int> eep )
     {
         m_pPicProcessor->eeprom->rom[i]->put_value( m_eeprom[i] );
     }
+}
+
+void PicProcessor::setDevice( QString device )
+{
+    m_device = device;
+
+    QStringList statusBits;
+    //qDebug()<<"PicProcessor::PicProcessor"<<m_device;
+
+    if( m_device.startsWith( "pic18" ) )
+            statusBits <<" X "<<" X "<<" X "<<" N "<<"OV "<<" Z "<<"DC "<<" C ";
+    else    statusBits <<"IRP"<<"RP1"<<"RP0"<<"TO "<<"PD "<<" Z "<<"DC "<<" C ";
+
+    m_ramTable.setStatusBits( statusBits );
 }
 
 #include "moc_picprocessor.cpp"

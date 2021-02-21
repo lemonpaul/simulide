@@ -27,12 +27,13 @@
 class MAINMODULE_EXPORT eMemory : public eLogicDevice
 {
     public:
-        eMemory( std::string id );
+        eMemory( QString id );
         ~eMemory();
-        
-        virtual void stamp();
-        virtual void resetState();
-        virtual void setVChanged();
+
+        virtual void stamp() override;
+        virtual void initialize() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
         
         void setMem( QVector<int> m );
         QVector<int> mem();
@@ -49,6 +50,8 @@ class MAINMODULE_EXPORT eMemory : public eLogicDevice
     protected:
         int m_addrBits;
         int m_dataBits;
+        int m_dataBytes;
+        int m_address;
         
         QVector<int> m_ram;
         std::vector<bool> m_dataPinState;
@@ -56,6 +59,8 @@ class MAINMODULE_EXPORT eMemory : public eLogicDevice
         bool m_we;
         bool m_cs;
         bool m_oe;
+        bool m_oeNext;
+        bool m_read;
         bool m_persistent;
 };
 

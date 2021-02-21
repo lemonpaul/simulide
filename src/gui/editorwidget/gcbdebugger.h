@@ -29,10 +29,9 @@ class GcbDebugger : public BaseDebugger
 {
     Q_OBJECT
     public:
-        GcbDebugger( QObject* parent, OutPanelText* outPane, QString filePath  );
+        GcbDebugger( CodeEditor* parent, OutPanelText* outPane, QString filePath  );
         ~GcbDebugger();
 
-        int  compile();
         void mapFlashToSource();
         
     protected:

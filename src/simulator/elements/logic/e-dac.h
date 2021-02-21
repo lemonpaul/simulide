@@ -25,24 +25,24 @@
 class MAINMODULE_EXPORT eDAC : public eLogicDevice
 {
     public:
-        eDAC( std::string id  );
+        eDAC( QString id  );
         ~eDAC();
 
         double maxVolt()               { return m_maxVolt; }
         void setMaxVolt( double volt ) { m_maxVolt = volt; }
 
-        double maxAddr()               { return m_maxAddr; }
-        void setMaxAddr( double volt ) { m_maxAddr = volt; }
+        double maxValue()               { return m_maxValue; }
+        void setMaxValue( double volt ) { m_maxValue = volt; }
 
-        virtual void stamp();
-        virtual void setVChanged();
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
                              
     protected:
         double m_maxVolt;
-        double m_maxAddr;
-        double m_threshold;
+        double m_maxValue;
 
-        int m_address;
+        int m_value;
 };
 
 #endif

@@ -24,7 +24,7 @@ License along with this library; if not, see
 
 // The methods of this class are typically called from Status_register
 //---------------------------------------------------------
-class RCON :  public sfr_register
+class RCON :  public  SfrReg
 {
 public:
 
@@ -38,7 +38,7 @@ public:
     LWRT = 1<<6,
     IPEN = 1<<7
   };
-  RCON(Processor *, const char *pName, const char *pDesc=0);
+  RCON(Processor *, const char *pName =0);
 
   inline void put_PD(uint new_pd)
   {

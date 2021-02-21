@@ -45,7 +45,7 @@ void VoltWidget::setupWidget()
     pushButton->setFixedSize( 40, 17 );
 
     QFont sansFont("Helvetica [Cronyx]", 8 );
-    sansFont.setPixelSize(10);
+    sansFont.setPixelSize(8);
     pushButton->setFont( sansFont );
     
     verticalLayout->addWidget(pushButton);

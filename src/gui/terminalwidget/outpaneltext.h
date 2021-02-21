@@ -24,37 +24,36 @@
 #include <QSyntaxHighlighter>
 #include <QObject>
 
+#include "e-element.h"
+
 class OutHighlighter;
 
-class MAINMODULE_EXPORT OutPanelText : public QPlainTextEdit
+class MAINMODULE_EXPORT OutPanelText : public QPlainTextEdit, public eElement
 {
     Q_OBJECT
     public:
         OutPanelText( QWidget* parent=0 );
         ~OutPanelText();
 
+        virtual void updateStep() override;
+
         void appendText( const QString text );
         void writeText( const QString text );
-        
-        void step();
 
     private:
- 
-        QString m_text;
+        QString m_textBuffer;
  
         OutHighlighter* m_highlighter;
 };
 
 // CLASS OutHighlighter ****************************************
 
-class QSyntaxHighlighter;
-
 class OutHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 
     public:
-        OutHighlighter( QTextDocument *parent = 0 );
+        OutHighlighter( QTextDocument* parent = 0 );
         ~OutHighlighter();
 
     protected:

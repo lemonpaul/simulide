@@ -21,6 +21,32 @@
 #include <QTranslator>
 
 #include "mainwindow.h"
+#include "circuitwidget.h"
+
+void myMessageOutput( QtMsgType type, const QMessageLogContext &context, const QString &msg )
+{
+    QByteArray localMsg = msg.toLocal8Bit();
+    const char *file = context.file ? context.file : "";
+    const char *function = context.function ? context.function : "";
+    switch (type) {
+    case QtDebugMsg:
+         CircuitWidget::self()->simDebug( msg );
+        fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+        break;
+    case QtInfoMsg:
+        fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+        break;
+    case QtWarningMsg:
+        fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+        break;
+    case QtCriticalMsg:
+        fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+        break;
+    case QtFatalMsg:
+        fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), file, context.line, function);
+        break;
+    }
+}
 
 QString langFile( QString locale )
 {
@@ -54,6 +80,7 @@ int main(int argc, char *argv[])
         freopen("CONOUT$", "w", stderr);
     }
 #endif
+    qInstallMessageHandler( myMessageOutput );
 
     //QApplication::setGraphicsSystem( "raster" );//native, raster, opengl
     QApplication app( argc, argv );
@@ -77,11 +104,14 @@ int main(int argc, char *argv[])
 
     MainWindow window;
     window.setLoc( locale );
+
+    if( argc > 1 )
+    {
+        QString circ = QString::fromStdString( argv[1] );
+        if( circ.endsWith( ".simu" )) CircuitWidget::self()->loadCirc( circ );
+        //qDebug() << "MAIN, circuit 0 "<< circ;
+    }
     
-    /*QRect screenGeometry = QApplication::desktop()->screenGeometry();
-    int x = ( screenGeometry.width()-window.width() ) / 2;
-    int y = ( screenGeometry.height()-window.height() ) / 2;
-    window.move( x, y );*/
     window.scroll( 0, 50 );
 
     window.show();

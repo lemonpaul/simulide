@@ -21,7 +21,7 @@
 
 <package name="atmega32u4" pins="44" width="14" height="14">
 
-    <pin side="left" pos="2"  type="bidir" id="PE6" label="E6"/>
+    <pin side="left" pos="2"  type="bidir,ain0" id="PE6" label="E6"/>
     <pin side="left" pos="3"  type="uvcc"  id="UVCC" label="UVcc"/>
     <pin side="left" pos="4"  type="d+"    id="D+"  label="D+"/>
     <pin side="left" pos="5"  type="d-"    id="D-"  label="D-"/>
@@ -33,13 +33,13 @@
     <pin side="left" pos="11" type="bidir" id="PB2" label="B2"/>
     <pin side="left" pos="12" type="bidir" id="PB3" label="B3"/>
 
-    <pin side="bottom" pos="2"  type="bidir" id="PB7" label="B7"/>
+    <pin side="bottom" pos="2"  type="OC0A,OC1C" id="PB7" label="B7"/>
     <pin side="bottom" pos="3"  type="reset" id="RST" label="Rst"/>
     <pin side="bottom" pos="4"  type="vcc"   id="VCC1" label="Vcc"/>
     <pin side="bottom" pos="5"  type="gnd"   id="GND1" label="Gnd"/>
     <pin side="bottom" pos="6"  type="osc"   id="XTAL2" label="XTAL2"/>
     <pin side="bottom" pos="7"  type="osc"   id="XTAL1" label="XTAL1"/>
-    <pin side="bottom" pos="8"  type="bidir,scl" id="PD0" label="D0"/>
+    <pin side="bottom" pos="8"  type="OC0B,scl" id="PD0" label="D0"/>
     <pin side="bottom" pos="9"  type="bidir,sda" id="PD1" label="D1"/>
     <pin side="bottom" pos="10" type="bidir" id="PD2" label="D2"/>
     <pin side="bottom" pos="11" type="bidir" id="PD3" label="D3"/>
@@ -51,9 +51,9 @@
     <pin side="right" pos="9"  type="adc9"  id="PD6" label="D6"/>
     <pin side="right" pos="8"  type="adc10" id="PD7" label="D7"/>
     <pin side="right" pos="7"  type="adc11" id="PB4" label="B4"/>
-    <pin side="right" pos="6"  type="adc12" id="PB5" label="B5"/>
-    <pin side="right" pos="5"  type="adc13" id="PB6" label="B6"/>
-    <pin side="right" pos="4"  type="bidir" id="PC6" label="C6"/>
+    <pin side="right" pos="6"  type="adc12,OC1A" id="PB5" label="B5"/>
+    <pin side="right" pos="5"  type="adc13,OC1B" id="PB6" label="B6"/>
+    <pin side="right" pos="4"  type="OC3A,OC3B" id="PC6" label="C6"/>
     <pin side="right" pos="3"  type="bidir" id="PC7" label="C7"/>
     <pin side="right" pos="2"  type="bidir" id="PE2" label="E2"/>
     

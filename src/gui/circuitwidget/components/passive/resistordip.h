@@ -30,8 +30,6 @@ class MAINMODULE_EXPORT ResistorDip : public Component, public eResistorDip
     Q_OBJECT
     Q_PROPERTY( int    Size       READ size     WRITE setSize    DESIGNABLE true USER true )
     Q_PROPERTY( double Resistance READ resist   WRITE setResist  DESIGNABLE true USER true )
-    Q_PROPERTY( QString  Unit     READ unit     WRITE setUnit    DESIGNABLE true USER true )
-    Q_PROPERTY( bool     Show_res READ showVal  WRITE setShowVal DESIGNABLE true USER true )
 
     public:
         ResistorDip( QObject* parent, QString type, QString id );
@@ -40,6 +38,8 @@ class MAINMODULE_EXPORT ResistorDip : public Component, public eResistorDip
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
+        virtual QList<propGroup_t> propGroups() override;
+
         int  size();
         void setSize( int size );
         
@@ -50,11 +50,10 @@ class MAINMODULE_EXPORT ResistorDip : public Component, public eResistorDip
         
         void createResistors( int c );
         void deleteResistors( int d );
+
+        virtual void remove() override;
         
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-        
-    public slots:
-        virtual void remove();
 
     private:
         std::vector<Pin*> m_pin;

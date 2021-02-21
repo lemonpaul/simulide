@@ -1,7 +1,7 @@
 /*
    Copyright (C) 1998-2003 Scott Dattalo
                  2003 Mike Durian
-		 2013 Roy Rankin
+         2013 Roy Rankin
 
 This file is part of the libgpsim library of gpsim
 
@@ -27,7 +27,7 @@ License along with this library; if not, see
 
 #include "gpsim_classes.h"
 #include "registers.h"
-#include "breakpoints.h"
+#include "trigger.h"
 
 #include <cstdio>
 
@@ -41,51 +41,51 @@ class PIR;
 // EECON1 - EE control register 1
 //
 
-class EECON1 : public sfr_register
+class EECON1 : public SfrReg
 {
-    public:
-        enum
-        {
-            RD    = (1<<0),
-            WR    = (1<<1),
-            WREN  = (1<<2),
-            WRERR = (1<<3),
-            EEIF  = (1<<4),
-            FREE  = (1<<4),	// 14 bit Extended
-            LWLO  = (1<<5),	//    ""
-            CFGS  = (1<<6),	//    ""
-            EEPGD = (1<<7)
-        };
+public:
+    enum
+    {
+        RD    = (1<<0),
+        WR    = (1<<1),
+        WREN  = (1<<2),
+        WRERR = (1<<3),
+        EEIF  = (1<<4),
+        FREE  = (1<<4),	// 14 bit Extended
+        LWLO  = (1<<5),	//    ""
+        CFGS  = (1<<6),	//    ""
+        EEPGD = (1<<7)
+    };
 
-        EECON1(Processor *pCpu, const char *pName, const char *pDesc);
+    EECON1(Processor *pCpu, const char *pName);
 
-        void put(uint new_value);
-        virtual void put_value(uint new_value);
-        uint get();
+    void put(uint new_value);
+    virtual void put_value(uint new_value);
+    uint get();
 
-        inline void set_eeprom(EEPROM *ee) { eeprom = ee; }
-        inline void set_valid_bits(uint vb) { valid_bits = vb; }
-        inline uint get_valid_bits() { return (valid_bits); }
-        inline void set_bits(uint b) { valid_bits |= b; }
-        inline void clear_bits(uint b) { valid_bits &= ~b; }
-        inline void set_always_on(uint b) { always_on_bits = b; }
+    inline void set_eeprom(EEPROM *ee) { eeprom = ee; }
+    inline void set_valid_bits(uint vb) { valid_bits = vb; }
+    inline uint get_valid_bits() { return (valid_bits); }
+    inline void set_bits(uint b) { valid_bits |= b; }
+    inline void clear_bits(uint b) { valid_bits &= ~b; }
+    inline void set_always_on(uint b) { always_on_bits = b; }
 
-        //private:
-        uint valid_bits;
-        uint always_on_bits;
-        EEPROM *eeprom;
+    //private:
+    uint valid_bits;
+    uint always_on_bits;
+    EEPROM *eeprom;
 };
 
 const uint EECON1_VALID_BITS = (EECON1::RD | EECON1::WR |
-  EECON1::WREN | EECON1::EEIF);
+                                EECON1::WREN | EECON1::EEIF);
 
 //
 // EECON2 - EE control register 2
 //
 
-class EECON2 : public sfr_register
+class EECON2 : public SfrReg
 {
-    public:
+public:
 
     enum EE_STATES
     {
@@ -97,11 +97,11 @@ class EECON2 : public sfr_register
         EEREAD
     };
 
-    EECON2(Processor *pCpu, const char *pName, const char *pDesc);
+    EECON2(Processor *pCpu, const char *pName );
 
     void put(uint new_value);
     uint get();
-    void ee_reset() { eestate = EENOT_READY;};
+    void ee_reset() { eestate = EENOT_READY;}
 
     inline virtual void set_eeprom(EEPROM *ee) { eeprom = ee; }
     inline enum EE_STATES get_eestate() { return (eestate); }
@@ -124,11 +124,11 @@ class EECON2 : public sfr_register
 // EEDATA - EE data register
 //
 
-class EEDATA : public sfr_register
+class EEDATA : public SfrReg
 {
-    public:
+public:
 
-    EEDATA(Processor *pCpu, const char *pName, const char *pDesc);
+    EEDATA(Processor *pCpu, const char *pName );
 
     void put(uint new_value);
     uint get();
@@ -142,19 +142,19 @@ class EEDATA : public sfr_register
 // EEADR - EE address register
 //
 
-class EEADR : public sfr_register
+class EEADR : public SfrReg
 {
-    public:
+public:
 
-        EEADR(Processor *pCpu, const char *pName, const char *pDesc);
+    EEADR(Processor *pCpu, const char *pName );
 
-        void put(uint new_value);
-        uint get();
+    void put(uint new_value);
+    uint get();
 
-        virtual void set_eeprom(EEPROM *ee) { eeprom = ee; }
+    virtual void set_eeprom(EEPROM *ee) { eeprom = ee; }
 
-        //private:
-        EEPROM *eeprom;
+    //private:
+    EEPROM *eeprom;
 };
 
 
@@ -165,62 +165,61 @@ const int EPROM_WRITE_TIME = 20;
 
 class EEPROM :  public TriggerObject
 {
-    public:
+public:
 
-        EEPROM(Processor *pCpu);
-        ~EEPROM();
-        void reset(RESET_TYPE);
-        virtual void set_intcon(INTCON *ic);
+    EEPROM(Processor *pCpu);
+    ~EEPROM();
+    void reset(RESET_TYPE);
+    virtual void set_intcon(INTCON *ic);
 
-        virtual void callback();
-        virtual void callback_print(){ puts(" EEPROM");}
-        virtual void start_write();
-        virtual void write_is_complete();
-        virtual void start_program_memory_read();
-        virtual void initialize(uint new_rom_size);
-        virtual Register *get_register(uint address);
-        virtual void save_state();
+    virtual void callback();
+    virtual void callback_print(){ puts(" EEPROM");}
+    virtual void start_write();
+    virtual void write_is_complete();
+    virtual void start_program_memory_read();
+    virtual void initialize(uint new_rom_size);
+    virtual Register *get_register(uint address);
 
-        inline virtual void change_rom(uint offset, uint val) {
-            assert(offset < rom_size);
-            rom[offset]->value.put(val);
-        }
+    inline virtual void change_rom(uint offset, uint val) {
+        assert(offset < rom_size);
+        rom[offset]->value.put(val);
+    }
 
-        inline int register_size() { return (rom_data_size); }
-        inline void set_resister_size(int bytes) { rom_data_size = bytes; }
-        inline virtual uint get_rom_size() { return (rom_size); }
-        // XXX might want to make get_rom a friend only to cli_dump
-        inline virtual Register **get_rom() { return (rom); }
+    inline int register_size() { return (rom_data_size); }
+    inline void set_resister_size(int bytes) { rom_data_size = bytes; }
+    inline virtual uint get_rom_size() { return (rom_size); }
+    // XXX might want to make get_rom a friend only to cli_dump
+    inline virtual Register **get_rom() { return (rom); }
 
-        inline virtual EECON1 *get_reg_eecon1() { return (&eecon1); }
-        inline virtual EECON2 *get_reg_eecon2() { return (&eecon2); }
-        inline virtual EEDATA *get_reg_eedata() { return (&eedata); }
-        inline virtual EEADR  *get_reg_eeadr()  { return (&eeadr); }
-        inline virtual EEADR  *get_reg_eeadrh() { return 0; }  // No eeadrh on basic EEPROM
+    inline virtual EECON1 *get_reg_eecon1() { return (&eecon1); }
+    inline virtual EECON2 *get_reg_eecon2() { return (&eecon2); }
+    inline virtual EEDATA *get_reg_eedata() { return (&eedata); }
+    inline virtual EEADR  *get_reg_eeadr()  { return (&eeadr); }
+    inline virtual EEADR  *get_reg_eeadrh() { return 0; }  // No eeadrh on basic EEPROM
 
-        void dump();
+    void dump();
 
-        //protected:
-        char *name_str;
-        Processor *cpu;
-        INTCON *intcon;
+    //protected:
+    char *name_str;
+    Processor *cpu;
+    INTCON *intcon;
 
-        EECON1 eecon1;            // The EEPROM consists of 4 control registers
-        EECON2 eecon2;            // on the F84 and 6 on the F877
-        EEDATA eedata;
-        EEADR  eeadr;
+    EECON1 eecon1;            // The EEPROM consists of 4 control registers
+    EECON2 eecon2;            // on the F84 and 6 on the F877
+    EEDATA eedata;
+    EEADR  eeadr;
 
-        Register **rom;           //  and the data area.
-        //RegisterCollection *m_UiAccessOfRom; // User access to the rom.
+    Register **rom;           //  and the data area.
+    //RegisterCollection *m_UiAccessOfRom; // User access to the rom.
 
-        int  rom_data_size;		// data width in bytes
-        uint rom_size;
-        uint wr_adr,wr_data;  // latched adr and data for eewrites.
-        uint rd_adr;          // latched adr for eereads.
-        uint abp;             // break point number that's set during eewrites
+    int  rom_data_size;		// data width in bytes
+    uint rom_size;
+    uint wr_adr,wr_data;  // latched adr and data for eewrites.
+    uint rd_adr;          // latched adr for eereads.
+    uint abp;             // break point number that's set during eewrites
 
-    protected:
-        virtual uint get_address(void)   { return eeadr.value.get(); };
+protected:
+    virtual uint get_address(void)   { return eeadr.value.get(); };
 };
 
 /**
@@ -233,76 +232,76 @@ class EEPROM_PIR : public EEPROM
 {
 public:
 
-  EEPROM_PIR(Processor *pCpu, PIR *);
-  ~EEPROM_PIR();
+    EEPROM_PIR(Processor *pCpu, PIR *);
+    ~EEPROM_PIR();
 
-  // the 16f628 eeprom is identical to the 16f84 eeprom except
-  // for the size and the location of EEIF. The size is taken
-  // care of when the '628 is constructed, the EEIF is taken
-  // care of here:
+    // the 16f628 eeprom is identical to the 16f84 eeprom except
+    // for the size and the location of EEIF. The size is taken
+    // care of when the '628 is constructed, the EEIF is taken
+    // care of here:
 
-  virtual void start_write();
-  virtual void write_is_complete();
-  virtual void callback();
-  virtual void set_pir(PIR *pir) {m_pir = pir;}
+    virtual void start_write();
+    virtual void write_is_complete();
+    virtual void callback();
+    virtual void set_pir(PIR *pir) {m_pir = pir;}
 
-  inline virtual EEADR *get_reg_eeadrh() { return (rom_size>256) ? (&eeadrh) : 0; }
-  virtual void initialize(uint new_rom_size);
-  virtual void callback_print(){ puts(" EEPROM_PIR");}
+    inline virtual EEADR *get_reg_eeadrh() { return (rom_size>256) ? (&eeadrh) : 0; }
+    virtual void initialize(uint new_rom_size);
+    virtual void callback_print(){ puts(" EEPROM_PIR");}
 
 protected:
-  PIR *m_pir;
+    PIR *m_pir;
 
-  EEADR  eeadrh;
+    EEADR  eeadrh;
 
-  virtual uint get_address(void)   
-          { return (rom_size <= 256 ) ? eeadr.value.get() 
-                    : (eeadrh.value.get()<<8)+eeadr.value.get(); };
+    virtual uint get_address(void)
+    { return (rom_size <= 256 ) ? eeadr.value.get()
+                                : (eeadrh.value.get()<<8)+eeadr.value.get(); };
 };
 
 
 class EEPROM_WIDE : public EEPROM_PIR
 {
 public:
-  EEPROM_WIDE(Processor *pCpu, PIR *);
-  ~EEPROM_WIDE();
+    EEPROM_WIDE(Processor *pCpu, PIR *);
+    ~EEPROM_WIDE();
 
-  virtual void start_write();
-  virtual void callback();
-  virtual void callback_print(){ puts(" EEPROM_WIDE");}
-  virtual void start_program_memory_read();
-  virtual void initialize(uint new_rom_size);
+    virtual void start_write();
+    virtual void callback();
+    virtual void callback_print(){ puts(" EEPROM_WIDE");}
+    virtual void start_program_memory_read();
+    virtual void initialize(uint new_rom_size);
 
-  inline virtual EEADR *get_reg_eeadrh() { return (&eeadrh); }
-  inline virtual EEDATA *get_reg_eedatah() { return (&eedatah); }
+    inline virtual EEADR *get_reg_eeadrh() { return (&eeadrh); }
+    inline virtual EEDATA *get_reg_eedatah() { return (&eedatah); }
 
-  //protected:
-  EEDATA eedatah;
+    //protected:
+    EEDATA eedatah;
 };
 
 class EEPROM_EXTND : public EEPROM_WIDE
 {
 public:
-  EEPROM_EXTND(Processor *pCpu, PIR *);
-  ~EEPROM_EXTND();
+    EEPROM_EXTND(Processor *pCpu, PIR *);
+    ~EEPROM_EXTND();
 
-  inline virtual EEADR *get_reg_eeadrh() { return (has_eeadrh) ? (&eeadrh) : 0; }
-  virtual void start_write();
-  virtual void start_program_memory_read();  
-  virtual void callback();
-  virtual void callback_print(){ puts(" EEPROM_EXTND");}
-  void	initialize(uint new_rom_size, int block_size, int num_latches, uint cfg_word_base, bool _has_eeadrh = true);
-  void	  set_prog_wp(uint adr) { prog_wp = adr;}
+    inline virtual EEADR *get_reg_eeadrh() { return (has_eeadrh) ? (&eeadrh) : 0; }
+    virtual void start_write();
+    virtual void start_program_memory_read();
+    virtual void callback();
+    virtual void callback_print(){ puts(" EEPROM_EXTND");}
+    void	initialize(uint new_rom_size, int block_size, int num_latches, uint cfg_word_base, bool _has_eeadrh = true);
+    void	  set_prog_wp(uint adr) { prog_wp = adr;}
 
 #define LATCH_MT 0x7fff
 
 protected:
-   int	erase_block_size;
-   int  num_write_latches;
-   uint *write_latches;
-   uint config_word_base;
-   uint prog_wp;	// program memory below this address is write protected
-   bool		has_eeadrh;
+    int	erase_block_size;
+    int  num_write_latches;
+    uint *write_latches;
+    uint config_word_base;
+    uint prog_wp;	// program memory below this address is write protected
+    bool		has_eeadrh;
 
 };
 

@@ -25,6 +25,7 @@
 
 class Component;
 class Circuit;
+class SimuProp;
 
 class CircuitView : public QGraphicsView
 {
@@ -48,7 +49,9 @@ class CircuitView : public QGraphicsView
 
         void resizeEvent( QResizeEvent* event );
         
-        void setCircTime( uint64_t step);
+        void setCircTime( uint64_t tStep );
+
+        qreal getScale() { return m_scale; }
 
     public slots:
         void saveImage();
@@ -60,7 +63,9 @@ class CircuitView : public QGraphicsView
 
     private:
  static CircuitView*  m_pSelf;
- 
+
+        qreal m_scale;
+        QString m_help;
         QPlainTextEdit* m_info;
  
         Component*  m_enterItem;

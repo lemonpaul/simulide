@@ -21,14 +21,13 @@
 
 TopWidget::TopWidget()
 {
+    mainLayout = new QHBoxLayout( this );
+    mainLayout->setObjectName( "mainLayout" );
+    mainLayout->setContentsMargins( 3, 0, 3, 0 );
+    mainLayout->setSpacing( 5 );
+    //setSizePolicy( QSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum) );
+    //m_widget = 0l;
 }
 TopWidget::~TopWidget() {}
 
-void TopWidget::setupWidget( QWidget* intWidget)
-{
-    verticalLayout = new QVBoxLayout(this);
-    verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-    verticalLayout->setContentsMargins(0, 0, 0, 0);
-    verticalLayout->addWidget( intWidget );
-}
 #include "moc_topwidget.cpp"

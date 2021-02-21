@@ -1,22 +1,36 @@
 Circuit:
 
-- Speed: Simulation speed in Steps per Second.
+Property: (default value)
 
-- ReactStep: run Reactive components once every simulation steps.
+- Speed sps: (1000000)
+   Simulation speed in Steps per Second.
 
-- NoLinAcc: Non-Linear components accuracy. Higher is more accurate.
+- Speed per: (100)
+   Simulation speed in percentage %. 
 
-- Show Grid:
+- Simu Step nS: (1000)
+   Simulation step in nanoSeconds.
 
-- Show Scrollbar:
+- ReactStep: (50)
+   Run Reactive components once every simulation steps.
 
-- Animate: wires will get Red if Volts>2.5, Blue otherwise.
+- NoLinAcc: (5)
+   Non-Linear components accuracy. Higher is more accurate.
 
-- Font Scale: scale interface font, for example 1,5 = 150%.
+- Show Grid: (true)
 
-- Auto Backup Secs: Time interval in seconds for Circuit to check for changes and save a backup if there are changes.
-  Setting time to 0 disables Auto Backup.
+- Show Scrollbar: (false)
 
+- Animate: (false)
+   Wires will get Red if Volts>2.5, Blue otherwise.
+
+- Font Scale: (1)
+   Scale interface font, for example 1,5 = 150%.
+
+- Auto Backup Secs: (15)
+   Time interval in seconds for Circuit to check for changes.
+   Save Circuit backup if there are changes.
+   Setting time to 0 disables Auto Backup.
 
 More Info:
 http://simulide.blogspot.com/p/blog-page_15.html

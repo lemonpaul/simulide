@@ -20,80 +20,73 @@
 #include <QDebug>
 
 #include "e-flipflopjk.h"
+#include "simulator.h"
 #include "circuit.h"
 
-eFlipFlopJK::eFlipFlopJK( std::string id )
+eFlipFlopJK::eFlipFlopJK( QString id )
            : eLogicDevice( id )
 {
 }
-eFlipFlopJK::~eFlipFlopJK()
-{ 
-}
-
-void eFlipFlopJK::createPins()
-{
-    createClockPin();
-    eLogicDevice::createPins( 4, 2 );          // Create Inputs, Outputs
-    
-    // Input 0 - J
-    // Input 1 - K
-    // Input 2 - S
-    // Input 3 - R
-    // Input 4 - Clock
-    
-    // Output 1 - Q
-    // Output 2 - !Q
-}
+eFlipFlopJK::~eFlipFlopJK() {}
 
 void eFlipFlopJK::stamp()
 {
-    eNode* enode = m_input[2]->getEpin()->getEnode();         // Set pin
-    if( enode ) enode->addToChangedFast(this);
+    eNode* enode = m_input[2]->getEpin(0)->getEnode();         // Set pin
+    if( enode ) enode->voltChangedCallback( this );
     
-    enode = m_input[3]->getEpin()->getEnode();              // Reset pin
-    if( enode ) enode->addToChangedFast(this);
-    
+    enode = m_input[3]->getEpin(0)->getEnode();              // Reset pin
+    if( enode ) enode->voltChangedCallback( this );
+
+    if( m_etrigger != Trig_Clk )
+    {
+        for( uint i=0; i<2; i++ )
+        {
+            eNode* enode = m_input[i]->getEpin(0)->getEnode();
+            if( enode ) enode->voltChangedCallback( this );
+        }
+    }
     eLogicDevice::stamp();
 }
 
-void eFlipFlopJK::setVChanged()
+void eFlipFlopJK::voltChanged()
 {
-    // Get Clk to don't miss any clock changes
-    bool clkRising = (eLogicDevice::getClockState() == Rising);
+    bool clkAllow = (eLogicDevice::getClockState() == Clock_Allow); // Get Clk to don't miss any clock changes
 
-    //qDebug() << "eFlipFlopJK::setVChanged()"<<clkRising;
-
-    if( eLogicDevice::getInputState( 2 )==true )          // Master Set
+    if( eLogicDevice::getInputState( 2 )==true )     // Master Set
     {
-        eLogicDevice::setOut( 0, true );                           // Q
-        eLogicDevice::setOut( 1, false );                          // Q'
-        //qDebug() << "eFlipFlopJK::setVChanged() set";
+        m_Q0 = true;         // Q
+        m_Q1 = false;        // Q'
     }
-    else if( eLogicDevice::getInputState( 3 )==true )   // Master Reset
+    else if( eLogicDevice::getInputState( 3 )==true ) // Master Reset
     {
-        eLogicDevice::setOut( 0, false );                          // Q
-        eLogicDevice::setOut( 1, true );                           // Q'
-        //qDebug() << "eFlipFlopJK::setVChanged() Reset";
+        m_Q0 = false;         // Q
+        m_Q1 = true;          // Q'
     }
-    else if( clkRising )                             // Clk Rising edge
+    else if( clkAllow )                              // Allow operation
     {
         bool J = eLogicDevice::getInputState( 0 );
         bool K = eLogicDevice::getInputState( 1 );
         bool Q = m_output[0]->out();
         
         bool state = (J && !Q) || (!K && Q) ;
-        //qDebug() << "eFlipFlopJK::setVChanged() clk"<<J<<K<<state;
 
-        eLogicDevice::setOut( 0, state );                          // Q
-        eLogicDevice::setOut( 1, !state );                         // Q'
+        m_Q0 = state ;       // Q
+        m_Q1 = !state;       // Q'
     }
+    Simulator::self()->addEvent( m_propDelay, this );
+}
+
+void eFlipFlopJK::runEvent()
+{
+    m_output[0]->setTimedOut( m_Q0 );      // Q
+    m_output[1]->setTimedOut( m_Q1 );      // Q'
 }
 
 void eFlipFlopJK::setSrInv( bool inv )
 {
     m_srInv = inv;
-    m_input[2]->setInverted( inv );                           // Set
-    m_input[3]->setInverted( inv );                           // Reset
+    m_input[2]->setInverted( inv );                   // Set
+    m_input[3]->setInverted( inv );                   // Reset
     
     Circuit::self()->update();
 }

@@ -18,8 +18,10 @@
  ***************************************************************************/
 
 #include "flipflopd.h"
+#include "circuitwidget.h"
+#include "simulator.h"
+#include "circuit.h"
 #include "pin.h"
-
 
 Component* FlipFlopD::construct( QObject* parent, QString type, QString id )
 {
@@ -38,22 +40,22 @@ LibraryItem* FlipFlopD::libraryItem()
 
 FlipFlopD::FlipFlopD( QObject* parent, QString type, QString id )
          : LogicComponent( parent, type, id )
-         , eFlipFlopD( id.toStdString() )
+         , eFlipFlopD( id )
 {
-    m_width  = 4;
-    m_height = 4;
+    m_width  = 3;
+    m_height = 3;
     
     QStringList pinList;
 
     pinList // Inputs:
-            << "IL01 D"
-            << "IU02S"
+            << "IL01D"
+            << "IU01S"
             << "ID02R"
-            << "IL03>"
+            << "IL02>"
             
             // Outputs:
-            << "OR01Q "
-            << "OR03!Q "
+            << "OR01Q"
+            << "OR02!Q"
             ;
     init( pinList );
     
@@ -61,16 +63,39 @@ FlipFlopD::FlipFlopD( QObject* parent, QString type, QString id )
     eLogicDevice::createInput( m_inPin[1] );                  // Input S
     eLogicDevice::createInput( m_inPin[2] );                  // Input R
     
-    eLogicDevice::createClockPin( m_inPin[3] );           // Input Clock
+    m_trigPin = m_inPin[3];
+    eLogicDevice::createClockPin( m_trigPin );             // Input Clock
     
     eLogicDevice::createOutput( m_outPin[0] );               // Output Q
     eLogicDevice::createOutput( m_outPin[1] );               // Output Q'
 
     setSrInv( true );                           // Inver Set & Reset pins
-    setClockInv( false );                       //Don't Invert Clock pin
-
+    setClockInv( false );                        //Don't Invert Clock pin
+    setTrigger( Clock );
 }
 FlipFlopD::~FlipFlopD(){}
 
+QList<propGroup_t> FlipFlopD::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Clock_Inverted", tr("Clock Inverted"),""} );
+    mainGroup.propList.append( {"S_R_Inverted", tr("Set / Reset Inverted"),""} );
+    mainGroup.propList.append( {"Trigger", tr("Trigger Type"),"enum"} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
+
+void FlipFlopD::setTrigger( Trigger trigger )
+{
+    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
+
+    int trig = static_cast<int>( trigger );
+    eLogicDevice::seteTrigger( trig );
+    LogicComponent::setTrigger( trigger );
+
+    Circuit::self()->update();
+}
 
 #include "moc_flipflopd.cpp"

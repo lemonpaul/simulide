@@ -26,50 +26,58 @@
 #include <QDebug>
 #include "e-pin.h"
 
+#define Trig_None 0
+#define Trig_Clk  1
+#define Trig_InEn 2
 
-// The following provides compatibility with gcc compiler v5 and up
-// (i.e. c++11 standard complience)
-//#if __GNUC__ >= 5
- #define GNU_CONST_STATIC_FLOAT_DECLARATION constexpr
-//#else
-// #define GNU_CONST_STATIC_FLOAT_DECLARATION const
-//#endif
+#define Clock_Low      0
+#define Clock_Rising   1
+#define Clock_Allow    1
+#define Clock_High     2
+#define Clock_Falling  3
 
 class MAINMODULE_EXPORT eElement
 {
     public:
-        eElement( std::string id=0 );
+        eElement( QString id );
         virtual ~eElement();
 
-        virtual void initEpins();
-        virtual void setNumEpins( int n );
-
-        virtual ePin* getEpin( int pin );
-        virtual ePin* getEpin( QString pinName );
-        
-        virtual void setEpin( int num, ePin* pin );
-
-        std::string getId(){ return m_elmId; }
-
         virtual void initialize(){;}
-        virtual void resetState(){;}
         virtual void attach(){;}
         virtual void stamp(){;}
 
-        virtual void simuClockStep(){;}
+        virtual void runEvent(){;}
         virtual void updateStep(){;}
-        virtual void setVChanged(){;}
+        virtual void voltChanged(){;}
 
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double cero_doub         = 1e-14;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double high_imp          = 1e14;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_high      = 5.0;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_low       = 0.0;
-        static GNU_CONST_STATIC_FLOAT_DECLARATION double digital_threshold = 2.5;
+        virtual void setNumEpins( int n );
+
+        virtual ePin* getEpin( int pin );
+        virtual void setEpin( int num, ePin* pin );
+
+        QString getId(){ return m_elmId; }
+
+        bool converged() { return m_converged; }
+        bool m_converged;
+
+        static constexpr double cero_doub = 1e-14;
+        static constexpr double high_imp  = 1e14;
+
+        double digital_high;
+        double digital_low;
+        double digital_thre;
+
+        // Simulator engine
+        eElement* nextChanged;
+        eElement* nextNonLin;
+        bool added;
 
     protected:
         std::vector<ePin*> m_ePin;
 
-        std::string m_elmId;
+        QString m_elmId;
+
+        bool m_changed;
 };
 
 #endif

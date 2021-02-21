@@ -36,10 +36,9 @@ class MAINMODULE_EXPORT Ground : public Component
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
-        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
+        virtual void remove() override;
 
-    public slots:
-        virtual void remove();
+        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     private:
         double m_Rth;

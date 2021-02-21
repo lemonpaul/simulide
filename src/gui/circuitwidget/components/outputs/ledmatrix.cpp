@@ -18,7 +18,9 @@
  ***************************************************************************/
 
 #include "ledmatrix.h"
+#include "circuitwidget.h"
 #include "connector.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "pin.h"
 
@@ -30,7 +32,7 @@ LibraryItem* LedMatrix::libraryItem()
 {
     return new LibraryItem(
             tr( "LedMatrix" ),
-            tr( "Outputs" ),
+            tr( "Leds" ),
             "ledmatrix.png",
             "LedMatrix",
             LedMatrix::construct);
@@ -38,8 +40,10 @@ LibraryItem* LedMatrix::libraryItem()
 
 LedMatrix::LedMatrix( QObject* parent, QString type, QString id )
          : Component( parent, type, id )
-         , eElement( id.toStdString() )
+         , eElement( id )
 {
+    m_graphical = true;
+
     m_rows = 8;
     m_cols = 8;
     m_resist  = 0.6;
@@ -53,13 +57,29 @@ LedMatrix::LedMatrix( QObject* parent, QString type, QString id )
 }
 LedMatrix::~LedMatrix(){}
 
+QList<propGroup_t> LedMatrix::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Vertical_Pins", tr("Vertical Pins"),""} );
+    mainGroup.propList.append( {"Rows", tr("Rows"),""} );
+    mainGroup.propList.append( {"Cols", tr("Columns"),""} );
+    mainGroup.propList.append( {"Color", tr("Color"),"enum"} );
+
+    propGroup_t elecGroup { tr("Electric") };
+    elecGroup.propList.append( {"Threshold", tr("Threshold"),"V"} );
+    elecGroup.propList.append( {"MaxCurrent", tr("Max Current"),"A"} );
+    elecGroup.propList.append( {"Resistance", tr("Resistance"),"Ω"} );
+
+    return {mainGroup, elecGroup};
+}
+
 void LedMatrix::attach()
 {
-    for( int row=0; row<m_rows; row++ )
+    for( int row=0; row<m_rows; ++row )
     {
         eNode* rowEnode = m_rowPin[row]->getEnode();
         
-        for( int col=0; col<m_cols; col++ )
+        for( int col=0; col<m_cols; ++col )
         {
             eNode* colEnode = m_colPin[col]->getEnode();
             
@@ -72,8 +92,7 @@ void LedMatrix::attach()
 
 void LedMatrix::setupMatrix( int rows, int cols )
 {
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    if( Simulator::self()->isRunning() )  CircuitWidget::self()->powerCircOff();
 
     deleteMatrix();
     m_rows = rows;
@@ -81,8 +100,6 @@ void LedMatrix::setupMatrix( int rows, int cols )
     createMatrix();
 
     Circuit::self()->update();
-
-    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void LedMatrix::createMatrix()
@@ -93,8 +110,9 @@ void LedMatrix::createMatrix()
     m_led.resize( m_rows, std::vector<LedSmd*>(m_cols) );
     m_rowPin.resize( m_rows );
     m_colPin.resize( m_cols );
+    m_pin.resize( m_rows+m_cols );
     
-    for( int row=0; row<m_rows; row++ )
+    for( int row=0; row<m_rows; ++row )
     {
         QString pinId = m_id;
         pinId.append( QString("-pinRow"+QString::number(row)));
@@ -112,8 +130,9 @@ void LedMatrix::createMatrix()
         }
 
         m_rowPin[row] = new Pin( angle, nodpos, pinId, 0, this);
+        m_pin[row] = m_rowPin[row];
         
-        for( int col=0; col<m_cols; col++ )
+        for( int col=0; col<m_cols; ++col )
         {
             QString ledid = m_id;
             ledid.append( QString( "-led"+QString::number(row)+"_"+QString::number(col) ) );
@@ -130,24 +149,26 @@ void LedMatrix::createMatrix()
             //lsmd->setEnabled(false);
             lsmd->setFlag( QGraphicsItem::ItemIsSelectable, false );
             lsmd->setAcceptedMouseButtons(0);
+            Circuit::self()->compList()->removeOne( lsmd );
 
             m_led[row][col] = lsmd;
         }
     }
-    for( int col=0; col<m_cols; col++ )
+    for( int col=0; col<m_cols; ++col )
     {
         QString pinId = m_id;
         pinId.append( QString("-pinCol"+QString::number(col)));
         QPoint nodpos = QPoint( col*8, m_rows*8+8 );
         m_colPin[col] = new Pin( 270, nodpos, pinId, 1, this);
+        m_pin[m_rows+col-1] = m_colPin[col];
     }
 }
 
 void LedMatrix::deleteMatrix()
 {
-    for( int row=0; row<m_rows; row++ )
+    for( int row=0; row<m_rows; ++row )
     {
-        for( int col=0; col<m_cols; col++ )
+        for( int col=0; col<m_cols; ++col )
         {
             LedSmd* lsmd = m_led[row][col];
             lsmd->getEpin(0)->reset();
@@ -165,15 +186,18 @@ void LedMatrix::deleteMatrix()
         delete pin;
     }
     m_led.resize(0);
+    m_rowPin.resize( 0 );
+    m_colPin.resize( 0 );
+    m_pin.resize( 0 );
 }
 
 void LedMatrix::setColor( LedBase::LedColor color ) 
 {
     m_ledColor = color;
     
-    for( int row=0; row<m_rows; row++ )
+    for( int row=0; row<m_rows; ++row )
     {
-        for( int col=0; col<m_cols; col++ )
+        for( int col=0; col<m_cols; ++col )
         {
             m_led[row][col]->setColor( color ); 
         }
@@ -221,7 +245,7 @@ void LedMatrix::setVerticalPins( bool v )
     
     if( v )
     {
-        for( int i=0; i<m_rows; i++ ) 
+        for( int i=0; i<m_rows; ++i )
         {
             m_rowPin[i]->setPos( i*8, -16 );
             m_rowPin[i]->setRotation( 90 );
@@ -229,13 +253,13 @@ void LedMatrix::setVerticalPins( bool v )
     }
     else
     {
-        for( int i=0; i<m_rows; i++ )
+        for( int i=0; i<m_rows; ++i )
         {
             m_rowPin[i]->setPos( -16, i*8 );
             m_rowPin[i]->setRotation( 0 );
         }
     }
-    for( int i=0; i<m_rows; i++ ) m_rowPin[i]->isMoved();
+    for( int i=0; i<m_rows; ++i ) m_rowPin[i]->isMoved();
     
     if( m_verticalPins ) m_area = QRect( -4, -8, m_cols*8, m_rows*8+8 );
     else                 m_area = QRect( -8, -8, m_cols*8+8, m_rows*8+8 );
@@ -253,9 +277,9 @@ void LedMatrix::setThreshold( double threshold )
     if( threshold < 1e-6 ) threshold = 1e-6;
     m_threshold = threshold;
     
-    for( int row=0; row<m_rows; row++ )
+    for( int row=0; row<m_rows; ++row )
     {
-        for( int col=0; col<m_cols; col++ )
+        for( int col=0; col<m_cols; ++col )
         {
             m_led[row][col]->setThreshold( threshold ); 
         }
@@ -271,9 +295,9 @@ void LedMatrix::setMaxCurrent( double current )
     if( current < 1e-6 ) current = 1e-6;
     m_maxCurr = current;
     
-    for( int row=0; row<m_rows; row++ )
+    for( int row=0; row<m_rows; ++row )
     {
-        for( int col=0; col<m_cols; col++ )
+        for( int col=0; col<m_cols; ++col )
         {
             m_led[row][col]->setMaxCurrent( current ); 
         }
@@ -291,9 +315,9 @@ void LedMatrix::setRes( double resist )
 
     m_resist = resist;
     
-    for( int row=0; row<m_rows; row++ )
+    for( int row=0; row<m_rows; ++row )
     {
-        for( int col=0; col<m_cols; col++ )
+        for( int col=0; col<m_cols; ++col )
         {
             m_led[row][col]->setRes( resist ); 
         }

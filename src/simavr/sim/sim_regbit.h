@@ -45,14 +45,14 @@ static inline uint8_t avr_regbit_set(avr_t * avr, avr_regbit_t rb)
 	uint16_t a = rb.reg;
 	uint8_t m;
 
-	if (!a)
-		return 0;
+    if (!a) return 0;
+
 	m = rb.mask << rb.bit;
 	avr_core_watch_write(avr, a, avr->data[a] | m);
 	return (avr->data[a] >> rb.bit) & rb.mask;
 }
 
-static inline uint8_t avr_regbit_setto(avr_t * avr, avr_regbit_t rb, uint8_t v)
+static inline uint8_t avr_regbit_setto( avr_t* avr, avr_regbit_t rb, uint8_t v )
 {
 	uint16_t a = rb.reg;
 	uint8_t m;

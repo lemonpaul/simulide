@@ -22,7 +22,7 @@
 #include "utils.h"
 #include "simuapi_apppath.h"
 
-PicAsmDebugger::PicAsmDebugger( QObject* parent, OutPanelText* outPane, QString filePath )
+PicAsmDebugger::PicAsmDebugger( CodeEditor* parent, OutPanelText* outPane, QString filePath )
               : BaseDebugger( parent,outPane, filePath )
 {
     setObjectName( "PIC asm Compiler/Debugger" );
@@ -66,8 +66,7 @@ int PicAsmDebugger::compile()
     command.append(" -L -w1  -i  -ainhx32 -I "+m_fileDir+" "+ file);
 
     m_outPane->appendText( "Exec: ");
-    m_outPane->appendText( command );
-    m_outPane->writeText( "\n\n" );
+    m_outPane->writeText( command );
     
     QProcess compAsm( this );
     compAsm.start( command  );

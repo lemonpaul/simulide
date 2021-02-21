@@ -18,11 +18,11 @@
  ***************************************************************************/
 
 #include "serialport.h"
-#include "circuit.h"
-#include "itemlibrary.h"
-#include "circuitwidget.h"
 #include "mcucomponent.h"
 #include "baseprocessor.h"
+#include "simulator.h"
+#include "circuit.h"
+#include "itemlibrary.h"
 #include "utils.h"
 
 static const char* SerialPort_properties[] = {
@@ -52,15 +52,16 @@ LibraryItem* SerialPort::libraryItem()
 
 SerialPort::SerialPort( QObject* parent, QString type, QString id )
       : Component( parent, type, id )
-      , eElement( (id+"-eElement").toStdString() )
+      , eElement( (id+"-eElement") )
 {
     Q_UNUSED( SerialPort_properties );
 
-    m_area = QRect( -34, -12, 100, 24 );
+    m_area = QRect( -34, -26, 160, 38 );
     setLabelPos(-34,-20 );
 
     m_serial = new QSerialPort( this );
 
+    m_mcuId = "";
     m_autoOpen = false;
     m_active = false;
     m_uart = 0;
@@ -81,26 +82,66 @@ SerialPort::SerialPort( QObject* parent, QString type, QString id )
     m_proxy->setPos( QPoint(-32, -8) );
 
     connect( m_button, SIGNAL( clicked() ),
-                 this, SLOT(   onbuttonclicked() ));
-
-    connect( McuComponent::self(), SIGNAL( closeSerials()),
-                             this, SLOT(   slotClose()) );
-
-    connect( McuComponent::self(), SIGNAL( openSerials()),
-                             this, SLOT(   slotAutoOpen()) );
+                 this, SLOT(   onbuttonclicked() ), Qt::UniqueConnection);
 
     connect( m_serial, SIGNAL( readyRead()),
-                 this, SLOT(   readData()) );
-
-    connect( BaseProcessor::self(), SIGNAL( uartDataOut( int, int )),
-                              this, SLOT(   slotWriteData( int, int )) );
+                 this, SLOT(   readData()), Qt::UniqueConnection );
 
     Simulator::self()->addToUpdateList( this );
+
+    initialize();
 }
 
 SerialPort::~SerialPort()
 {
     Simulator::self()->remFromUpdateList( this );
+}
+
+void SerialPort::setMcuId( QString mcu )
+{
+    QString name = Circuit::self()->origId( mcu );
+    if( name == "" ) name = mcu;
+    m_mcuId =  name;
+
+    Component* mcuComp = Circuit::self()->getCompById( m_mcuId );
+    if( mcuComp ) m_mcuComponent = static_cast<McuComponent*>(mcuComp);
+
+    //qDebug() << "SerialPort::setMcuId" << mcu << name;
+}
+
+void SerialPort::initialize()
+{
+    m_mcuComponent = 0l;
+
+    int circVersion = Circuit::self()->circType().split(".").last().toInt();
+
+    if( circVersion < 5 )
+    {
+        m_mcuComponent = McuComponent::self();
+        m_mcuId = m_mcuComponent->objectName();
+    }
+
+    {
+        Component* mcu = Circuit::self()->getCompById( m_mcuId );
+        if( mcu )
+        {
+            m_mcuComponent = static_cast<McuComponent*>(mcu);
+            //qDebug() << "SerialPort::resetState" << mcu->objectName();
+        }
+    }
+    if( m_mcuComponent )
+    {
+        m_processor = m_mcuComponent->processor();
+
+        connect( m_mcuComponent, SIGNAL( closeSerials()),
+                           this, SLOT(   slotClose()), Qt::UniqueConnection );
+
+        connect( m_mcuComponent, SIGNAL( openSerials()),
+                           this, SLOT(   slotAutoOpen()), Qt::UniqueConnection );
+
+        connect( m_processor, SIGNAL( uartDataOut( int, int )),
+                        this, SLOT(   slotWriteData( int, int )), Qt::UniqueConnection );
+    }
 }
 
 void SerialPort::updateStep()
@@ -155,7 +196,7 @@ void SerialPort::readData()
     update();
     //qDebug()<<"SerialPort::readData" << data;
 
-    for( int i=0; i<data.size(); i++ ) BaseProcessor::self()->uartIn( m_uart, data.at(i) );
+    for( int i=0; i<data.size(); i++ ) m_processor->uartIn( m_uart, data.at(i) );
 }
 
 void SerialPort::slotWriteData( int uart, int value )
@@ -200,13 +241,6 @@ void SerialPort::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWi
     
     p->setBrush( Qt::darkBlue );
     p->drawRoundedRect( m_area, 4, 4 );
-    
-    p->setBrush( Qt::white );
-    QPen pen = p->pen();
-    pen.setWidth( 0 );
-    pen.setColor( QColor( 250, 210, 150 ) );
-    p->setPen(pen);
-    p->drawText( 10, 5, "Uart"+QString::number(m_uart+1) );
 
     if( m_serial->isOpen() )
     {
@@ -215,9 +249,18 @@ void SerialPort::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWi
         m_active = false;
     }
     else p->setBrush( Qt::black );
-    p->drawEllipse( 48, -6, 12, 12);
-    //p->drawRoundedRect( QRectF( -114, -79, 345, 185 ), 3, 3 );
+    p->drawEllipse( 2, -6, 12, 12);
+    
+    p->setBrush( Qt::white );
+    QPen pen = p->pen();
+    pen.setWidth( 0 );
+    pen.setColor( QColor( 250, 210, 150 ) );
+    p->setPen(pen);
+    p->drawText( 18 , 5, "Uart"+QString::number(m_uart+1)+"-"+m_portName );
 
+    QString mcuId = m_mcuId;
+    if( m_mcuComponent ) mcuId = m_mcuComponent->idLabel();
+    p->drawText(-30 ,-13, mcuId );
 }
 
 #include "moc_serialport.cpp"

@@ -78,8 +78,8 @@ class P16F178x : public _14bit_e_processor
       ADCON0_DIF  	adcon0;
       ADCON1_16F 	adcon1;
       ADCON2_DIF	adcon2;
-      sfr_register  adresh;
-      sfr_register  adresl;
+      SfrReg  adresh;
+      SfrReg  adresl;
       OSCCON_2  	*osccon;
       OSCTUNE 	osctune;
       OSCSTAT 	oscstat;
@@ -93,7 +93,7 @@ class P16F178x : public _14bit_e_processor
       ECCPAS        ccp1as;
       PSTRCON       pstr1con;
       EEPROM_EXTND *e;
-      sfr_register     vregcon;
+      SfrReg     vregcon;
 
       WPU              *m_wpua;
       IOC              *m_iocap;
@@ -138,7 +138,7 @@ class P16F178x : public _14bit_e_processor
 
       virtual EEPROM_EXTND *get_eeprom() { return ((EEPROM_EXTND *)eeprom); }
 
-     P16F178x(const char *_name=0, const char *desc=0);
+     P16F178x(const char *_name=0 );
       ~P16F178x();
       virtual void create_sfr_map();
 
@@ -156,9 +156,9 @@ class P16F178x : public _14bit_e_processor
 class P16F1788 : public P16F178x
 {
     public:
-      virtual PROCESSOR_TYPE isa(){return _P16F1788_;};
+      virtual PROCESSOR_TYPE isa(){return _P16F1788_;}
 
-     P16F1788(const char *_name=0, const char *desc=0);
+     P16F1788(const char *_name=0 );
       ~P16F1788();
       static Processor *construct(const char *name);
       virtual void create_sfr_map();
@@ -171,9 +171,9 @@ class P16F1788 : public P16F178x
 class P16LF1788 : public P16F1788
 {
     public:
-      virtual PROCESSOR_TYPE isa(){return _P16LF1788_;};
+      virtual PROCESSOR_TYPE isa(){return _P16LF1788_;}
 
-     P16LF1788(const char *_name=0, const char *desc=0);
+     P16LF1788(const char *_name=0 );
       ~P16LF1788();
       static Processor *construct(const char *name);
       virtual void create(int ram_top, int eeprom_size, int dev_id);

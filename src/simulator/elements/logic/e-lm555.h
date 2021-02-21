@@ -20,23 +20,22 @@
 #ifndef ELM555_H
 #define ELM555_H
 
-#include "e-element.h"
+#include "e-logic_device.h"
 
 class eSource;
 
-class MAINMODULE_EXPORT eLm555 : public eElement
+class MAINMODULE_EXPORT eLm555 : public eLogicDevice
 {
     public:
 
-        eLm555( std::string id );
+        eLm555( QString id );
         ~eLm555();
         
-        virtual void stamp();
-        virtual void resetState();
+        virtual void stamp() override;
+        virtual void initialize() override;
 
-        virtual void setVChanged();
-        
-        virtual void initEpins();
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
 
     protected:
         
@@ -45,6 +44,13 @@ class MAINMODULE_EXPORT eLm555 : public eElement
         eSource* m_dis;
         
         double m_volt;
+        double m_voltLast;
+        double m_voltNeg;
+        double m_voltNegLast;
+        double m_voltHight;
+        double m_voltHightLast;
+        double m_disImp;
+        double m_disImpLast;
         
         bool m_outState;
 };

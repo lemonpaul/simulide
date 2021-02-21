@@ -17,12 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-#include <QDebug>
-
 #include "e-bus.h"
 
-eBus::eBus( std::string id )
+eBus::eBus( QString id )
     : eElement( id )
 {
     m_numLines = 0;
@@ -38,29 +35,11 @@ void eBus::setStartBit( int bit )
     m_startBit = bit; 
 }
 
-void eBus::initEpins()
-{
-    setNumEpins( m_numLines+1 );
-}
-
 void eBus::setNumLines( int lines )
 {
     if( lines == m_numLines ) return;
     if( lines < 1 ) lines = 1;
     
     m_numLines = lines;
-}
-
-void eBus::setVChanged()
-{
-
-}
-
-ePin* eBus::getEpin( QString pinName )
-{
-    //qDebug() << "eBus::getEpin" << pinName;
-    if( pinName == "busPin1") return m_ePin[m_numLines+1];
-
-    return eElement::getEpin( pinName );
 }
 

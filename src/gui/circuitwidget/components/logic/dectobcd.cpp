@@ -36,7 +36,8 @@ LibraryItem* DecToBcd::libraryItem()
 }
 
 DecToBcd::DecToBcd( QObject* parent, QString type, QString id )
-        : LogicComponent( parent, type, id ), eDecToBcd( id.toStdString() )
+        : LogicComponent( parent, type, id )
+        , eDecToBcd( id )
 {
     m_width  = 4;
     m_height = 10;
@@ -72,21 +73,23 @@ DecToBcd::DecToBcd( QObject* parent, QString type, QString id )
 
     eLogicDevice::createOutEnablePin( m_inPin[15] );    // IOutput Enable
 
-    for( int i=0; i<15; i++ )
-    {
-        eLogicDevice::createInput( m_inPin[i] );
-    }
-    for( int i=9; i<15; i++ )
-    {
-        m_inPin[i]->setVisible( false );
-    }
-        
-    for( int i=0; i<4; i++ )
-    {
-        eLogicDevice::createOutput( m_outPin[i] );
-    }
+    for( int i=0; i<15; ++i ) eLogicDevice::createInput( m_inPin[i] );
+    for( int i=9; i<15; ++i ) m_inPin[i]->setVisible( false );
+    for( int i=0; i<4; ++i ) eLogicDevice::createOutput( m_outPin[i] );
 }
 DecToBcd::~DecToBcd(){}
+
+QList<propGroup_t> DecToBcd::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Invert_Inputs", tr("Invert Inputs"),""} );
+    mainGroup.propList.append( {"_16_Bits", tr("16 Bits"),""} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
+
 
 bool DecToBcd::_16bits()
 {
@@ -97,23 +100,21 @@ void DecToBcd::set_16bits( bool set )
 {
     m_16Bits = set;
 
+    int height = m_height;
     if( set )
     {
-        for( int i=9; i<15; i++ )
-        {
-            m_inPin[i]->setVisible( true );
-        }
-        m_area = QRect( -(m_width/2)*8, -(m_height/2)*8, m_width*8, 16*8 );
+        for( int i=9; i<15; ++i ) m_inPin[i]->setVisible( true );
+        height = 16;
     }
     else
     {
-        for( int i=9; i<15; i++ )
+        for( int i=9; i<15; ++i )
         {
             m_inPin[i]->setVisible( false );
             if( m_inPin[i]->isConnected() ) m_inPin[i]->connector()->remove();
         }
-        m_area = QRect( -(m_width/2)*8, -(m_height/2)*8, m_width*8, m_height*8 );
     }
+     m_area = QRect( -(m_width/2)*8, -(m_height/2)*8, m_width*8, height*8 );
     Circuit::self()->update();
 }
 

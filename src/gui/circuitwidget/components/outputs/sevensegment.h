@@ -44,7 +44,8 @@ class MAINMODULE_EXPORT SevenSegment : public Component, public eElement
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
-        
+        virtual QList<propGroup_t> propGroups() override;
+
         LedBase::LedColor color();
         void setColor( LedBase::LedColor color );
 
@@ -66,9 +67,8 @@ class MAINMODULE_EXPORT SevenSegment : public Component, public eElement
         double resistance() { return m_resistance; }
         void   setResistance( double res );
 
-        virtual void attach();
-        
-        virtual void remove();
+        virtual void attach() override;
+        virtual void remove() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 

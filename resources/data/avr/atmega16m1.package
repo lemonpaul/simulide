@@ -21,9 +21,9 @@
 
 <package name="atmega16m1" pins="32" width="11" height="11">
 
-    <pin side="left" pos="2"  type="bidir" id="PD2"  label="D2"/>
-    <pin side="left" pos="3"  type="bidir" id="PD3"  label="D3"/>
-    <pin side="left" pos="4"  type="bidir" id="PC1"  label="C1"/>
+    <pin side="left" pos="2"  type="OC1A" id="PD2"  label="D2"/>
+    <pin side="left" pos="3"  type="OC0A" id="PD3"  label="D3"/>
+    <pin side="left" pos="4"  type="OC1B" id="PC1"  label="C1"/>
     <pin side="left" pos="5"  type="vcc"   id="VCC"  label="Vcc"/>
     <pin side="left" pos="6"  type="gnd"   id="GND0" label="Gnd"/>
     <pin side="left" pos="7"  type="bidir" id="PC2"  label="C2"/>
@@ -31,7 +31,7 @@
     <pin side="left" pos="9"  type="bidir" id="PB0"  label="B0"/>
 
     <pin side="bottom" pos="2"  type="bidir" id="PB1"  label="B1"/>
-    <pin side="bottom" pos="3"  type="bidir" id="PE1"  label="E1"/>
+    <pin side="bottom" pos="3"  type="OC0B" id="PE1"  label="E1"/>
     <pin side="bottom" pos="4"  type="adc0"  id="PE2"  label="E2"/>
     <pin side="bottom" pos="5"  type="adc1"  id="PD4"  label="D4"/>
     <pin side="bottom" pos="6"  type="adc2"  id="PD5"  label="D5"/>

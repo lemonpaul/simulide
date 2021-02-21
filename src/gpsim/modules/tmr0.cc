@@ -25,10 +25,8 @@ License along with this library; if not, see
 #include <QDebug>
 #include <string>
 
-#include "config.h"
 #include "14bit-processors.h"
 #include "14bit-tmrs.h"
-#include "stimuli.h"
 #include "a2dconverter.h"
 #include "clc.h"
 
@@ -43,8 +41,8 @@ License along with this library; if not, see
 //--------------------------------------------------
 // member functions for the TMR0 base class
 //--------------------------------------------------
-TMR0::TMR0(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu,pName,pDesc),
+TMR0::TMR0(Processor *pCpu, const char *pName )
+  : SfrReg(pCpu,pName),
     prescale(1), prescale_counter(0), old_option(0),
     state(STOPPED), synchronized_cycle(0),
     future_cycle(0), last_cycle(0),
@@ -135,15 +133,15 @@ void TMR0::start(int restart_value, int sync)
   } 
   else 
   {
-    synchronized_cycle = get_cycles().get() + sync;
+    synchronized_cycle = cpu->currentCycle() + sync;
 
     last_cycle = (restart_value % max_counts()) * prescale;
     last_cycle = synchronized_cycle - last_cycle;
 
     uint64_t fc = last_cycle + max_counts() * prescale;
 
-    if(future_cycle) get_cycles().reassign_break(future_cycle, fc, this);
-    else             get_cycles().set_break(fc, this);
+    if(future_cycle) cpu->reassign_break( future_cycle, fc, this );
+    else             cpu->setBreakAbs( fc, this );
 
     future_cycle = fc;
 
@@ -157,7 +155,7 @@ void TMR0::clear_trigger()
 
   if (future_cycle) {
     future_cycle = 0;
-    get_cycles().clear_break(this);
+    cpu->clear_break( this );
   }
   last_cycle = 0;
 }
@@ -218,7 +216,7 @@ uint TMR0::get_value()
 {
   // If the TMR0 is being read immediately after being written, then
   // it hasn't had enough time to synchronize with the PIC's clock.
-  if(get_cycles().get() <= synchronized_cycle)
+  if(cpu->currentCycle() <= synchronized_cycle)
     return value.get();
 
   // If we're running off the external clock or the tmr is disabled
@@ -226,7 +224,7 @@ uint TMR0::get_value()
   if(get_t0cs() || ((state & RUNNING)==0))
     return(value.get());
 
-  int new_value = (int )((get_cycles().get() - last_cycle)/ prescale);
+  int new_value = (int )((cpu->currentCycle() - last_cycle)/ prescale);
 
   if (new_value == (int)max_counts())
   {
@@ -236,7 +234,7 @@ uint TMR0::get_value()
      if (future_cycle)
      {
         future_cycle = 0;
-        get_cycles().clear_break(this);
+        cpu->clear_break( this );
         callback();
      }
      new_value = 0;
@@ -245,7 +243,7 @@ uint TMR0::get_value()
   if (new_value >= (int)max_counts())
     {
       cout << "TMR0: bug TMR0 is larger than " <<  max_counts() - 1  << "...\n";
-      cout << "cycles.value = " << get_cycles().get() <<
+      cout << "cycles.value = " << cpu->currentCycle() <<
         "  last_cycle = " << last_cycle <<
         "  prescale = "  << prescale <<
         "  calculated value = " << new_value << '\n';
@@ -255,7 +253,7 @@ uint TMR0::get_value()
       // let's just go ahead and reset the logic.
       new_value &= 0xff;
       last_cycle = new_value*prescale;
-      last_cycle = get_cycles().get() - last_cycle;
+      last_cycle = cpu->currentCycle() - last_cycle;
       synchronized_cycle = last_cycle;
     }
 
@@ -289,7 +287,7 @@ void TMR0::new_prescale()
       if (future_cycle)
       {
         future_cycle = 0;
-        get_cycles().clear_break(this);
+        cpu->clear_break(this);
       }
     }
     start(value.get());
@@ -308,8 +306,8 @@ void TMR0::new_prescale()
     } 
     else 
     {
-      if(last_cycle < (int64_t)get_cycles().get())
-        new_value = (uint)((get_cycles().get() - last_cycle)/prescale);
+      if(last_cycle < (int64_t)cpu->currentCycle())
+        new_value = (uint)((cpu->currentCycle() - last_cycle)/prescale);
       else
         new_value = 0;
 
@@ -317,7 +315,7 @@ void TMR0::new_prescale()
       {
         cout << "TMR0 bug (new_prescale): exceeded max count"<< max_counts() <<'\n';
         cout << "   last_cycle = 0x" << hex << last_cycle << endl;
-        cout << "   cpu cycle = 0x" << hex << (get_cycles().get()) << endl;
+        cout << "   cpu cycle = 0x" << hex << (cpu->currentCycle()) << endl;
 
         cout << "   prescale = 0x" << hex << prescale << endl;
       }
@@ -328,12 +326,12 @@ void TMR0::new_prescale()
       prescale_counter = prescale;
 
       last_cycle = value.get() * prescale;
-      last_cycle = get_cycles().get() - last_cycle;
+      last_cycle = cpu->currentCycle() - last_cycle;
       synchronized_cycle = last_cycle;
 
       uint64_t fc = last_cycle + max_counts() * prescale;
 
-      get_cycles().reassign_break(future_cycle, fc, this);
+      cpu->reassign_break( future_cycle, fc, this );
 
       future_cycle = fc;
     }
@@ -385,7 +383,7 @@ void TMR0::set_clc( CLC *_clc, int index )
 void TMR0::callback()
 {
 
-  Dprintf(("now=0x%" PRINTF_GINT64_MODIFIER "x\n",get_cycles().get()));
+  Dprintf(("now=0x%" PRINTF_GINT64_MODIFIER "x\n",cpu->get_cycles()->get()));
 
   if((state & RUNNING) == 0) {
 
@@ -402,16 +400,15 @@ void TMR0::callback()
     }
 
   value.put(0);
-  synchronized_cycle = get_cycles().get();
+  synchronized_cycle = cpu->currentCycle();
   last_cycle = synchronized_cycle;
   future_cycle = last_cycle + max_counts()*prescale;
-  get_cycles().set_break(future_cycle, this);
+  cpu->setBreakAbs( future_cycle, this );
   set_t0if();
 }
 
 void  TMR0::reset(RESET_TYPE r)
 {
-
   switch(r) {
   case POR_RESET:
     value = por_value;

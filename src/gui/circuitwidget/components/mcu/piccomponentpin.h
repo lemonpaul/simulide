@@ -30,14 +30,13 @@ class PICComponentPin : public McuComponentPin
 {
     Q_OBJECT
         public:
-        PICComponentPin( McuComponent *mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
+        PICComponentPin( McuComponent* mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
         ~PICComponentPin();
 
-        virtual void attach( pic_processor *PicProcessor );
-        virtual void setVChanged();
+        virtual void attachPin( pic_processor* PicProcessor );
+        virtual void voltChanged() override;
 
         virtual void pullupNotConnected( bool up );
-        //virtual void resetOutput();
 
     protected:
 

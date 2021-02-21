@@ -26,15 +26,12 @@ License along with this library; if not, see
 
 #include "gpsim_classes.h"
 #include "registers.h"
-#include "breakpoints.h"
 #include "pic-ioports.h"
 
 class IOCxF;
 class PicPortGRegister;
-//---------------------------------------------------------
-// INTCON - Interrupt control register
 
-class INTCON : public sfr_register
+class INTCON : public  SfrReg  // Interrupt control register
 {
     public:
         bool in_interrupt;
@@ -52,10 +49,9 @@ class INTCON : public sfr_register
           GIE  = 1<<7
         };
 
-        INTCON(Processor *pCpu, const char *pName, const char *pDesc);
+        INTCON(Processor *pCpu, const char *pName  );
 
         virtual void set_gie() { put(value.get() | GIE); }
-
         virtual void clear_gie() { put(value.get() & ~GIE);  }
 
         void set_T0IF();
@@ -94,10 +90,10 @@ class INTCON : public sfr_register
 
 
 //---------------------------------------------------------
-class INTCON2 :  public sfr_register
+class INTCON2 :  public  SfrReg
 {
     public:
-      INTCON2(Processor *pCpu, const char *pName, const char *pDesc);
+      INTCON2(Processor *pCpu, const char *pName  );
 
       virtual void put_value(uint new_value);
       virtual void put(uint new_value);
@@ -122,10 +118,10 @@ class INTCON2 :  public sfr_register
 };
 
 
-class INTCON3 :  public sfr_register
+class INTCON3 :  public  SfrReg
 {
     public:
-      INTCON3(Processor *pCpu, const char *pName, const char *pDesc);
+      INTCON3(Processor *pCpu, const char *pName  );
 
       virtual void put_value(uint new_value);
       virtual void put(uint new_value);
@@ -172,7 +168,7 @@ class INTCON_14_PIR : public INTCON
 {
     public:
 
-      INTCON_14_PIR(Processor *pCpu, const char *pName, const char *pDesc);
+      INTCON_14_PIR( Processor *pCpu, const char *pName );
 
       virtual void put(uint new_value);
       virtual void put_value(uint new_value);
@@ -229,7 +225,7 @@ public:
 #define INTERRUPT_VECTOR_LO       (0x18 >> 1)
 #define INTERRUPT_VECTOR_HI       (0x08 >> 1)
 
-  INTCON_16(Processor *pCpu, const char *pName, const char *pDesc);
+  INTCON_16(Processor *pCpu, const char *pName);
 
   inline void set_rcon(RCON *r) { rcon = r; }
   inline void set_intcon2(INTCON2 *ic) { intcon2 = ic; }
@@ -243,18 +239,9 @@ public:
   void clear_gies();
   void set_gies();
   virtual int check_peripheral_interrupt();
-  uint get_interrupt_vector() 
-  {
-    return interrupt_vector;
-  }
-  bool isHighPriorityInterrupt() 
-  { 
-    return ( interrupt_vector == INTERRUPT_VECTOR_HI );
-  }
-  void set_interrupt_vector(uint new_int_vect)
-  {
-    interrupt_vector = new_int_vect;
-  }
+  uint get_interrupt_vector() { return interrupt_vector; }
+  bool isHighPriorityInterrupt()  { return ( interrupt_vector == INTERRUPT_VECTOR_HI ); }
+  void set_interrupt_vector(uint new_int_vect) { interrupt_vector = new_int_vect; }
 
 private:
   uint interrupt_vector;        // Starting address of the interrupt

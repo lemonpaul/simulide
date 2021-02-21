@@ -32,6 +32,8 @@ class LibraryItem;
 class MAINMODULE_EXPORT Lm555 : public Component, public eLm555
 {
     Q_OBJECT
+    Q_PROPERTY( quint64 Tpd_ps  READ propDelay   WRITE setPropDelay   DESIGNABLE true USER true )
+
 
     public:
 

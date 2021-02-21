@@ -20,6 +20,8 @@
 #include "connectorline.h"
 #include "connector.h"
 #include "circuitview.h"
+#include "circuitwidget.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "node.h"
 #include "utils.h"
@@ -237,7 +239,7 @@ void ConnectorLine::mousePressEvent( QGraphicsSceneMouseEvent* event )
         if     ( dy() == 0 ) CircuitView::self()->viewport()->setCursor( Qt::SplitVCursor );
         else if( dx() == 0 ) CircuitView::self()->viewport()->setCursor( Qt::SplitHCursor );
         else                 CircuitView::self()->viewport()->setCursor( Qt::SizeAllCursor );
-        m_moving = true;
+        //m_moving = true;
     }
     else if( event->button() == Qt::LeftButton )
     {
@@ -249,7 +251,7 @@ void ConnectorLine::mousePressEvent( QGraphicsSceneMouseEvent* event )
             
             if     ( evPoint==p1() ) m_moveP1 = true;
             else if( evPoint==p2() ) m_moveP2 = true;
-            m_moving = true;
+            //m_moving = true;
         }
         else                                   // Connecting a wire here
         {   
@@ -319,16 +321,13 @@ void ConnectorLine::mousePressEvent( QGraphicsSceneMouseEvent* event )
            }
 
            QString type = QString("Node");
-           QString id = type;
-           id.append( "-" );
-           id.append( Circuit::self()->newSceneId() );
+           QString id = type +"-"+ Circuit::self()->newSceneId();
 
            Node* node = new Node( 0, type, id );     // Now add the Node
            node->setPos( point1.x(), point1.y());
            Circuit::self()->addItem( node );
 
-           bool pauseSim = Simulator::self()->isRunning();
-           if( pauseSim )  Simulator::self()->pauseSim();
+           if( Simulator::self()->isRunning() )  CircuitWidget::self()->powerCircOff();
 
            //qDebug() << "line constarted" << Circuit::self()->is_constarted() << Circuit::self();
 
@@ -340,8 +339,6 @@ void ConnectorLine::mousePressEvent( QGraphicsSceneMouseEvent* event )
                Circuit::self()->closeconnector( node->getPin(1) );
            else                                     // A new Connector created here (starts in a node)
                Circuit::self()->newconnector( node->getPin(1) );      // start a new connector
-
-           if( pauseSim ) Simulator::self()->runContinuous();
         }
     }
     //else setSelected( true );
@@ -352,6 +349,12 @@ void ConnectorLine::mouseMoveEvent( QGraphicsSceneMouseEvent* event )
     event->accept();
 
     QPoint delta = togrid( event->scenePos() ).toPoint() - togrid(event->lastScenePos()).toPoint();
+
+    if( !m_moving )
+    {
+        Circuit::self()->saveState();
+        m_moving = true;
+    }
 
     if( event->modifiers() & Qt::ShiftModifier )          // Move Corner
     {
@@ -382,13 +385,8 @@ void ConnectorLine::mouseReleaseEvent( QGraphicsSceneMouseEvent* event )
     event->accept();
     m_moveP1 = false;
     m_moveP2 = false;
+    m_moving = false;
     m_pConnector->remNullLines();
-
-    if( m_moving )
-    {
-        m_moving = false;
-        Circuit::self()->setChanged();
-    }
 }
 
 void ConnectorLine::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
@@ -401,7 +399,8 @@ void ConnectorLine::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
        QMenu menu;
 
        QAction* removeAction = menu.addAction( tr("Remove") );
-       connect(removeAction, SIGNAL(triggered()), this, SLOT(remove()));
+       connect( removeAction, SIGNAL(triggered()),
+                       this, SLOT(remove()), Qt::UniqueConnection );
 
        menu.exec(event->screenPos());
 

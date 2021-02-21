@@ -36,7 +36,7 @@ LibraryItem* Stepper::libraryItem()
 {
     return new LibraryItem(
         tr("Stepper"),
-        tr("Outputs"),
+        tr("Motors"),
         "steeper.png",
         "Stepper",
         Stepper::construct );
@@ -44,22 +44,24 @@ LibraryItem* Stepper::libraryItem()
 
 Stepper::Stepper( QObject* parent, QString type, QString id )
         : Component( parent, type, id )
-        , eElement( (id+"-eElement").toStdString() )
-        , m_resA1( (id+"-eEresistorA1").toStdString() )
-        , m_resA2( (id+"-eEresistorA2").toStdString() )
-        , m_resB1( (id+"-eEresistorB1").toStdString() )
-        , m_resB2( (id+"-eEresistorB2").toStdString() )
+        , eElement( (id+"-eElement") )
+        , m_resA1( (id+"-eEresistorA1") )
+        , m_resA2( (id+"-eEresistorA2") )
+        , m_resB1( (id+"-eEresistorB1") )
+        , m_resB2( (id+"-eEresistorB2") )
         , m_pinA1( 180, QPoint(-72,-32), id+"-PinA1", 0, this )
         , m_pinA2( 180, QPoint(-72, 16), id+"-PinA2", 0, this )
         , m_pinCo( 180, QPoint(-72, 0 ), id+"-PinCo", 0, this )
         , m_pinB1( 180, QPoint(-72,-16), id+"-PinB1", 0, this )
         , m_pinB2( 180, QPoint(-72, 32), id+"-PinB2", 0, this )
-        , m_ePinA1Co( (id+"-ePinA1Co").toStdString(), 0 )
-        , m_ePinA2Co( (id+"-ePinA2Co").toStdString(), 0 )
-        , m_ePinB1Co( (id+"-ePinB1Co").toStdString(), 0 )
-        , m_ePinB2Co( (id+"-ePinB2Co").toStdString(), 0 )
+        , m_ePinA1Co( (id+"-ePinA1Co"), 0 )
+        , m_ePinA2Co( (id+"-ePinA2Co"), 0 )
+        , m_ePinB1Co( (id+"-ePinB1Co"), 0 )
+        , m_ePinB2Co( (id+"-ePinB2Co"), 0 )
 {
     Q_UNUSED( Stepper_properties );
+
+    m_graphical = true;
     
     m_area = QRectF( -64, -50, 114, 100 );
     m_color = QColor( 50, 50, 70 );
@@ -95,12 +97,18 @@ Stepper::Stepper( QObject* parent, QString type, QString id )
     setLabelPos(-32,-62, 0);
     setShowId( true );
 }
+Stepper::~Stepper(){}
 
-Stepper::~Stepper()
+QList<propGroup_t> Stepper::propGroups()
 {
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Bipolar", tr("Bipolar"),""} );
+    mainGroup.propList.append( {"Steps", tr("Steps per Rotation"),tr("teeth")} );
+    mainGroup.propList.append( {"Resistance", tr("Resistance"),"Ω"} );
+    return {mainGroup};
 }
 
-void Stepper::setVChanged()
+void Stepper::voltChanged()
 {
     double voltCom = m_pinCo.getVolt();
     double phaseA = ( m_pinA1.getVolt()-voltCom )-( m_pinA2.getVolt()-voltCom );
@@ -192,7 +200,7 @@ void Stepper::setBipolar( bool bi )
     m_pinCo.setVisible( !bi );
 }
 
-void Stepper::attach()
+void Stepper::stamp()
 {
     eNode* enode = m_pinCo.getEnode();// Register for changes callback
     if( enode )
@@ -202,24 +210,20 @@ void Stepper::attach()
         m_ePinB1Co.setEnode( enode );
         m_ePinB2Co.setEnode( enode );
     }
-}
-
-void Stepper::stamp()
-{
-    eNode* enode = m_pinA1.getEnode();// Register for changes callback
-    if( enode ) enode->addToChangedFast(this);
+    enode = m_pinA1.getEnode();// Register for changes callback
+    if( enode ) enode->voltChangedCallback( this );
 
     enode = m_pinA2.getEnode();// Register for changes callback
-    if( enode ) enode->addToChangedFast(this);
+    if( enode ) enode->voltChangedCallback( this );
 
     enode = m_pinB1.getEnode();// Register for changes callback
-    if( enode ) enode->addToChangedFast(this);
+    if( enode ) enode->voltChangedCallback( this );
 
     enode = m_pinB2.getEnode();// Register for changes callback
-    if( enode ) enode->addToChangedFast(this);
+    if( enode ) enode->voltChangedCallback( this );
     
     enode = m_pinCo.getEnode();// Register for changes callback
-    if( enode ) enode->addToChangedFast(this);
+    if( enode ) enode->voltChangedCallback( this );
 }
 
 void Stepper::updateStep()

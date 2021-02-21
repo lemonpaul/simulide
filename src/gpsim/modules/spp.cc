@@ -21,8 +21,6 @@ License along with this library; if not, see
 #include <stdio.h>
 #include <iostream>
 
-#include "config.h"
-#include "stimuli.h"
 #include "spp.h"
 
 //#define DEBUG
@@ -41,96 +39,93 @@ License along with this library; if not, see
 class SppSignalSource : public SignalControl
 {
 public:
-  SppSignalSource()
-  {
-      state = '?';
-  }
-  ~SppSignalSource() { }
-  virtual char getState()
-  {
-    return state;
-  }
-  void setState(char _state){ state = _state;}
-  virtual void release()
-  {
-    delete this;
-  }
+    SppSignalSource()
+    {
+        state = '?';
+    }
+    ~SppSignalSource() { }
+    virtual char getState()
+    {
+        return state;
+    }
+    void setState(char _state){ state = _state;}
+    virtual void release()
+    {
+        delete this;
+    }
 private:
-  char state;
+    char state;
 };
-//--------------------------------------------------
-//
-//--------------------------------------------------
 
-
-SPPCON::SPPCON(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc)
+//--------------------------------------------------
+SPPCON::SPPCON(Processor *pCpu, const char *pName)
+    : SfrReg(pCpu, pName)
 {
 }
 void SPPCON::put(uint new_value)
 {
-  uint mask = (SPP::SPPOWN | SPP::SPPEN );
-  uint old = value.data;
+    uint mask = (SPP::SPPOWN | SPP::SPPEN );
+    uint old = value.data;
 
-  value.data = (new_value & mask);
-  if ((old ^ value.data) && value.data == mask)
+    value.data = (new_value & mask);
+    if ((old ^ value.data) && value.data == mask)
         cout << "Warning USB functionality of SPP not supported\n";
-  else
-          spp->enabled(value.data & SPP::SPPEN);
+    else
+        spp->enabled(value.data & SPP::SPPEN);
 }
 
 void SPPCON::put_value(uint new_value)
 {
-  value.data = new_value;
+    value.data = new_value;
 }
 
-SPPCFG::SPPCFG(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc)
+SPPCFG::SPPCFG(Processor *pCpu, const char *pName )
+    : SfrReg(pCpu, pName )
 {
 }
 void SPPCFG::put(uint new_value)
 {
-  value.data = new_value;
-  if (spp) spp->cfg_write(value.data);
+    value.data = new_value;
+    if (spp) spp->cfg_write(value.data);
 }
 
 void SPPCFG::put_value(uint new_value)
 {
-  value.data = new_value;
+    value.data = new_value;
 }
-SPPEPS::SPPEPS(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc)
+SPPEPS::SPPEPS(Processor *pCpu, const char *pName )
+    : SfrReg(pCpu, pName )
 {
 }
 void SPPEPS::put(uint new_value)
 {
-  uint mask = 0x0f;
-  uint fixed = value.data & 0xd0;  // Read only part of register
+    uint mask = 0x0f;
+    uint fixed = value.data & 0xd0;  // Read only part of register
 
-  value.data = ((new_value & mask) | fixed);
+    value.data = ((new_value & mask) | fixed);
 
-  if (spp) spp->eps_write(value.data);
+    if (spp) spp->eps_write(value.data);
 }
 
 void SPPEPS::put_value(uint new_value)
 {
-  value.data = new_value;
-  if (spp) spp->eps_write(new_value);
+    value.data = new_value;
+    if (spp) spp->eps_write(new_value);
 }
-SPPDATA::SPPDATA(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc)
+SPPDATA::SPPDATA(Processor *pCpu, const char *pName )
+    : SfrReg(pCpu, pName )
 {
     spp = 0;
 }
 void SPPDATA::put(uint new_value)
 {
-  value.data = new_value;
-  if (spp) spp->data_write(new_value);
+    value.data = new_value;
+    if (spp) spp->data_write(new_value);
 }
 
 void SPPDATA::put_value(uint new_value)
 {
-  value.data = new_value;
+    value.data = new_value;
 }
 uint SPPDATA::get()
 {
@@ -138,10 +133,10 @@ uint SPPDATA::get()
     return(value.data);
 }
 void SPP::initialize( PIR_SET *_pir_set, PicPSP_PortRegister *_port_set,
-        PicTrisRegister *_port_tris,
-        SPPCON *_sppcon, SPPCFG *_sppcfg, SPPEPS *_sppeps, 
-       SPPDATA *_sppdata, PinModule   *_clk1spp, PinModule  *_clk2spp, 
-        PinModule  *_oespp, PinModule  *_csspp )
+                      PicTrisRegister *_port_tris,
+                      SPPCON *_sppcon, SPPCFG *_sppcfg, SPPEPS *_sppeps,
+                      SPPDATA *_sppdata, PinModule   *_clk1spp, PinModule  *_clk2spp,
+                      PinModule  *_oespp, PinModule  *_csspp )
 {
     pir_set = _pir_set;
     parallel_port = _port_set;
@@ -194,11 +189,10 @@ void SPP::data_write(uint data)
         sig_csspp->setState('1');
         pin_csspp->updatePinModule();
     }
-    get_cycles().set_break(get_cycles().get() + (cfg_value & 0x0f) + 1 , this);
+    m_cpu->setBreakRel( (cfg_value & 0x0f) + 1 , this );
 }
 
-// SPPEPS register has been written to
-void SPP::eps_write(uint data)
+void SPP::eps_write(uint data) // SPPEPS register has been written to
 {
     uint old = eps_value;
     eps_value = data;
@@ -219,11 +213,10 @@ void SPP::eps_write(uint data)
         sig_csspp->setState('1');
         pin_csspp->updatePinModule();
     }
-    get_cycles().set_break(get_cycles().get() + (cfg_value & 0x0f) + 1 , this);
+    m_cpu->setBreakRel( (cfg_value & 0x0f) + 1 , this );
 }
 
-// SPPCFG register has been written to
-void SPP::cfg_write(uint data)
+void SPP::cfg_write(uint data) // SPPCFG register has been written to
 {
     uint diff = cfg_value ^ data;
     cfg_value = data;
@@ -281,7 +274,7 @@ uint SPP::data_read()
         sig_csspp->setState('1');
         pin_csspp->updatePinModule();
     }
-    get_cycles().set_break(get_cycles().get() + (cfg_value & 0x0f) + 1 , this);
+    m_cpu->setBreakRel( (cfg_value & 0x0f) + 1 , this );
     return data_value;
 }
 void SPP::enabled(bool _enabled)
@@ -329,18 +322,18 @@ void SPP::enabled(bool _enabled)
                 pin_oespp->setSource(0);
                 active_sig_oe = false;
             }
-            if (active_sig_clk2) 
+            if (active_sig_clk2)
             {
                 pin_clk2spp->setSource(0);
                 active_sig_clk2 = false;
             }
-            if (active_sig_clk1) 
+            if (active_sig_clk1)
             {
                 pin_clk1spp->setSource(0);
                 active_sig_clk1 = false;
             }
 
-            if (active_sig_cs) 
+            if (active_sig_cs)
             {
                 pin_csspp->setSource(0);
                 active_sig_cs = false;
@@ -355,7 +348,7 @@ void SPP::callback()
     case ST_CYCLE1:
         cycle_state = ST_CYCLE2;
         if(io_operation == DATA_READ)
-                data_value = parallel_port->get();
+            data_value = parallel_port->get();
         switch ((cfg_value & (CLKCFG1|CLKCFG0)) >> 6)
         {
         case 3:
@@ -364,15 +357,15 @@ void SPP::callback()
             {
                 if (cfg_value & CLK1EN)
                 {
-                        sig_clk1spp->setState('1');
-                        pin_clk1spp->updatePinModule();
+                    sig_clk1spp->setState('1');
+                    pin_clk1spp->updatePinModule();
                 }
             }
             else
             {
-                    sig_clk2spp->setState('1');
-                    pin_clk2spp->updatePinModule();
-            } 
+                sig_clk2spp->setState('1');
+                pin_clk2spp->updatePinModule();
+            }
             break;
 
         case 1:
@@ -380,51 +373,51 @@ void SPP::callback()
             {
                 if (cfg_value & CLK1EN)
                 {
-                        sig_clk1spp->setState('1');
-                        pin_clk1spp->updatePinModule();
+                    sig_clk1spp->setState('1');
+                    pin_clk1spp->updatePinModule();
                 }
             }
             else if (io_operation == DATA_READ)
             {
-                    sig_clk2spp->setState('1');
-                    pin_clk2spp->updatePinModule();
-            } 
+                sig_clk2spp->setState('1');
+                pin_clk2spp->updatePinModule();
+            }
 
             break;
 
         case 0:
             if ((cfg_value & CLK1EN) && io_operation == ADDR_WRITE)
             {
-                    sig_clk1spp->setState('1');
-                    pin_clk1spp->updatePinModule();
+                sig_clk1spp->setState('1');
+                pin_clk1spp->updatePinModule();
             }
             if (io_operation == DATA_WRITE || io_operation == DATA_READ)
             {
-                    sig_clk2spp->setState('1');
-                    pin_clk2spp->updatePinModule();
+                sig_clk2spp->setState('1');
+                pin_clk2spp->updatePinModule();
             }
             break;
         }
-        get_cycles().set_break(get_cycles().get() + (cfg_value & 0x0f) + 1 , this);
+        m_cpu->setBreakRel( (cfg_value & 0x0f) + 1 , this );
         break;
 
     case ST_CYCLE2:
         cycle_state = ST_IDLE;
         eps_value &= ~SPPBUSY;
         sppeps->put_value(eps_value);
-            sig_oespp->setState('1');
-            pin_oespp->updatePinModule();
-            sig_clk2spp->setState('0');
-            pin_clk2spp->updatePinModule();
+        sig_oespp->setState('1');
+        pin_oespp->updatePinModule();
+        sig_clk2spp->setState('0');
+        pin_clk2spp->updatePinModule();
         if (cfg_value & CSEN)
         {
-                sig_csspp->setState('0');
-                pin_csspp->updatePinModule();
+            sig_csspp->setState('0');
+            pin_csspp->updatePinModule();
         }
         if (cfg_value & CLK1EN)
         {
-                sig_clk1spp->setState('0');
-                pin_clk1spp->updatePinModule();
+            sig_clk1spp->setState('0');
+            pin_clk1spp->updatePinModule();
         }
         if (!(sppcon->get_value() & SPPOWN))
             pir_set->set_sppif();

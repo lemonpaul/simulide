@@ -27,12 +27,12 @@ class MAINMODULE_EXPORT eVoltReg : public eResistor
 {
     public:
 
-        eVoltReg( std::string id );
+        eVoltReg( QString id );
         virtual ~eVoltReg();
 
-        virtual void stamp();
-        virtual void resetState();
-        virtual void setVChanged();
+        virtual void stamp() override;
+        virtual void initialize() override;
+        virtual void voltChanged() override;
         
         virtual double vRef()              {return m_vRef;}
         virtual void setVRef( double vref ){m_vRef = vref;}

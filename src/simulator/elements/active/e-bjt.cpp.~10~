@@ -1,0 +1,285 @@
+/***************************************************************************
+ *   Copyright (C) 2018 by santiago González                               *
+ *   santigoro@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 3 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
+ ***************************************************************************/
+
+//#include <QDebug>
+
+#include <math.h>   // fabs(x,y)
+#include <ctime>
+
+#include "e-bjt.h"
+#include "e-node.h"
+#include "simulator.h"
+
+#define COLL m_ePin[0]
+#define EMIT m_ePin[1]
+#define BASE m_ePin[2]
+
+eBJT::eBJT( QString id )
+    : eResistor( id )
+{
+    m_ePin.resize(3);
+
+    m_gain = 100;
+    m_fast = false;
+    m_PNP = false;
+    m_BCdiodeOn = false;
+
+
+    m_vt = 0.025;
+    m_rsCurr = 1e-13;
+    m_vcrit = m_vt*log( m_vt/(sqrt(2)*m_rsCurr) );
+
+
+
+
+    m_BEdiode = new ePN( m_elmId+"-BEdiode" );
+    m_BEdiode->setNumEpins(2);
+    setBEthr( 0.7 );
+
+    m_BCdiode = new eDiode( m_elmId+"-BCdiode" );
+    m_BCdiode->setNumEpins(2);
+}
+eBJT::~eBJT()
+{
+    delete m_BEdiode;
+    delete m_BCdiode;
+}
+
+void eBJT::initialize()
+{
+    m_accuracy = Simulator::self()->NLaccuracy();
+    if( m_accuracy > 0.01 ) m_fast = true;
+    //m_iteractions = 0;
+    m_osc = 0;
+    m_iterDiv = 1;
+    m_lastOut = 0;
+    m_baseCurr = 0;
+    m_voltE = 0;
+    m_voltBE = 0;
+    m_Efollow = false;
+
+    srand(time(NULL));
+}
+
+void eBJT::attach()
+{
+    eNode* collNod = COLL->getEnode();// Collector
+    if( m_BCdiodeOn )
+    {
+        if( m_PNP ) m_BCdiode->getEpin( 0 )->setEnode( collNod );
+        else        m_BCdiode->getEpin( 1 )->setEnode( collNod );
+    }
+
+    eNode* emitNod = EMIT->getEnode();// Emitter
+    if( m_PNP ) m_BEdiode->getEpin( 0 )->setEnode( emitNod );
+    else        m_BEdiode->getEpin( 1 )->setEnode( emitNod );
+
+    eNode* baseNod = BASE->getEnode();// Base
+    if( m_PNP )
+    {
+        m_BEdiode->getEpin( 1 )->setEnode( baseNod );
+        if( m_BCdiodeOn ) m_BCdiode->getEpin( 1 )->setEnode( baseNod );
+    }
+    else
+    {
+        m_BEdiode->getEpin( 0 )->setEnode( baseNod );
+        if( m_BCdiodeOn ) m_BCdiode->getEpin( 0 )->setEnode( baseNod );
+    }
+}
+
+void eBJT::stamp()
+{
+    eNode* collNod = COLL->getEnode();// Collector
+    if( collNod ) collNod->addToNoLinList( this );
+
+    eNode* emitNod = EMIT->getEnode();// Emitter
+    if( emitNod ) emitNod->addToNoLinList( this );
+
+    eNode* baseNod = BASE->getEnode();// Base
+    if( baseNod ) baseNod->addToNoLinList( this );
+
+    eResistor::setAdmit( cero_doub );
+    eResistor::stamp();
+}
+
+void eBJT::voltChanged()
+{
+    double voltC = COLL->getVolt();
+    double voltE = EMIT->getVolt();
+    double voltB = BASE->getVolt();
+    double voltCE = voltC-voltE;
+    double voltBE = voltB-voltE;
+
+    if( m_PNP )
+    {
+        voltCE = -voltCE;
+        voltBE = -voltBE;
+    }
+    if( voltCE < cero_doub ) voltCE = cero_doub;
+
+
+    double baseCurr = m_BEdiode->step( voltBE );
+    if( baseCurr == m_baseCurr )
+    {
+        return;
+    }
+
+    m_voltBE = voltBE;
+
+return;
+    double currentCE = calcCurrCE( voltCE );
+    double admit = cero_doub;
+    if( currentCE>0 && voltCE>0 ) admit = currentCE/voltCE;
+
+    //if( checkConvergence( admit ) ) return;
+
+    eResistor::setAdmit( admit );
+    eResistor::stamp();
+
+
+
+    return;
+
+
+
+
+
+
+
+    if( !m_Efollow )
+    {
+        if( fabs(voltE-m_voltE) > 1e-3 )
+        {
+            m_Efollow = true;
+            eResistor::setRes( 400/m_gain );
+            eResistor::stamp();
+        }
+        m_voltE = voltE;
+    }
+    stepBase( voltBE );
+
+    //double currentCE = calcCurrCE( voltCE );
+
+    if( m_Efollow )
+    {
+        double maxCurrCE = voltCE/m_resist;
+        double current = maxCurrCE-currentCE;
+
+        if( checkConvergence( current ) ) return;
+
+        if( current < 0 ) current = 0;
+        if( m_PNP ) current = -current;
+
+        COLL->stampCurrent( current );
+        EMIT->stampCurrent(-current );
+    }else
+    {
+        double admit = cero_doub;
+        if( currentCE>0 && voltCE>0 ) admit = currentCE/voltCE;
+
+        if( checkConvergence( admit ) ) return;
+
+        eResistor::setAdmit( admit );
+        eResistor::stamp();
+    }
+}
+
+void eBJT::stepBase( double voltBE )
+{
+    if( voltBE > m_vcrit && fabs(voltBE-m_voltBE) > (2*m_vt) )
+    {
+        if( m_voltBE > 0 )
+        {
+            double arg = 1+(voltBE-m_voltBE)/m_vt;
+            if( arg > 0 ) voltBE = m_voltBE + m_vt*log( arg );
+            else          voltBE = m_vcrit;
+        }
+        else voltBE = m_vt *log( voltBE/m_vt );
+    }
+    m_voltBE = voltBE;
+
+    // Id = rsC*(exp(V/vt)-1)
+    // rsC = Reverse Saturation Current
+    // vt  = Thermal Voltage
+    double expV = m_rsCurr*exp( voltBE/m_vt ); // rsC*exp(V/vt)
+    m_baseCurr = expV-m_rsCurr;               // rsC*exp(V/vt) - rsC // rsC*(exp(V/vt)-1)
+    m_baseAdmit += expV/m_vt;                 // rsC*exp(V/vt)/vt = delta Admitance
+
+    m_BEdiode->setAdmit( m_baseAdmit );
+    m_BEdiode->stampCurrent( m_baseCurr );
+}
+
+double eBJT::calcCurrCE( double voltCE )
+{
+    double satK = 0;
+    if( voltCE < m_voltBE )
+    {
+        satK = voltCE/m_voltBE-1;
+        satK = pow( satK, 2 );
+    }
+    double currentCE = m_baseCurr*m_gain*(1+voltCE/75);
+    currentCE -= currentCE*satK;
+
+    return currentCE;
+}
+
+bool eBJT::checkConvergence( double value )
+{
+    double deltaOut = value-m_lastOut;
+
+    if( (fabs(deltaOut) < m_accuracy/10) )
+    {
+        m_iterDiv = 1;
+        m_osc = 0;
+        return true;
+    }
+    m_lastOut = value;
+
+    bool dir = deltaOut > 0;
+    if( dir != m_dir )
+    {
+        m_dir = dir;
+        m_osc++;
+        if( m_iterDiv < 1e3 ) m_iterDiv += m_osc/5;
+    }
+    return false;
+}
+
+double eBJT::BEthr()
+{
+    return m_BEthr;
+}
+
+void eBJT::setBEthr( double thr )
+{
+    if( thr == 0 ) thr = 0.7;
+    m_BEdiode->setThreshold( thr );
+    m_BEthr = thr;
+}
+
+void eBJT::setBCd( bool bcd )
+{
+    if( !bcd )
+    {
+        m_BCdiode->getEpin( 0 )->setEnode( 0l );
+        m_BCdiode->getEpin( 1 )->setEnode( 0l );
+    }
+    m_BCdiodeOn = bcd;
+}
+

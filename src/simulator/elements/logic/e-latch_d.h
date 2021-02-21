@@ -26,17 +26,16 @@ class MAINMODULE_EXPORT eLatchD : public eLogicDevice
 {
     public:
 
-        eLatchD( std::string id, int channels=0 );
+        eLatchD( QString id, int channels=0 );
         ~eLatchD();
 
-        virtual void stamp();
-        virtual void setVChanged();
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
 
-        //void setInverted( bool inverted );
-        void setNumChannels( int channels );
-                             
-    protected:           
-        
+    protected:
+        uint32_t m_state;
+        uint32_t m_oldst;
 };
 
 

@@ -17,23 +17,22 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QtGui>
-
 #include "outpaneltext.h"
 #include "mainwindow.h"
-
+#include "simulator.h"
 
 OutPanelText::OutPanelText( QWidget* parent )
             : QPlainTextEdit( parent )
+            , eElement( "outPanel" )
 {
-    m_text = "";
-    
-    //setStyleSheet("background-color: #150925");
+    m_textBuffer = "";
+    this->setObjectName( "outPanel" );
+
     m_highlighter = new OutHighlighter( document() );
 
     QPalette p;// = palette();
-    p.setColor(QPalette::Base, QColor( 35, 30, 60) );
-    p.setColor(QPalette::Text, QColor( 190, 190, 150));
+    p.setColor( QPalette::Base, QColor( 35, 30, 60 ) );
+    p.setColor( QPalette::Text, QColor( 190, 190, 150) );
     setPalette(p);
     
     QFont font;
@@ -41,53 +40,43 @@ OutPanelText::OutPanelText( QWidget* parent )
     font.setFixedPitch(true);
     font.setPixelSize( 12*MainWindow::self()->fontScale() );
     setFont(font);
+
+    setMaximumBlockCount( 1000 );
+
+    setReadOnly(true);
 }
 OutPanelText::~OutPanelText(){}
 
-
 void OutPanelText::appendText( const QString text )
 {
-    //qDebug() << "OutPanelText::appendText" << text;
-    m_text.append( text);
-    //QPlainTextEdit::insertPlainText( text );
+    m_textBuffer.append( text );
 }
 
 void OutPanelText::writeText( const QString text )
 {
-    //qDebug()<< "OutPanelText::writeText" << text;
-    //QPlainTextEdit::insertPlainText( text );
-    m_text.append( text );
-    step();
+    m_textBuffer.append( text+"\n" );
+    if( !Simulator::self()->isRunning() ) updateStep();
 }
 
-void OutPanelText::step()
+void OutPanelText::updateStep()
 {
-    if( m_text == "" ) return;
+    if( m_textBuffer.isEmpty() ) return;
 
-    QPlainTextEdit::insertPlainText( m_text );
-    ensureCursorVisible();
-    repaint();
-    m_text = "";
+    if( this->document()->characterCount() > 50000 )
+        setPlainText( this->toPlainText().right( 25000 ) );
+
+    moveCursor( QTextCursor::End );
+    insertPlainText( m_textBuffer );
+    moveCursor( QTextCursor::End );
+    m_textBuffer.clear();
 }
 
 // CLASS OutHighlighter ***********************************************
 
-OutHighlighter::OutHighlighter( QTextDocument *parent )
+OutHighlighter::OutHighlighter( QTextDocument* parent )
               : QSyntaxHighlighter( parent )
 {
     HighlightingRule rule;
-
-    /*errorFormat.setForeground( QColor(100, 50, 0) );
-    errorFormat.setBackground( QColor(255, 255, 100) );
-    errorFormat.setFontWeight( QFont::Bold );
-    QStringList patterns;
-    patterns<< "ERROR";
-    for( const QString &pattern : patterns )
-    {
-        rule.pattern = QRegExp( pattern );
-        rule.format = errorFormat;
-        highlightingRules.append( rule );
-    }*/
 
     fileFormat.setForeground( QColor(110, 180, 100) );
     rule.pattern = QRegExp( "/[^\n]*" );

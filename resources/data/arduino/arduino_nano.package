@@ -19,7 +19,7 @@
 <!-- *                                                                         * -->
 <!-- *************************************************************************** -->
 
-<package name="arduinoNano" pins="30" width="8" height="19">
+<package name="arduinoNano" pins="30" width="8" height="19" background="nano_board.png">
 
     <pin side="left" pos="2"  type="bidir" id="PD1"  label=" 1 Tx"/>
     <pin side="left" pos="3"  type="bidir" id="PD0"  label=" 0 Rx"/>
@@ -30,8 +30,8 @@
     <pin side="left" pos="7"  type="pwm2B" id="PD3"  label=" 3 ~" />
     <pin side="left" pos="8"  type="bidir" id="PD4"  label=" 4"   />
     <pin side="left" pos="9"  type="pwm0B" id="PD5"  label=" 5 ~" />
-    <pin side="left" pos="10" type="pwm0A" id="PD6"  label=" 6 ~" />
-    <pin side="left" pos="11" type="bidir" id="PD7"  label=" 7"   />
+    <pin side="left" pos="10" type="pwm0A,ain0" id="PD6"  label=" 6 ~" />
+    <pin side="left" pos="11" type="bidir,ain1" id="PD7"  label=" 7"   />
 
     <pin side="left" pos="12" type="bidir" id="PB0"  label=" 8"   />
     <pin side="left" pos="13" type="pwm1A" id="PB1"  label=" 9 ~" />

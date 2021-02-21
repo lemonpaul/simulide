@@ -20,30 +20,27 @@
 #ifndef EMUXANALOG_H
 #define EMUXANALOG_H
 
-#include "e-element.h"
+#include "e-logic_device.h"
 
 class ePin;
 class eResistor;
 
-class MAINMODULE_EXPORT eMuxAnalog : public eElement
+class MAINMODULE_EXPORT eMuxAnalog : public eLogicDevice
 {
     public:
 
-        eMuxAnalog( std::string id );
+        eMuxAnalog( QString id );
         ~eMuxAnalog();
 
-        virtual void stamp();
-        virtual void setVChanged();
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
         
         double resist();
         void setResist( double r );
 
         void setBits( int bits );
-        
-        virtual void initEpins(){;}
-        
-        virtual ePin* getEpin( QString pinName );
-                             
+
     protected:
         int m_addrBits;
         int m_channels;

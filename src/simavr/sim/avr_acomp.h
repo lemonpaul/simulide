@@ -32,7 +32,6 @@ extern "C" {
  * simavr Analog Comparator allows external code to feed real voltages to the
  * simulator, and the simulator uses it's 'real' reference voltage
  * to set comparator output accordingly and trigger in interrupt, if set up this way
- *
  */
 
 enum {
@@ -71,8 +70,7 @@ typedef struct avr_acomp_t {
 
 	char			timer_name;	// connected timer for incput capture triggering
 
-	// use ACI and ACIE bits
-	avr_int_vector_t ac;
+    avr_int_vector_t ac; // use ACI and ACIE bits
 
 	// runtime data
 	uint16_t		adc_values[16];	// current values on the ADCs inputs
@@ -80,7 +78,7 @@ typedef struct avr_acomp_t {
 	avr_irq_t*		timer_irq;
 } avr_acomp_t;
 
-void avr_acomp_init(avr_t * avr, avr_acomp_t * port);
+void avr_acomp_init( avr_t* avr, avr_acomp_t* port );
 
 #ifdef __cplusplus
 };

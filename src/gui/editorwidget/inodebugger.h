@@ -29,10 +29,9 @@ class InoDebugger : public BaseDebugger
     Q_OBJECT
     Q_PROPERTY( board_t Board        READ board       WRITE setBoard       DESIGNABLE true USER true )
     Q_PROPERTY( QString Custom_Board READ customBoard WRITE setCustomBoard DESIGNABLE true USER true )
-    Q_ENUMS( board_t )
     
     public:
-        InoDebugger( QObject* parent, OutPanelText* outPane, QString filePath  );
+        InoDebugger( CodeEditor* parent, OutPanelText* outPane, QString filePath  );
         ~InoDebugger();
         
         enum board_t {
@@ -43,6 +42,7 @@ class InoDebugger : public BaseDebugger
             Leonardo,
             Custom
         };
+        Q_ENUM( board_t )
         
         QString customBoard() { return m_customBoard; }
         void setCustomBoard( QString b ){ m_customBoard = b; }
@@ -53,7 +53,7 @@ class InoDebugger : public BaseDebugger
         int compile();
         void mapFlashToSource();
         
-        virtual void upload();
+        virtual bool upload();
         
     protected:
         void getVariables();
@@ -63,10 +63,14 @@ class InoDebugger : public BaseDebugger
         int m_loopInoLine;
         int m_processorType;
         
-        QStringList boardList;
+        QStringList m_boardList;
+
+        QStringList m_fileList;
         
         QString m_customBoard;
         board_t m_board;
+
+        QString m_sketchBook;
 };
 
 

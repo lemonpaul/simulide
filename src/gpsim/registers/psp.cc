@@ -20,8 +20,7 @@ License along with this library; if not, see
 
 #include <stdio.h>
 #include <iostream>
-#include "config.h"
-#include "stimuli.h"
+
 #include "psp.h"
 
 //#define DEBUG
@@ -39,55 +38,55 @@ License along with this library; if not, see
 class CS_SignalSink : public SignalSink
 {
 public:
-  CS_SignalSink(PSP *_psp)
-    : m_psp(_psp)
-  {
-    assert(_psp);
-  }
-  virtual void release(){ delete this;}
+    CS_SignalSink(PSP *_psp)
+        : m_psp(_psp)
+    {
+        assert(_psp);
+    }
+    virtual void release(){ delete this;}
 
-  void setSinkState(char new3State)
-  {
-    m_psp->setCS_State(new3State);
-  }
+    void setSinkState(char new3State)
+    {
+        m_psp->setCS_State(new3State);
+    }
 private:
-  PSP *m_psp;
+    PSP *m_psp;
 };
 
 class RD_SignalSink : public SignalSink
 {
 public:
-  RD_SignalSink(PSP *_psp)
-    : m_psp(_psp)
-  {
-    assert(_psp);
-  }
-  virtual void release(){ delete this;}
+    RD_SignalSink(PSP *_psp)
+        : m_psp(_psp)
+    {
+        assert(_psp);
+    }
+    virtual void release(){ delete this;}
 
-  void setSinkState(char new3State)
-  {
-    m_psp->setRD_State(new3State);
-  }
+    void setSinkState(char new3State)
+    {
+        m_psp->setRD_State(new3State);
+    }
 private:
-  PSP *m_psp;
+    PSP *m_psp;
 };
 
 class WR_SignalSink : public SignalSink
 {
 public:
-  WR_SignalSink(PSP *_psp)
-    : m_psp(_psp)
-  {
-    assert(_psp);
-  }
-  virtual void release(){delete this;}
+    WR_SignalSink(PSP *_psp)
+        : m_psp(_psp)
+    {
+        assert(_psp);
+    }
+    virtual void release(){delete this;}
 
-  void setSinkState(char new3State)
-  {
-    m_psp->setWR_State(new3State);
-  }
+    void setSinkState(char new3State)
+    {
+        m_psp->setWR_State(new3State);
+    }
 private:
-  PSP *m_psp;
+    PSP *m_psp;
 };
 
 
@@ -96,63 +95,63 @@ private:
  * have a dedicated PSPCON register which is defined here
  */
 
-PSPCON::PSPCON(Processor *pCpu, const char *pName, const char *pDesc)
-  : sfr_register(pCpu, pName, pDesc)
+PSPCON::PSPCON(Processor *pCpu, const char *pName )
+    : SfrReg(pCpu, pName )
 {
 }
 void PSPCON::put(uint new_value)
 {
-  uint mask = (PSP::OBF | PSP::IBF | 0x0f);
-  uint fixed;
+    uint mask = (PSP::OBF | PSP::IBF | 0x0f);
+    uint fixed;
 
-  if (! (new_value & PSP::PSPMODE))
-    fixed = 0;
-  else
-    fixed = value.data & mask;
+    if (! (new_value & PSP::PSPMODE))
+        fixed = 0;
+    else
+        fixed = value.data & mask;
 
-  value.data = (new_value & ~mask) | fixed;
+    value.data = (new_value & ~mask) | fixed;
 }
 
 void PSPCON::put_value(uint new_value)
 {
-  value.data = new_value;
+    value.data = new_value;
 }
 //
 // setup information for PSP module
 //
 void PSP::initialize( PIR_SET *_pir_set, PicPSP_PortRegister *_port_set,
-	PicTrisRegister *_port_tris, sfr_register *_pspcon,
-        PinModule *pin_RD, PinModule *pin_WR, PinModule *pin_CS)
+                      PicTrisRegister *_port_tris, SfrReg *_pspcon,
+                      PinModule *pin_RD, PinModule *pin_WR, PinModule *pin_CS)
 {
-   pir_set = _pir_set;
-   parallel_port = _port_set;
-   parallel_port->setPSP(this);
-   parallel_tris = _port_tris;
-   cntl_tris = _pspcon;
-   //
-   // The rest of this function allows catching of changes to PSP contol signals
-   //
-   if (!m_rd_sink) 
-   {
-      m_rd_sink = new RD_SignalSink(this);
-      Not_RD = pin_RD;
-      if (Not_RD)
-        Not_RD->addSink(m_rd_sink);
-   }
-   if (!m_cs_sink) 
-   {
-      m_cs_sink = new CS_SignalSink(this);
-      Not_CS = pin_CS;
-      if (Not_CS)
-        Not_CS->addSink(m_cs_sink);
-   }
-   if (!m_wr_sink) 
-   {
-      m_wr_sink = new WR_SignalSink(this);
-      Not_WR = pin_WR;
-      if (Not_WR)
-        Not_WR->addSink(m_wr_sink);
-   }
+    pir_set = _pir_set;
+    parallel_port = _port_set;
+    parallel_port->setPSP(this);
+    parallel_tris = _port_tris;
+    cntl_tris = _pspcon;
+    //
+    // The rest of this function allows catching of changes to PSP contol signals
+    //
+    if (!m_rd_sink)
+    {
+        m_rd_sink = new RD_SignalSink(this);
+        Not_RD = pin_RD;
+        if (Not_RD)
+            Not_RD->addSink(m_rd_sink);
+    }
+    if (!m_cs_sink)
+    {
+        m_cs_sink = new CS_SignalSink(this);
+        Not_CS = pin_CS;
+        if (Not_CS)
+            Not_CS->addSink(m_cs_sink);
+    }
+    if (!m_wr_sink)
+    {
+        m_wr_sink = new WR_SignalSink(this);
+        Not_WR = pin_WR;
+        if (Not_WR)
+            Not_WR->addSink(m_wr_sink);
+    }
 
 }
 //
@@ -164,47 +163,47 @@ void PSP::state_control()
     
     if (rd && wr && cs)	// this is an error condition
     {
-	cerr << "PSP: Error CS, WR and RD must not all be low\n";
-	parallel_tris->put(0xff);
-	state = ST_INACTIVE;
-	return;
+        cerr << "PSP: Error CS, WR and RD must not all be low\n";
+        parallel_tris->put(0xff);
+        state = ST_INACTIVE;
+        return;
     }
     else if (cs && rd)
     {
-	parallel_tris->put(0);
-	parallel_port->put_value(put_value);
-	cntl_tris->put_value(cntl_tris->get() & ~OBF);
-	state = ST_READ;
+        parallel_tris->put(0);
+        parallel_port->put_value(put_value);
+        cntl_tris->put_value(cntl_tris->get() & ~OBF);
+        state = ST_READ;
     }
     else if (cs && wr)
     {
-	parallel_tris->put(0xff);
-	get_value = parallel_port->get_value();
-	state = ST_WRITE;
+        parallel_tris->put(0xff);
+        get_value = parallel_port->get_value();
+        state = ST_WRITE;
     }
     else
     {
-  	if (state != ST_INACTIVE)
+        if (state != ST_INACTIVE)
         {
-	    pir_set->set_pspif();
-	}
+            pir_set->set_pspif();
+        }
 
-	//
-	// On first bus write set IBF flag.
- 	// if a second bus write occurs prior to read of pic port (portd)
-	// IBOV flag is also set.
-	//
-	if (state == ST_WRITE)
-	{
-	    uint trise_val = cntl_tris->get();
-	    if (trise_val & IBF)
-		cntl_tris->put_value(trise_val | IBOV);
-	    else
-	        cntl_tris->put_value(trise_val | IBF);
-	}
+        //
+        // On first bus write set IBF flag.
+        // if a second bus write occurs prior to read of pic port (portd)
+        // IBOV flag is also set.
+        //
+        if (state == ST_WRITE)
+        {
+            uint trise_val = cntl_tris->get();
+            if (trise_val & IBF)
+                cntl_tris->put_value(trise_val | IBOV);
+            else
+                cntl_tris->put_value(trise_val | IBF);
+        }
 
-	parallel_tris->put(0xff);
-	state = ST_INACTIVE;
+        parallel_tris->put(0xff);
+        state = ST_INACTIVE;
     }
     return;
 }
@@ -213,18 +212,18 @@ void PSP::state_control()
 // The control pins are active low which is converted to active high signals
 void PSP::setRD_State(char new3State)
 {
-	rd = new3State == '0';
-	state_control();
+    rd = new3State == '0';
+    state_control();
 }
 void PSP::setCS_State(char new3State)
 {
-	cs = new3State == '0';
-	state_control();
+    cs = new3State == '0';
+    state_control();
 }
 void PSP::setWR_State(char new3State)
 {
-	wr = new3State == '0';
-	state_control();
+    wr = new3State == '0';
+    state_control();
 }
 
 //
@@ -242,6 +241,6 @@ void PSP::psp_put(uint new_value)
 //
 uint PSP::psp_get(void)
 {
-	cntl_tris->put_value(cntl_tris->get() & ~IBF);
-	return(get_value);
+    cntl_tris->put_value(cntl_tris->get() & ~IBF);
+    return(get_value);
 }

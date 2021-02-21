@@ -23,13 +23,16 @@
 
 #include "e-gate_or.h"
 
-eOrGate::eOrGate( std::string id, int inputs ) : eGate( id, inputs ) {}
+eOrGate::eOrGate( QString id, int inputs )
+       : eGate( id, inputs )
+{
+
+}
 eOrGate::~eOrGate(){}
 
 bool eOrGate::calcOutput( int inputs )
 {
-    if( inputs > 0 )  return true;
-
+    if( inputs > 0 ) return true;
     return false;
 }
 

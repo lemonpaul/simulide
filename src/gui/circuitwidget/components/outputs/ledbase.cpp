@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "ledbase.h"
+#include "circuitwidget.h"
 #include "connector.h"
 #include "simulator.h"
 #include "pin.h"
@@ -29,13 +30,13 @@ static const char* LedBase_properties[] = {
 
 LedBase::LedBase( QObject* parent, QString type, QString id )
        : Component( parent, type, id )
-       , eLed( id.toStdString() )
+       , eLed( id )
 {
     Q_UNUSED( LedBase_properties );
     
+    m_graphical = true;
     m_overCurrent = false;
     m_grounded = false;
-    m_ground   = 0l;
     m_scrEnode = 0l;
     m_counter = 0;
     m_bright = 0;
@@ -48,13 +49,17 @@ LedBase::LedBase( QObject* parent, QString type, QString id )
 
     Simulator::self()->addToUpdateList( this );
 }
-LedBase::~LedBase()
-{ 
+LedBase::~LedBase() {}
+
+void LedBase::initialize()
+{
+    eLed::initialize();
+    update();
 }
 
 void LedBase::updateStep()
 {
-    uint bright = m_bright;
+    uint32_t bright = m_bright;
     eLed::updateBright();
     
     if( m_bright > 255+75 )
@@ -87,8 +92,7 @@ void LedBase::setGrounded( bool grounded )
 {
     if( grounded == m_grounded ) return;
     
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim )  Simulator::self()->pauseSim();
+    if( Simulator::self()->isRunning() )  CircuitWidget::self()->powerCircOff();
 
     if( grounded )
     {
@@ -96,16 +100,13 @@ void LedBase::setGrounded( bool grounded )
         if( m_ePin[1]->isConnected() ) pin1->connector()->remove();
         pin1->setEnabled( false );
         pin1->setVisible( false );
-        
-        QString nodid = m_id;
-        nodid.append(QString("Gnod-eSource"));
-        
-        m_ground = new eSource( nodid.toStdString(), m_ePin[1] );
-        
-        m_scrEnode = new eNode( nodid+"scr" );
-        m_scrEnode->setNodeNumber(0);
-        Simulator::self()->remFromEnodeList( m_scrEnode, /*delete=*/ false );
-        
+
+        if( !m_scrEnode )
+        {
+            m_scrEnode = new eNode( m_id+"Gnod" );
+            m_scrEnode->setNodeNumber(0);
+            Simulator::self()->remFromEnodeList( m_scrEnode, /*delete=*/ false );
+        }
         m_ePin[1]->setEnode( m_scrEnode );
     }
     else
@@ -114,23 +115,16 @@ void LedBase::setGrounded( bool grounded )
 
         pin1->setEnabled( true );
         pin1->setVisible( true );
-        
-        delete m_ground;
 
-        m_ground = 0l;
-        m_scrEnode = 0l;
-        
         m_ePin[1]->setEnode( 0l );
     }
     m_grounded = grounded;
-
-    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void LedBase::remove()
 {
-    if( m_ground ) delete m_ground;
-    
+    if( m_grounded ) m_ePin[1]->setEnode( 0l );
+    //if( m_scrEnode ) delete m_scrEnode;
     Simulator::self()->remFromUpdateList( this ); 
     
     Component::remove();

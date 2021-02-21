@@ -44,7 +44,7 @@ LibraryItem* Inductor::libraryItem()
 
 Inductor::Inductor( QObject* parent, QString type, QString id )
         : Component( parent, type, id )
-        , eInductor( id.toStdString() )
+        , eInductor( id )
 {
     Q_UNUSED( Inductor_properties );
     
@@ -76,6 +76,13 @@ Inductor::Inductor( QObject* parent, QString type, QString id )
     setLabelPos(-16,-24, 0);
 }
 Inductor::~Inductor(){}
+
+QList<propGroup_t> Inductor::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Inductance", tr("Inductance"),"main"} );
+    return {mainGroup};
+}
 
 double Inductor::induc() { return m_value; }
 

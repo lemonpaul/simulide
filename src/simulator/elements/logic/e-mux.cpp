@@ -17,46 +17,41 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-
 #include "e-mux.h"
+#include "simulator.h"
 
-eMux::eMux( std::string id )
+eMux::eMux( QString id )
     : eLogicDevice( id )
 {
 }
-eMux::~eMux()
-{ 
-}
+eMux::~eMux() {}
 
 void eMux::stamp()
 {
-    for( int i=0; i<11; i++ )
+    for( int i=0; i<11; ++i )
     {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedFast(this);
+        eNode* enode = m_input[i]->getEpin(0)->getEnode();
+        if( enode ) enode->voltChangedCallback( this );
     }
     eLogicDevice::stamp();
 }
 
-void eMux::setVChanged()
+void eMux::voltChanged()
 {
     eLogicDevice::updateOutEnabled();
     
     int address = 0;
     
-    for( int i=8; i<11; i++ )
-    {
+    for( int i=8; i<11; ++i )
         if( getInputState( i ) ) address += pow( 2, i-8 );
-    }
-    
-    bool out = getInputState( address );
-    eLogicDevice::setOut( 0, out );
-    eLogicDevice::setOut( 1, !out );
 
+    m_out = getInputState( address );
+
+    Simulator::self()->addEvent( m_propDelay, this );
 }
 
-void eMux::createPins()
+void eMux::runEvent()
 {
-    eLogicDevice::createPins( 11, 2 );
+    m_output[0]->setTimedOut( m_out );
+    m_output[1]->setTimedOut(!m_out );
 }

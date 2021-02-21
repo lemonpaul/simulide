@@ -20,28 +20,24 @@
 #ifndef AVRASMDEBUGGER_H
 #define AVRASMDEBUGGER_H
 
-#include <QtGui>
-#include <QHash>
-
 #include "basedebugger.h"
 
 class AvrAsmDebugger : public BaseDebugger
 {
     Q_OBJECT
-    Q_PROPERTY( QString  Avra_Inc_Path   READ avraIncPath    WRITE setAvraIncPath   DESIGNABLE true USER true )
+    Q_PROPERTY( QString Avra_Inc_Path   READ avraIncPath    WRITE setAvraIncPath   DESIGNABLE true USER true )
     
     public:
-        AvrAsmDebugger( QObject* parent, OutPanelText* outPane, QString filePath  );
+        AvrAsmDebugger( CodeEditor* parent, OutPanelText* outPane, QString filePath  );
         ~AvrAsmDebugger();
         
-        QString avraIncPath();
+        QString avraIncPath()  { return m_avraIncPath; }
         void    setAvraIncPath( QString path );
 
-        int  compile();
         void mapFlashToSource();
         
     private:
-        QString m_avraIncPath;                  // path to avra includes
+        QString m_avraIncPath;    // path to avra includes
 };
 
 

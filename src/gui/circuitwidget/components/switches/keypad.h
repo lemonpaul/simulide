@@ -39,6 +39,8 @@ class MAINMODULE_EXPORT KeyPad : public Component, public eElement
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
+        virtual QList<propGroup_t> propGroups() override;
+
         double rows();
         void setRows( double rows );
         
@@ -48,12 +50,10 @@ class MAINMODULE_EXPORT KeyPad : public Component, public eElement
         QString keyLabels();
         void setKeyLabels( QString keyLabels );
         
-        virtual void attach();
+        virtual void stamp() override;
+        virtual void remove() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-
-    public slots:
-        virtual void remove();
 
     private:
         void setupButtons();

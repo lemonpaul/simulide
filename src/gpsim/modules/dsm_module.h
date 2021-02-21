@@ -19,10 +19,10 @@ class MDoutSignalSource;
 
 
 //_MDCON: MODULATION CONTROL REGISTER
-class _MDCON : public sfr_register
+class _MDCON : public SfrReg
 {
      public:
-      _MDCON(Processor *pCpu, const char *pName, const char *pDesc, DSM_MODULE *);
+      _MDCON(Processor *pCpu, const char *pName, DSM_MODULE *);
       virtual void put(uint);
       virtual void put_value(uint);
 
@@ -36,10 +36,10 @@ class _MDCON : public sfr_register
 
 
 // MODULATION SOURCE CONTROL REGISTER
-class _MDSRC : public sfr_register
+class _MDSRC : public SfrReg
 {
      public:
-      _MDSRC(Processor *pCpu, const char *pName, const char *pDesc, DSM_MODULE *);
+      _MDSRC(Processor *pCpu, const char *pName, DSM_MODULE *);
       virtual void put(uint);
       virtual void put_value(uint);
 
@@ -52,10 +52,10 @@ class _MDSRC : public sfr_register
 };
 
 // _MDCARH: MODULATION HIGH CARRIER CONTROL REGISTER
-class _MDCARH : public sfr_register
+class _MDCARH : public SfrReg
 {
      public:
-      _MDCARH(Processor *pCpu, const char *pName, const char *pDesc, DSM_MODULE *);
+      _MDCARH(Processor *pCpu, const char *pName, DSM_MODULE *);
       virtual void put(uint);
       virtual void put_value(uint);
 
@@ -67,11 +67,11 @@ class _MDCARH : public sfr_register
 };
 
 // _MDCARL: MODULATION LOW CARRIER CONTROL REGISTER
-class _MDCARL : public sfr_register
+class _MDCARL : public SfrReg
 {
      public:
 
-      _MDCARL(Processor *pCpu, const char *pName, const char *pDesc, DSM_MODULE *);
+      _MDCARL(Processor *pCpu, const char *pName, DSM_MODULE *);
       virtual void put(uint);
       virtual void put_value(uint);
 
@@ -125,7 +125,7 @@ class DSM_MODULE
      void new_mdcarl(uint, uint);
      void dsm_logic(bool carl_neg_edge, bool carh_new_edge);
      void putMDout(bool);
-     
+
      PinModule *m_mdout;
      PinModule *m_mdmin;
      minSink   *m_minSink;
@@ -142,7 +142,7 @@ class DSM_MODULE
 
 private:
 
-    bool	mdmin_state;	//value of min 
+    bool	mdmin_state;	//value of min
     bool	mdcarl_state;	//value of carl
     bool	mdcarh_state;	//value of carh
 

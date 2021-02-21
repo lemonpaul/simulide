@@ -33,6 +33,11 @@ typedef struct argv_t {
 	char * argv[];
 } argv_t, *argv_p;
 
+#ifdef WIN32
+/* https://unixpapa.com/incnote/string.html */
+char *strsep(char **sp, char *sep);
+#endif
+
 /*
  * Allocate a argv_t structure, split 'line' into words (destructively)
  * and fills up argc, and argv fields with pointers to the individual
@@ -43,9 +48,6 @@ typedef struct argv_t {
  * You are still responsible, as the caller, to (free) the resulting
  * pointer, and the 'line' text, if appropriate, no duplication is made
  */
-argv_p
-argv_parse(
-	argv_p	argv,
-	char * line );
+argv_p argv_parse( argv_p	argv, char * line );
 
 #endif /* __SIM_UTILS_H__ */

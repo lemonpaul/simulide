@@ -26,21 +26,21 @@ class MAINMODULE_EXPORT eBcdToDec : public eLogicDevice
 {
     public:
 
-        eBcdToDec( std::string id  );
+        eBcdToDec( QString id  );
         ~eBcdToDec();
 
-        virtual void stamp();
-        virtual void resetState();
-        virtual void setVChanged();
+        virtual void stamp() override;
+        virtual void initialize() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
 
         virtual void set_16bits( bool set );
-        
-        void createPins();
-                             
-    protected:           
+
+    protected:
         bool m_16Bits;
 
-        int m_address;
+        int m_dec;
+        int m_old;
 };
 
 

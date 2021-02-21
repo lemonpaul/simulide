@@ -11,6 +11,18 @@
         <source>Logic/Other Logic</source>
         <translation>Logique/Autre logique</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reference Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AVRComponent</name>
@@ -24,12 +36,43 @@
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation type="vanished">Erreur</translation>
     </message>
     <message>
         <source>Only 1 Mcu allowed
  to be in the Circuit.</source>
-        <translation>1 seul microcontrôleur est autorisé dans le circuit.</translation>
+        <translation type="vanished">1 seul microcontrôleur est autorisé dans le circuit.</translation>
+    </message>
+</context>
+<context>
+    <name>Aip31068_i2c</name>
+    <message>
+        <source>Aip31068_i2c</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Displays</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows</source>
+        <translation type="unfinished">Lignes</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I2C Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I2C Frequency</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -52,6 +95,10 @@
     <message>
         <source>Logic/Gates</source>
         <translation>Logique/Portes</translation>
+    </message>
+    <message>
+        <source>Input Size</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -293,10 +340,6 @@
         <translation>Valeur Ohm</translation>
     </message>
     <message>
-        <source>PlotterCh</source>
-        <translation>Plotter</translation>
-    </message>
-    <message>
         <source>Rcoil</source>
         <translation>Rcoil</translation>
     </message>
@@ -521,6 +564,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>RPM Nominal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volt Nominal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Vertical Pins</source>
         <translation type="unfinished"></translation>
     </message>
@@ -530,6 +581,14 @@
     </message>
     <message>
         <source>Show Cap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max Resistance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Min Resistance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -552,6 +611,83 @@
         <source>Package File</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Propagation Delay ns</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AppProp</name>
+    <message>
+        <source>Application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Property: (default value)&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Language: (English)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Application Language.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Needs Restart.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Font Scale: (1)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Scale Application Font, example 1,5=150%.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Minimum = 0.5&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Maximum = 2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>English</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>French</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>German</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Italian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Russian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spanish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font Scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dutch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pt_Brasil</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Arduino</name>
@@ -565,12 +701,12 @@
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation type="vanished">Erreur</translation>
     </message>
     <message>
         <source>Only 1 Mcu allowed
  to be in the Circuit.</source>
-        <translation>1 seul microcontrôleur est autorisé dans le circuit.</translation>
+        <translation type="vanished">1 seul microcontrôleur est autorisé dans le circuit.</translation>
     </message>
 </context>
 <context>
@@ -582,6 +718,25 @@
     <message>
         <source>Outputs</source>
         <translation>Sorties</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Buzzer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Impedance</source>
+        <translation type="unfinished">Impédance</translation>
+    </message>
+</context>
+<context>
+    <name>AvrCompBase</name>
+    <message>
+        <source>Init gdb server at restart</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -668,20 +823,32 @@
         <source>Active</source>
         <translation>Actif</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PNP</source>
+        <translation type="unfinished">PNP</translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">Gain</translation>
+    </message>
 </context>
 <context>
     <name>BaseDebugger</name>
     <message>
         <source>Debugger already running</source>
-        <translation>Debugger déjà en route</translation>
+        <translation type="vanished">Debugger déjà en route</translation>
     </message>
     <message>
         <source>Stop active session</source>
-        <translation>Arrêter la session active</translation>
+        <translation type="vanished">Arrêter la session active</translation>
     </message>
     <message>
         <source>Uploading: </source>
-        <translation>Chargement : </translation>
+        <translation type="vanished">Chargement : </translation>
     </message>
     <message>
         <source>FirmWare Uploaded to </source>
@@ -709,6 +876,25 @@
     </message>
 </context>
 <context>
+    <name>Battery</name>
+    <message>
+        <source>Battery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sources</source>
+        <translation type="unfinished">Sources</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voltage</source>
+        <translation type="unfinished">Tension</translation>
+    </message>
+</context>
+<context>
     <name>BcdTo7S</name>
     <message>
         <source>Bcd To 7S.</source>
@@ -717,6 +903,14 @@
     <message>
         <source>Logic/Converters</source>
         <translation>Logique/Convertisseurs</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert Outputs</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -727,6 +921,18 @@
     </message>
     <message>
         <source>Decoder(4 to 10/16)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16 Bits</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -740,6 +946,22 @@
         <source>Logic/Arithmetic</source>
         <translation>Logique/Arithmétique</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clock Inverted</source>
+        <translation type="unfinished">Horloge inversée</translation>
+    </message>
+    <message>
+        <source>Reset Inverted</source>
+        <translation type="unfinished">Reset inversé</translation>
+    </message>
+    <message>
+        <source>Count to</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Buffer</name>
@@ -751,6 +973,10 @@
         <source>Logic/Gates</source>
         <translation>Logique/Portes</translation>
     </message>
+    <message>
+        <source>Tristate</source>
+        <translation type="unfinished">Tristate</translation>
+    </message>
 </context>
 <context>
     <name>Bus</name>
@@ -761,6 +987,18 @@
     <message>
         <source>Logic/Other Logic</source>
         <translation>Logique/Autre logique</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Bit</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -775,12 +1013,23 @@
     </message>
 </context>
 <context>
+    <name>CapacitorBase</name>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capacitance</source>
+        <translation type="unfinished">Capacité</translation>
+    </message>
+</context>
+<context>
     <name>Chip</name>
     <message>
         <source>Cannot read file:
 %1:
 %2.</source>
-        <translation>Impossible de lire le fichier :
+        <translation type="vanished">Impossible de lire le fichier :
 %1 :
 %2.</translation>
     </message>
@@ -788,7 +1037,7 @@
         <source>Cannot set file:
 %1
 to DomDocument</source>
-        <translation>Impossible de modifier le fichier :
+        <translation type="vanished">Impossible de modifier le fichier :
 %1
 vers DomDocument</translation>
     </message>
@@ -799,6 +1048,78 @@ No valid Chip</source>
         <translation>Erreur de lecture du fichier :
 %1
 Pas de puce valide</translation>
+    </message>
+</context>
+<context>
+    <name>CircProp</name>
+    <message>
+        <source>Circuit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Circuit Canvas</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation type="unfinished">Autre</translation>
+    </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Property: (default value)&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Show Grid: (true)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Global Property, applies to all circuits.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Show Scrollbar: (false)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Global Property, applies to all circuits.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Animate: (false)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Wires will get Red if Volts&amp;gt;2.5, Blue if not.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Canvas Refresh: (20)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Graphical refresh in frames per second.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Auto Backup Secs: (15)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Time interval in seconds for Circuit to check for changes.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Save Circuit backup if there are changes.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Setting time to 0 disables Auto Backup.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Draw Grid</source>
+        <translation type="unfinished">Afficher la grille</translation>
+    </message>
+    <message>
+        <source>Show ScrollBars</source>
+        <translation type="unfinished">Afficher les barres</translation>
+    </message>
+    <message>
+        <source>Animate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Canvas Refresh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FPS</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -814,13 +1135,13 @@ Pas de puce valide</translation>
     <message>
         <source>Cannot read file %1:
 %2.</source>
-        <translation>Impossible de lire le fichier %1 :
+        <translation type="vanished">Impossible de lire le fichier %1 :
 %2.</translation>
     </message>
     <message>
         <source>Cannot set file %1
 to DomDocument</source>
-        <translation>Impossible de modifier le fichier %1
+        <translation type="vanished">Impossible de modifier le fichier %1
 vers DomDocument</translation>
     </message>
     <message>
@@ -835,23 +1156,15 @@ vers DomDocument</translation>
     </message>
     <message>
         <source>Create Subcircuit</source>
-        <translation>Créer sous-circuit</translation>
-    </message>
-    <message>
-        <source>Select Directory</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Créer sous-circuit</translation>
     </message>
     <message>
         <source>Cannot set file:
 %1
 to DomDocument</source>
-        <translation type="unfinished">Impossible de modifier le fichier :
+        <translation type="obsolete">Impossible de modifier le fichier :
 %1
 vers DomDocument</translation>
-    </message>
-    <message>
-        <source>2 Package Pins connected together</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -878,7 +1191,7 @@ vers DomDocument</translation>
     </message>
     <message>
         <source>Create SubCircuit</source>
-        <translation>Créer sous-circuit</translation>
+        <translation type="vanished">Créer sous-circuit</translation>
     </message>
     <message>
         <source>Bill of Materials</source>
@@ -899,6 +1212,10 @@ vers DomDocument</translation>
     <message>
         <source>Time: </source>
         <translation>Temps: </translation>
+    </message>
+    <message>
+        <source>Properties</source>
+        <translation type="obsolete">Propriétés</translation>
     </message>
 </context>
 <context>
@@ -1001,6 +1318,34 @@ Voulez-vous sauvegarder les changements ?
         <source>Info</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Last Circuits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;%1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    Load: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>App Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Circuit Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simulation Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Clock</name>
@@ -1011,6 +1356,34 @@ Voulez-vous sauvegarder les changements ?
     <message>
         <source>Sources</source>
         <translation>Sources</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voltage</source>
+        <translation type="unfinished">Tension</translation>
+    </message>
+    <message>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rise Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fall Time</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1039,7 +1412,7 @@ Voulez-vous sauvegarder les changements ?
         <source>
 Error:  Mcu Deleted while Debugging!!
 </source>
-        <translation>
+        <translation type="vanished">
 Erreur : microcontrôleur supprimé pendant le debug !!
 </translation>
     </message>
@@ -1068,6 +1441,10 @@ Erreur : microcontrôleur supprimé pendant le debug !!
         <translation>Erreur de chargement du firmware... </translation>
     </message>
     <message>
+        <source>Clock Cycles: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>     ERROR!!! Compilation Failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1079,22 +1456,68 @@ Erreur : microcontrôleur supprimé pendant le debug !!
         <source>Debugger Stopped </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished">Propriétés</translation>
+    </message>
+    <message>
+        <source>Please save the Document first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Compiler available for: %1 files</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CodeEditorWidget</name>
     <message>
         <source>Ready</source>
-        <translation>Prêt</translation>
+        <translation type="vanished">Prêt</translation>
     </message>
 </context>
 <context>
     <name>ColorCombo</name>
     <message>
         <source>Custom</source>
-        <translation>Personnalisé</translation>
+        <translation type="vanished">Personnalisé</translation>
+    </message>
+</context>
+<context>
+    <name>CompilDialog</name>
+    <message>
+        <source>Type: </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Transparent</source>
+        <source>Label: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tab 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Compiler</name>
+    <message>
+        <source>Error: ToolChain not found</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1184,6 +1607,14 @@ vers DomDocument</translation>
         <source>Sources</source>
         <translation>Sources</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max. Current</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DAC</name>
@@ -1195,6 +1626,64 @@ vers DomDocument</translation>
         <source>Logic/Other Logic</source>
         <translation>Logique/Autre logique</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reference Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DataWidget</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DcMotor</name>
+    <message>
+        <source>Dc Motor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Outputs</source>
+        <translation type="obsolete">Sorties</translation>
+    </message>
+    <message>
+        <source>Motors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nominal Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nominal Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
+    </message>
 </context>
 <context>
     <name>DecToBcd</name>
@@ -1204,6 +1693,18 @@ vers DomDocument</translation>
     </message>
     <message>
         <source>Encoder(10/16 to 4)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert Inputs</source>
+        <translation type="unfinished">Inverser les entrées</translation>
+    </message>
+    <message>
+        <source>16 Bits</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1217,6 +1718,14 @@ vers DomDocument</translation>
         <source>Logic/Converters</source>
         <translation>Logique/Convertisseurs</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Diode</name>
@@ -1227,6 +1736,25 @@ vers DomDocument</translation>
     <message>
         <source>Active</source>
         <translation>Actif</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threshold</source>
+        <translation type="unfinished">Seuil</translation>
+    </message>
+    <message>
+        <source>Zener Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DoubleVal</name>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1250,6 +1778,105 @@ vers DomDocument</translation>
     <message>
         <source>Edit Pin </source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Point Pin</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditorProp</name>
+    <message>
+        <source>Editor / Debugger</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compiler / Debugger</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font Size</source>
+        <translation type="unfinished">Taille de police</translation>
+    </message>
+    <message>
+        <source>Tab Size</source>
+        <translation type="unfinished">Taille de tabulation</translation>
+    </message>
+    <message>
+        <source>Pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tabs as Spaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Spaces</source>
+        <translation type="unfinished">Afficher les espaces</translation>
+    </message>
+    <message>
+        <source>Spaces</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drive Circuit</source>
+        <translation type="unfinished">Circuit conducteur</translation>
+    </message>
+    <message>
+        <source>Board</source>
+        <translation type="unfinished">Carte</translation>
+    </message>
+    <message>
+        <source>Uno</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mega</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nano</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duemilanove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leonardo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished">Personnalisé</translation>
+    </message>
+    <message>
+        <source>Compiler Path</source>
+        <translation type="unfinished">Chemin du compilateur</translation>
+    </message>
+    <message>
+        <source>Avra Inc Path</source>
+        <translation type="unfinished">Chemin vers Avra</translation>
+    </message>
+    <message>
+        <source>Custom Board</source>
+        <translation type="unfinished">Carte personnalisée</translation>
     </message>
 </context>
 <context>
@@ -1446,6 +2073,14 @@ Voulez-vous sauvegarder les changements?
         <source>Reload</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Last Circuits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;%1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ellipse</name>
@@ -1454,8 +2089,8 @@ Voulez-vous sauvegarder les changements?
         <translation>Ellipse</translation>
     </message>
     <message>
-        <source>Other</source>
-        <translation>Autre</translation>
+        <source>Graphical</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1572,6 +2207,22 @@ Voulez-vous sauvegarder les changements?
         <source>Logic/Memory</source>
         <translation>Logique/Mémoire</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clock Inverted</source>
+        <translation type="unfinished">Horloge inversée</translation>
+    </message>
+    <message>
+        <source>Set / Reset Inverted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trigger Type</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FlipFlopJK</name>
@@ -1583,6 +2234,22 @@ Voulez-vous sauvegarder les changements?
         <source>Logic/Memory</source>
         <translation>Logique/Mémoire</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clock Inverted</source>
+        <translation type="unfinished">Horloge inversée</translation>
+    </message>
+    <message>
+        <source>Set / Reset Inverted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trigger Type</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Frequencimeter</name>
@@ -1593,6 +2260,14 @@ Voulez-vous sauvegarder les changements?
     <message>
         <source>Meters</source>
         <translation>Mesures</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter</source>
+        <translation type="unfinished">Filtre</translation>
     </message>
 </context>
 <context>
@@ -1624,6 +2299,89 @@ Voulez-vous sauvegarder les changements?
         <source> Function:</source>
         <translation> Fonction :</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Functions</source>
+        <translation type="unfinished">Fonctions</translation>
+    </message>
+    <message>
+        <source>Load Functions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Functions</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Gate</name>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inverted</source>
+        <translation type="unfinished">Inversé</translation>
+    </message>
+    <message>
+        <source>Open Drain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Electric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low to High Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High to Low Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Impedance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output High Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Low Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Impedance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Propagation Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rise Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fall Time</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ground</name>
@@ -1644,7 +2402,23 @@ Voulez-vous sauvegarder les changements?
     </message>
     <message>
         <source>Outputs</source>
-        <translation>Sorties</translation>
+        <translation type="vanished">Sorties</translation>
+    </message>
+    <message>
+        <source>Displays</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows</source>
+        <translation type="unfinished">Lignes</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1665,6 +2439,30 @@ Voulez-vous sauvegarder les changements?
         <source>Save data</source>
         <translation>Sauvegarder données</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control_Code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I2C Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Persistent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Memory Table</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>I2CToParallel</name>
@@ -1676,6 +2474,29 @@ Voulez-vous sauvegarder les changements?
         <source>Logic/Converters</source>
         <translation>Logique/Convertisseurs</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control_Code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I2C Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Ili9341</name>
+    <message>
+        <source>Ili9341</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Displays</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Image</name>
@@ -1684,16 +2505,20 @@ Voulez-vous sauvegarder les changements?
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Other</source>
-        <translation type="unfinished">Autre</translation>
-    </message>
-    <message>
         <source>Load Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>All files (*.*)</source>
         <translation type="unfinished">Tous types (*.*)</translation>
+    </message>
+    <message>
+        <source>Graphical</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image File</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1706,14 +2531,41 @@ Voulez-vous sauvegarder les changements?
         <source>Passive</source>
         <translation>Passif</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inductance</source>
+        <translation type="unfinished">Inductance</translation>
+    </message>
 </context>
 <context>
     <name>InoDebugger</name>
     <message>
         <source>Cannot write file %1:
 %2.</source>
-        <translation>Impossible d&apos;écrire le fichier %1 :
+        <translation type="vanished">Impossible d&apos;écrire le fichier %1 :
 %2.</translation>
+    </message>
+</context>
+<context>
+    <name>IntCircuit</name>
+    <message>
+        <source>There are no data files for </source>
+        <translation type="obsolete">Il n&apos;y a pas de fichier de données pour </translation>
+    </message>
+    <message>
+        <source>Cannot read file %1:
+%2.</source>
+        <translation type="obsolete">Impossible de lire le fichier %1 :
+%2.</translation>
+    </message>
+    <message>
+        <source>Cannot set file %1
+to DomDocument</source>
+        <translation type="obsolete">Impossible de modifier le fichier %1
+vers DomDocument</translation>
     </message>
 </context>
 <context>
@@ -1750,6 +2602,76 @@ Voulez-vous sauvegarder les changements?
         <source>Micro</source>
         <translation>Microcontrôleurs</translation>
     </message>
+    <message>
+        <source>Leds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Outputs</source>
+        <translation type="unfinished">Sorties</translation>
+    </message>
+    <message>
+        <source>Displays</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Perifericals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="unfinished">Passif</translation>
+    </message>
+    <message>
+        <source>Resistive Sensors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AVRs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NEW_MCU</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PICs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I51</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>KY023</name>
+    <message>
+        <source>KY-023</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Perifericals</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>KY040</name>
+    <message>
+        <source>KY-040</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Perifericals</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>KeyPad</name>
@@ -1761,6 +2683,22 @@ Voulez-vous sauvegarder les changements?
         <source>Switches</source>
         <translation>Interrupteurs</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows</source>
+        <translation type="unfinished">Lignes</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Key Labels</source>
+        <translation type="unfinished">Labels clé</translation>
+    </message>
 </context>
 <context>
     <name>Ks0108</name>
@@ -1770,7 +2708,26 @@ Voulez-vous sauvegarder les changements?
     </message>
     <message>
         <source>Outputs</source>
-        <translation>Sorties</translation>
+        <translation type="vanished">Sorties</translation>
+    </message>
+    <message>
+        <source>Displays</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CS Active Low</source>
+        <translation type="unfinished">CS actif à l&apos;état bas</translation>
+    </message>
+</context>
+<context>
+    <name>LabelVal</name>
+    <message>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1783,6 +2740,69 @@ Voulez-vous sauvegarder les changements?
         <source>Logic/Memory</source>
         <translation>Logique/Mémoire</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tristate</source>
+        <translation type="unfinished">Tristate</translation>
+    </message>
+    <message>
+        <source>Invert Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trigger Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Ldr</name>
+    <message>
+        <source>LDR</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="obsolete">Passif</translation>
+    </message>
+    <message>
+        <source>Resistive Sensors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dial Step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gamma</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Led</name>
@@ -1792,7 +2812,39 @@ Voulez-vous sauvegarder les changements?
     </message>
     <message>
         <source>Outputs</source>
-        <translation>Sorties</translation>
+        <translation type="vanished">Sorties</translation>
+    </message>
+    <message>
+        <source>Leds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished">Couleur</translation>
+    </message>
+    <message>
+        <source>Grounded</source>
+        <translation type="unfinished">Masse</translation>
+    </message>
+    <message>
+        <source>Electric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threshold</source>
+        <translation type="unfinished">Seuil</translation>
+    </message>
+    <message>
+        <source>Max Current</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
     </message>
 </context>
 <context>
@@ -1803,7 +2855,43 @@ Voulez-vous sauvegarder les changements?
     </message>
     <message>
         <source>Outputs</source>
-        <translation>Sorties</translation>
+        <translation type="vanished">Sorties</translation>
+    </message>
+    <message>
+        <source>Leds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished">Couleur</translation>
+    </message>
+    <message>
+        <source>Grounded</source>
+        <translation type="unfinished">Masse</translation>
+    </message>
+    <message>
+        <source>Electric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threshold</source>
+        <translation type="unfinished">Seuil</translation>
+    </message>
+    <message>
+        <source>Max Current</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
     </message>
 </context>
 <context>
@@ -1814,7 +2902,47 @@ Voulez-vous sauvegarder les changements?
     </message>
     <message>
         <source>Outputs</source>
-        <translation>Sorties</translation>
+        <translation type="vanished">Sorties</translation>
+    </message>
+    <message>
+        <source>Leds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical Pins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows</source>
+        <translation type="unfinished">Lignes</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished">Couleur</translation>
+    </message>
+    <message>
+        <source>Electric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threshold</source>
+        <translation type="unfinished">Seuil</translation>
+    </message>
+    <message>
+        <source>Max Current</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
     </message>
 </context>
 <context>
@@ -1824,8 +2952,8 @@ Voulez-vous sauvegarder les changements?
         <translation>Ligne</translation>
     </message>
     <message>
-        <source>Other</source>
-        <translation>Autre</translation>
+        <source>Graphical</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1851,6 +2979,61 @@ Voulez-vous sauvegarder les changements?
     </message>
 </context>
 <context>
+    <name>LogicComponent</name>
+    <message>
+        <source>Electric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inputs:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low to High Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High to Low Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Impedance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Outputs:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output High Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Low Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Impedance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Propagation Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rise Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fall Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LogicInput</name>
     <message>
         <source>Fixed Volt.</source>
@@ -1859,6 +3042,14 @@ Voulez-vous sauvegarder les changements?
     <message>
         <source>Sources</source>
         <translation>Sources</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voltage</source>
+        <translation type="unfinished">Tension</translation>
     </message>
 </context>
 <context>
@@ -1869,11 +3060,7 @@ Voulez-vous sauvegarder les changements?
     </message>
     <message>
         <source>RamTable</source>
-        <translation>Table RAM</translation>
-    </message>
-    <message>
-        <source>Properties</source>
-        <translation>Propriétés</translation>
+        <translation type="vanished">Table RAM</translation>
     </message>
     <message>
         <source>File explorer</source>
@@ -1895,19 +3082,57 @@ Voulez-vous sauvegarder les changements?
         <source>Plugin Error:</source>
         <translation>Erreur de plugin :</translation>
     </message>
+    <message>
+        <source>Search Components</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Max72xx_matrix</name>
+    <message>
+        <source>Max72xx_matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Mcu</name>
+    <message>
+        <source>Load Firmware</source>
+        <translation type="unfinished">Charger le firmware</translation>
+    </message>
+    <message>
+        <source>All files (*.*);;ELF Files (*.elf);;Hex Files (*.hex)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load firmware</source>
+        <translation type="unfinished">Charger le firmware</translation>
+    </message>
 </context>
 <context>
     <name>McuComponent</name>
     <message>
         <source>Cannot read file %1:
 %2.</source>
-        <translation>Impossible de lire le fichier %1 :
+        <translation type="vanished">Impossible de lire le fichier %1 :
 %2.</translation>
     </message>
     <message>
         <source>Cannot set file %1
 to DomDocument</source>
-        <translation>Impossible de modifier le fichier %1
+        <translation type="vanished">Impossible de modifier le fichier %1
 vers DomDocument</translation>
     </message>
     <message>
@@ -1950,12 +3175,44 @@ vers DomDocument</translation>
         <source>All files (*.*);;ELF Files (*.elf);;Hex Files (*.hex)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Open RamTable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Mcu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logic Symbol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fimware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Load Firmware at Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show EEPROM Table</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MemData</name>
     <message>
         <source>Load Data</source>
-        <translation>Charger données</translation>
+        <translation type="vanished">Charger données</translation>
     </message>
     <message>
         <source>Save Data</source>
@@ -1969,6 +3226,13 @@ vers DomDocument</translation>
     </message>
     <message>
         <source>.data (*.data);;.bin (*.bin);;All files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MemTable</name>
+    <message>
+        <source>Memory View</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1990,6 +3254,26 @@ vers DomDocument</translation>
         <source>Save data</source>
         <translation>Sauvegarder données</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Persistent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Memory Table</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Mosfet</name>
@@ -2000,6 +3284,26 @@ vers DomDocument</translation>
     <message>
         <source>Active</source>
         <translation>Actif</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P Channel</source>
+        <translation type="unfinished">Voie P</translation>
+    </message>
+    <message>
+        <source>Depletion</source>
+        <translation type="unfinished">Epuisement</translation>
+    </message>
+    <message>
+        <source>RDSon</source>
+        <translation type="unfinished">RDSon</translation>
+    </message>
+    <message>
+        <source>Threshold</source>
+        <translation type="unfinished">Seuil</translation>
     </message>
 </context>
 <context>
@@ -2012,6 +3316,14 @@ vers DomDocument</translation>
         <source>Logic/Converters</source>
         <translation>Logique/Convertisseurs</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert Inputs</source>
+        <translation type="unfinished">Inverser les entrées</translation>
+    </message>
 </context>
 <context>
     <name>MuxAnalog</name>
@@ -2022,6 +3334,18 @@ vers DomDocument</translation>
     <message>
         <source>Active</source>
         <translation>Actif</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Impedance</source>
+        <translation type="unfinished">Impédance</translation>
     </message>
 </context>
 <context>
@@ -2034,6 +3358,30 @@ vers DomDocument</translation>
         <source>Active</source>
         <translation>Actif</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gain</source>
+        <translation type="unfinished">Gain</translation>
+    </message>
+    <message>
+        <source>Supply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>V+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>V-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Supply Pins</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OrGate</name>
@@ -2044,6 +3392,17 @@ vers DomDocument</translation>
     <message>
         <source>Logic/Gates</source>
         <translation>Logique/Portes</translation>
+    </message>
+    <message>
+        <source>Input Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OscWidget</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2056,6 +3415,58 @@ vers DomDocument</translation>
         <source>Meters</source>
         <translation>Mesures</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter</source>
+        <translation type="unfinished">Filtre</translation>
+    </message>
+    <message>
+        <source>Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Baisc Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>One Shot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active (pauses simulation at trigger)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conditions:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ref. Pin</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PICComponent</name>
@@ -2065,12 +3476,12 @@ vers DomDocument</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur</translation>
+        <translation type="vanished">Erreur</translation>
     </message>
     <message>
         <source>Only 1 Mcu allowed
  to be in the Circuit.</source>
-        <translation>Un seul microcontrôleur autorisé
+        <translation type="vanished">Un seul microcontrôleur autorisé
 dans le circuit.</translation>
     </message>
 </context>
@@ -2082,7 +3493,11 @@ dans le circuit.</translation>
     </message>
     <message>
         <source>Outputs</source>
-        <translation>Sorties</translation>
+        <translation type="vanished">Sorties</translation>
+    </message>
+    <message>
+        <source>Displays</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2109,25 +3524,6 @@ dans le circuit.</translation>
     </message>
 </context>
 <context>
-    <name>PlotterWidget</name>
-    <message>
-        <source>Max </source>
-        <translation>Max </translation>
-    </message>
-    <message>
-        <source>Min  </source>
-        <translation>Min  </translation>
-    </message>
-    <message>
-        <source>Scale:   </source>
-        <translation>Echelle :   </translation>
-    </message>
-    <message>
-        <source>Tracks: </source>
-        <translation>Signaux : </translation>
-    </message>
-</context>
-<context>
     <name>Potentiometer</name>
     <message>
         <source>Potentiometer</source>
@@ -2135,7 +3531,23 @@ dans le circuit.</translation>
     </message>
     <message>
         <source>Passive</source>
-        <translation>Passif</translation>
+        <translation type="vanished">Passif</translation>
+    </message>
+    <message>
+        <source>Resistors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
+    </message>
+    <message>
+        <source>Current Value</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2149,37 +3561,47 @@ dans le circuit.</translation>
         <translation>Mesures</translation>
     </message>
     <message>
-        <source>Remove from Plotter</source>
-        <translation>Supprimer du plotter</translation>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Plotter Channel</source>
-        <translation>Voie plotter</translation>
-    </message>
-    <message>
-        <source>Channel 1</source>
-        <translation>Voie 1</translation>
-    </message>
-    <message>
-        <source>Channel 2</source>
-        <translation>Voie 2</translation>
-    </message>
-    <message>
-        <source>Channel 3</source>
-        <translation>Voie 3</translation>
-    </message>
-    <message>
-        <source>Channel 4</source>
-        <translation>Voie 4</translation>
+        <source>Threshold</source>
+        <translation type="unfinished">Seuil</translation>
     </message>
 </context>
 <context>
-    <name>PropertiesWidget</name>
+    <name>PropDialog</name>
     <message>
-        <source>Here will be some help ..............................................
-</source>
-        <translation>Ici, il y aura de l&apos;aide..................
-</translation>
+        <source>Type: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tab 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2192,16 +3614,75 @@ dans le circuit.</translation>
         <source>Switches</source>
         <translation>Interrupteurs</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally Closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Poles</source>
+        <translation type="unfinished">Pôles</translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QPropertyModel</name>
     <message>
         <source>Name</source>
-        <translation>Nom</translation>
+        <translation type="vanished">Nom</translation>
     </message>
     <message>
         <source>Value</source>
-        <translation>Valeur</translation>
+        <translation type="vanished">Valeur</translation>
+    </message>
+</context>
+<context>
+    <name>RTD</name>
+    <message>
+        <source>RTD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="obsolete">Passif</translation>
+    </message>
+    <message>
+        <source>Resistive Sensors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dial Step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R0</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2213,6 +3694,14 @@ dans le circuit.</translation>
     <message>
         <source>Sources</source>
         <translation>Sources</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voltage</source>
+        <translation type="unfinished">Tension</translation>
     </message>
 </context>
 <context>
@@ -2271,8 +3760,8 @@ dans le circuit.</translation>
         <translation>Rectangle</translation>
     </message>
     <message>
-        <source>Other</source>
-        <translation>Autre</translation>
+        <source>Graphical</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2285,6 +3774,46 @@ dans le circuit.</translation>
         <source>Switches</source>
         <translation>Interrupteurs</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally Closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Double Throw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Poles</source>
+        <translation type="unfinished">Pôles</translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Electric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
+    </message>
+    <message>
+        <source>Inductance</source>
+        <translation type="unfinished">Inductance</translation>
+    </message>
+    <message>
+        <source>IOn</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IOff</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Resistor</name>
@@ -2294,7 +3823,19 @@ dans le circuit.</translation>
     </message>
     <message>
         <source>Passive</source>
-        <translation>Passif</translation>
+        <translation type="vanished">Passif</translation>
+    </message>
+    <message>
+        <source>Resistors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
     </message>
 </context>
 <context>
@@ -2305,7 +3846,23 @@ dans le circuit.</translation>
     </message>
     <message>
         <source>Passive</source>
-        <translation>Passif</translation>
+        <translation type="vanished">Passif</translation>
+    </message>
+    <message>
+        <source>Resistors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2317,6 +3874,54 @@ dans le circuit.</translation>
     <message>
         <source>Sensors</source>
         <translation>Capteurs</translation>
+    </message>
+</context>
+<context>
+    <name>Scripted</name>
+    <message>
+        <source>Scripted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logic/Arithmetic</source>
+        <translation type="unfinished">Logique/Arithmétique</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Script</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Script Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Evaluate Script</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load script</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save script</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot write file %1:
+%2.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2335,7 +3940,19 @@ dans le circuit.</translation>
     </message>
     <message>
         <source>Outputs</source>
-        <translation>Sorties</translation>
+        <translation type="vanished">Sorties</translation>
+    </message>
+    <message>
+        <source>Motors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2346,7 +3963,47 @@ dans le circuit.</translation>
     </message>
     <message>
         <source>Outputs</source>
-        <translation>Sorties</translation>
+        <translation type="vanished">Sorties</translation>
+    </message>
+    <message>
+        <source>Leds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical Pins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished">Couleur</translation>
+    </message>
+    <message>
+        <source>Electric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Common Cathode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threshold</source>
+        <translation type="unfinished">Seuil</translation>
+    </message>
+    <message>
+        <source>Max Current</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
     </message>
 </context>
 <context>
@@ -2361,6 +4018,37 @@ dans le circuit.</translation>
     </message>
 </context>
 <context>
+    <name>Shape</name>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Border</source>
+        <translation type="unfinished">Frontière</translation>
+    </message>
+    <message>
+        <source>Z Value</source>
+        <translation type="unfinished">Valeur Z</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished">Couleur</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished">Opacité</translation>
+    </message>
+</context>
+<context>
     <name>ShiftReg</name>
     <message>
         <source>Shift Reg.</source>
@@ -2369,6 +4057,116 @@ dans le circuit.</translation>
     <message>
         <source>Logic/Arithmetic</source>
         <translation>Logique/Arithmétique</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clock Inverted</source>
+        <translation type="unfinished">Horloge inversée</translation>
+    </message>
+    <message>
+        <source>Reset Inverted</source>
+        <translation type="unfinished">Reset inversé</translation>
+    </message>
+</context>
+<context>
+    <name>SimuProp</name>
+    <message>
+        <source>Simulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simulation Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>50%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed % Real</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simulation Step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>µs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Steps per Second</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NonLinear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NL. Max. Steps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Values are not saved until Editing is finished.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Slider changes are saved inmediatly.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Property:&lt;/span&gt; (default value)&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;Speed  %: &lt;/span&gt;(100)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Simulation speed in percentage of real time. &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;Steps per Second:&lt;/span&gt; (1000000)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Simulation speed in Steps per Second.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;Simulation Step:&lt;/span&gt; (1 µs)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Simulation step in specified units .&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;NL. Max, Steps:&lt;/span&gt; (100000)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Limit NonLinear Iterations.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- &lt;span style=&quot; font-weight:600;&quot;&gt;Reactive Steps:&lt;/span&gt; (50)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   Run Reactive once every X steps.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2379,7 +4177,27 @@ dans le circuit.</translation>
     </message>
     <message>
         <source>Outputs</source>
-        <translation type="unfinished">Sorties</translation>
+        <translation type="obsolete">Sorties</translation>
+    </message>
+    <message>
+        <source>Displays</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation type="unfinished">Couleur</translation>
+    </message>
+    <message>
+        <source>I2C Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I2C Frequency</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2390,7 +4208,77 @@ dans le circuit.</translation>
     </message>
     <message>
         <source>Outputs</source>
-        <translation>Sorties</translation>
+        <translation type="vanished">Sorties</translation>
+    </message>
+    <message>
+        <source>Motors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bipolar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Steps per Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>teeth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistance</source>
+        <translation type="unfinished">Résistance</translation>
+    </message>
+</context>
+<context>
+    <name>Strain</name>
+    <message>
+        <source>Force Strain Gauge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resistive Sensors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dial Step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ref. Temperature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temperature</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StringVal</name>
+    <message>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2414,12 +4302,20 @@ vers DomDocument</translation>
     <message>
         <source>Error reading Subcircuit file: %1
 </source>
-        <translation>Erreur de lecture du fichier : %1
+        <translation type="vanished">Erreur de lecture du fichier : %1
 </translation>
     </message>
     <message>
         <source>There are no data files for </source>
         <translation>Il n&apos;y a pas de fichier de données pour </translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logic Symbol</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2476,6 +4372,34 @@ Voulez-vous sauvegarder les changements ?
         <source>Edit Pin </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Select Main Component</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Board Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished">Largeur</translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation type="unfinished">Hauteur</translation>
+    </message>
+    <message>
+        <source>Package File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Switch</name>
@@ -2487,6 +4411,26 @@ Voulez-vous sauvegarder les changements ?
         <source>Switch (all)</source>
         <translation>Interrupteur (tous)</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally Closed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Double Throw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Poles</source>
+        <translation type="unfinished">Pôles</translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SwitchDip</name>
@@ -2497,6 +4441,14 @@ Voulez-vous sauvegarder les changements ?
     <message>
         <source>Switch Dip</source>
         <translation>Interrupteur DIP</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2533,6 +4485,17 @@ Voulez-vous sauvegarder les changements ?
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unknown Mcu</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Termistor</name>
+    <message>
+        <source>Passive</source>
+        <translation type="obsolete">Passif</translation>
+    </message>
 </context>
 <context>
     <name>TextComponent</name>
@@ -2541,8 +4504,160 @@ Voulez-vous sauvegarder les changements ?
         <translation>Texte</translation>
     </message>
     <message>
+        <source>Graphical</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Margin</source>
+        <translation type="unfinished">Marge</translation>
+    </message>
+    <message>
+        <source>Border</source>
+        <translation type="unfinished">Frontière</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished">Opacité</translation>
+    </message>
+    <message>
+        <source>Font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Font Size</source>
+        <translation type="unfinished">Taille de police</translation>
+    </message>
+    <message>
+        <source>Fixed_Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TextVal</name>
+    <message>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> No Errors
+
+    Script Saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+
+    Script Not Saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Thermistor</name>
+    <message>
+        <source>Thermistor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="obsolete">Passif</translation>
+    </message>
+    <message>
+        <source>Resistive Sensors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dial Step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R25</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Tunnel</name>
+    <message>
+        <source>Tunnel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Other</source>
-        <translation>Autre</translation>
+        <translation type="unfinished">Autre</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Nom</translation>
+    </message>
+    <message>
+        <source>Rotated</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VarResistor</name>
+    <message>
+        <source>Variable Resistor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passive</source>
+        <translation type="obsolete">Passif</translation>
+    </message>
+    <message>
+        <source>Resistors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum Resistance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Resistance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dial Step</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2555,6 +4670,14 @@ Voulez-vous sauvegarder les changements ?
         <source>Active</source>
         <translation>Actif</translation>
     </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VoltSource</name>
@@ -2565,6 +4688,14 @@ Voulez-vous sauvegarder les changements ?
     <message>
         <source>Sources</source>
         <translation>Sources</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Voltage</source>
+        <translation type="unfinished">Tension</translation>
     </message>
 </context>
 <context>
@@ -2586,7 +4717,23 @@ Voulez-vous sauvegarder les changements ?
     </message>
     <message>
         <source>Outputs</source>
-        <translation type="unfinished">Sorties</translation>
+        <translation type="obsolete">Sorties</translation>
+    </message>
+    <message>
+        <source>Leds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows</source>
+        <translation type="unfinished">Lignes</translation>
+    </message>
+    <message>
+        <source>Columns</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2598,6 +4745,50 @@ Voulez-vous sauvegarder les changements ?
     <message>
         <source>Sources</source>
         <translation>Sources</translation>
+    </message>
+    <message>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wave Type</source>
+        <translation type="unfinished">Type de signal</translation>
+    </message>
+    <message>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Electric</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amplitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Base Voltage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rise Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fall Time</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

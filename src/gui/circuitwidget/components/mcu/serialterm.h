@@ -34,6 +34,7 @@ class MAINMODULE_EXPORT SerialTerm : public Component, public eElement
     Q_PROPERTY( int posy     READ posY  WRITE setPosY )
     Q_PROPERTY( int sizex    READ sizeX WRITE resizeX )
     Q_PROPERTY( int sizey    READ sizeY WRITE resizeY )
+    Q_PROPERTY( QString Mcu_Id READ mcuId WRITE setMcuId )
 
     public:
 
@@ -43,21 +44,25 @@ class MAINMODULE_EXPORT SerialTerm : public Component, public eElement
  static Component* construct( QObject* parent, QString type, QString id );
  static LibraryItem* libraryItem();
 
-        void updateStep();
+        virtual void initialize() override { m_serialWidget->initialize(); }
+        virtual void updateStep() override;
 
-        int uart() { return m_serialWidget.uart(); }
+        int uart() { return m_serialWidget->uart(); }
 
-        int posX() { return m_serialWidget.x(); }
-        void setPosX( int x ) { m_serialWidget.move( x, m_serialWidget.y() );}
+        int posX() { return m_serialWidget->x(); }
+        void setPosX( int x ) { m_serialWidget->move( x, m_serialWidget->y() );}
 
-        int posY() { return m_serialWidget.y(); }
-        void setPosY( int y ) { m_serialWidget.move( m_serialWidget.x(), y );}
+        int posY() { return m_serialWidget->y(); }
+        void setPosY( int y ) { m_serialWidget->move( m_serialWidget->x(), y );}
 
-        int sizeX() { return m_serialWidget.size().width(); }
-        void resizeX( int x ) {m_serialWidget.resize( QSize( x, m_serialWidget.size().height()) ); }
+        int sizeX() { return m_serialWidget->size().width(); }
+        void resizeX( int x ) {m_serialWidget->resize( QSize( x, m_serialWidget->size().height()) ); }
 
-        int sizeY() { return m_serialWidget.size().height(); }
-        void resizeY( int y ) {m_serialWidget.resize( QSize( m_serialWidget.size().width(), y) ); }
+        int sizeY() { return m_serialWidget->size().height(); }
+        void resizeY( int y ) {m_serialWidget->resize( QSize( m_serialWidget->size().width(), y) ); }
+
+        QString mcuId() { return m_serialWidget->mcuId(); }
+        void setMcuId( QString mcu ){ m_serialWidget->setMcuId( mcu); }
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
@@ -66,7 +71,7 @@ class MAINMODULE_EXPORT SerialTerm : public Component, public eElement
         void setUart( int uart );
 
     private:
-        TerminalWidget m_serialWidget;
+        TerminalWidget* m_serialWidget;
 };
 
 #endif

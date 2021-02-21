@@ -37,16 +37,17 @@ class MAINMODULE_EXPORT WS2812 : public Component, public eLogicDevice
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
+        virtual QList<propGroup_t> propGroups() override;
+
         int  rows();
         void setRows( int rows );
 
         int  cols();
         void setCols( int cols );
 
-        virtual void initialize();
-        virtual void resetState();
-        virtual void updateStep();
-        virtual void setVChanged();
+        virtual void initialize() override;
+        virtual void updateStep() override;
+        virtual void voltChanged() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 

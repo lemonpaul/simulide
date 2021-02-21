@@ -22,19 +22,19 @@
 
 #include "e-logic_device.h"
 
-
 class MAINMODULE_EXPORT eFullAdder : public eLogicDevice
 {
     public:
-
-        eFullAdder( std::string id );
-        ~eFullAdder() {};
+        eFullAdder( QString id );
+        ~eFullAdder() {}
         
-        void stamp();
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
 
-        void createPins();
-        virtual void setVChanged();
-
+    protected:
+        bool m_Sum;
+        bool m_Co;
 };
 
 #endif

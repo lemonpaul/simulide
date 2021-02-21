@@ -18,8 +18,8 @@
 
     <pin side="left" pos="15"  type="bidir" id="PB0"  label="B0" />
     <pin side="left" pos="16"  type="bidir" id="PB1"  label="B1" />
-    <pin side="left" pos="17"  type="bidir" id="PB2"  label="B2" />
-    <pin side="left" pos="18"  type="bidir" id="PB3"  label="B3" />
+    <pin side="left" pos="17"  type="ain0" id="PB2"  label="B2" />
+    <pin side="left" pos="18"  type="ain1,OC0A" id="PB3"  label="B3" />
     <pin side="left" pos="19"  type="bidir" id="PB4"  label="B4" />
     <pin side="left" pos="20"  type="bidir" id="PB5"  label="B5" />
     <pin side="left" pos="21"  type="bidir" id="PB6"  label="B6" />
@@ -41,8 +41,8 @@
     <pin side="right" pos="16"  type="bidir" id="PD1"  label="D1" />
     <pin side="right" pos="17"  type="bidir" id="PD2"  label="D2" />
     <pin side="right" pos="18"  type="bidir" id="PD3"  label="D3" />
-    <pin side="right" pos="19"  type="open"  id="PD4"  label="D4" />
-    <pin side="right" pos="20"  type="bidir" id="PD5"  label="D5" />
+    <pin side="right" pos="19"  type="open,OC1B"  id="PD4"  label="D4" />
+    <pin side="right" pos="20"  type="OC1A" id="PD5"  label="D5" />
     <pin side="right" pos="21"  type="bidir" id="PD6"  label="D6" />
     <pin side="right" pos="22"  type="bidir" id="PD7"  label="D7" />
     

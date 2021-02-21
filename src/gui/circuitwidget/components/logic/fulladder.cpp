@@ -35,32 +35,29 @@ LibraryItem* FullAdder::libraryItem()
 }
 
 FullAdder::FullAdder(QObject *parent, QString type, QString id) 
-          : LogicComponent( parent, type, id ), eFullAdder( id.toStdString() )
+          : LogicComponent( parent, type, id )
+          , eFullAdder( id )
 {
-    m_width  = 4;
+    m_width  = 3;
     m_height = 4;
 
     QStringList pinList;
     pinList
-        << "IU01 A"
-        << "IU03 B"
+        << "IL01 A"
+        << "IL03 B"
         
-        << "ID03 Ci "
+        << "IR01Ci "
 
         // Outputs:
 
-        << "OD02 S" 
-        << "OD01 Co"
+        << "OR02S "
+        << "OR03Co "
         ;
     init( pinList );
     
-    for( int i=0; i<m_numInPins; i++ )
-        eLogicDevice::createInput( m_inPin[i] );
-        
-    for( int i=0; i<m_numOutPins; i++ )
-        eLogicDevice::createOutput( m_outPin[i] );
+    for( int i=0; i<m_numInPins; ++i )  eLogicDevice::createInput( m_inPin[i] );
+    for( int i=0; i<m_numOutPins; ++i ) eLogicDevice::createOutput( m_outPin[i] );
 }
-
 FullAdder::~FullAdder(){}
 
 #include "moc_fulladder.cpp"

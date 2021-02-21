@@ -37,127 +37,127 @@ class NCO;
 class INxSignalSink;
 class CLCSigSource;
 
-class CLCxCON : public sfr_register
+class CLCxCON : public SfrReg
 {
-  public:
-    CLCxCON(CLC *_clc, Processor *pCpu, const char *pName, const char *pDesc) :
-    sfr_register(pCpu, pName, pDesc), m_clc(_clc), write_mask(0xdf)
+public:
+    CLCxCON(CLC *_clc, Processor *pCpu, const char *pName) :
+        SfrReg(pCpu, pName), m_clc(_clc), write_mask(0xdf)
     {
     }
     void put(uint);
 
-  private:
+private:
     CLC *m_clc;
     uint write_mask;
 };
 
-class CLCxPOL : public sfr_register
+class CLCxPOL : public SfrReg
 {
-  public:
-    CLCxPOL(CLC *_clc, Processor *pCpu, const char *pName, const char *pDesc) :
-    sfr_register(pCpu, pName, pDesc), m_clc(_clc), write_mask(0x8f)
+public:
+    CLCxPOL(CLC *_clc, Processor *pCpu, const char *pName  ) :
+        SfrReg(pCpu, pName  ), m_clc(_clc), write_mask(0x8f)
 
     {
     }
 
     void put(uint);
 
-  private:
+private:
     CLC *m_clc;
     uint write_mask;
 };
 
-class CLCxSEL0 : public sfr_register
+class CLCxSEL0 : public SfrReg
 {
-  public:
-    CLCxSEL0(CLC *_clc, Processor *pCpu, const char *pName, const char *pDesc);
+public:
+    CLCxSEL0(CLC *_clc, Processor *pCpu, const char *pName  );
 
     void put(uint);
 
-  private:
-   CLC *m_clc;
+private:
+    CLC *m_clc;
     uint write_mask;
     
 };
 
-class CLCxSEL1 : public sfr_register
+class CLCxSEL1 : public SfrReg
 {
-  public:
-    CLCxSEL1(CLC *_clc, Processor *pCpu, const char *pName, const char *pDesc);
+public:
+    CLCxSEL1(CLC *_clc, Processor *pCpu, const char *pName  );
     void put(uint);
 
-  private:
+private:
     CLC *m_clc;
     uint write_mask;
 };
 
-class CLCxGLS0 : public sfr_register
+class CLCxGLS0 : public SfrReg
 {
-  public:
-    CLCxGLS0(CLC *_clc, Processor *pCpu, const char *pName, const char *pDesc) :
-    sfr_register(pCpu, pName, pDesc), m_clc(_clc)
+public:
+    CLCxGLS0(CLC *_clc, Processor *pCpu, const char *pName  ) :
+        SfrReg(pCpu, pName  ), m_clc(_clc)
     {
     }
 
     void put(uint);
 
-  private:
+private:
     CLC *m_clc;
 };
 
-class CLCxGLS1 : public sfr_register
+class CLCxGLS1 : public SfrReg
 {
-  public:
-    CLCxGLS1(CLC *_clc, Processor *pCpu, const char *pName, const char *pDesc) :
-    sfr_register(pCpu, pName, pDesc), m_clc(_clc)
-
-    {
-    }
-
-    void put(uint);
-
-  private:
-    CLC *m_clc;
-};
-
-class CLCxGLS2 : public sfr_register
-{
-  public:
-    CLCxGLS2(CLC *_clc, Processor *pCpu, const char *pName, const char *pDesc) :
-    sfr_register(pCpu, pName, pDesc), m_clc(_clc)
+public:
+    CLCxGLS1(CLC *_clc, Processor *pCpu, const char *pName  ) :
+        SfrReg(pCpu, pName  ), m_clc(_clc)
 
     {
     }
 
     void put(uint);
 
-  private:
+private:
     CLC *m_clc;
 };
 
-class CLCxGLS3 : public sfr_register
+class CLCxGLS2 : public SfrReg
 {
-  public:
-    CLCxGLS3(CLC *_clc, Processor *pCpu, const char *pName, const char *pDesc) :
-    sfr_register(pCpu, pName, pDesc), m_clc(_clc)
+public:
+    CLCxGLS2(CLC *_clc, Processor *pCpu, const char *pName  ) :
+        SfrReg(pCpu, pName  ), m_clc(_clc)
 
     {
     }
 
     void put(uint);
 
-  private:
+private:
     CLC *m_clc;
 };
 
-class CLCDATA : public sfr_register
+class CLCxGLS3 : public SfrReg
 {
-  public:
-    CLCDATA(Processor *pCpu, const char *pName = 0, const char *pDesc = 0) :
-    sfr_register(pCpu, pName, pDesc)
+public:
+    CLCxGLS3(CLC *_clc, Processor *pCpu, const char *pName  ) :
+        SfrReg(pCpu, pName  ), m_clc(_clc)
+
     {
-    for(int i = 0; i < 4; i++)
-        m_clc[i] = 0;
+    }
+
+    void put(uint);
+
+private:
+    CLC *m_clc;
+};
+
+class CLCDATA : public SfrReg
+{
+public:
+    CLCDATA(Processor *pCpu, const char *pName = 0 ) :
+        SfrReg(pCpu, pName  )
+    {
+        for(int i = 0; i < 4; i++)
+            m_clc[i] = 0;
     }
 
 
@@ -165,64 +165,64 @@ class CLCDATA : public sfr_register
     void set_bit(bool bit_val, uint pos);
     void set_clc(CLC *clc1, CLC *clc2=0, CLC *clc3=0, CLC *clc4 = 0)
     {
-    m_clc[0] = clc1;
-    m_clc[1] = clc2;
-    m_clc[2] = clc3;
-    m_clc[3] = clc4;
+        m_clc[0] = clc1;
+        m_clc[1] = clc2;
+        m_clc[2] = clc3;
+        m_clc[3] = clc4;
     }
 
-  private:
+private:
     CLC *m_clc[4];
 };
 
 class CLC : public apfpin
 {
-  public:
-    enum {
-    // CLCxCON
-    LCxEN   = (1<<7),
-    LCxOE   = (1<<6),
-    LCxOUT  = (1<<5),
-    LCxINTP = (1<<4),
-    LCxINTN = (1<<3),
-    LCxMODE = 0x7,
-
-    // CLCxPOL
-    LCxPOL  = (1<<7),
-    };
-    enum data_in {
-    UNUSED = 0,
-    LC1,
-    LC2,
-    LC3,
-    LC4,
-    CLCxIN0,    // 5
-    CLCxIN1,
-    PWM1,
-    PWM2,
-    PWM3,
-    PWM4,        //10
-    NCOx,
-    FOSCLK,
-    LFINTOSC,
-    HFINTOSC,
-    FRC_IN,        //15
-    T0_OVER,
-    T1_OVER,
-    T2_MATCH,
-    C1OUT,
-    C2OUT,        //20
-    };
-    
-    enum {
-    CLCout_PIN=0,
-    CLCin1_PIN,
-    CLCin2_PIN
-    };
-    
+public:
     CLC(Processor *_cpu, uint _index, CLCDATA *_clcdata);
     ~CLC();
+
+    enum {
+        // CLCxCON
+        LCxEN   = (1<<7),
+        LCxOE   = (1<<6),
+        LCxOUT  = (1<<5),
+        LCxINTP = (1<<4),
+        LCxINTN = (1<<3),
+        LCxMODE = 0x7,
+
+        // CLCxPOL
+        LCxPOL  = (1<<7),
+    };
+    enum data_in {
+        UNUSED = 0,
+        LC1,
+        LC2,
+        LC3,
+        LC4,
+        CLCxIN0,    // 5
+        CLCxIN1,
+        PWM1,
+        PWM2,
+        PWM3,
+        PWM4,        //10
+        NCOx,
+        FOSCLK,
+        LFINTOSC,
+        HFINTOSC,
+        FRC_IN,        //15
+        T0_OVER,
+        T1_OVER,
+        T2_MATCH,
+        C1OUT,
+        C2OUT,        //20
+    };
     
+    enum {
+        CLCout_PIN=0,
+        CLCin1_PIN,
+        CLCin2_PIN
+    };
+
     bool CLCenabled() { return clcxcon.value.get() & LCxEN; }
     void setCLCxPin( PinModule *alt_pin );
     void enableINxpin( int, bool );
@@ -253,10 +253,9 @@ class CLC : public apfpin
     bool JKflipflop();
     bool transparent_D_latch();
     void lcxupdate(bool bit_val, uint pos);
-    virtual void setInterruptSource(InterruptSource * _int) 
-        { m_Interrupt = _int;}
-     void outputCLC(bool out);
-
+    virtual void setInterruptSource(InterruptSource * _int)
+    { m_Interrupt = _int;}
+    void outputCLC(bool out);
 
     uint  index;
     CLCxCON  clcxcon;
@@ -274,7 +273,7 @@ class CLC : public apfpin
     NCO      *p_nco;
     data_in      DxS_data[4];
 
-  private:
+private:
     PinModule     *pinCLCx;
     CLCSigSource  *CLCxsrc;
     string        CLCxgui;
@@ -300,35 +299,40 @@ class CLC : public apfpin
 
 class CLC1 : public CLC
 {
-  public:
-    CLC1(Processor *_cpu, uint _index, CLCDATA *_clcdata);
+public:
+    CLC1( Processor* _cpu, uint _index, CLCDATA* _clcdata );
+
     virtual void D1S(int select);
     virtual void D2S(int select);
     virtual void D3S(int select);
     virtual void D4S(int select);
+
+private:
+    void setDxsData( int select, int i );
 };
 
 // RC clock 600KHz used with ADC, CLC
 class OSC_SIM : public TriggerObject
 {
 public:
-    OSC_SIM(double _freq, int _data_in );
-    
+    OSC_SIM( double _freq, int _data_in , Processor* cpu );
+
     void start_osc_sim(bool on);
-    
+
     void set_clc(CLC *clc1, CLC *clc2=0, CLC *clc3=0, CLC *clc4 = 0)
     {
-    m_clc[0] = clc1; m_clc[1] = clc2; m_clc[2] = clc3; m_clc[3] = clc4;
+        m_clc[0] = clc1; m_clc[1] = clc2; m_clc[2] = clc3; m_clc[3] = clc4;
     }
     void callback();
+
 private:
-    double     frequency;
-    int        data_in;
-    int        active;
-    CLC     *m_clc[4];
+    double  frequency;
+    int     data_in;
+    int      active;
+    CLC*  m_clc[4];
     bool     level;
     int      next_cycle;
-    uint64_t     future_cycle;
-    int64_t      adjust_cycles;
+    uint64_t future_cycle;
+    int64_t  adjust_cycles;
 };
 #endif // __CLC_h__

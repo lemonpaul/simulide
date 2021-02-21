@@ -1,0 +1,607 @@
+/***************************************************************************
+ *   Copyright (C) 2012 by santiago González                               *
+ *   santigoro@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 3 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
+ ***************************************************************************/
+
+#include <iostream>
+
+#include "circuit.h"
+#include "matrixsolver.h"
+#include "e-element.h"
+#include "outpaneltext.h"
+#include "mcucomponent.h"
+#include "mainwindow.h"
+#include "circuitwidget.h"
+#include "baseprocessor.h"
+
+#define I_NEED_ADD_EVENTS
+#include "simulator.h"
+
+Simulator* Simulator::m_pSelf = 0l;
+
+Simulator::Simulator( QObject* parent )
+         : QObject(parent)
+{
+    m_pSelf = this;
+
+    m_isrunning = false;
+    m_debugging = false;
+    m_paused    = false;
+
+    m_step      = 0;
+    m_timerId   = 0;
+    m_lastStep  = 0;
+    m_lastRefT  = 0;
+    m_circTime  = 0;
+    m_timerTick = 50;
+    m_stepsReac = 10;
+    m_stepsPS   = 1000000;
+    m_stepNano  = 1000;
+    m_noLinAcc  = 5; // Non-Linear accuracy
+    m_stepsPerus = 1;
+
+    m_changedNode = 0l;
+    m_chNodeLast  = 0l;
+    //m_nonLinNode  = 0l;
+    //m_nonLinear   = 0l;
+
+    clearEventList();
+
+    m_RefTimer.start();
+}
+Simulator::~Simulator()
+{
+    m_CircuitFuture.waitForFinished();
+}
+
+inline void Simulator::solveMatrix()
+{
+    //while( m_changedNodeList.size() )
+    //    m_changedNodeList.takeFirst()->stampMatrix();
+    /*qDebug() << "\nchangedNodes";
+    eNode* changedNode = m_changedNode;
+    while( changedNode )
+    {
+        qDebug() << changedNode;
+        changedNode = changedNode->nextCH;
+    }*/
+
+
+    while( m_changedNode )
+    {
+        m_changedNode->stampMatrix();
+        m_changedNode = m_changedNode->nextCH;
+    }
+    //m_chNodeLast = 0l;
+
+    if( !m_matrix.solveMatrix() ) // Try to solve matrix, if not stop simulation
+    {
+        std::cout << "Simulator::solveMatrix(), Failed to solve Matrix" << std::endl;
+        m_error = true;
+    }                                // m_matrix sets the eNode voltages
+}
+
+/*inline void Simulator::solveMatrixNL()
+{
+    while( m_nonLinNode )
+    {
+        m_nonLinNode->stampMatrix();
+        m_nonLinNode = m_nonLinNode->nextNL;
+    }
+    if( !m_matrix.solveMatrix() ) // Try to solve matrix, if not stop simulation
+    {
+        std::cout << "Simulator::solveMatrix(), Failed to solve Matrix" << std::endl;
+        m_error = true;
+    }                                // m_matrix sets the eNode voltages
+}*/
+
+void Simulator::timerEvent( QTimerEvent* e )  //update at m_timerTick rate (50 ms, 20 Hz max)
+{
+    e->accept();
+
+    if( !m_isrunning ) return;
+    if( m_error )
+    {
+        CircuitWidget::self()->powerCircOff();
+        CircuitWidget::self()->setRate( -1 );
+        return;
+    }
+    if( !m_CircuitFuture.isFinished() ) // Stop remaining parallel thread
+    {
+        return;
+        m_isrunning = false;
+        m_CircuitFuture.waitForFinished();
+        m_isrunning = true;
+    }
+    // Get Real Simulation Speed
+    m_refTime = m_RefTimer.nsecsElapsed();
+    m_tStep   = m_circTime;
+
+    runGraphicStep1();
+    // Run Circuit in parallel thread
+    m_CircuitFuture = QtConcurrent::run( this, &Simulator::runCircuit ); // Run Circuit in a parallel thread
+
+    runGraphicStep2();
+}
+
+void Simulator::runGraphicStep()
+{
+    runGraphicStep1();
+    runGraphicStep2();
+}
+
+void Simulator::runGraphicStep1()
+{
+    for( eElement* el : m_updateList ) el->updateStep();
+}
+
+void Simulator::runGraphicStep2()
+{
+    //qDebug() <<"Simulator::runGraphicStep";
+    if( m_debugging ) m_tStep = m_circTime;        // Debugger driving, not timer
+
+    if( Circuit::self()->animate() )
+    {
+        Circuit::self()->updateConnectors();
+        for( eNode* enode : m_eNodeList ) enode->setVoltChanged( false );
+    }
+
+    uint64_t deltaRefTime = m_refTime-m_lastRefT;
+    if( deltaRefTime >= 1e9 )               // We want steps per 1 Sec = 1e9 ns
+    {
+        stepsPerSec = (m_tStep-m_lastStep)*10/deltaRefTime;
+        CircuitWidget::self()->setRate( stepsPerSec );
+        m_lastStep = m_tStep;
+        m_lastRefT = m_refTime;
+    }
+    CircuitView::self()->setCircTime( m_tStep/1e6 );
+}
+
+void Simulator::runCircuit()
+{
+    simEvent_t* event = m_eventList.first;
+    uint64_t endRun = m_circTime + m_timerTick*1000*1e6; // Ru upto next Timer event
+    //uint64_t endStep;
+
+    while( event ) // Simulator event loop
+    {
+        //endStep = m_circTime + (m_stepNano*1e3); // Run for defined Simulation Step (m_stepNano)
+        //while( m_circTime <= endStep  )  // Group callbacks per simu step
+        //{
+            if( event->time < m_circTime ) continue; // This event is in the past...
+            m_circTime = event->time;
+
+            if( m_circTime > endRun ) break;  // All events for this step are done
+            freeEvent( event );
+
+            eElement* el = event->comp;
+            if(el) el->simuClockStep();            // Run event callback
+        //}
+
+        if( m_changedNode )
+        {
+            solveMatrix();
+
+            while( m_nonLinear.size() )   // Run untill all converged
+            {
+                m_nonLinear.takeFirst()->setVChanged();
+                //for( eElement* el : m_nonLinear ) el->setVChanged();
+                //m_nonLinear.clear();
+
+                if( !m_isrunning )
+                {
+                    addEvent( 0, 0l );
+                    return;
+                }
+
+                if( m_changedNode ) solveMatrix();
+            }
+        }
+
+        if( !m_isrunning ) return; // Keep this at the end for debugger to run 1 step
+
+        event = m_eventList.first;
+    }
+    m_circTime = endRun; // Circuit Time in picoseconds
+}
+
+void Simulator::runContinuous()
+{
+    if( m_debugging ) // Debugger Controllig Simulation
+    {
+        debug( false );
+        emit resumeDebug();
+        return;
+    }
+    simuRateChanged( m_stepsPS );
+    startSim();
+
+    std::cout << "\n    Simulation Running... \n"<<std::endl;
+    m_timerId = this->startTimer( m_timerTick, Qt::PreciseTimer );
+}
+
+void Simulator::debug( bool run )
+{
+    if( run )
+    {
+        m_debugging = false;
+        runContinuous();
+    }
+    else
+    {
+        startSim();
+        m_isrunning = false;
+        m_debugging = true;
+        std::cout << "\n    Debugger Controllig Simulation... \n"<<std::endl;
+    }
+}
+
+void Simulator::startSim()
+{
+    std::cout <<"\nStarting Circuit Simulation...\n"<< std::endl;
+
+    for( eNode* busNode : m_eNodeBusList ) busNode->initialize(); // Clear Buses
+
+    std::cout <<"  Initializing "<< m_elementList.size() << "\teElements"<< std::endl;
+    for( eElement* el : m_elementList )    // Initialize all Elements
+    {
+        //std::cout << "initializing  "<< el->getId()<<  std::endl;
+        if( !m_paused ) el->resetState();
+        el->initialize();
+    }
+
+    std::cout <<"  Initializing "<< m_eNodeBusList.size() << "\tBuses"<< std::endl;
+    for( eNode* busNode : m_eNodeBusList ) busNode->createBus(); // Create Buses
+
+    m_nonLinear.clear();
+    //m_changedNodeList.clear();
+
+    // Connect Elements with internal circuits.
+    for( eElement* el : m_elementList ) el->attach();
+
+    std::cout <<"  Initializing "<< m_eNodeList.size()<< "\teNodes"<< std::endl;
+    for( int i=0; i<m_eNodeList.size(); i++ )
+    {
+        eNode* enode = m_eNodeList.at(i);
+        enode->setNodeNumber( i+1 );
+        enode->initialize();
+    }
+    for( eElement* el : m_elementList ) el->stamp();
+
+    // Initialize Matrix
+    m_matrix.createMatrix( m_eNodeList );
+
+    // Try to solve matrix, if fails stop simulation
+    // m_matrix.printMatrix();
+    if( !m_matrix.solveMatrix() )
+    {
+        std::cout << "Simulator::startSim, Failed to solve Matrix"
+                  <<  std::endl;
+        CircuitWidget::self()->powerCircOff();
+        CircuitWidget::self()->setRate( -1 );
+        return;
+    }
+    std::cout << "\nCircuit Matrix looks good" <<  std::endl;
+
+    if( !m_paused )
+    {
+        m_lastStep  = 0;
+        m_lastRefT  = 0;
+        m_updtCounter = m_stepsPF;
+        CircuitView::self()->setCircTime( 0 );
+    }
+    m_isrunning = true;
+    m_paused = false;
+    m_error = false;
+}
+
+void Simulator::stopDebug()
+{
+    m_debugging = false;
+    stopSim();
+}
+
+void Simulator::stopSim()
+{
+    stopTimer();
+
+    m_paused = false;
+    m_circTime = 0;
+    m_step = 0;
+
+    for( eNode* node  : m_eNodeList  )  node->setVolt( 0 );
+    for( eElement* el : m_elementList ) el->resetState();
+    for( eElement* el : m_updateList )  el->updateStep();
+
+    clearEventList();
+
+    CircuitWidget::self()->setRate( 0 );
+    Circuit::self()->update();
+
+    std::cout << "\n    Simulation Stopped \n" << std::endl;
+}
+
+void Simulator::pauseSim()
+{
+    emit pauseDebug();
+    m_paused = true;
+    stopTimer();
+
+    std::cout << "\n    Simulation Paused \n" << std::endl;
+}
+
+void Simulator::resumeSim()
+{
+    m_isrunning = true;
+    m_paused = false;
+
+    emit resumeDebug();
+
+    if( m_debugging ) return;
+
+    std::cout << "\n    Resuming Simulation\n" << std::endl;
+    m_timerId = this->startTimer( m_timerTick, Qt::PreciseTimer );
+}
+
+void Simulator::stopTimer()
+{
+    if( m_timerId != 0 )
+    {
+        m_isrunning = false;
+        this->killTimer( m_timerId );
+        m_timerId = 0;
+        m_CircuitFuture.waitForFinished();
+    }
+}
+
+void Simulator::resumeTimer()
+{
+    if( m_timerId == 0 )
+    {
+        m_isrunning = true;
+        m_timerId = this->startTimer( m_timerTick, Qt::PreciseTimer );
+    }
+}
+
+void Simulator::simuRateChanged( uint64_t rate )
+{
+    if( rate < 1 ) rate = 1;
+
+    m_stepsPerus = 1e3/m_stepNano;
+
+    m_timerTick  = 50;
+    uint64_t fps = 1000/m_timerTick;
+
+    m_stepsPF = rate/fps;
+
+    if( rate < fps )
+    {
+        fps = rate;
+        m_stepsPF = 1;
+        m_timerTick = 1000/rate;
+    }
+    m_stepsPS = m_stepsPF*fps;
+
+    if( m_isrunning )
+    {
+        pauseSim();
+        emit rateChanged();
+        resumeSim();
+    }
+
+    double sps100 = 100*(double)m_stepsPS/(1e6*1000/m_stepNano);
+
+    std::cout << "\nFrames/Sec: " << fps         << "\t Frames per Sec"
+              << "\nSteps/Fram: " << m_stepsPF   << "\t Simul. Steps"
+              << std::endl
+              << "\nSpeed  PER: " << sps100      << "%"
+              << "\nSpeed  SPS: " << m_stepsPS   << "\t Steps Per Sec"
+              << "\nSimul Step: " << m_stepNano    << "\t nanoSeconds"
+              << "\nReact Rate: " << m_stepsReac << "\t Simul. Steps"
+              << std::endl
+              << std::endl;
+}
+
+void Simulator::setReaClock( int value )
+{
+    bool running = m_isrunning;
+    if( running ) stopSim();
+
+    if     ( value < 1  )  value = 1;
+    else if( value > 100 ) value = 100;
+
+    m_stepsReac = value;
+
+    if( running ) runContinuous();
+}
+
+void  Simulator::setNoLinAcc( int ac )
+{
+    bool running = m_isrunning;
+    if( running ) stopSim();
+
+    if     ( ac < 3 )  ac = 3;
+    else if( ac > 14 ) ac = 14;
+    m_noLinAcc = ac;
+
+    if( running ) runContinuous();
+}
+
+void Simulator::clearEventList()
+{
+    for( int i=0; i<LAST_SIM_EVENT; i++ )
+    {
+        m_eventList.events[i].next = &(m_eventList.events[i+1]);
+    }
+    m_eventList.eventFree = &(m_eventList.events[0]);
+    m_eventList.first = 0l;
+
+    if( m_changedNode ) m_changedNode->nextCH = 0l;
+    if( m_chNodeLast ) m_chNodeLast->nextCH = 0l;
+    //if( m_nonLinNode )  m_nonLinNode->nextNL  = 0l;
+    //if( m_nonLinear )   m_nonLinear->nextSimNL = 0l;
+    m_changedNode = 0l;
+    m_chNodeLast = 0l;
+    //m_nonLinNode  = 0l;
+    //m_nonLinear   = 0l;
+}
+
+inline void Simulator::freeEvent( simEvent_t* event )
+{
+    m_eventList.first = event->next;
+    event->next = m_eventList.eventFree;
+    m_eventList.eventFree = event;
+}
+
+void Simulator::addToEnodeBusList( eNode* nod )
+{ if( !m_eNodeBusList.contains(nod) ) m_eNodeBusList.append( nod ); }
+
+void Simulator::remFromEnodeBusList( eNode* nod, bool del )
+{
+    if( m_eNodeBusList.contains(nod) ) m_eNodeBusList.removeOne( nod );
+    if( del ){ delete nod; }
+}
+
+void Simulator::addToEnodeList( eNode* nod )
+{ if( !m_eNodeList.contains(nod) ) m_eNodeList.append( nod ); }
+
+void Simulator::remFromEnodeList( eNode* nod, bool del )
+{
+    if( m_eNodeList.contains( nod ) )
+    {
+        m_eNodeList.removeOne( nod );
+        if( del ) delete nod;
+    }
+}
+
+
+
+void Simulator::addToChangedNodes( eNode* nod )
+{
+    //if( !m_changedNodeList.contains( nod )) m_changedNodeList.append( nod );
+
+    //qDebug() << "\nAdd eNode: "<< nod;
+    //nod->nextCH = m_changedNode;
+    //m_changedNode = nod;
+
+
+    /*if( m_chNodeLast ) m_chNodeLast->nextCH = nod;
+    else               m_changedNode = nod;
+    m_chNodeLast = nod;
+    nod->nextCH = 0l;*/
+
+    //qDebug() << nod;
+
+    /*eNode* changedNode = m_changedNode;
+    while( changedNode )
+    {
+        qDebug() << changedNode;
+        changedNode = changedNode->nextCH;
+    }*/
+
+    eNode* changedNode = m_changedNode;
+    while( changedNode ) // Already some in the list, append
+    {
+        if( nod == changedNode )
+        {
+            qDebug() << "Simulator::addToChangedNodes ERROR:   EXIST !!!!!!!!!!";
+            return;
+        }
+
+        if( changedNode->nextCH ) changedNode = changedNode->nextCH;
+        else
+        {
+            changedNode->nextCH = nod;
+            nod->nextCH = 0l;
+            return;
+        }
+    }
+    m_changedNode = nod;    // First in the list
+    nod->nextCH = 0l;
+}
+
+/*void Simulator::addToNonLinNodes( eNode* nod )
+{
+    //nod->nextNL = m_nonLinNode;
+    //m_nonLinNode = nod;
+    eNode* nonLinNode = m_nonLinNode;
+    while( nonLinNode ) // Already some in the list, append
+    {
+        if( nod == nonLinNode )
+        {
+            //qDebug() << "Simulator::addToNonLinNodes ERROR:   EXIST !!!!!!!!!!";
+            return;
+        }
+
+        if( nonLinNode->nextNL ) nonLinNode = nonLinNode->nextNL;
+        else
+        {
+            nonLinNode->nextNL = nod;
+            nod->nextNL = 0l;
+            return;
+        }
+    }
+    m_nonLinNode = nod;    // First in the list
+    nod->nextNL = 0l;
+}*/
+
+void Simulator::addToNoLinList( eElement* el )
+{
+    if( !m_nonLinear.contains(el) ) m_nonLinear.append(el);
+    //qDebug() << "\nAdd Non Linear: "<< el;
+    /*eElement* nonLinear = m_nonLinear;
+    while( nonLinear ) // Already some in the list, append
+    {
+        if( el == nonLinear )
+        {
+            qDebug() << "Simulator::addToNoLinList ERROR:   NL EXIST !!!!!!!!!!";
+            return;
+        }
+
+        if( nonLinear->nextSimNL ) nonLinear = nonLinear->nextSimNL;
+        else
+        {
+            nonLinear->nextSimNL = el;
+            el->nextSimNL = 0l;
+            return;
+        }
+    }
+    m_nonLinear = el;    // First in the list
+    el->nextSimNL = 0l;
+    nonLinear = m_nonLinear;*/
+}
+
+void Simulator::addToElementList( eElement* el )
+{ if( !m_elementList.contains(el) ) m_elementList.append(el); }
+
+void Simulator::remFromElementList( eElement* el )
+{ if( m_elementList.contains(el) ) m_elementList.removeOne(el); }
+
+void Simulator::addToUpdateList( eElement* el )
+{ if( !m_updateList.contains(el) ) m_updateList.append(el); }
+
+void Simulator::remFromUpdateList( eElement* el )
+{ m_updateList.removeOne(el); }
+
+void Simulator::addToSimuClockList( eElement* el )
+{ if( !m_simuClock.contains(el) ) m_simuClock.append(el); }
+
+void Simulator::remFromSimuClockList( eElement* el )
+{ m_simuClock.removeOne(el); }
+
+#include "moc_simulator.cpp"
+

@@ -20,9 +20,8 @@
 #include "e-resistor.h"
 #include "simulator.h"
 
-#include <sstream>
 
-eResistor::eResistor( std::string id ) 
+eResistor::eResistor( QString id )
          : eElement( id )
 {
     m_resist = 100;
@@ -31,7 +30,7 @@ eResistor::eResistor( std::string id )
     m_ePin.resize(2);
 }
 eResistor::~eResistor(){
-    //qDebug() << "eResistor::~eResistor deleting" << QString::fromStdString( m_elmId );
+    //qDebug() << "eResistor::~eResistor deleting" << m_elmId ;
 }
 
 void eResistor::stamp()
@@ -39,25 +38,25 @@ void eResistor::stamp()
     m_ePin[0]->setEnodeComp( m_ePin[1]->getEnode() );
     m_ePin[1]->setEnodeComp( m_ePin[0]->getEnode() );
     stampAdmit();
-    //qDebug() << "eResistor::initialize"<<QString::fromStdString(m_elmId);
+    //qDebug() << "eResistor::initialize"<< m_elmId;
 }
 
 void eResistor::stampAdmit()
 {
     if( !m_ePin[0] ) return;
-    //double admit = 1/m_resist;
+
     m_ePin[0]->stampAdmitance( m_admit );
     m_ePin[1]->stampAdmitance( m_admit );
-    //qDebug() << "eResistor::stamp" <<QString::fromStdString(m_elmId)<< m_resist;
+    //qDebug() << "eResistor::stamp" << m_elmId<< m_resist;
 }
 
 void eResistor::stampCurrent( double current )
 {
     if( !m_ePin[0] ) return;
-    //double admit = 1/m_resist;
+
     m_ePin[0]->stampCurrent( current );
     m_ePin[1]->stampCurrent( -current );
-    //qDebug() << "eResistor::stampCurrent" <<QString::fromStdString(m_elmId)<< m_resist;
+    //qDebug() << "eResistor::stampCurrent" << m_elmId<< m_resist;
 }
 
 double eResistor::res() 
@@ -112,16 +111,5 @@ void eResistor::updateVI()
         //qDebug() << " current " <<m_current<<volt;
     }
     else m_current = 0;
-}
-
-void eResistor::initEpins()
-{
-    std::stringstream sl;
-    sl << m_elmId << "-lPin";
-    m_ePin[0] = new ePin( sl.str(), 0 );
-    
-    std::stringstream sr;
-    sr << m_elmId << "-rPin";
-    m_ePin[1] = new ePin( sr.str(), 1 );
 }
 

@@ -20,6 +20,8 @@
 #include <QDomDocument>
 
 #include "chip.h"
+#include "circuitwidget.h"
+#include "simulator.h"
 #include "connector.h"
 #include "circuit.h"
 #include "utils.h"
@@ -32,7 +34,7 @@ static const char* Chip_properties[] = {
 
 Chip::Chip( QObject* parent, QString type, QString id )
     : Component( parent, type, id )
-    , eElement( id.toStdString() )
+    , eElement( id )
 {
     Q_UNUSED( Chip_properties );
 
@@ -41,18 +43,21 @@ Chip::Chip( QObject* parent, QString type, QString id )
     m_initialized = false;
     
     m_pkgeFile = "";
+    m_BackPixmap = 0l;
     
     m_lsColor = QColor( 255, 255, 255 );
     m_icColor = QColor( 50, 50, 70 );
     
     setLabelPos( m_area.x(), m_area.y()-20, 0);
 }
-Chip::~Chip() {}
+Chip::~Chip()
+{
+    if( m_BackPixmap ) delete m_BackPixmap;
+}
 
 void Chip::initChip()
 {
     //qDebug() << "Chip::initChip m_pkgeFile"<<m_pkgeFile;
-
     m_error = 0;
 
     QDir circuitDir = QFileInfo( Circuit::self()->getFileName() ).absoluteDir();
@@ -61,74 +66,63 @@ void Chip::initChip()
     QFile pfile( fileNameAbs );
     if( !pfile.exists() )   // Check if package file exist, if not try LS or no LS
     {
+        if( m_initialized ) return;
         if     ( m_pkgeFile.endsWith("_LS.package")) m_pkgeFile.replace( "_LS.package", ".package" );
         else if( m_pkgeFile.endsWith(".package"))    m_pkgeFile.replace( ".package", "_LS.package" );
-        else qDebug() << "SubPackage::setPackage: No package files found.\nTODO: create dummy package\n";
+        else qDebug() << "Chip::initChip: No package files found.\nTODO: create dummy package\n";
         fileNameAbs = circuitDir.absoluteFilePath( m_pkgeFile );
     }
-    QFile file( fileNameAbs );
-    if( !file.open( QFile::ReadOnly | QFile::Text) )
-    {
-        MessageBoxNB( "Chip::initChip",
-                  tr( "Cannot read file:\n%1:\n%2." ).arg(m_pkgeFile).arg(file.errorString()) );
-          m_error = 1;
-          return;
-    }
 
-    QDomDocument domDoc;
-    if( !domDoc.setContent(&file) )
-    {
-         MessageBoxNB( "Chip::initChip",
-                   tr( "Cannot set file:\n%1\nto DomDocument" ) .arg(m_pkgeFile));
-         file.close();
-         m_error = 2;
-         return;
-    }
-    file.close();
+    QDomDocument domDoc = fileToDomDoc( fileNameAbs, "Chip::initChip" );
+    if( domDoc.isNull() ) { m_error = 1; return; }
 
     QDomElement root  = domDoc.documentElement();
 
-    if( root.tagName()!="package" )
+    if(( root.tagName() == "package" )
+    || ( root.tagName() == "packageB" ))
+    {
+        if( m_pkgeFile.endsWith( "_LS.package" )) m_isLS = true;
+        else                                      m_isLS = false;
+
+        if( m_isLS ) m_color = m_lsColor;
+        else         m_color = m_icColor;
+
+        m_width   = root.attribute( "width" ).toInt();
+        m_height  = root.attribute( "height" ).toInt();
+        m_area = QRect( 0, 0, 8*m_width, 8*m_height );
+        setShowId( true );
+
+        m_numpins = root.attribute( "pins" ).toInt();
+
+        for( Pin* pin : m_pin )
+        {
+            deletePin( pin );
+            if( m_pins.contains( pin ) ) m_pins.removeAll( pin );
+        }
+        for( Pin* pin : m_pins ) deletePin( pin );
+        m_pins.clear();
+        m_ePin.clear();
+        m_pin.clear();
+        m_ePin.resize( m_numpins );
+        m_pin.resize( m_numpins );
+
+        if( root.hasAttribute("background")) setBackground( root.attribute( "background") );
+
+        if     ( root.tagName() == "package" )  initPackage_old( root );
+        else if( root.tagName() == "packageB" ) initPackage( root );
+    }
+    else
     {
         MessageBoxNB( "Chip::initChip",
                   tr( "Error reading Chip file:\n%1\nNo valid Chip" ) .arg(m_pkgeFile));
         m_error = 3;
         return;
     }
+    m_initialized = true;
+}
 
-    m_width   = root.attribute( "width" ).toInt();
-    m_height  = root.attribute( "height" ).toInt();
-    m_numpins = root.attribute( "pins" ).toInt();
-    
-    for( Pin* pin : m_pin )
-    {
-        if( !pin ) continue;
-        if( pin->connector() ) pin->connector()->remove();
-        if( pin->scene() ) Circuit::self()->removeItem( pin );
-        pin->reset();
-        delete pin;
-    }
-    m_ePin.clear();
-    m_pin.clear();
-    m_ePin.resize( m_numpins );
-    m_pin.resize( m_numpins );
-    
-    m_rigPin.clear();
-    m_topPin.clear();
-    m_lefPin.clear();
-    m_botPin.clear();
-    
-    if( m_pkgeFile.endsWith( "_LS.package" )) m_isLS = true;
-    else                                      m_isLS = false;
-
-    if( m_isLS ) m_color = m_lsColor;
-    else         m_color = m_icColor;
-
-    m_area = QRect( 0, 0, 8*m_width, 8*m_height );
-    //setTransformOriginPoint( togrid( boundingRect().center()) );
-    
-    setShowId( true );
-
+void Chip::initPackage_old( QDomElement root )
+{
     QDomNode node = root.firstChild();
 
     int chipPos = 0;
@@ -140,7 +134,8 @@ void Chip::initChip()
         {
             QString type  = element.attribute( "type" );
             QString label = element.attribute( "label" );
-            QString id    = element.attribute( "id" );
+            QString id    = element.attribute( "id" ).remove(" ");
+
             QString side  = element.attribute( "side" );
             int     pos   = element.attribute( "pos" ).toInt();
 
@@ -173,14 +168,40 @@ void Chip::initChip()
                 angle = 270;
             }
             chipPos++;              
-            addPin( id, type, label, chipPos, xpos, ypos, angle );
+            addPin( id, type, label, chipPos, xpos, ypos, angle, 8 );
         }
         node = node.nextSibling();
     }
-    m_initialized = true;
 }
 
-void Chip::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
+void Chip::initPackage( QDomElement root )
+{
+    QDomNode node = root.firstChild();
+
+    int chipPos = 0;
+
+    while( !node.isNull() )
+    {
+        QDomElement element = node.toElement();
+        if( element.tagName() == "pin" )
+        {
+            QString type  = element.attribute( "type" );
+            QString label = element.attribute( "label" );
+            QString id    = element.attribute( "id" ).remove(" ");
+
+            int xpos   = element.attribute( "xpos" ).toInt();
+            int ypos   = element.attribute( "ypos" ).toInt();
+            int angle  = element.attribute( "angle" ).toInt();
+            int length = element.attribute( "length" ).toInt();
+
+            chipPos++;
+            addPin( id, type, label, chipPos, xpos, ypos, angle, length );
+        }
+        node = node.nextSibling();
+    }
+}
+
+void Chip::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle, int length )
 {
     Pin* pin = new Pin( angle, QPoint(xpos, ypos), m_id+"-"+id, pos-1, this ); // pos in package starts at 1
     
@@ -195,15 +216,24 @@ void Chip::addPin( QString id, QString type, QString label, int pos, int xpos, i
         pin->setVisible( false );
         pin->setLabelText( "" );
     }
-    if     ( angle == 0 )   m_rigPin.append( pin );
-    else if( angle == 90 )  m_topPin.append( pin );
-    else if( angle == 180 ) m_lefPin.append( pin );
-    else if( angle == 270 ) m_botPin.append( pin );
+
+    pin->setLength( length );
+    pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false );
 
     if( m_isLS ) pin->setLabelColor( QColor( 0, 0, 0 ) );
 
     m_ePin[pos-1] = pin;
     m_pin[pos-1]  = pin;
+    m_pins.append( pin );
+}
+
+void Chip::deletePin( Pin* pin )
+{
+    if( !pin ) return;
+    if( pin->connector() ) pin->connector()->remove();
+    if( pin->scene() ) Circuit::self()->removeItem( pin );
+    pin->reset();
+    delete pin;
 }
 
 bool Chip::logicSymbol()
@@ -214,6 +244,9 @@ bool Chip::logicSymbol()
 void Chip::setLogicSymbol( bool ls )
 {
     if( m_initialized && (m_isLS == ls) ) return;
+
+    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
+    Circuit::self()->saveState();
     
     if(  ls && m_pkgeFile.endsWith(".package"))    m_pkgeFile.replace( ".package", "_LS.package" );
     if( !ls && m_pkgeFile.endsWith("_LS.package")) m_pkgeFile.replace( "_LS.package", ".package" );
@@ -221,47 +254,50 @@ void Chip::setLogicSymbol( bool ls )
     m_error = 0;
     Chip::initChip();
     
-    if( m_error == 0 )  Circuit::self()->update();
+    if( m_error == 0 ) Circuit::self()->update();
+    else               Circuit::self()->unSaveState();
 }
 
-void Chip::remove()
+void Chip::setBackground( QString bck )
 {
-    /*for( uint i=0; i<m_ePin.size(); i++ )
+    m_BackGround = bck;
+    if( bck == "" )
     {
-        Pin* pin = static_cast<Pin*>(m_ePin[i]);
-        if( pin->connector() ) pin->connector()->remove();
-    }*/
-    Component::remove();
+        if( m_BackPixmap )
+        {
+            delete m_BackPixmap;
+            m_BackPixmap = 0l;
+        }
+    }
+    else
+    {
+        m_BackPixmap = new QPixmap();
+
+        QString pixmapPath = SIMUAPI_AppPath::self()->availableDataFilePath("images");
+        pixmapPath += "/"+bck;
+        m_BackPixmap->load( pixmapPath );
+    }
+    update();
 }
 
-void Chip::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
-{
-    event->accept();
-    QMenu *menu = new QMenu();
-    /*QAction *loadAction = menu->addAction( QIcon(":/fileopen.png"),tr("Load firmware") );
-    connect( loadAction, SIGNAL(triggered()), this, SLOT(slotLoad()) );
-
-    QAction *reloadAction = menu->addAction( QIcon(":/fileopen.png"),tr("Reload firmware") );
-    connect( reloadAction, SIGNAL(triggered()), this, SLOT(slotReload()) );*/
-
-    menu->addSeparator();
-
-    Component::contextMenu( event, menu );
-    menu->deleteLater();
-}
-
-void Chip::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
+void Chip::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
     Component::paint( p, option, widget );
 
-    p->drawRoundedRect( m_area, 1, 1);
-
-    if( !m_isLS )
+    if( m_BackPixmap )
+        p->drawPixmap( m_area.x(), m_area.y(), *m_BackPixmap );
+    else if( m_BackGround != "" )
+        p->drawPixmap( m_area.x(), m_area.y(), QPixmap( m_BackGround ));
+    else
     {
-        p->setPen( QColor( 170, 170, 150 ) );
-        p->drawArc( boundingRect().width()/2-6, -4, 8, 8, 0, -2880 /* -16*180 */ );
+        p->drawRoundedRect( m_area, 1, 1);
+
+        if( !m_isLS )
+        {
+            p->setPen( QColor( 170, 170, 150 ) );
+            p->drawArc( boundingRect().width()/2-6, -4, 8, 8, 0, -2880 /* -16*180 */ );
+        }
     }
 }
 
 #include "moc_chip.cpp"
-

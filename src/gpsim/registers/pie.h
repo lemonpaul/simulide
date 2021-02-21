@@ -9,15 +9,16 @@ class PIR;
 // PIE Peripheral Interrupt Enable register base class 
 // for PIE1 & PIE2
 
-class PIE : public sfr_register
+class PIE : public  SfrReg
 {
-public:
-  PIE(Processor *pCpu, const char *pName, const char *pDesc);
+    public:
+      PIE(Processor *pCpu, const char *pName );
 
-  void put(uint new_value);
-  void setPir(PIR *pPir);
-protected:
-  PIR *pir;
+      void put(uint new_value);
+      void setPir(PIR *pPir);
+
+    protected:
+      PIR *pir;
 };
 
 #endif /* PIE_H */

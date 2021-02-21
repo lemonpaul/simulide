@@ -22,7 +22,7 @@
 #include "utils.h"
 #include "simuapi_apppath.h"
 
-GcbDebugger::GcbDebugger( QObject* parent, OutPanelText* outPane, QString filePath ) 
+GcbDebugger::GcbDebugger( CodeEditor* parent, OutPanelText* outPane, QString filePath )
            : BaseDebugger( parent,outPane, filePath )
 {
     setObjectName( "GcBasic Compiler/Debugger" );
@@ -40,68 +40,6 @@ GcbDebugger::GcbDebugger( QObject* parent, OutPanelText* outPane, QString filePa
     m_typesList["string"]  = "string";
 }
 GcbDebugger::~GcbDebugger(){}
-
-int GcbDebugger::compile()
-{
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    
-    QDir gcBasicDir( m_compilerPath );
-    if( !gcBasicDir.exists() )
-    {
-        m_outPane->appendText( "\nGcBasic" );
-        toolChainNotFound();
-        return -1;
-    }
-
-    QString file = m_fileDir+m_fileName+m_fileExt;
-    QString args = " -NP -K:L -A:GCASM -R:text  ";
-    QString command = m_compilerPath + "gcbasic";
-    
-    #ifndef Q_OS_UNIX
-    command  = addQuotes( command );
-    file     = addQuotes( file );
-    #endif
-
-    command.append( args + file );
-    
-    m_outPane->appendText( command );
-    m_outPane->writeText( "\n\n" );
-
-    QProcess compGcb( 0l );
-    compGcb.setWorkingDirectory( m_fileDir );
-    compGcb.start( command );
-    compGcb.waitForFinished(-1);
-    QString p_stdout = compGcb.readAllStandardOutput();
-
-    m_outPane->writeText( p_stdout.remove("The message has been logged to the file Errors.txt.\n") );
-
-    int error = -1;
-    if( p_stdout=="" )
-    {
-        m_outPane->appendText( "\nGcBasic" );
-        toolChainNotFound();
-        error = -1;
-    }
-    else if( p_stdout.toUpper().contains("DONE")) 
-    {
-        m_firmware = m_fileDir+m_fileName+".hex";
-        error = 0;
-    }
-    /*else // some error found
-    {
-        QStringList lines = p_stdout.split("\n");
-        for( QString line : lines )
-        {
-            if( !line.contains( "Error:" ) ) continue;
-            QStringList words = line.split(" ");
-            words.removeFirst();
-            error = words.first().remove("(").remove(")").remove(":").toInt();
-            break;
-        }
-    }*/
-    QApplication::restoreOverrideCursor();
-    return error;
-}
 
 void GcbDebugger::getSubs()
 {
@@ -171,18 +109,13 @@ void GcbDebugger::mapGcbToAsm()  // Map asm_source_line <=> gcb_source_line
             
             if( wordUp == "IF" ) break;
             
-            if( m_subs.contains( wordUp ) )
-            {
-                m_subLines.append( lineNum );
-                break;
-            }
+            if( m_subs.contains( wordUp ) ) { m_subLines.append( lineNum ); break; }
         }
         lineNum++;
         
         if( !line.contains( "DIM" )) continue; // Search lines containing "Dim"
         
-        line = line.replace( "'", ";" ).split( ";" ).first(); // Remove comments
-        
+        line    = line.replace( "'", ";" ).split( ";" ).first(); // Remove comments
         gcbLine = gcbLine.replace( "\t", " " );
         
         if( !line.contains( "AS" ))  // Should be an array
@@ -207,14 +140,8 @@ void GcbDebugger::mapGcbToAsm()  // Map asm_source_line <=> gcb_source_line
             {
                 m_varList[ varName ] = type;
                 m_varNames.append( varName );
-            }
-            
-            //qDebug() << "GcbDebugger::mapGcbToAsm  Array "<<type<<varName;
-        }
-        else
-        {
-            //QStringList wordList = gcbLine.split( " " );
-            //wordList.removeAll( "" );
+            }//qDebug() << "GcbDebugger::mapGcbToAsm  Array "<<type<<varName;
+        }else{
             if( wordList.first().toUpper() != "DIM" ) continue;
             if( wordList.size() < 4 ) continue;
             
@@ -226,16 +153,14 @@ void GcbDebugger::mapGcbToAsm()  // Map asm_source_line <=> gcb_source_line
                 {
                     m_varList[ varName ] = m_typesList[ type ];
                     m_varNames.append( varName );
-                }
-                //qDebug() << "GcbDebugger::mapGcbToAsm  variable "<<type<<varName<<m_typesList[ type ];
+                }//qDebug() << "GcbDebugger::mapGcbToAsm  variable "<<type<<varName<<m_typesList[ type ];
             }
         }
     }//qDebug() << "GcbDebugger::mapGcbToAsm() SubLines\n" << m_subLines;
     m_flashToSource.clear();
     m_sourceToFlash.clear();
     
-    QString asmFileName = m_fileDir + m_fileName + ".asm";
-
+    QString  asmFileName = m_fileDir+m_fileName+".asm";
     QStringList asmLines = fileToStringList( asmFileName, "GcbDebugger::mapGcbToAsm" );
 
     bool haveVariable = false;
@@ -268,9 +193,7 @@ void GcbDebugger::mapGcbToAsm()  // Map asm_source_line <=> gcb_source_line
             {
                 asmLine.remove( "EQU").replace( "\t", " ");
                 text = asmLine.split(" ");
-            }
-            else
-            {
+            }else{
                 asmLine.remove( ".EQU").remove("\t").remove(" ");
                 text = asmLine.split("=");
             }
@@ -336,7 +259,7 @@ void GcbDebugger::mapLstToAsm()
     for( QString line : lstLines )
     {
         if( !line.startsWith("0") ) continue; // Code lines start with address
-        //if( line.isEmpty() )      continue;
+
         line = line.replace("\t", " ").toUpper();
         line = line.remove(" ");
         line = line.split(";").first();
@@ -356,11 +279,7 @@ void GcbDebugger::mapLstToAsm()
             //qDebug() << "GcbDebugger::mapLstToAsm" << line << asmLine;
             if( line.contains(asmLine) ) break;
         }
-        if( asmLineNumber >= lastAsmLine )
-        {
-            asmLineNumber = 0;
-            continue; // End of asm file
-        }
+        if( asmLineNumber >= lastAsmLine ) { asmLineNumber = 0; continue; } // End of asm file
 
         QString numberText = line.left( 6 ); // first 6 digits in lst file is address
         bool ok = false;

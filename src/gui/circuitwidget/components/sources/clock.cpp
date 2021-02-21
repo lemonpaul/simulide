@@ -42,20 +42,35 @@ Clock::Clock( QObject* parent, QString type, QString id )
 }
 Clock::~Clock(){}
 
-void Clock::simuClockStep()
+QList<propGroup_t> Clock::propGroups()
 {
-    m_step++;
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Voltage",   tr("Voltage"),  "main"} );
+    mainGroup.propList.append( {"Freq",      tr("Frequency"),"Hz"} );
+    mainGroup.propList.append( {"Always_On", tr("Always On"),""} );
 
-    if ( m_step >= m_stepsPC/2 )
-    {
-        m_out->setOut( !m_out->out() );
-        m_out->stampOutput();
-        m_step = 0;
-    }
+    propGroup_t timeGroup { tr("Edges") };
+    timeGroup.propList.append( {"Tr_ps", tr("Rise Time"),"ps"} );
+    timeGroup.propList.append( {"Tf_ps", tr("Fall Time"),"ps"} );
+
+    return {mainGroup, timeGroup};
+}
+
+void Clock::runEvent()
+{
+    m_out->setTimedOut( !m_out->out() );
+
+    m_remainder += m_fstepsPC-(double)m_stepsPC;
+    uint64_t remainerInt = m_remainder;
+    m_remainder -= remainerInt;
+
+    if( m_isRunning ) Simulator::self()->addEvent( m_stepsPC/2+remainerInt, this );
 }
 
 void Clock::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
+    if( m_hidden ) return;
+
     Component::paint( p, option, widget );
 
     if (  m_isRunning ) p->setBrush( QColor( 250, 200, 50 ) );

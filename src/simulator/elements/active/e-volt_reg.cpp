@@ -23,14 +23,12 @@
 #include "e-volt_reg.h"
 #include "simulator.h"
 
-eVoltReg::eVoltReg( std::string id )
+eVoltReg::eVoltReg( QString id )
         : eResistor( id )
 {
     m_ePin.resize(3);
 }
-eVoltReg::~eVoltReg()
-{ 
-}
+eVoltReg::~eVoltReg(){}
 
 void eVoltReg::stamp()
 {
@@ -41,7 +39,7 @@ void eVoltReg::stamp()
     eResistor::stamp();
 }
 
-void eVoltReg::resetState()
+void eVoltReg::initialize()
 {
     eResistor::setRes( 1e-6 );
     
@@ -50,7 +48,7 @@ void eVoltReg::resetState()
     m_lastOut = 0;
 }
 
-void eVoltReg::setVChanged() 
+void eVoltReg::voltChanged() 
 {
     double inVolt = m_ePin[0]->getVolt();
     
@@ -62,15 +60,17 @@ void eVoltReg::setVChanged()
     
     if     ( outVolt > m_voltPos ) outVolt = m_voltPos;
     else if( outVolt < m_voltNeg ) outVolt = m_voltNeg;
-    //qDebug()<< inVolt<< outVolt <<m_lastOut;
-    
-    double outRealVolt = m_ePin[1]->getVolt();
 
-    if( fabs(outRealVolt-m_lastOut)<m_accuracy ) return;
     
-    m_lastOut = outRealVolt;
-    
+    //double outRealVolt = m_ePin[1]->getVolt();
+
+    //qDebug()<< "eVoltReg::setVChanged" << inVolt<< outVolt << m_lastOut;
+
     double current = (inVolt-outVolt)/m_resist;
+    if( fabs(current-m_lastOut)<m_accuracy ) return;
+    
+    m_lastOut = current;
+
     m_ePin[0]->stampCurrent( current );
     m_ePin[1]->stampCurrent(-current );
 }

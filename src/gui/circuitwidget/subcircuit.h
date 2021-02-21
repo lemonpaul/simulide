@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2012 by santiago González                               *
+ *   Copyright (C) 2020 by santiago González                               *
  *   santigoro@gmail.com                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,46 +21,50 @@
 #define SUBCIRCUIT_H
 
 #include "chip.h"
-#include "itemlibrary.h"
+
+class Tunnel;
+class QDomDocument;
+class LibraryItem;
 
 class MAINMODULE_EXPORT SubCircuit : public Chip
 {
     Q_OBJECT
 
     public:
-
         SubCircuit( QObject* parent, QString type, QString id );
         ~SubCircuit();
         
-        static Component* construct( QObject* parent, QString type, QString id );
-        static LibraryItem* libraryItem();
+ static Component* construct( QObject* parent, QString type, QString id );
+ static LibraryItem* libraryItem();
 
-        virtual void initChip();
+        virtual QList<propGroup_t> propGroups() override;
 
-        virtual void initialize();
-        virtual void attach();
+        virtual void remove() override;
 
         virtual void setLogicSymbol( bool ls );
-        
+
+        Component* getMainComp(){ return m_mainComponent; }
+
     public slots:
-        virtual void remove();
+        virtual void slotProperties();
 
     protected:
-        virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
+        void contextMenuEvent( QGraphicsSceneContextMenuEvent* event );
 
-        virtual void initSubcircuit();
-        
-        void clear();
+        void loadSubCircuit( QString file );
+        void loadDomDoc( QDomDocument* doc );
 
-        void connectEpin( ePin *epin, QString connetTo );
+        virtual void addPin( QString id, QString type, QString label,
+                            int pos, int xpos, int ypos, int angle, int length=8 );
 
-        int m_numItems;
-        
-        QString m_subcFile;     // file containig subcircuit defs
+        virtual void updatePin( QString id, QString type, QString label,
+                                int pos, int xpos, int ypos, int angle, int length=8  );
 
-        QList<eNode*> m_internal_eNode;
-        QList<eElement*> m_elementList;
-        QVector<QList<ePin*> > m_pinConections;
+        Component* m_mainComponent;
+
+        QList<Component*> m_compList;
+        QHash<QString, Tunnel*> m_tunnelList;
+        //QList<Tunnel*> m_tunnelList;
 };
 #endif
 

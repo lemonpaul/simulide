@@ -21,6 +21,7 @@
 #include "circuit.h"
 #include "itemlibrary.h"
 #include "logicinput.h"
+#include "simulator.h"
 
 static const char* LogicInput_properties[] = {
     QT_TRANSLATE_NOOP("App::Property","Voltage"),
@@ -43,12 +44,13 @@ LibraryItem* LogicInput::libraryItem()
 
 LogicInput::LogicInput( QObject* parent, QString type, QString id )
           : Component( parent, type, id )
-          , eElement( id.toStdString() )
+          , eElement( id )
 {
     Q_UNUSED( LogicInput_properties );
 
+    m_graphical = true;
+
     m_area = QRect( -10, -10, 20, 20 );
-    
     setLabelPos(-64,-24 );
     
     m_changed = false;
@@ -57,16 +59,18 @@ LogicInput::LogicInput( QObject* parent, QString type, QString id )
     nodid.append(QString("-outnod"));
     QPoint nodpos = QPoint(16,0);
     m_outpin = new Pin( 0, nodpos, nodid, 0, this);
+    m_pin.resize(1);
+    m_pin[0] = m_outpin;
 
     nodid.append(QString("-eSource"));
-    m_out = new eSource( nodid.toStdString(), m_outpin );
+    m_out = new eSource( nodid, m_outpin );
     
     m_unit = "V";
     setVolt(5.0);
     setValLabelPos(-16, 8 , 0 ); // x, y, rot 
     setShowVal( true );
 
-    m_button = new QPushButton( );
+    m_button = new QToolButton();
     m_button->setMaximumSize( 16,16 );
     m_button->setGeometry(-20,-16,16,16);
     m_button->setCheckable( true );
@@ -78,30 +82,42 @@ LogicInput::LogicInput( QObject* parent, QString type, QString id )
     Simulator::self()->addToUpdateList( this );
 
     connect( m_button, SIGNAL( clicked() ),
-             this,     SLOT  ( onbuttonclicked() ));
+             this,     SLOT  ( onbuttonclicked() ), Qt::UniqueConnection );
+}
+LogicInput::~LogicInput()  {}
+
+QList<propGroup_t> LogicInput::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Voltage", tr("Voltage"),"main"} );
+    return {mainGroup};
 }
 
-LogicInput::~LogicInput() 
+void LogicInput::stamp()
 {
-    //delete m_out;
-}
-
-void LogicInput::onbuttonclicked()
-{
-    m_out->setOut( m_button->isChecked() );
-    m_changed = true;
-    //qDebug() << "LogicInput::onbuttonclicked" ;
-    //update();
+    if( !Simulator::self()->isPaused() ) m_changed = true;
 }
 
 void LogicInput::updateStep()
 {
     if( m_changed ) 
     {
-        m_out->stampOutput();
         m_changed = false;
-        update();
+        Simulator::self()->addEvent( 1, this );
+        //update();
     }
+}
+
+void LogicInput::runEvent()
+{
+    m_out->stampOutput();
+}
+
+void LogicInput::onbuttonclicked()
+{
+    m_out->setOut( m_button->isChecked() );
+    m_changed = true;
+    update();
 }
 
 double LogicInput::volt()  
@@ -111,34 +127,53 @@ double LogicInput::volt()
 
 void LogicInput::setVolt( double v )
 {
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim )  Simulator::self()->pauseSim();
+
     Component::setValue( v );       // Takes care about units multiplier
-    m_voltHight = m_value*m_unitMult;
-    m_out->setVoltHigh( m_voltHight );
-    m_changed = true;
-    //update();
+    updateOutput();
+
+    if( pauseSim ) Simulator::self()->resumeSim();
 }
 
 void LogicInput::setUnit( QString un ) 
 {
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim )  Simulator::self()->pauseSim();
+
     Component::setUnit( un );
+    updateOutput();
+
+    if( pauseSim ) Simulator::self()->resumeSim();
+}
+
+void LogicInput::updateOutput()
+{
     m_voltHight = m_value*m_unitMult;
     m_out->setVoltHigh( m_voltHight );
     m_changed = true;
+    Simulator::self()->addEvent( 1, NULL );
+}
+
+void LogicInput::setOut( bool out )
+{
+    m_button->setChecked( out );
+    onbuttonclicked();
 }
 
 void LogicInput::remove()
 {
-    if( m_outpin->isConnected() ) m_outpin->connector()->remove();
     delete m_out;
     
     Simulator::self()->remFromUpdateList( this );
-    
     Component::remove();
 }
 
 
 void LogicInput::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
+    if( m_hidden ) return;
+
     Component::paint( p, option, widget );
 
     if ( m_out->out() )

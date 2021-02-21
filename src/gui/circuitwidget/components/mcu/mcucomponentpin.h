@@ -34,28 +34,35 @@ class MAINMODULE_EXPORT McuComponentPin : public QObject, public eSource
 
         Pin* pin() const { return ( static_cast<Pin*>(m_ePin[0]) ); }
 
-        virtual void stamp();
-        virtual void resetState();
-        void terminate();
+        virtual void stamp() override;
+        virtual void initialize() override;
+        virtual void setState( bool state );
 
         void setDirection( bool out );
-        void setState( bool state );
-        void setOutput( bool state );
         void setPullup(bool up );
+        void setExtraSource( double vddAdmit, double gndAdmit );
+        void update();
 
         virtual void pullupNotConnected( bool up )=0;
-        virtual void resetOutput();
+
+        void enableIO( bool en );
 
         void move( int dx, int dy );
-        int angle() { return m_angle;}
+        int angle() { return m_angle; }
         
         QString ptype() { return m_type; }
         QString id() { return m_id; }
 
+        bool m_enableIO;
+
     protected:
         McuComponent* m_mcuComponent;
+        BaseProcessor* m_processor;
 
-        double m_inputImp;
+        double m_vddAdmit;  // Out stage
+        double m_gndAdmit;  // Out Stage
+        double m_vddAdmEx;  // Extra Source (vref out)
+        double m_gndAdmEx;  // Extra Source (vref out)
         
         bool m_attached;
         bool m_isInput;

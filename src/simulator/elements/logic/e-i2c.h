@@ -20,76 +20,67 @@
 #ifndef EI2C_H
 #define EI2C_H
 
-#define I2C_IDLE      0
-#define I2C_STARTED   1
-#define I2C_READING   2
-#define I2C_WRITTING  3
-#define I2C_STOPPED   4
-#define I2C_ACK       5
-#define I2C_ENDACK    6
-#define I2C_WAITACK   7
-
-
 #include "e-logic_device.h"
 #include "component.h"
 
+#define SDA_PIN m_input[0]
+#define SCL_PIN m_clockSource
+
+enum i2cState_t{
+    I2C_IDLE = 0,
+    I2C_STARTED ,
+    I2C_READING ,
+    I2C_WRITTING,
+    I2C_STOPPED ,
+    I2C_ACK     ,
+    I2C_ENDACK  ,
+    I2C_WAITACK ,
+};
 
 class MAINMODULE_EXPORT eI2C : public eLogicDevice
 {
     public:
-
-        eI2C( std::string id );
+        eI2C( QString id );
         ~eI2C();
 
-        virtual void stamp();
-        virtual void resetState();
-        virtual void simuClockStep();
-        virtual void setVChanged();
+        virtual void initialize() override;
 
+        virtual double freq() { return m_freq/1e3; }
+        virtual void setFreq( double f );
+
+        virtual void setEnabled( bool en );
         virtual void startWrite(){;}
         virtual void writeByte();
         virtual void readByte();
-        virtual void slaveStop();
-        //virtual bool isEnabled() { return m_enabled; }
-        virtual void setEnabled( bool en );
-        virtual void setMaster( bool m );
-        virtual void setAddress( int address );
-        virtual void setFreq( double f );
-        virtual void setComponent( Component* comp ) { m_comp = comp; }
+        virtual void I2Cstop();
 
-        virtual void masterStart( uint8_t addr );
-        virtual void masterWrite( uint8_t data );
-        virtual void masterRead();
-        virtual void masterStop();
+        virtual void setComponent( Component* comp ) { m_comp = comp; }
 
         virtual int byteReceived() { return m_rxReg; }
 
-        void createPins();
-
     protected:
+        virtual void setSDA( bool state )=0;
+        virtual void setSCL( bool state )=0;
         void readBit();
         void writeBit();
         void ACK();
         void waitACK();
-        
-        int m_address;                                 // Device Address
-        
-        int m_txReg;                                     // Byte to Send
-        int m_rxReg;                                    // Byte Received
-        int m_state;                             // Current State of i2c
-        int m_lastState;                            // Last State of i2c
-        int m_addressBits;                   // Number of m_address bits
-        int m_bitPtr;                                     // Bit Pointer
+
+        virtual void updatePins()=0;
+
+        int m_txReg;             // Byte to Send
+        int m_rxReg;             // Byte Received
+        int m_bitPtr;            // Bit Pointer
+
+        i2cState_t m_state;      // Current State of i2c
+        i2cState_t m_lastState;  // Last State of i2c
 
         double m_freq;
         double m_stepsPe;
-        double m_nextCycle;
 
         bool m_SDA;
         bool m_lastSDA;
-        bool m_master;
         bool m_enabled;
-        bool m_toggleClock;
 
         Component* m_comp;
 };

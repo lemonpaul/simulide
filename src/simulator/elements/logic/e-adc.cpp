@@ -17,12 +17,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-#include <QDebug>
-
 #include "e-adc.h"
+#include "simulator.h"
 
-eADC::eADC( std::string id )
+eADC::eADC( QString id )
     : eLogicDevice( id )
 {
 }
@@ -32,22 +30,26 @@ eADC::~eADC()
 
 void eADC::stamp()
 {
-    eNode* enode = m_input[0]->getEpin()->getEnode();
-    if( enode ) enode->addToChangedFast(this);
+    eNode* enode = m_input[0]->getEpin(0)->getEnode();
+    if( enode ) enode->voltChangedCallback( this );
 
     eLogicDevice::stamp();
 }
 
-void eADC::setVChanged()
+void eADC::voltChanged()
 {
     double volt = m_input[0]->getVolt();
+    m_value = (int)(volt*m_maxValue/m_maxVolt+0.1);
 
-    int address = (int)(volt*m_maxAddr/m_maxVolt+0.1);
-    //qDebug()<<"\n" << "eADC::setVChanged"<<volt << address<<(volt*m_maxAddr/m_maxVolt)<<(int)(volt*m_maxAddr/m_maxVolt);
-    for( int i=0; i<m_numOutputs; i++ )
+    Simulator::self()->addEvent( m_propDelay, this );
+}
+
+void eADC::runEvent()
+{
+    for( int i=0; i<m_numOutputs; ++i )
     {
         //qDebug() << "eADC::setVChanged" << i << (address & 1);
-        eLogicDevice::setOut( m_numOutputs-1-i, address & 1 );
-        address >>= 1;
+        m_output[m_numOutputs-1-i]->setTimedOut( m_value & 1 );
+        m_value >>= 1;
     }
 }

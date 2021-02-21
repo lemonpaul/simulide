@@ -18,7 +18,6 @@ License along with this library; if not, see
 <http://www.gnu.org/licenses/lgpl-2.1.html>.
 */
 
-#include "config.h"
 #include "14bit-processors.h"
 #include "14bit-registers.h"
 #include "a2d_v2.h"
@@ -35,7 +34,7 @@ License along with this library; if not, see
 
 
 LCD_MODULE::LCD_MODULE(Processor *pCpu, bool p16f917)
-   : cpu(pCpu), IntSrc(0)
+    : cpu(pCpu), IntSrc(0)
 {
     char lcdsex[] = "lcdsex";
     char lcddataX[10];
@@ -47,33 +46,27 @@ LCD_MODULE::LCD_MODULE(Processor *pCpu, bool p16f917)
     future_cycle = 0;
     is_sleeping = false;
 
-    lcdcon = new LCDCON(pCpu, "lcdcon", "LCD control register", this);
-    lcdps = new LCDPS(pCpu, "lcdps", "LCD prescaler select register", this, 0xcf);
+    lcdcon = new LCDCON(pCpu, "lcdcon", this);
+    lcdps = new LCDPS(pCpu, "lcdps", this, 0xcf);
     for (i = 0; i < 3 ; i++)
     {
         lcdsex[5] = '0' + i;
         if ( i < 2 || p16f917)
-            lcdSEn[i] = new LCDSEn(pCpu, (const char *)lcdsex, "LCD Segment register", this, i);
-        else
-            lcdSEn[i] = 0;
+            lcdSEn[i] = new LCDSEn(pCpu, (const char *)lcdsex, this, i);
+        else lcdSEn[i] = 0;
     }
     printf("\n");
     for (i=0; i < 12; i++)
     {
         snprintf(lcddataX, sizeof(lcddataX), "lcddata%d", i);
-         if (((i+1)%3 != 0) || p16f917)
-         {
-            lcddatax[i] = new LCDDATAx(pCpu, (const char *)lcddataX, "LCD Data register", this, i);
-        }
-        else
+        if (((i+1)%3 != 0) || p16f917)
         {
-            lcddatax[i] = 0;
+            lcddatax[i] = new LCDDATAx(pCpu, (const char *)lcddataX, this, i);
         }
+        else lcddatax[i] = 0;
     }
-    for(i=0; i < 24; i++)
-        LCDsegn[i] = 0;
-    for(i=0; i<4; i++)
-        LCDcom[i] = 0;
+    for(i=0; i < 24; i++) LCDsegn[i] = 0;
+    for(i=0; i<4; i++)    LCDcom[i] = 0;
 }
 // set LCD bias pins
 void LCD_MODULE::set_Vlcd(PinModule *_Vlcd1, PinModule *_Vlcd2, PinModule *_Vlcd3)
@@ -85,20 +78,20 @@ void LCD_MODULE::set_Vlcd(PinModule *_Vlcd1, PinModule *_Vlcd2, PinModule *_Vlcd
 // set LCD common pins
 void LCD_MODULE::set_LCDcom(PinModule *c0, PinModule *c1, PinModule *c2, PinModule *c3)
 {
-        LCDcom[0] = c0;
-        LCDcom[1] = c1;
-        LCDcom[2] = c2;
-        LCDcom[3] = c3;
+    LCDcom[0] = c0;
+    LCDcom[1] = c1;
+    LCDcom[2] = c2;
+    LCDcom[3] = c3;
 }
 
 // set 4 LCD segment pins (at a time)
 void LCD_MODULE::set_LCDsegn(uint i, PinModule *c0, PinModule *c1, PinModule *c2, PinModule *c3)
 {
-        assert(i <= 20);
-        LCDsegn[i+0] = c0;
-        LCDsegn[i+1] = c1;
-        LCDsegn[i+2] = c2;
-        LCDsegn[i+3] = c3;
+    assert(i <= 20);
+    LCDsegn[i+0] = c0;
+    LCDsegn[i+1] = c1;
+    LCDsegn[i+2] = c2;
+    LCDsegn[i+3] = c3;
 }
 
 void LCD_MODULE::clear_bias()
@@ -107,18 +100,18 @@ void LCD_MODULE::clear_bias()
     bias_now = 0;
     if (Vlcd1_on)
     {
-        Vlcd1->AnalogReq(lcdps, false, Vlcd1->getPin().name().c_str());
-               Vlcd1_on = false;
+        Vlcd1->AnalogReq(lcdps, false, "?" /*Vlcd1->getPin().name_str.c_str()*/);
+        Vlcd1_on = false;
     }
     if (Vlcd2_on)
     {
-        Vlcd2->AnalogReq(lcdps, false, Vlcd2->getPin().name().c_str());
-               Vlcd2_on = false;
+        Vlcd2->AnalogReq(lcdps, false, "?" /*Vlcd2->getPin().name_str.c_str()*/);
+        Vlcd2_on = false;
     }
     if (Vlcd3_on)
     {
-        Vlcd3->AnalogReq(lcdps, false, Vlcd3->getPin().name().c_str());
-               Vlcd3_on = false;
+        Vlcd3->AnalogReq(lcdps, false, "?" /*Vlcd3->getPin().name_str.c_str()*/);
+        Vlcd3_on = false;
     }
 }
 
@@ -147,30 +140,28 @@ void LCD_MODULE::set_bias(uint lmux)
         bias = 3;
         break;
     }
-    if (bias == bias_now)
-        return;
+    if (bias == bias_now) return;
 
     switch(bias)
     {
     case 1:        //Static bias
         if (lcdcon->value.get() & LCDCON::VLCDEN)
         {
-                if (Vlcd1_on)
+            if (Vlcd1_on)
             {
-                    Vlcd1->AnalogReq(lcdps, false, Vlcd1->getPin().name().c_str());
-                   Vlcd1_on = false;
+                Vlcd1->AnalogReq(lcdps, false, "?" /*Vlcd1->getPin().name_str.c_str()*/);
+                Vlcd1_on = false;
             }
-                if (Vlcd2_on)
+            if (Vlcd2_on)
             {
-                    Vlcd2->AnalogReq(lcdps, false, Vlcd2->getPin().name().c_str());
+                Vlcd2->AnalogReq(lcdps, false, "?" /*Vlcd2->getPin().name_str.c_str()*/);
                 Vlcd2_on = false;
-                }
-                if (!Vlcd3_on)
+            }
+            if (!Vlcd3_on)
             {
-                    Vlcd3->AnalogReq(lcdps, true, "vlcd3");
+                Vlcd3->AnalogReq(lcdps, true, "vlcd3");
                 Vlcd3_on = true;
-                }
-
+            }
         }
         break;
 
@@ -178,8 +169,8 @@ void LCD_MODULE::set_bias(uint lmux)
     case 3:        // 1>/3 bias
         if (!Vlcd1_on)
         {
-           Vlcd1->AnalogReq(lcdps, true, "vlcd1");
-                  Vlcd1_on = true;
+            Vlcd1->AnalogReq(lcdps, true, "vlcd1");
+            Vlcd1_on = true;
         }
         if (!Vlcd2_on)
         {
@@ -262,10 +253,10 @@ void LCD_MODULE::sleep()
     // Stop during sleep
     if ((con_reg & LCDCON::SLPEN) || !(con_reg & (LCDCON::CS0 | LCDCON::CS1)))
     {
-        Dprintf(("LCD_MODULE::sleep() stop during sleep fc=%" PRINTF_GINT64_MODIFIER "d now=%" PRINTF_GINT64_MODIFIER "d\n", future_cycle, get_cycles().get()));
-        if (future_cycle >= get_cycles().get())
+        Dprintf(("LCD_MODULE::sleep() stop during sleep fc=%" PRINTF_GINT64_MODIFIER "d now=%" PRINTF_GINT64_MODIFIER "d\n", future_cycle, cpu->get_cycles()->get()));
+        if (future_cycle >= cpu->currentCycle() )
         {
-            get_cycles().clear_break(future_cycle);
+            cpu->clear_break(future_cycle);
             future_cycle = 0;
             phase = 0;
         }
@@ -273,7 +264,7 @@ void LCD_MODULE::sleep()
         // Set all LCD outputs to zero
         for(int l=0; l <= mux_now; l++) // scan across com related output
         {
-          LCDcom[l]->getPin().putState(0.);
+            LCDcom[l]->getPin().putState(0.);
         }
         for(int k = 0; (k < 3) && lcdSEn[k]; k++)
         {
@@ -349,8 +340,7 @@ void LCD_MODULE::start_clock()
 
     case 1:        //T1OSC(32kHz) (Timer1)/32
         freq = t1con->t1osc();
-        if (freq > 1.)
-            clock_source = get_cycles().instruction_cps() * 32 /freq;
+        if (freq > 1.) clock_source = cpu->instruction_cps()*32/freq;
         else
         {
             fprintf(stderr, "LCD_MODULE::start_clock() t1osc not enabled\n");
@@ -360,14 +350,12 @@ void LCD_MODULE::start_clock()
 
     case 2:        //LFINTOSC (31 kHz) /32
     case 3:
-        clock_source = get_cycles().instruction_cps() * 32 /31e3;
+        clock_source = cpu->instruction_cps()*32/31e3;
         Dprintf(("LFINTOSC %u \n", clock_source));
         break;
     }
-    if (mux_now != 3)
-        frame_rate = clock_source * (4 * prescale);
-    else
-        frame_rate = clock_source * (3 * prescale);
+    if (mux_now != 3) frame_rate = clock_source * (4 * prescale);
+    else              frame_rate = clock_source * (3 * prescale);
 
     num_phases = 2 * (mux_now + 1);
     phase = 0;
@@ -382,10 +370,9 @@ void LCD_MODULE::start_clock()
         clock_tick = frame_rate / num_phases;
         start_typeA();
     }
-    Dprintf(("frame rate %u clock_tick %u %.1f\n", frame_rate, clock_tick, get_cycles().instruction_cps()/frame_rate));
-    if (future_cycle >= get_cycles().get())
+    if (future_cycle >= cpu->currentCycle() )
     {
-        get_cycles().clear_break(future_cycle);
+        cpu->clear_break(future_cycle);
         future_cycle = 0;
     }
     save_hold_data();
@@ -467,18 +454,18 @@ void LCD_MODULE::start_typeB()
 // shutdown LCD
 void LCD_MODULE::stop_clock()
 {
-        for (int i=0; i < 3; i++)
-        {
-            if (lcdSEn[i])
-                lcd_set_segPins(i, 0, lcdSEn[i]->value.get());
-        }
-        lcd_set_com(false, lcdcon->value.get() & (LCDCON::LMUX0| LCDCON::LMUX1));
+    for (int i=0; i < 3; i++)
+    {
+        if (lcdSEn[i])
+            lcd_set_segPins(i, 0, lcdSEn[i]->value.get());
+    }
+    lcd_set_com(false, lcdcon->value.get() & (LCDCON::LMUX0| LCDCON::LMUX1));
 
     lcdps->value.put(lcdps->value.get() & ~LCDPS::LCDA);
 }
 void LCD_MODULE::callback()
 {
-   Dprintf(("LCD_MODULE::callback() %" PRINTF_GINT64_MODIFIER "d phase=%d bias_now=%d\n", future_cycle, phase,  bias_now));
+    Dprintf(("LCD_MODULE::callback() %" PRINTF_GINT64_MODIFIER "d phase=%d bias_now=%d\n", future_cycle, phase,  bias_now));
 
     drive_lcd();
 
@@ -499,16 +486,15 @@ void LCD_MODULE::callback()
     }
     if (lcdps->value.get() & LCDPS::LCDA)
     {
-        future_cycle = get_cycles().get() + clock_tick;
-        get_cycles().set_break(future_cycle, this);
+        future_cycle = cpu->currentCycle() + clock_tick;
+        cpu->setBreakAbs( future_cycle, this );
     }
 }
 void LCD_MODULE::save_hold_data()
 {
     for(int i = 0; i < 12; i++)
     {
-        if (lcddatax[i])
-            hold_data[i] = lcddatax[i]->value.get();
+        if (lcddatax[i]) hold_data[i] = lcddatax[i]->value.get();
     }
 }
 void LCD_MODULE::drive_lcd()
@@ -559,8 +545,8 @@ void LCD_MODULE::drive_lcd()
                 bool bit = (1<<i) & data;        // segment data
                 if (enable & (1<<i))                // segment active
                 {
-                   double seg_volt;
-                   seg_volt = bit ? Von : Voff;
+                    double seg_volt;
+                    seg_volt = bit ? Von : Voff;
 #ifdef DEBUG
                     printf(" %d(%.0f %.0f) ", bit, seg_volt , com_volt[0]-seg_volt);
 #endif
@@ -575,8 +561,8 @@ void LCD_MODULE::drive_lcd()
     }
 }
 
-LCDCON::LCDCON(Processor *pCpu, const char *pName, const char *pDesc, LCD_MODULE *_lcd_module) :
-    sfr_register(pCpu, pName, pDesc)
+LCDCON::LCDCON(Processor *pCpu, const char *pName, LCD_MODULE *_lcd_module) :
+    SfrReg(pCpu, pName )
 {
     lcd_module = _lcd_module;
 }
@@ -596,8 +582,7 @@ void LCDCON::put_value(uint new_value)
         lcd_module->clear_bias();
     }
     // LCD on/off
-    if (diff & LCDEN)
-        lcd_module->lcd_on_off(new_value & LCDEN);
+    if (diff & LCDEN) lcd_module->lcd_on_off(new_value & LCDEN);
 }
 void LCDCON::put(uint new_value)
 {
@@ -607,17 +592,17 @@ void LCDCON::put(uint new_value)
 }
 
 
-LCDPS::LCDPS(Processor *pCpu, const char *pName, const char *pDesc, LCD_MODULE *_lcd_module, uint bitmask) :
-    sfr_register(pCpu, pName, pDesc), lcd_module(_lcd_module),
-        mask_writeable(bitmask)
+LCDPS::LCDPS(Processor *pCpu, const char *pName,  LCD_MODULE *_lcd_module, uint bitmask) :
+    SfrReg(pCpu, pName ), lcd_module(_lcd_module),
+    mask_writeable(bitmask)
 {
 }
 void LCDPS::put(uint new_value)
 {
     put_value(new_value & mask_writeable);
 }
-LCDSEn::LCDSEn(Processor *pCpu, const char *pName, const char *pDesc, LCD_MODULE *_lcd_module, uint _n) :
-    sfr_register(pCpu, pName, pDesc)
+LCDSEn::LCDSEn(Processor *pCpu, const char *pName,  LCD_MODULE *_lcd_module, uint _n) :
+    SfrReg(pCpu, pName )
 {
     lcd_module = _lcd_module;
     n = _n;
@@ -632,8 +617,8 @@ void LCDSEn::put(uint new_value)
         lcd_module->lcd_set_segPins(n, new_value, diff);
 
 }
-LCDDATAx::LCDDATAx(Processor *pCpu, const char *pName, const char *pDesc, LCD_MODULE *_lcd_module, uint _n) :
-    sfr_register(pCpu, pName, pDesc)
+LCDDATAx::LCDDATAx(Processor *pCpu, const char *pName,  LCD_MODULE *_lcd_module, uint _n) :
+    SfrReg(pCpu, pName )
 {
     lcd_module = _lcd_module;
     n =_n;
@@ -643,7 +628,7 @@ void LCDDATAx::put(uint new_value)
     // set error if lcdps:WA not set
     if (!lcd_module->get_lcdps_wa())
     {
-        fprintf(stderr, "%s ERROR write with WA == 0\n", name().c_str());
+        fprintf(stderr, "%s ERROR write with WA == 0\n", name_str.c_str());
         lcd_module->set_lcdcon_werr();
         return;
     }

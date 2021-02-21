@@ -17,24 +17,34 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>   // fabs(x,y)
-#include <sstream>
-
 #include "e-op_amp.h"
 #include "e-source.h"
 #include "simulator.h"
 
-eOpAmp::eOpAmp( std::string id )
+eOpAmp::eOpAmp( QString id )
       : eElement( id )
 {
     m_ePin.resize(5);
+
     m_gain = 1000;
+    m_voltPosDef = 5;
+    m_voltNegDef = 0;
     
-    resetState();
+    initialize();
 }
 eOpAmp::~eOpAmp()
 {
     delete m_output;
+}
+
+void eOpAmp::initialize()
+{
+    m_accuracy = Simulator::self()->NLaccuracy();
+
+    m_lastOut = 0;
+    m_lastIn  = 0;
+    m_k = 1e-6/m_gain;
+    m_firstStep = true;
 }
 
 void eOpAmp::stamp()
@@ -44,17 +54,7 @@ void eOpAmp::stamp()
     if( m_ePin[2]->isConnected() ) m_ePin[2]->getEnode()->addToNoLinList(this);
 }
 
-void eOpAmp::resetState()
-{
-    m_accuracy = Simulator::self()->NLaccuracy();
-    
-    m_lastOut = 0;
-    m_lastIn  = 0;
-    m_k = 1e-6/m_gain;
-    m_converged = true;
-}
-
-void eOpAmp::setVChanged() // Called when input pins nodes change volt
+void eOpAmp::voltChanged() // Called when any pin node change volt
 {
     if( m_powerPins )
     {
@@ -63,55 +63,51 @@ void eOpAmp::setVChanged() // Called when input pins nodes change volt
     }
     else
     {
-        m_voltPos = 5;
-        m_voltNeg = 0;
+        m_voltPos = m_voltPosDef;
+        m_voltNeg = m_voltNegDef;
     }
     double vd = m_ePin[0]->getVolt()-m_ePin[1]->getVolt();
-
-    //qDebug() << "lastIn " << m_lastIn << "vd " << vd ;
+    if( m_firstStep && fabs(m_lastIn-vd) < m_accuracy )
+    {
+        m_converged = true;
+        m_firstStep = true;
+        return;
+    }
     
     double out = vd * m_gain;
     if     ( out > m_voltPos ) out = m_voltPos;
     else if( out < m_voltNeg ) out = m_voltNeg;
-    
-    //qDebug() << "lastOut " << m_lastOut << "out " << out << abs(out-m_lastOut)<< "<1e-5 ??";
 
     if( fabs(out-m_lastOut) < m_accuracy )
     {
         m_converged = true;
+        m_firstStep = true;
         return;
     }
+    m_converged = false;
 
-    if( m_converged )                  // First step after a convergence
+    if( m_firstStep )                  // First step after a convergence
     {
-        double dOut = -1e-6;
+        double dOut = -1e-6;           // Do a tiny step to se what happens
         if( vd>0 ) dOut = 1e-6;
         
         out = m_lastOut + dOut;
-        m_converged = false;
+        m_firstStep = false;
     }
-    else
-    {
+    else {
         if( m_lastIn != vd ) // We problably are in a close loop configuration
         {
             double dIn  = fabs(m_lastIn-vd); // Input diff with last step
-            
-            // Guess next converging output:
-            out = (m_lastOut*dIn + vd*1e-6)/(dIn + m_k);
+            out = (m_lastOut*dIn + vd*1e-6)/(dIn + m_k); // Guess next converging output:
         }
-        m_converged = true;
+        m_firstStep = true;
     }
-    
     if     ( out >= m_voltPos ) out = m_voltPos;
     else if( out <= m_voltNeg ) out = m_voltNeg;
     
-    //qDebug()<< "lastOut " << m_lastOut << "out " << out << "dOut" << dOut  << "converged" << m_converged;
-    
-    m_lastIn = vd;
+    m_lastIn  = vd;
     m_lastOut = out;
     
-    //m_output->setVoltHigh(out);
-    //m_output->stampOutput();
     m_ePin[2]->stampCurrent( out/cero_doub );
 }
 
@@ -121,24 +117,3 @@ void   eOpAmp::setGain( double gain ){m_gain = gain;}
 bool eOpAmp::hasPowerPins()          {return m_powerPins;}
 void eOpAmp::setPowerPins( bool set ){m_powerPins = set;}
 
-ePin* eOpAmp::getEpin( QString pinName )
-{
-    ePin* pin = 0l;
-    if     ( pinName == "inputInv")  pin = m_ePin[0];
-    else if( pinName == "inputNinv") pin = m_ePin[1];
-    else if( pinName == "output")    pin = m_ePin[2];
-    else if( pinName == "powerPos")  pin = m_ePin[3];
-    else if( pinName == "powerNeg")  pin = m_ePin[4];
-    return pin;
-}
-
-void eOpAmp::initEpins()
-{
-    setNumEpins(5); 
-    
-    std::stringstream ss;
-    ss << m_elmId << "-eSource";
-    m_output = new eSource( ss.str(), m_ePin[2] );
-    //m_output->setImp( 40 );
-    m_output->setOut( true );
-}

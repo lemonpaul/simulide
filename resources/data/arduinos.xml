@@ -22,11 +22,11 @@
 <itemlib>
     <itemset category="Arduino" type="Arduino">
 
-    <item name="Arduino Uno"        package="arduino/arduino_uno"  data="avr/atmega328"  device="atmega328"  icon="arduinoUno.png" ></item>
-    <item name="Arduino Mega"       package="arduino/mega"         data="avr/atmega2560" device="atmega2560" icon="mega.png" ></item>
-    <item name="Arduino Nano"       package="arduino/arduino_nano" data="avr/atmega328"  device="atmega328"  icon="arduinoNano.png" ></item>
-    <item name="Duemilanove (m168)" package="arduino/arduino_uno"  data="avr/atmega328"  device="atmega168"  icon="duemilanove.png" ></item>
-    <item name="Arduino Leonardo"   package="arduino/leonardo"     data="avr/atmega32u4" device="atmega32u4" icon="leonardo.png" ></item>
+    <item name="Arduino Uno"        package="arduino/arduino_uno"  data="avr/atmega328"  device="atmega328" icon="uno_icon.png" ></item>
+    <item name="Arduino Mega"       package="arduino/mega"         data="avr/atmega2560" device="atmega2560" icon="mega_icon.png" ></item>
+    <item name="Arduino Nano"       package="arduino/arduino_nano" data="avr/atmega328"  device="atmega328"  icon="nano_icon.png" ></item>
+    <item name="Duemilanove (m168)" package="arduino/duemilanove"  data="avr/atmega328"  device="atmega168"  icon="due_icon.png" ></item>
+    <item name="Arduino Leonardo"   package="arduino/leonardo"     data="avr/atmega32u4" device="atmega32u4" icon="leo_icon.png" ></item>
 
     </itemset>
 </itemlib>

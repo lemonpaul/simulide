@@ -20,59 +20,24 @@
 #ifndef CURRSOURCE_H
 #define CURRSOURCE_H
 
-#include "component.h"
-#include "e-source.h"
-#include "voltwidget.h"
-#include "pin.h"
+#include "varsource.h"
 
 class LibraryItem;
-//class DialWidget;
 
-class MAINMODULE_EXPORT CurrSource : public Component, public eElement
+class MAINMODULE_EXPORT CurrSource : public VarSource
 {
     Q_OBJECT
-    Q_PROPERTY( double  Current   READ current WRITE setCurrent DESIGNABLE true USER true )
-    Q_PROPERTY( QString Unit      READ unit    WRITE setUnit    DESIGNABLE true USER true )
-    Q_PROPERTY( bool    Show_Amp  READ showVal WRITE setShowVal DESIGNABLE true USER true )
-    //Q_PROPERTY( double  Max_Volt  READ volt    WRITE setVolt    DESIGNABLE true USER true )
-
+    Q_PROPERTY( double Current READ value WRITE setValue DESIGNABLE true USER true )
     public:
         CurrSource( QObject* parent, QString type, QString id );
         ~CurrSource();
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
-        
-        virtual void initialize();
-        virtual void updateStep();
 
-        double current() const      { return m_value; }
-        void setCurrent( double c );
-        
-        void setUnit( QString un );
+        virtual QList<propGroup_t> propGroups() override;
 
-        virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
-
-    public slots:
-        void onbuttonclicked();
-        void currChanged( int volt );
-        virtual void remove();
-
-    private:
-        void updateButton();
-        
-        bool m_changed;
-        
-        double m_current;
-        double m_maxCurrent;
-        
-        Pin* outpin;
-        
-        VoltWidget m_voltw;
-
-        QPushButton* m_button;
-        QDial* m_dial;
-        QGraphicsProxyWidget* m_proxy;
+        virtual void updateStep() override;
 };
 
 #endif

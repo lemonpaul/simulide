@@ -20,20 +20,14 @@
 #ifndef VOLTSOURCE_H
 #define VOLTSOURCE_H
 
-#include "component.h"
-#include "e-source.h"
-#include "voltwidget.h"
-#include "pin.h"
+#include "varsource.h"
 
 class LibraryItem;
-//class DialWidget;
 
-class MAINMODULE_EXPORT VoltSource : public Component, public eElement
+class MAINMODULE_EXPORT VoltSource : public VarSource
 {
     Q_OBJECT
-    Q_PROPERTY( double  Voltage   READ volt    WRITE setVolt    DESIGNABLE true USER true )
-    Q_PROPERTY( QString Unit      READ unit    WRITE setUnit    DESIGNABLE true USER true )
-    Q_PROPERTY( bool    Show_Volt READ showVal WRITE setShowVal DESIGNABLE true USER true )
+    Q_PROPERTY( double Voltage READ value WRITE setValue DESIGNABLE true USER true )
 
     public:
         VoltSource( QObject* parent, QString type, QString id );
@@ -41,36 +35,10 @@ class MAINMODULE_EXPORT VoltSource : public Component, public eElement
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
-        
-        virtual void updateStep();
 
-        double volt() const      { return m_value; }
-        void setVolt( double v );
-        
-        void setUnit( QString un );
+        virtual QList<propGroup_t> propGroups() override;
 
-        virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
-
-    public slots:
-        void onbuttonclicked();
-        void voltChanged( int volt );
-        virtual void remove();
-
-    private:
-        void updateButton();
-        
-        bool m_changed;
-        
-        double m_voltHight;
-        double m_voltOut;
-        Pin* outpin;
-        eSource* m_out;
-        
-        VoltWidget m_voltw;
-
-        QPushButton* m_button;
-        QDial* m_dial;
-        QGraphicsProxyWidget* m_proxy;
+        virtual void updateStep() override;
 };
 
 #endif

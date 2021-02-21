@@ -26,13 +26,11 @@ License along with this library; if not, see
 
 #include <iostream>
 
-#include "config.h"
 #include "12bit-processors.h"
 #include "12bit-instructions.h"
 
-instruction * disasm12 (pic_processor *cpu, uint address, uint inst)
+Instruction* disasm12( pic_processor *cpu, uint address, uint inst )
 {
-
   unsigned char topnibble;
   unsigned char midnibble;
   unsigned char lownibble;
@@ -78,7 +76,6 @@ instruction * disasm12 (pic_processor *cpu, uint address, uint inst)
 	    return(new DECF(cpu,inst,address));
 
 	  }
-
       break;
 
     case 0x01:	switch(bits6and7)

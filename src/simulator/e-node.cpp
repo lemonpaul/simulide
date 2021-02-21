@@ -50,10 +50,10 @@ void eNode::initialize()
     m_changed      = false;
     m_currChanged  = false;
     m_admitChanged = false;
+    nextCH = NULL;
 
     m_changedFast.clear();
     m_nonLinear.clear();
-    m_reactiveList.clear();
     m_admitList.clear();
     m_currList.clear();
     m_nodeList.clear();
@@ -81,13 +81,14 @@ void eNode::stampCurrent( ePin* epin, double data )
     if( !m_changed )
     {
         m_changed = true;
-        Simulator::self()->addToChangedNodeList( this );
+        Simulator::self()->addToChangedNodes( this );
     }
 }
 
 void eNode::stampAdmitance( ePin* epin, double data )
 {
-    if( m_nodeList[epin] == m_nodeNum  ) return; // Be sure msg doesn't come from this node
+    if( m_nodeList[epin] == m_nodeNum  )
+        return; // Be sure msg doesn't come from this node
 
     m_admitList[epin] = data;
 
@@ -96,7 +97,7 @@ void eNode::stampAdmitance( ePin* epin, double data )
     if( !m_changed )
     {
         m_changed = true;
-        Simulator::self()->addToChangedNodeList( this );
+        Simulator::self()->addToChangedNodes( this );
     }
 }
 
@@ -114,7 +115,7 @@ void eNode::stampMatrix()
         m_totalAdmit = 0;
 
         QHashIterator<ePin*, double> i(m_admitList); // ePin-Admit
-        while ( i.hasNext() )
+        while( i.hasNext() )
         {
             i.next();
 
@@ -147,19 +148,19 @@ void eNode::stampAdmit()
 {
     int nonCero = 0;
     QHashIterator<int, double> ai(m_admit); // iterate admitance hash: eNode-Admit
-    while ( ai.hasNext() )
+    while( ai.hasNext() )
     {
         ai.next();
         int enode = ai.key();
         double admit = ai.value();
         if( enode>0 ) CircMatrix::self()->stampMatrix( m_nodeNum, enode, -admit );
 
-        if( m_switched )                       // Find open/close events
+        if( m_switched )                       // Find Open/Close events
         {
             if( admit > 0 ) nonCero++;
             double admitP = m_admitPrev[enode];
 
-            if(( admit != admitP )
+            if(( admit != admitP )             // Open/Close event found
               &&((admit==0)||(admitP==0))) CircMatrix::self()->setCircChanged();
         }
     }
@@ -196,16 +197,25 @@ QList<int> eNode::getConnections()
 
 void  eNode::setVolt( double v )
 {
-    //qDebug() << m_id << m_volt << v;
-    if( fabs(m_volt-v) > 1e-9 ) //( m_volt != v )
+    //qDebug() << m_id << m_volt << v<<Simulator::self()->NLaccuracy();
+    if( m_volt != v ) //( fabs(m_volt-v) > 1e-9 ) //
     {
         //qDebug() << m_id << "setVChanged";
         m_voltChanged = true;
         m_volt = v;
 
-        for( eElement* el : m_changedFast ) Simulator::self()->addToChangedFast( el ); // el->setVChanged();
-        for( eElement* el : m_reactiveList ) Simulator::self()->addToReactiveList( el );
-        for( eElement* el : m_nonLinear ) Simulator::self()->addToNoLinList( el );
+        for( eElement* el : m_changedFast )
+        {
+            if( el->added ) continue;
+            Simulator::self()->addToChangedFast( el );
+            el->added = true;
+        }
+        for( eElement* el : m_nonLinear )
+        {
+            if( el->added ) continue;
+            Simulator::self()->addToNoLinList( el );
+            el->added = true;
+        }
     }
 }
 double eNode::getVolt() { return m_volt; }
@@ -213,38 +223,27 @@ double eNode::getVolt() { return m_volt; }
 void eNode::setIsBus( bool bus )
 {
     m_isBus = bus;
+    if( !bus ) return;
 
     Simulator::self()->remFromEnodeList( this, /*delete=*/ false );
     Simulator::self()->addToEnodeBusList( this );
 }
 
-bool eNode::isBus()
-{
-    return m_isBus;
-}
-
 void eNode::createBus()
 {
     int busSize = m_eBusPinList.size();
-
     //qDebug()<<"\neNode::createBus"<< this <<busSize << m_eBusPinList;
 
     m_eNodeList.clear();
     for( int i=0; i<busSize; i++ )
     {
         QList<ePin*> pinList = m_eBusPinList.at( i );
-
         eNode* enode = 0l;
 
         if( !pinList.isEmpty() )
         {
             enode = new eNode( m_id+"-eNode-"+QString::number( i ) );
-
-            for( ePin* epin : pinList )
-            {
-                //qDebug() <<"Pin eNode"<< QString::fromStdString(epin->getId())<<enode;
-                epin->setEnode( enode );
-            }
+            for( ePin* epin : pinList ) epin->setEnode( enode );
         }
         m_eNodeList.append( enode );
     }
@@ -292,32 +291,21 @@ void eNode::remEpin( ePin* epin )
 
 //qDebug() << "eNode::remEpin" << m_id << QString::fromStdString(epin->getId())<<m_ePinList.size();
 
-    // If No epins then remove this enode
-    if( m_ePinList.isEmpty() )
+    if( m_ePinList.isEmpty() ) // If No epins then remove this enode
     {
         if( m_isBus ) Simulator::self()->remFromEnodeBusList( this, true );
         else          Simulator::self()->remFromEnodeList( this, true );
     }
 }
 
-void eNode::addToChangedFast( eElement* el )
+void eNode::voltChangedCallback( eElement* el )
 {
     if( !m_changedFast.contains(el) ) m_changedFast.append(el);
 }
 
-void eNode::remFromChangedFast( eElement* el )
+void eNode::remFromChangedCallback( eElement* el )
 {
     m_changedFast.removeOne(el);
-}
-
-void eNode::addToReactiveList( eElement* el )
-{
-    if( !m_reactiveList.contains(el) ) m_reactiveList.append(el);
-}
-
-void eNode::remFromReactiveList( eElement* el )
-{
-    m_reactiveList.removeOne(el);
 }
 
 void eNode::addToNoLinList( eElement* el )

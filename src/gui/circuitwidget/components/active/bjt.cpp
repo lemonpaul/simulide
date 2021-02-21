@@ -19,7 +19,9 @@
 
 #include "bjt.h"
 #include "itemlibrary.h"
+#include "circuitwidget.h"
 #include "connector.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "pin.h"
 
@@ -48,7 +50,7 @@ LibraryItem* BJT::libraryItem()
 
 BJT::BJT( QObject* parent, QString type, QString id )
    : Component( parent, type, id )
-   , eBJT( id.toStdString() )
+   , eBJT( id )
 {
     Q_UNUSED( BJT_properties );
     
@@ -79,11 +81,19 @@ BJT::BJT( QObject* parent, QString type, QString id )
 
     Simulator::self()->addToUpdateList( this );
     
-    resetState();
+    initialize();
 }
 BJT::~BJT()
 {
     Simulator::self()->remFromUpdateList( this );
+}
+
+QList<propGroup_t> BJT::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"PNP", tr("PNP"),""} );
+    mainGroup.propList.append( {"Gain", tr("Gain"),""} );
+    return {mainGroup};
 }
 
 void BJT::updateStep()
@@ -95,16 +105,6 @@ void BJT::setPnp( bool pnp )
 {
     m_PNP = pnp;
     update();
-}
-
-void BJT::setBCd( bool bcd ) 
-{ 
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim )  Simulator::self()->pauseSim();
-    
-    eBJT::setBCd( bcd );
-    
-    if( pauseSim ) Simulator::self()->runContinuous();
 }
 
 void BJT::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

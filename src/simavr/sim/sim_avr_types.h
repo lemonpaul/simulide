@@ -30,8 +30,8 @@ extern "C" {
 #include <stdint.h>
 #include <inttypes.h>
 
-typedef uint64_t	avr_cycle_count_t;
-typedef uint16_t	avr_io_addr_t;
+typedef uint64_t avr_cycle_count_t;
+typedef uint16_t avr_io_addr_t;
 
 /*
  * this 'structure' is a packed representation of an IO register 'bit'

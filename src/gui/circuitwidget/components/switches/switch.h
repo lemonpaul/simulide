@@ -27,7 +27,7 @@ class LibraryItem;
 class MAINMODULE_EXPORT Switch : public SwitchBase
 {
     Q_OBJECT
-    Q_PROPERTY( bool DT     READ dt  WRITE setDt  DESIGNABLE true USER true )
+    Q_PROPERTY( bool DT READ dt  WRITE setDt DESIGNABLE true USER true )
 
     public:
 
@@ -37,7 +37,9 @@ class MAINMODULE_EXPORT Switch : public SwitchBase
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
-        virtual void stamp();
+        virtual QList<propGroup_t> propGroups() override;
+
+        virtual void stamp() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 

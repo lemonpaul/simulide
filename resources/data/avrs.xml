@@ -42,9 +42,11 @@
     <item name="atmega16"   package="avr/atmega32"   data="avr/atmega32"   device="atmega16" ></item>
     <item name="atmega16m1" package="avr/atmega16m1" data="avr/atmega16m1" device="atmega16m1"></item>
     <item name="atmega32"   package="avr/atmega32"   data="avr/atmega32"   device="atmega32" ></item>
+    <item name="atmega32m1" package="avr/atmega16m1" data="avr/atmega16m1" device="atmega32m1"></item>
     <item name="atmega32u4" package="avr/atmega32u4" data="avr/atmega32u4" device="atmega32u4" ></item>
     <item name="atmega48"   package="avr/atmega328"  data="avr/atmega328"  device="atmega48" ></item>
     <item name="atmega64"   package="avr/atmega64"   data="avr/atmega64"   device="atmega64" ></item>
+    <item name="atmega64m1" package="avr/atmega16m1" data="avr/atmega16m1" device="atmega64m1"></item>
     <item name="atmega88"   package="avr/atmega328"  data="avr/atmega328"  device="atmega88" ></item>
     <item name="atmega128"  package="avr/atmega128"  data="avr/atmega128"  device="atmega128" ></item>
     <item name="atmega128rfa1" package="avr/atmega128rfa1" data="avr/atmega128rfa1" device="atmega128rfa1" ></item>

@@ -20,8 +20,6 @@
 #include <iostream>
 #include <math.h>
 
-//#include <iomanip>
-
 #include "circmatrix.h"
 #include "simulator.h"
 
@@ -49,8 +47,7 @@ void CircMatrix::createMatrix( QList<eNode*> &eNodeList )
     m_admitChanged = false;
     m_currChanged  = false;
 
-    std::cout <<"\n  Initializing Matrix: "<< m_numEnodes << " eNodes"<< std::endl;
-    for( int i=0; i<m_numEnodes; i++ ) m_eNodeList->at(i)->stampMatrix();
+    qDebug() <<"\n  Initializing Matrix: "<< m_numEnodes << " eNodes";
 }
 
 void CircMatrix::stampMatrix( int row, int col, double value )
@@ -103,25 +100,23 @@ bool CircMatrix::solveMatrix()
         m_ipvtList.clear();
         m_eNodeActList.clear();
         int group = 0;
+        int singleNode = 0;
         
         while( !allNodes.isEmpty() ) // Get a list of groups of nodes interconnected
         {
             QList<int> nodeGroup;
             addConnections( allNodes.first(), &nodeGroup, &allNodes ); // Get a group of nodes interconnected
             //qDebug() <<"CircMatrix::solveMatrix split"<<nodeGroup<<allNodes;
-            
-            //for( int num : nodeGroup ) allNodes.removeOne(num);
-            
+
             int numEnodes = nodeGroup.size();
             if( numEnodes==1 )           // Sigle nodes do by themselves
             {
                 eNode* enod = m_eNodeList->at( nodeGroup[0]-1 );
                 enod->setSingle( true );
                 enod->solveSingle();
+                singleNode++;
                 //qDebug() <<"CircMatrix::solveMatrix solve single"<<enod->itemId();
-            }
-            else
-            {
+            }else{
                 dp_matrix_t a;
                 d_matrix_t ap;
                 dp_vector_t b;
@@ -138,7 +133,7 @@ bool CircMatrix::solveMatrix()
                 {
                     if( !nodeGroup.contains( y+1 ) ) continue;
                     int nx=0;
-                    for( int x=0; x<m_numEnodes; x++ )      
+                    for( int x=0; x<m_numEnodes; x++ )
                     {
                         if( !nodeGroup.contains( x+1 ) ) continue;
                         a[nx][ny] = &(m_circMatrix[x][y]);
@@ -158,7 +153,7 @@ bool CircMatrix::solveMatrix()
                 m_eNodeActList.append( eNodeActive );
                 m_eNodeActive = &eNodeActive;
                 
-                factorMatrix( ny, group );
+                isOk &= factorMatrix( ny, group );
                 isOk &= luSolve( ny, group );
 
                 group++;
@@ -166,9 +161,8 @@ bool CircMatrix::solveMatrix()
         }
         m_circChanged  = false;
         //qDebug() <<"CircMatrix::solveMatrix"<<group<<"Circuits";
-    }
-    else
-    {
+        //qDebug() <<"CircMatrix::solveMatrix"<<singleNode<<"Single Nodes";
+    }else{
         for( int i=0; i<m_bList.size(); i++ )
         {
             m_eNodeActive = &(m_eNodeActList[i]);
@@ -184,7 +178,7 @@ bool CircMatrix::solveMatrix()
     return isOk;
 }
 
-void CircMatrix::factorMatrix( int n, int group  )
+bool CircMatrix::factorMatrix( int n, int group  )
 {
     // factors a matrix into upper and lower triangular matrices by
     // gaussian elimination.  On entry, a[0..n-1][0..n-1] is the
@@ -195,9 +189,9 @@ void CircMatrix::factorMatrix( int n, int group  )
     i_vector_t&  ipvt = m_ipvtList[group];
     
     d_matrix_t& a = m_aFaList[group];
-    for( int i=0; i<n; i++ )
+    for( int i=0; i<n; ++i )
     {
-        for( int j=0; j<n; j++ )
+        for( int j=0; j<n; ++j )
         {
              a[i][j] = *(ap[i][j]);             
              //qDebug() << m_circMatrix[i][j];
@@ -247,7 +241,7 @@ void CircMatrix::factorMatrix( int n, int group  )
             }
             //qDebug() <<"LTE"<<i<<j<<x<<q<<largest<<largestRow<<( !(x < largest) );
         }
-
+        if( largestRow == -1 ) return false;
         if( j != largestRow ) // pivoting
         {
             double x;
@@ -283,6 +277,7 @@ void CircMatrix::factorMatrix( int n, int group  )
         std::cout << ipvt[i] << std::endl;
         //std::cout << std::endl;
     }*/
+    return true;
 }
 
 bool CircMatrix::luSolve( int n, int group )
@@ -346,7 +341,7 @@ bool CircMatrix::luSolve( int n, int group )
         double volt = tot/a[i][i];
         b[i] = volt;
         
-        if( std::isnan( volt ) ) 
+        if( std::isnan( volt ) )
         {
             isOk = false;
             volt = 0;

@@ -25,9 +25,7 @@
 #include "sim_time.h"
 #include "avr_adc.h"
 
-static avr_cycle_count_t
-avr_adc_int_raise(
-		struct avr_t * avr, avr_cycle_count_t when, void * param)
+static avr_cycle_count_t avr_adc_int_raise( struct avr_t* avr, avr_cycle_count_t when, void * param)
 {
 	avr_adc_t * p = (avr_adc_t *)param;
 	if (avr_regbit_get(avr, p->aden)) {
@@ -42,9 +40,7 @@ avr_adc_int_raise(
 	return 0;
 }
 
-static uint8_t
-avr_adc_read_l(
-		struct avr_t * avr, avr_io_addr_t addr, void * param)
+static uint8_t avr_adc_read_l( struct avr_t* avr, avr_io_addr_t addr, void* param)
 {
 	avr_adc_t * p = (avr_adc_t *)param;
 
@@ -131,9 +127,7 @@ avr_adc_read_l(
  * So here if the H is read before the L, we still call the L to update the
  * register value.
  */
-static uint8_t
-avr_adc_read_h(
-		struct avr_t * avr, avr_io_addr_t addr, void * param)
+static uint8_t avr_adc_read_h( struct avr_t * avr, avr_io_addr_t addr, void * param)
 {
 	avr_adc_t * p = (avr_adc_t *)param;
 	// no "break" here on purpose
@@ -149,9 +143,7 @@ avr_adc_read_h(
 	}
 }
 
-static void
-avr_adc_configure_trigger(
-		struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
+static void avr_adc_configure_trigger( struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
 {
 	avr_adc_t * p = (avr_adc_t *)param;
 	
@@ -205,40 +197,44 @@ avr_adc_configure_trigger(
 }
 
 static void
-avr_adc_write_adcsra(
-		struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
+avr_adc_write_adcsra( struct avr_t* avr, avr_io_addr_t addr, uint8_t v, void* param )
 {
-	
-	avr_adc_t * p = (avr_adc_t *)param;
-	uint8_t adsc = avr_regbit_get(avr, p->adsc);
-	uint8_t aden = avr_regbit_get(avr, p->aden);
+    avr_adc_t* p = (avr_adc_t*)param;
+    uint8_t adsc = avr_regbit_get( avr, p->adsc );
+    uint8_t aden = avr_regbit_get( avr, p->aden );
+
+    uint8_t adifBit = 1<<p->adc.raised.bit;
+    uint8_t old_adif = avr->data[addr] & adifBit;
+    uint8_t new_adif = v & adifBit;
 
 	avr->data[p->adsc.reg] = v;
 
 	// can't write zero to adsc
-	if (adsc && !avr_regbit_get(avr, p->adsc)) {
+    if (adsc && !avr_regbit_get(avr, p->adsc))
+    {
 		avr_regbit_set(avr, p->adsc);
 		v = avr->data[p->adsc.reg];
 	}
-	if (!aden && avr_regbit_get(avr, p->aden)) {
-		// first conversion
+    if (!aden && avr_regbit_get( avr, p->aden )) // first conversion
+    {
 		p->first = 1;
 		AVR_LOG(avr, LOG_TRACE, "ADC: Start AREF %d AVCC %d\n", avr->aref, avr->avcc);
 	}
-	if (aden && !avr_regbit_get(avr, p->aden)) {
-		// stop ADC
+    if (aden && !avr_regbit_get(avr, p->aden)) // stop ADC
+    {
 		avr_cycle_timer_cancel(avr, avr_adc_int_raise, p);
-		avr_regbit_clear(avr, p->adsc);
-		v = avr->data[p->adsc.reg];	// Peter Ross pross@xvid.org
+        avr_regbit_clear( avr, p->adsc );
+        v = avr->data[p->adsc.reg];	          // Peter Ross pross@xvid.org
 	}
-	if (!adsc && avr_regbit_get(avr, p->adsc)) {
-		// start one!
+    if (!adsc && avr_regbit_get(avr, p->adsc)) // start one!
+    {
 		uint8_t muxi = avr_regbit_get_array(avr, p->mux, ARRAY_SIZE(p->mux));
 		union {
 			avr_adc_mux_t mux;
 			uint32_t v;
-		} e = { .mux = p->muxmode[muxi] };
-		avr_raise_irq(p->io.irq + ADC_IRQ_OUT_TRIGGER, e.v);
+        } e;
+        e.mux = p->muxmode[muxi];
+        avr_raise_irq( p->io.irq + ADC_IRQ_OUT_TRIGGER, e.v );
 
 		// clock prescaler are just a bit shift.. and 0 means 1
 		uint32_t div = avr_regbit_get_array(avr, p->adps, ARRAY_SIZE(p->adps));
@@ -253,21 +249,21 @@ avr_adc_write_adcsra(
 				avr_hz_to_cycles(avr, div),
 				avr_adc_int_raise, p);
 	}
-	avr_core_watch_write(avr, addr, v);
-	avr_adc_configure_trigger(avr, addr, v, param);
+
+    if( old_adif && !new_adif ) v |= adifBit;
+    else                        v &= ~adifBit;
+
+    avr_core_watch_write( avr, addr, v );
+    avr_adc_configure_trigger( avr, addr, v, param );
 }
 
-static void
-avr_adc_write_adcsrb(
-		struct avr_t * avr, avr_io_addr_t addr, uint8_t v, void * param)
+static void avr_adc_write_adcsrb( struct avr_t* avr, avr_io_addr_t addr, uint8_t v, void* param)
 {
 	avr_core_watch_write(avr, addr, v);
 	avr_adc_configure_trigger(avr, addr, v, param);
 }
 
-static void
-avr_adc_irq_notify(
-		struct avr_irq_t * irq, uint32_t value, void * param)
+static void avr_adc_irq_notify( struct avr_irq_t* irq, uint32_t value, void* param)
 {
     avr_adc_t* p = (avr_adc_t *)param;
     avr_t* avr = p->io.avr;
@@ -308,7 +304,7 @@ static void avr_adc_reset(avr_io_t * port)
 		avr_irq_register_notify(p->io.irq + i, avr_adc_irq_notify, p);
 }
 
-static const char * irq_names[ADC_IRQ_COUNT] = {
+static const char* irq_names[ADC_IRQ_COUNT] = {
 	[ADC_IRQ_ADC0] = "16<adc0",
 	[ADC_IRQ_ADC1] = "16<adc1",
 	[ADC_IRQ_ADC2] = "16<adc2",

@@ -33,7 +33,7 @@ LibraryItem* WS2812::libraryItem()
 {
     return new LibraryItem(
         tr( "WS2812 Led" ),
-        tr( "Outputs" ),
+        tr( "Leds" ),
         "ws2812.png",
         "WS2812",
         WS2812::construct );
@@ -41,8 +41,10 @@ LibraryItem* WS2812::libraryItem()
 
 WS2812::WS2812( QObject* parent, QString type, QString id )
       : Component( parent, type, id )
-      , eLogicDevice( id.toStdString() )
+      , eLogicDevice( id )
 {
+    m_graphical = true;
+
     m_pin.resize( 2 );
     m_ePin.resize( 2 );
     m_rgb.resize( 3 );
@@ -74,26 +76,20 @@ WS2812::~WS2812()
     Simulator::self()->remFromUpdateList( this );
 }
 
+QList<propGroup_t> WS2812::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Rows", tr("Rows"),""} );
+    mainGroup.propList.append( {"Cols", tr("Columns"),""} );
+    return {mainGroup};
+}
+
 void WS2812::updateStep()
 {
     update();
 }
 
 void WS2812::initialize()
-{
-    m_stepsPerus = Simulator::self()->stepsPerus();
-    if( McuComponent::self() )
-    {
-        double freq = McuComponent::self()->freq();
-        double simurate = freq*1e6;
-        if( Simulator::self()->simuRate() == simurate ) return;
-
-        qDebug() << "WS2812::initialize: Changed Simulation Speed to:" << freq << "MHz";
-        Simulator::self()->simuRateChanged( simurate );
-    }
-}
-
-void WS2812::resetState()
 {
     for( int i=0; i<m_leds; i++ ) m_led[i] = QColor( 0, 0, 0 );
     m_lastTime = 0;
@@ -102,25 +98,24 @@ void WS2812::resetState()
     m_byte = 0;
     m_bit  = 7;
 }
-void WS2812::setVChanged()
+void WS2812::voltChanged()
 {
-    // Get Clk to don't miss any clock changes
-    int  clkState = eLogicDevice::getClockState();
+    int clkState = eLogicDevice::getClockState(); // Get Clk to don't miss any clock changes
 
     uint64_t CircTime = Simulator::self()->circTime();
     uint64_t time = CircTime - m_lastTime;
     m_lastTime = CircTime;
 
-    if( clkState  == Rising )                      // Input Rising edge
+    if( clkState == Clock_Rising )               // Input Rising edge
     {
-        if( time > 50000 )                      // Time > 50uS -> Reset
+        if( time > 50*1e6 )                      // Time > 50uS -> Reset
         {
             m_data = 0;
             m_word = 0;
             m_byte = 0;
             m_bit  = 7;
         }
-        else if(( time > 400 )&&( time < 951 ))   // Valid L State Time
+        else if(( time > 400*1e3 )&&( time < 951*1e3 )) // Valid L State Time
         {
             if( m_word >= m_leds )
             {
@@ -130,23 +125,23 @@ void WS2812::setVChanged()
             {
                 if( m_lastHstate  )
                 {
-                    if( time < 751 )  saveBit( 1 );    // Valid bit = 1
+                    if( time < 751*1e3 )  saveBit( 1 ); // Valid bit = 1
                 }
-                else if( time > 649 ) saveBit( 0 );    // Valid bit = 0
+                else if( time > 649 *1e3) saveBit( 0 ); // Valid bit = 0
             }
         }
         m_newWord = true;
     }
-    else if( clkState  == Falling )               // Input Falling edge
+    else if( clkState == Clock_Falling )               // Input Falling edge
     {
         if( m_word >= m_leds )
         {
             eLogicDevice::setOut( 0, false );
         }
-        else if(( time > 199 )&&( time < 851 ))   // Valid H State Time
+        else if(( time > 199*1e3 )&&( time < 851*1e3 )) // Valid H State Time
         {
-            if( time > 500 ) m_lastHstate = true;
-            else             m_lastHstate = false;
+            if( time > 500*1e3 ) m_lastHstate = true;
+            else                 m_lastHstate = false;
 
             if(( m_byte == 2 )&&( m_bit == 0 )) // Low time for last bit can be anything?
             {                                   // so save it here and skip saving
@@ -179,7 +174,6 @@ void WS2812::saveBit( bool bit )
         }
     }
 }
-
 
 int WS2812::rows()
 {
@@ -224,11 +218,14 @@ void WS2812::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget
 
     p->drawRect( m_area );
 
-    QPointF points[3] = {
-    QPointF( -8,-2 ),
-    QPointF( -8+3,0 ),
-    QPointF( -8, 2 )     };
-    p->drawPolygon(points, 3);
+    if( !m_hidden )
+    {
+        QPointF points[3] = {
+        QPointF( -8,-2 ),
+        QPointF( -8+3,0 ),
+        QPointF( -8, 2 )     };
+        p->drawPolygon(points, 3);
+    }
 
     for( int row=0; row<m_rows; row++ )
     {

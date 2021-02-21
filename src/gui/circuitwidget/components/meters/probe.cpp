@@ -30,8 +30,7 @@
 
 static const char* Probe_properties[] = {
     QT_TRANSLATE_NOOP("App::Property","Show volt"),
-    QT_TRANSLATE_NOOP("App::Property","Threshold"),
-    QT_TRANSLATE_NOOP("App::Property","PlotterCh")
+    QT_TRANSLATE_NOOP("App::Property","Threshold")
 };
 
 Component* Probe::construct( QObject* parent, QString type, QString id )
@@ -49,34 +48,37 @@ LibraryItem* Probe::libraryItem()
 
 Probe::Probe( QObject* parent, QString type, QString id )
      : Component( parent, type, id )
-     , eElement( id.toStdString() )
+     , eElement( id )
 {
     Q_UNUSED( Probe_properties );
+
+    m_graphical = true;
     
     m_area = QRect( -8, -8, 16, 16 );
     m_readPin = 0l;
     m_readConn = 0l;
     m_voltTrig = 2.5;
-    m_plotterLine = 0;
     m_plotterColor = QColor( 255, 255, 255 );
 
     // Create Input Pin
     m_ePin.resize(1);
+    m_pin.resize(1);
     QString nodid = id;
     nodid.append(QString("-inpin"));
     QPoint nodpos = QPoint(-22,0);
     m_inputpin = new Pin( 180, nodpos, nodid, 0, this);
     m_inputpin->setLength( 20 );
     m_inputpin->setBoundingRect( QRect(-2, -2, 6, 4) );
+    m_pin[0] = m_inputpin;
     
     nodid.append( QString("-eSource") );
-    m_inSource = new eSource( nodid.toStdString(), m_inputpin );
+    m_inSource = new eSource( nodid, m_inputpin );
     m_inSource->setOut(false);
     m_inSource->setImp( 1e9 );
 
     setRotation( rotation() - 45 );
     
-    m_unit = " ";
+    m_unit = " V";
     m_valLabel->setDefaultTextColor( Qt::darkRed );
     m_valLabel->setPlainText( "0" );
     setValLabelPos( 16, 0 , 45 ); // x, y, rot 
@@ -90,6 +92,13 @@ Probe::Probe( QObject* parent, QString type, QString id )
 Probe::~Probe()
 {
     delete m_inSource;
+}
+
+QList<propGroup_t> Probe::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Threshold", tr("Threshold"),"V"} );
+    return {mainGroup};
 }
 
 void Probe::updateStep()
@@ -127,7 +136,7 @@ void Probe::updateStep()
 
             if( con->objectName().startsWith("Connector") ) // Connector found
             {
-                setVolt( con->getVolt() ); //startPin()->volt();
+                setVolt( con->getVolt() );
                 m_readConn = con;
                 break;
             }
@@ -136,11 +145,9 @@ void Probe::updateStep()
         {
             m_readPin =  qgraphicsitem_cast<Pin *>( it );
             setVolt( m_readPin->getVolt() );
-            //qDebug() << " probe: Pin found" << volt;
             break;
         }
     }
-    //qDebug() << " probe: " /*<< item->type()*/ << UserType;//con->objectName();
 }
 
 void Probe::setVolt( double volt )
@@ -153,8 +160,6 @@ void Probe::setVolt( double volt )
     int dispVolt = int( volt*100+0.5 );
     
     m_valLabel->setPlainText( QString("%1 V").arg(double(dispVolt)/100) );
-
-    if( m_plotterLine > 0 ) PlotterWidget::self()->setData( m_plotterLine, m_voltIn*100 );
 
     update();       // Repaint
 }
@@ -172,84 +177,11 @@ void Probe::remove()
 {
     if( m_inputpin->isConnected() ) m_inputpin->connector()->remove();
 
-    slotPlotterRem();
+    emit removed( this );
     
     Simulator::self()->remFromUpdateList( this );
     
     Component::remove();
-}
-
-int Probe::plotter()
-{
-    return m_plotterLine ;
-}
-
-void Probe::setPlotter( int channel )
-{
-    if( channel == 0 ) return;
-    
-    if( PlotterWidget::self()->addChannel( channel ) )
-    {
-        slotPlotterRem(); 
-        m_plotterLine = channel;
-        PlotterWidget::self()->setData( m_plotterLine, int(m_voltIn*100) );
-        m_plotterColor = PlotterWidget::self()->getColor( m_plotterLine );
-        update();       // Repaint
-    }
-}
-
-void Probe::slotPlotter1() { setPlotter( 1 ); }
-void Probe::slotPlotter2() { setPlotter( 2 ); }
-void Probe::slotPlotter3() { setPlotter( 3 ); }
-void Probe::slotPlotter4() { setPlotter( 4 ); }
-
-/*void Probe::slotPlotterAdd()
-{
-    if( m_plotterLine != 0 ) return;            // Already have plotter
-    
-    m_plotterLine = PlotterWidget::self()->getChannel();
-    if( m_plotterLine < 1 ) return;
-
-    PlotterWidget::self()->setData( m_plotterLine, int(m_voltIn*100) );
-    m_plotterColor = PlotterWidget::self()->getColor( m_plotterLine );
-    update();       // Repaint
-}*/
-
-void Probe::slotPlotterRem()
-{
-    //qDebug() << m_plotterLine;
-    if( m_plotterLine == 0 ) return;              // No plotter to remove
-
-    PlotterWidget::self()->remChannel( m_plotterLine );
-    m_plotterLine = 0;
-    update();       // Repaint
-}
-
-void Probe::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
-{
-    event->accept();
-    QMenu* menu  = new QMenu();
-    QMenu *pmenu = menu->addMenu(QIcon(":/fileopen.png"),tr("Plotter Channel"));
-
-    QAction* plotter1Action = pmenu->addAction(QIcon(":/fileopen.png"),tr("Channel 1"));
-    connect(plotter1Action, SIGNAL(triggered()), this, SLOT(slotPlotter1()));
-    
-    QAction* plotter2Action = pmenu->addAction(QIcon(":/fileopen.png"),tr("Channel 2"));
-    connect(plotter2Action, SIGNAL(triggered()), this, SLOT(slotPlotter2()));
-    
-    QAction* plotter3Action = pmenu->addAction(QIcon(":/fileopen.png"),tr("Channel 3"));
-    connect(plotter3Action, SIGNAL(triggered()), this, SLOT(slotPlotter3()));
-    
-    QAction* plotter4Action = pmenu->addAction(QIcon(":/fileopen.png"),tr("Channel 4"));
-    connect(plotter4Action, SIGNAL(triggered()), this, SLOT(slotPlotter4()));
-
-    QAction* plotterRemAction = pmenu->addAction(QIcon(":/fileopen.png"),tr("Remove from Plotter"));
-    connect(plotterRemAction, SIGNAL(triggered()), this, SLOT(slotPlotterRem()));
-    
-    menu->addSeparator();
-
-    Component::contextMenu( event, menu );
-    menu->deleteLater();
 }
 
 QPainterPath Probe::shape() const
@@ -263,22 +195,11 @@ void Probe::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget 
 {
     Component::paint( p, option, widget );
 
-    if( m_plotterLine > 0 )           p->setBrush( m_plotterColor );
-    else if ( m_voltIn > m_voltTrig)  p->setBrush( QColor( 255, 166, 0 ) );
+    if      ( m_voltIn > m_voltTrig)  p->setBrush( QColor( 255, 166, 0 ) );
     else if ( m_voltIn < -m_voltTrig) p->setBrush( QColor( 0, 100, 255 ) );
     else                              p->setBrush( QColor( 230, 230, 255 ) );
 
     p->drawEllipse( m_area );
-    
-    if( m_plotterLine > 0 )
-    {
-        //p->drawLine(-4,-7,-5,-1 );
-        p->drawLine(-5,-1, 1,-3 );
-        p->drawLine( 1,-3,-1, 3 );
-        p->drawLine(-1, 3, 5, 1 );
-        //p->drawLine( 6, 1, 4, 7 );
-        //p->drawLine( 5, 3, 8,  0 );
-    }
 }
 
 #include "moc_probe.cpp"

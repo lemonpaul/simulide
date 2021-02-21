@@ -40,7 +40,7 @@ License along with this library; if not, see
 class P16F62x : public P16X6X_processor
 {
 public:
-  P16F62x(const char *_name=0, const char *desc=0);
+  P16F62x(const char *_name=0);
   ~P16F62x();
 
   USART_MODULE usart;
@@ -76,11 +76,11 @@ class P16F627 : public P16F62x
 {
 public:
 
-  virtual PROCESSOR_TYPE isa(){return _P16F627_;};
+  virtual PROCESSOR_TYPE isa(){return _P16F627_;}
 
-  virtual uint program_memory_size() const { return 0x400; };
+  virtual uint program_memory_size() const { return 0x400; }
 
-  P16F627(const char *_name=0, const char *desc=0);
+  P16F627(const char *_name=0 );
   static Processor *construct(const char *name);
 };
 
@@ -88,11 +88,11 @@ class P16F628 : public P16F627
 {
 public:
 
-  virtual PROCESSOR_TYPE isa(){return _P16F628_;};
+  virtual PROCESSOR_TYPE isa(){return _P16F628_;}
 
-  virtual uint program_memory_size() const { return 0x800; };
+  virtual uint program_memory_size() const { return 0x800; }
 
-  P16F628(const char *_name=0, const char *desc=0);
+  P16F628(const char *_name=0 );
   ~P16F628();
   static Processor *construct(const char *name);
 };
@@ -101,12 +101,12 @@ class P16F648 : public P16F628
 {
 public:
 
-  virtual PROCESSOR_TYPE isa(){return _P16F648_;};
+  virtual PROCESSOR_TYPE isa(){return _P16F648_;}
 
-  virtual uint program_memory_size() const { return 0x1000; };
+  virtual uint program_memory_size() const { return 0x1000; }
   virtual void create_sfr_map();
 
-  P16F648(const char *_name=0, const char *desc=0);
+  P16F648(const char *_name=0 );
   ~P16F648();
   static Processor *construct(const char *name);
 };

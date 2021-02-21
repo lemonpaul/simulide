@@ -37,21 +37,18 @@ class MAINMODULE_EXPORT SR04 : public Component, public eElement
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
         
-        void stamp();
-        void resetState();
-        void setVChanged();
-        void simuClockStep();
+        virtual void stamp() override;
+        virtual void initialize() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
+        virtual void remove() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-        
-    public slots:
-        virtual void remove();
-        
+
     private:
         uint64_t m_lastStep;
         bool     m_lastTrig;
-        
-        int m_trigCount;
+
         int m_echouS;
         
         Pin* m_inpin;

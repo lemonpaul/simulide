@@ -20,6 +20,7 @@
 #include "connector.h"
 #include "circuit.h"
 #include "rail.h"
+#include "simulator.h"
 
 
 Component* Rail::construct( QObject* parent, QString type, QString id )
@@ -37,7 +38,7 @@ LibraryItem* Rail::libraryItem()
 
 Rail::Rail( QObject* parent, QString type, QString id )
     : Component( parent, type, id )
-    , eElement( id.toStdString() )
+    , eElement( id )
 {
     setLabelPos(-64,-24 );
 
@@ -51,7 +52,7 @@ Rail::Rail( QObject* parent, QString type, QString id )
     m_outpin = new Pin( 0, nodpos, nodid, 0, this);
 
     nodid.append(QString("-eSource"));
-    m_out = new eSource( nodid.toStdString(), m_outpin );
+    m_out = new eSource( nodid, m_outpin );
     
     m_out->setOut( true );
     m_unit = "V";
@@ -61,23 +62,48 @@ Rail::Rail( QObject* parent, QString type, QString id )
     
     setLabelPos(-16,-24, 0);
 }
+Rail::~Rail() {}
 
-Rail::~Rail() 
+QList<propGroup_t> Rail::propGroups()
 {
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Voltage", tr("Voltage"),"main"} );
+    return {mainGroup};
+}
+
+double Rail::volt()
+{
+    return m_value;
 }
 
 void Rail::setVolt( double v )
 {
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim )  Simulator::self()->pauseSim();
+
     Component::setValue( v );       // Takes care about units multiplier
-    m_voltHight = m_value*m_unitMult;
-    m_out->setVoltHigh( m_voltHight );
-    //update();
+    updateOutput();
+
+    if( pauseSim ) Simulator::self()->resumeSim();
 }
 
 void Rail::setUnit( QString un ) 
 {
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim )  Simulator::self()->pauseSim();
+
     Component::setUnit( un );
-    setVolt( m_value*m_unitMult );
+    updateOutput();
+
+    if( pauseSim ) Simulator::self()->resumeSim();
+}
+
+void Rail::updateOutput()
+{
+    m_voltHight = m_value*m_unitMult;
+    m_out->setVoltHigh( m_voltHight );
+    m_out->stampOutput();
+    Simulator::self()->addEvent( 1, NULL );
 }
 
 void Rail::remove()

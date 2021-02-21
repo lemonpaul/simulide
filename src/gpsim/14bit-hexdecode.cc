@@ -1,13 +1,13 @@
 /*
-   Copyright (C) 1998 T. Scott Dattalo
-   Copyright (C) 2013 Roy R Rankin
+   Copyright( C) 1998 T. Scott Dattalo
+   Copyright( C) 2013 Roy R Rankin
 
 This file is part of the libgpsim library of gpsim
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
 License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
+version 2.1 of the License, or( at your option) any later version.
 
 This library is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,11 +25,10 @@ License along with this library; if not, see
 //
 /* pic14.c  - pic 14bit core routines   */
 /* version 0.1                          */
-/* (c) I.King 1994                      */
+/*( c) I.King 1994                      */
 
 #include <iostream>
 
-#include "config.h"
 #include "14bit-processors.h"
 #include "14bit-instructions.h"
 
@@ -112,40 +111,39 @@ const int NUM_OP_16CXX	= sizeof(op_16cxx) / sizeof(op_16cxx[0]);
 const int NUM_OP_16EXT	= sizeof(op_16ext) / sizeof(op_16ext[0]);
 
 
-instruction * disasm14 (_14bit_processor *cpu, uint addr, uint inst)
+Instruction*  disasm14( _14bit_processor *cpu, uint addr, uint inst)
 {
-  instruction *pi;
+  Instruction* pi;
 
   pi = 0;
 
-  for(int i =0; i<NUM_OP_16CXX && !pi; i++)
-    if((op_16cxx[i].inst_mask & inst) == op_16cxx[i].opcode)
+  for( int i=0; i<NUM_OP_16CXX && !pi; i++ )
+    if(( op_16cxx[i].inst_mask & inst) == op_16cxx[i].opcode)
       pi = op_16cxx[i].inst_constructor(cpu, inst, addr);
 
-  if(!pi)
-    pi = invalid_instruction::construct(cpu, inst, addr);
+  if( !pi ) pi = BadInstruction::construct(cpu, inst, addr);
 
-  return (pi);
+  return( pi);
 }
+
 // decode for 14bit processors with enhanced instructions 
-instruction * disasm14E (_14bit_e_processor *cpu, uint addr, uint inst)
+Instruction*  disasm14E( _14bit_e_processor *cpu, uint addr, uint inst)
 {
-  instruction *pi;
+  Instruction* pi;
 
   pi = 0;
 
-  for(int i =0; i<NUM_OP_16EXT && !pi; i++)
+  for( int i=0; i<NUM_OP_16EXT && !pi; i++ )
       if((op_16ext[i].inst_mask & inst) == op_16ext[i].opcode)
         pi = op_16ext[i].inst_constructor(cpu, inst, addr);
   
-  for(int i =0; i<NUM_OP_16CXX && !pi; i++)
-    if((op_16cxx[i].inst_mask & inst) == op_16cxx[i].opcode)
+  for( int i=0; i<NUM_OP_16CXX && !pi; i++ )
+    if(( op_16cxx[i].inst_mask & inst) == op_16cxx[i].opcode )
       pi = op_16cxx[i].inst_constructor(cpu, inst, addr);
 
-  if(!pi)
-    pi = invalid_instruction::construct(cpu, inst, addr);
+  if( !pi ) pi = BadInstruction::construct(cpu, inst, addr);
 
-  return (pi);
+  return( pi );
 }
 
 

@@ -17,11 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <sstream>
-
 #include "memory.h"
+#include "circuitwidget.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "pin.h"
+#include "memtable.h"
 #include "utils.h"
 
 static const char* Memory_properties[] = {
@@ -46,7 +47,7 @@ LibraryItem* Memory::libraryItem()
 
 Memory::Memory( QObject* parent, QString type, QString id )
       : LogicComponent( parent, type, id )
-      , eMemory( id.toStdString() )
+      , eMemory( id )
       , MemData()
 {
     Q_UNUSED( Memory_properties );
@@ -76,8 +77,27 @@ Memory::Memory( QObject* parent, QString type, QString id )
     m_dataBits = 0;
     setAddrBits( 8 );
     setDataBits( 8 );
+
+    Simulator::self()->addToUpdateList( this );
 }
 Memory::~Memory(){}
+
+QList<propGroup_t> Memory::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Address_Bits", tr("Address Size"),"Bits"} );
+    mainGroup.propList.append( {"Data_Bits", tr("Data Size"),"Bits"} );
+    mainGroup.propList.append( {"Persistent", tr("Persistent"),""} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
+
+void Memory::updateStep()
+{
+    if( m_memTable ) m_memTable->updateTable( m_ram );
+}
 
 void Memory::updatePins()
 {
@@ -122,17 +142,17 @@ void Memory::setAddrBits( int bits )
     if( bits == 0 ) bits = 8;
     if( bits > 18 ) bits = 18;
     
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
     
     if     ( bits < m_addrBits ) deleteAddrBits( m_addrBits-bits );
     else if( bits > m_addrBits ) createAddrBits( bits-m_addrBits );
     
     eMemory::setAddrBits( bits );
 
+    if( m_memTable ) m_memTable->resizeTable( m_ram.size() );
+
     updatePins();
-    
-    if( pauseSim ) Simulator::self()->runContinuous();
+
     Circuit::self()->update();
 }
 
@@ -164,21 +184,17 @@ void Memory::deleteAddrBits( int bits )
 
 void Memory::setDataBits( int bits )
 {
+    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
+
     if( bits == m_dataBits ) return;
     if( bits == 0 ) bits = 8;
     if( bits > 32 ) bits = 32;
-    
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
-    
+
     if     ( bits < m_dataBits ) deleteDataBits( m_dataBits-bits );
     else if( bits > m_dataBits ) createDataBits( bits-m_dataBits );
     
     m_dataBits = bits;
-    
     updatePins();
-    
-    if( pauseSim ) Simulator::self()->runContinuous();
     Circuit::self()->update();
 }
 
@@ -216,6 +232,7 @@ void Memory::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
         event->accept();
         QMenu* menu = new QMenu();
         contextMenu( event, menu );
+        Component::contextMenu( event, menu );
         menu->deleteLater();
     }
 }
@@ -223,24 +240,37 @@ void Memory::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 void Memory::contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu )
 {
     QAction* loadAction = menu->addAction( QIcon(":/load.png"),tr("Load data") );
-    connect( loadAction, SIGNAL(triggered()), this, SLOT(loadData()) );
+    connect( loadAction, SIGNAL(triggered()),
+                   this, SLOT(loadData()), Qt::UniqueConnection );
 
     QAction* saveAction = menu->addAction(QIcon(":/save.png"), tr("Save data") );
-    connect( saveAction, SIGNAL(triggered()), this, SLOT(saveData()) );
+    connect( saveAction, SIGNAL(triggered()),
+                   this, SLOT(saveData()), Qt::UniqueConnection );
+
+    QAction* showEepAction = menu->addAction(QIcon(":/save.png"), tr("Show Memory Table") );
+    connect( showEepAction, SIGNAL(triggered()),
+                      this, SLOT(showTable()), Qt::UniqueConnection );
 
     menu->addSeparator();
-
-    Component::contextMenu( event, menu );
 }
 
 void Memory::loadData()
 {
     MemData::loadData( &m_ram, false, m_dataBits );
+    if( m_memTable ) m_memTable->setData( m_ram );
 }
 
 void Memory::saveData()
 {
     MemData::saveData( m_ram, m_dataBits );
+}
+
+void Memory::showTable()
+{
+    MemData::showTable( m_ram.size(), m_dataBytes );
+    if( m_persistent ) m_memTable->setWindowTitle( "ROM: "+m_idLabel->toPlainText() );
+    else               m_memTable->setWindowTitle( "RAM: "+m_idLabel->toPlainText() );
+    m_memTable->setData( m_ram );
 }
 
 void Memory::remove()

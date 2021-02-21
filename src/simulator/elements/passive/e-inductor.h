@@ -27,12 +27,11 @@ class LibraryItem;
 class MAINMODULE_EXPORT eInductor : public eResistor
 {
     public:
-        eInductor( std::string id );
+        eInductor( QString id );
         ~eInductor();
 
-        virtual void stamp();
-        virtual void resetState();
-        virtual void setVChanged();
+        virtual void initialize() override;
+        virtual void runEvent() override;
 
         double indCurrent();
 
@@ -44,6 +43,8 @@ class MAINMODULE_EXPORT eInductor : public eResistor
         double m_curSource;
         double m_tStep;
         double m_volt;
+
+        uint64_t m_nextStep;
 };
 
 #endif

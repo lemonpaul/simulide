@@ -33,7 +33,6 @@ class MAINMODULE_EXPORT Probe : public Component, public eElement
     Q_OBJECT
     Q_PROPERTY( bool   Show_volt READ showVal  WRITE setShowVal  DESIGNABLE true USER true )
     Q_PROPERTY( double Threshold READ trigVolt WRITE setTrigVolt DESIGNABLE true USER true )
-    Q_PROPERTY( int    PlotterCh READ plotter  WRITE setPlotter )
 
     public:
         Probe( QObject* parent, QString type, QString id );
@@ -42,38 +41,27 @@ class MAINMODULE_EXPORT Probe : public Component, public eElement
  static Component* construct( QObject* parent, QString type, QString id );
  static LibraryItem* libraryItem();
 
+        virtual QList<propGroup_t> propGroups() override;
+
         double trigVolt() { return m_voltTrig; }
         void setTrigVolt( double volt ) { m_voltTrig = volt; update();}
         
         void setVolt( double volt );
         double getVolt();
-        
-        int plotter();
-        void setPlotter( int channel );
 
-        virtual void updateStep();
+        virtual void updateStep() override;
+        virtual void remove() override;
 
         virtual QPainterPath shape() const;
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
-    public slots:
-        virtual void remove();
-
-        void slotPlotter1();
-        void slotPlotter2();
-        void slotPlotter3();
-        void slotPlotter4();
-        
-        void slotPlotterRem();
-
-    protected:
-        void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    signals:
+        void removed( Probe* probe );
 
     private: 
         double m_voltIn;
         double m_voltTrig;
 
-        int    m_plotterLine;
         QColor m_plotterColor;
 
         Pin*       m_inputpin;

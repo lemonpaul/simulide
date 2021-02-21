@@ -27,15 +27,13 @@
 class MAINMODULE_EXPORT eShiftReg : public eLogicDevice
 {
     public:
-        eShiftReg( std::string id, int latchClk=0, int serOut=0 );
+        eShiftReg( QString id, int latchClk=0, int serOut=0 );
         ~eShiftReg();
 
-        virtual void initEpins();
-        virtual void stamp();
-        virtual void resetState();
-        virtual void setVChanged();
-        
-        virtual ePin* getEpin( QString pinName );
+        virtual void stamp() override;
+        virtual void initialize() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
 
         bool resetInv() { return m_resetInv; }
         void setResetInv( bool inv );
@@ -48,9 +46,11 @@ class MAINMODULE_EXPORT eShiftReg : public eLogicDevice
         std::bitset<8> m_latch;
         
         bool m_latchClock;
-        bool m_changed;
         bool m_reset;
         bool m_resetInv;
+
+        bool m_setSerOut;
+        bool m_resSerOut;
         
         eSource* m_latchClockPin;
         eSource* m_serOutPin;

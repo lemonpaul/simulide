@@ -26,18 +26,15 @@ class MAINMODULE_EXPORT eBcdTo7S : public eLogicDevice
 {
     public:
 
-        eBcdTo7S( std::string id  );
+        eBcdTo7S( QString id  );
         ~eBcdTo7S();
 
-        virtual void stamp();
-        virtual void setVChanged();
-        
-        void createPins();
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
 
     protected:
-        std::vector<bool> m_outValue;
-        
-        bool m_changed;
+        std::vector<uint8_t> m_values;
 
         int m_digit;
 };

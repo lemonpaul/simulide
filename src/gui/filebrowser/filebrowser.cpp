@@ -37,7 +37,7 @@ FileBrowser::FileBrowser( QWidget *parent )
     
     m_currentPath = QDir::rootPath();
     
-    setModel(m_fileSystemModel);
+    setModel( m_fileSystemModel );
     setRootIndex( m_fileSystemModel->index( QDir::rootPath() ));
     
     setHeaderHidden( true );
@@ -47,7 +47,8 @@ FileBrowser::FileBrowser( QWidget *parent )
     
     double fontScale = MainWindow::self()->fontScale();
     QString fontSize = QString::number( int(11*fontScale) );
-    
+
+    setObjectName( "FileBrowser" );
     setStyleSheet("font-size:"+fontSize+"px; border: 0px solid red");
 }
 
@@ -98,7 +99,7 @@ void FileBrowser::setPath( QString path )
 void FileBrowser::addBookMark()
 {
     
-    QString fileName = m_fileSystemModel->fileName( currentIndex() );
+    //QString fileName = m_fileSystemModel->fileName( currentIndex() );
     QString filePath = m_fileSystemModel->filePath( currentIndex() );
     
     FileWidget::self()->addBookMark( filePath );
@@ -126,7 +127,7 @@ void FileBrowser::contextMenuEvent( QContextMenuEvent* event )
         {
             QAction* addBookMarkAction = menu.addAction(QIcon(":/setroot.png"),tr("Add Bookmark"));
             connect( addBookMarkAction, SIGNAL( triggered()), 
-                     this,              SLOT(   addBookMark() ) );
+                     this,              SLOT(   addBookMark() ), Qt::UniqueConnection );
                      
             menu.addSeparator();
         }
@@ -134,7 +135,7 @@ void FileBrowser::contextMenuEvent( QContextMenuEvent* event )
         {
             QAction* openWithEditor = menu.addAction(QIcon(":/open.png"),tr("Open in editor"));
             connect( openWithEditor, SIGNAL( triggered()), 
-                     this,           SLOT(   openInEditor()) );
+                     this,           SLOT(   openInEditor()), Qt::UniqueConnection );
                      
             menu.addSeparator();
         }
@@ -143,7 +144,7 @@ void FileBrowser::contextMenuEvent( QContextMenuEvent* event )
         showHidden->setCheckable( true );
         showHidden->setChecked( m_showHidden );
         connect( showHidden, SIGNAL( triggered()), 
-                 this,       SLOT(   showHidden()) );
+                 this,       SLOT(   showHidden()), Qt::UniqueConnection );
         menu.exec( eventPos );
     }
 }

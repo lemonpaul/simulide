@@ -40,9 +40,9 @@ extern "C" {
 #define MAX_CYCLE_TIMERS	64
 
 typedef avr_cycle_count_t (*avr_cycle_timer_t)(
-		struct avr_t * avr,
+        struct avr_t* avr,
 		avr_cycle_count_t when,
-		void * param);
+		void* param);
 
 /*
  * Each timer instance contains the absolute cycle number they
@@ -57,8 +57,8 @@ typedef avr_cycle_count_t (*avr_cycle_timer_t)(
 typedef struct avr_cycle_timer_slot_t {
 	struct avr_cycle_timer_slot_t *next;
 	avr_cycle_count_t	when;
-	avr_cycle_timer_t	timer;
-	void * param;
+    avr_cycle_timer_t	event;
+    void* param;
 } avr_cycle_timer_slot_t, *avr_cycle_timer_slot_p;
 
 /*
@@ -68,29 +68,28 @@ typedef struct avr_cycle_timer_slot_t {
  * when done
  */
 typedef struct avr_cycle_timer_pool_t {
-	avr_cycle_timer_slot_t timer_slots[MAX_CYCLE_TIMERS];
-	avr_cycle_timer_slot_p timer_free;
-	avr_cycle_timer_slot_p timer;
+    avr_cycle_timer_slot_t t_slots[MAX_CYCLE_TIMERS];
+    avr_cycle_timer_slot_p slot_free;
+    avr_cycle_timer_slot_p t_slot;
 } avr_cycle_timer_pool_t, *avr_cycle_timer_pool_p;
 
 
 // register for calling 'timer' in 'when' cycles
-void
-avr_cycle_timer_register(
+void avr_cycle_timer_register(
 		struct avr_t * avr,
 		avr_cycle_count_t when,
 		avr_cycle_timer_t timer,
 		void * param);
+
 // register a timer to call in 'when' usec
-void
-avr_cycle_timer_register_usec(
+void avr_cycle_timer_register_usec(
 		struct avr_t * avr,
 		uint32_t when,
 		avr_cycle_timer_t timer,
 		void * param);
+
 // cancel a previously set timer
-void
-avr_cycle_timer_cancel(
+void avr_cycle_timer_cancel(
 		struct avr_t * avr,
 		avr_cycle_timer_t timer,
 		void * param);
@@ -98,21 +97,15 @@ avr_cycle_timer_cancel(
  * Check to see if a timer is present, if so, return the number (+1) of
  * cycles left for it to fire, and if not present, return zero
  */
-avr_cycle_count_t
-avr_cycle_timer_status(
+avr_cycle_count_t avr_cycle_timer_status(
 		struct avr_t * avr,
 		avr_cycle_timer_t timer,
 		void * param);
 
-//
 // Private, called from the core
-//
-avr_cycle_count_t
-avr_cycle_timer_process(
-		struct avr_t * avr);
-void
-avr_cycle_timer_reset(
-		struct avr_t * avr);
+avr_cycle_count_t avr_cycle_timer_process( struct avr_t * avr);
+
+void avr_cycle_timer_reset( struct avr_t * avr);
 
 #ifdef __cplusplus
 };

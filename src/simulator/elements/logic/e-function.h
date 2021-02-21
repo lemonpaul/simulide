@@ -21,6 +21,7 @@
 #define EFUNCTION_H
 
 #include <QScriptEngine>
+#include <QScriptProgram>
 
 #include "e-logic_device.h"
 
@@ -28,18 +29,20 @@ class MAINMODULE_EXPORT eFunction : public eLogicDevice
 {
     public:
 
-        eFunction( std::string id );
+        eFunction( QString id );
         ~eFunction();
 
-        virtual void stamp();
-        virtual void setVChanged();
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
         
         QString functions();
         void setFunctions( QString f );
 
     protected:
         QScriptEngine m_engine;
-        
+        QList<QScriptProgram> m_program;
+
         QString m_functions;
         QStringList m_funcList;
 };

@@ -43,16 +43,15 @@ class MAINMODULE_EXPORT MechContact : public Component, public eElement
         virtual bool nClose() const;
         virtual void setNClose( bool nc );
 
-        virtual void attach();
-        virtual void stamp();
+        virtual void attach() override;
+        virtual void stamp() override;
+        virtual void remove() override;
+        virtual void updateStep() override;
 
         void  SetupSwitches( int poles, int throws );
         void  SetupButton();
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-
-    public slots:
-        virtual void remove();
 
     protected:
         virtual void setSwitch( bool on );
@@ -61,7 +60,7 @@ class MAINMODULE_EXPORT MechContact : public Component, public eElement
 
         bool m_closed;
         bool m_nClose;
-        bool m_hidden;
+        bool m_ButHidden;
 
         int m_numPoles;
         int m_numthrows;

@@ -42,6 +42,8 @@ class MAINMODULE_EXPORT LedBar : public Component
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
+        virtual QList<propGroup_t> propGroups() override;
+
         void setColor( LedBase::LedColor color );
         LedBase::LedColor color();
         
@@ -62,11 +64,10 @@ class MAINMODULE_EXPORT LedBar : public Component
         
         void createLeds( int c );
         void deleteLeds( int d );
+
+        virtual void remove() override;
         
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-        
-    public slots:
-        virtual void remove();
 
     private:
         std::vector<LedSmd*> m_led;

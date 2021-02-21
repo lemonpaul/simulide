@@ -18,8 +18,8 @@
  ***************************************************************************/
 
 #include "bcdto7s.h"
+#include "simulator.h"
 #include "pin.h"
-
 
 Component* BcdTo7S::construct( QObject* parent, QString type, QString id )
 {
@@ -38,7 +38,7 @@ LibraryItem* BcdTo7S::libraryItem()
 
 BcdTo7S::BcdTo7S( QObject* parent, QString type, QString id )
        : LogicComponent( parent, type, id )
-       , eBcdTo7S( id.toStdString() )
+       , eBcdTo7S( id )
 {
     m_width  = 4;
     m_height = 8;
@@ -77,18 +77,22 @@ BcdTo7S::BcdTo7S( QObject* parent, QString type, QString id )
 }
 BcdTo7S::~BcdTo7S(){}
 
+QList<propGroup_t> BcdTo7S::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Inverted", tr("Invert Outputs"),""} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
+
 void BcdTo7S::stamp()
 {
     eBcdTo7S::stamp();
 
-    m_outValue[0] = true;
-    m_outValue[1] = true;
-    m_outValue[2] = true;
-    m_outValue[3] = true;
-    m_outValue[4] = true;
-    m_outValue[5] = true;
-    m_outValue[6] = false;
-    for( int i=0; i<m_numOutputs; i++ ) setOut( i, m_outValue[i] );
+    uint8_t value = m_values[0];
+    for( int i=0; i<7; ++i ) setOut( i, value & (1<<i) );
 }
 
 #include "moc_bcdto7s.cpp"

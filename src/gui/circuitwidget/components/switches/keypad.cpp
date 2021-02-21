@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "keypad.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "itemlibrary.h"
 
@@ -40,9 +41,11 @@ LibraryItem* KeyPad::libraryItem()
 
 KeyPad::KeyPad( QObject* parent, QString type, QString id )
       : Component( parent, type, id )
-      , eElement( id.toStdString() )
+      , eElement( id )
 {
     Q_UNUSED( KeyPad_properties );
+
+    m_graphical = true;
     
     setLabelPos(-8,-16, 0);
     
@@ -53,7 +56,16 @@ KeyPad::KeyPad( QObject* parent, QString type, QString id )
 }
 KeyPad::~KeyPad(){}
 
-void KeyPad::attach()
+QList<propGroup_t> KeyPad::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Rows", tr("Rows"),""} );
+    mainGroup.propList.append( {"Cols", tr("Columns"),""} );
+    mainGroup.propList.append( {"Key_Labels", tr("Key Labels"),""} );
+    return {mainGroup};
+}
+
+void KeyPad::stamp()
 {
     for( int row=0; row<m_rows; row++ )
     {
@@ -142,6 +154,7 @@ double KeyPad::rows()
 
 void KeyPad::setRows( double rows )
 {
+    if( rows < 1 ) rows = 1;
     m_rows = rows;
     setupButtons();
 }
@@ -153,6 +166,7 @@ double KeyPad::cols()
 
 void KeyPad::setCols( double cols )
 {
+    if( cols < 1 ) cols = 1;
     m_cols = cols;
     setupButtons();
 }

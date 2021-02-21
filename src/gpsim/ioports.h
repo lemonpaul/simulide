@@ -29,8 +29,8 @@ License along with this library; if not, see
 #include "registers.h"
 #include "stimuli.h"
 
-class stimulus;
-class Stimulus_Node;
+//class stimulus;
+//class Stimulus_Node;
 class PinModule;
 
 
@@ -97,7 +97,7 @@ class PinModule;
 /// a register that contains an array of PinModule's.
 ///
 ///  Register               PortModule
-///    |-> sfr_register         |
+///    |->  SfrReg         |
 ///             |               |
 ///             \------+--------/
 ///                    |
@@ -120,14 +120,13 @@ class PinModule;
 class SignalControl
 {
     public:
-      virtual ~SignalControl();  //// fixme
+      virtual ~SignalControl();  /// fixme
       virtual char getState()=0;
       virtual void release()=0;
 };
 
 ///------------------------------------------------------------
-/// PeripheralSignalSource - A class to interface I/O pins with
-/// peripheral outputs.
+/// PeripheralSignalSource - A class to interface I/O pins with peripheral outputs.
 
 class PeripheralSignalSource : public SignalControl
 {
@@ -136,17 +135,11 @@ class PeripheralSignalSource : public SignalControl
       virtual ~PeripheralSignalSource();
       virtual void release();
 
-      /// getState - called by the PinModule to determine the source state
-      virtual char getState();
-
-      /// putState - called by the peripheral to set a new state
-      virtual void putState(const char new3State);
-
-      /// toggle - called by the peripheral to toggle the current state.
-      virtual void toggle();
+      virtual char getState(); // Called by the PinModule to determine the source state
+      virtual void putState(const char new3State); // Called by the peripheral to set a new state
       
     private:
-      PinModule *m_pin;
+      PinModule* m_pin;
       char m_cState;
 };
 
@@ -163,17 +156,7 @@ class PortModule
       explicit PortModule(uint numIopins);
       virtual ~PortModule();
 
-      /// updatePort -- loop through update all I/O pins
-      virtual void updatePort();
-
-      /// updatePin -- Update a single I/O pin
-      virtual void updatePin(uint iPinNumber);
-
-      /// updatePins -- Update several I/O pins
-      virtual void updatePins(uint iPinBitMask);
-
-      /// updateUI -- convey pin state info to a User Interface (e.g. the gui).
-      virtual void   updateUI();
+      virtual void updatePort();// updatePort -- loop through update all I/O pins
 
       /// addPinModule -- supply a pin module at a particular bit position.
       ///      Most of the low level I/O pin related processing will be handled
@@ -184,44 +167,25 @@ class PortModule
       ///      will be ignored.
       void addPinModule(PinModule *, uint iPinNumber);
 
-      /// addSource -- supply a pin with a source of data. There may
-      SignalControl *addSource(SignalControl *, uint iPinNumber);
+      void addSink( SignalSink*, uint iPinNumber );// Supply a sink to receive info driven on to a pin
 
-      /// addControl -- supply a pin with a data direction control
-      SignalControl *addControl(SignalControl *, uint iPinNumber);
+      IOPIN* addPin( IOPIN*, uint iPinNumber );// Supply an I/O pin. this will create a default pin module if not already created.
+      IOPIN* getPin( uint iPinNumber );// An I/O pin accessor. This returns the I/O pin at a particular bit position.
 
-      /// addPullupControl -- supply a pin with a pullup control
-      SignalControl *addPullupControl(SignalControl *, uint iPinNumber);
-
-      /// addSink -- supply a sink to receive info driven on to a pin
-      SignalSink    *addSink(SignalSink *, uint iPinNumber);
-
-      /// addPin -- supply an I/O pin. Note, this will create a default pin module
-      ///           if one is not already created.
-      IOPIN         *addPin(IOPIN *, uint iPinNumber);
-
-      /// getPin -- an I/O pin accessor. This returns the I/O pin at a particular
-      ///           bit position.
-      IOPIN         *getPin(uint iPinNumber);
-
-      /// operator[] -- PinModule accessor. This returns the pin module at
-      ///               a particular bit position.
-      PinModule &operator [] (uint pin_number);
-
-      PinModule * getIOpins(uint pin_number);
+      PinModule &operator [] (uint pin_number);// PinModule accessor. This returns the pin module at a bit position.
+      PinModule* getIOpins(uint pin_number);
 
       // set/get OutputMask which controls bits returned on I/O
       // port register get() call. Used to return 0 for  analog pins
-      virtual void setOutputMask (uint OutputMask) { mOutputMask = OutputMask;}
-      virtual uint getOutputMask () { return(mOutputMask);}
+      virtual void setOutputMask( uint OutputMask) { mOutputMask = OutputMask;}
+      virtual uint getOutputMask() { return(mOutputMask);}
       
     protected:
       uint mNumIopins;
-      uint  mOutputMask;
+      uint mOutputMask;
 
     private:
-      /// PinModule -- The array of PinModules that are handled by PortModule.
-      PinModule  **iopins;
+      PinModule** iopins; // The array of PinModules that are handled by PortModule.
 };
 
 ///------------------------------------------------------------
@@ -251,16 +215,16 @@ class PinModule : public PinMonitor
       /// a pin's state will always be refreshed whenever the PinModule
       /// is updated. If false, then the pin is updated only if there
       /// is a detected state change.
-      void refreshPinOnUpdate(bool bForcedUpdate);
+      void refreshPinOnUpdate (bool bForcedUpdate );
 
       void setPin(IOPIN *);
       void clrPin() { m_pin = NULL; }
-      void setDefaultSource(SignalControl *);
-      void setSource(SignalControl *);
-      void setDefaultControl(SignalControl *);
-      void setControl(SignalControl *);
-      void setPullupControl(SignalControl *);
-      void setDefaultPullupControl(SignalControl *);
+      void setDefaultSource( SignalControl *);
+      void setSource( SignalControl *);
+      void setDefaultControl( SignalControl *);
+      void setControl( SignalControl *);
+      //void setPullupControl( SignalControl *);
+      //void setDefaultPullupControl( SignalControl *);
 
       char getControlState();
       char getSourceState();
@@ -268,9 +232,9 @@ class PinModule : public PinMonitor
       uint getPinNumber() { return m_pinNumber;}
       void AnalogReq(Register *reg, bool analog, const char *newName);
       // If active control not default, return it
-      SignalControl *getActiveControl() {return (m_activeControl == m_defaultControl)?0:m_activeControl;}
+      SignalControl* getActiveControl() {return (m_activeControl == m_defaultControl)?0:m_activeControl;}
       // If active source not default, return it
-      SignalControl *getActiveSource() {return (m_activeSource == m_defaultSource)?0:m_activeSource;}
+      SignalControl* getActiveSource() {return (m_activeSource == m_defaultSource)?0:m_activeSource;}
 
       IOPIN &getPin() { return *m_pin;}
       ///
@@ -279,13 +243,12 @@ class PinModule : public PinMonitor
       virtual void set_nodeVoltage(double);
       virtual void putState(char);
       virtual void setDirection();
-      virtual void updateUI();
 
     private:
-      char          m_cLastControlState;
-      char          m_cLastSinkState;
-      char          m_cLastSourceState;
-      char          m_cLastPullupControlState;
+      char m_cLastControlState;
+      char m_cLastSinkState;
+      char m_cLastSourceState;
+      char m_cLastPullupControlState;
 
       SignalControl *m_defaultSource,  *m_activeSource;
       SignalControl *m_defaultControl, *m_activeControl;
@@ -301,11 +264,10 @@ class PinModule : public PinMonitor
 
 
 ///------------------------------------------------------------
-class PortRegister : public sfr_register, public PortModule
+class PortRegister : public SfrReg, public PortModule
 {
     public:
-      PortRegister(Module *pCpu, const char *pName, const char *pDesc,
-                   uint numIopins, uint enableMask);
+      PortRegister(Processor* pCpu, const char *pName, uint numIopins, uint enableMask );
 
       virtual void put(uint new_value);
       virtual void put_value(uint new_value);
@@ -315,11 +277,11 @@ class PortRegister : public sfr_register, public PortModule
       virtual uint getDriving();
       virtual void setbit(uint bit_number, char new_value);
       virtual void setEnableMask(uint nEnableMask);
-      IOPIN         *addPin(IOPIN *, uint iPinNumber);
-      IOPIN         *addPin(Module *mod, IOPIN *pin, uint iPinNumber);
+
+      IOPIN* addPin(IOPIN *, uint iPinNumber);
+      //IOPIN         *addPin(Module *mod, IOPIN *pin, uint iPinNumber);
 
       uint getEnableMask() { return mEnableMask; }
-      virtual void   updateUI();
 
     protected:
       uint  mEnableMask;

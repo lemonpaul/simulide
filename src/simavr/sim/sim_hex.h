@@ -31,11 +31,7 @@ extern "C" {
 #endif
 
 // parses a hex text string 'src' of at max 'maxlen' characters, decodes it into 'buffer'
-int
-read_hex_string(
-		const char * src,
-		uint8_t * buffer,
-		int maxlen);
+int read_hex_string( const char* src, uint8_t* buffer, int maxlen );
 
 // a .hex file chunk (base address + size)
 typedef struct ihex_chunk_t {
@@ -53,10 +49,9 @@ int
 read_ihex_chunks(
 		const char * fname,
 		ihex_chunk_p * chunks );
+
 /* Frees previously allocated chunks */
-void
-free_ihex_chunks(
-		ihex_chunk_p chunks);
+void free_ihex_chunks( ihex_chunk_p chunks);
 
 // reads IHEX file 'fname', puts it's decoded size in *'dsize' and returns
 // a newly allocated buffer with the binary data (or NULL, if error)

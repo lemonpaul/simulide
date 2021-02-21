@@ -32,26 +32,26 @@ class MAINMODULE_EXPORT SwitchBase : public MechContact
         SwitchBase( QObject* parent, QString type, QString id );
         ~SwitchBase();
 
-        virtual void updateStep();
+        virtual void updateStep() override;
+        virtual void remove() override;
+
+        virtual void setHidden( bool hide );
         
         void setButtonText( QString text );
 
         QString key();
         void setKey( QString key );
         
-        QPushButton* button() { return m_button; }
+        QToolButton* button() { return m_button; }
 
     public slots:
-        void remove();
         virtual void onbuttonclicked();
         virtual void keyEvent( QString key, bool pressed ){;}
 
     protected:
-        bool m_changed;
-
         QString m_key;
         
-        QPushButton*          m_button;
+        QToolButton*          m_button;
         QGraphicsProxyWidget* m_proxy;
 };
 

@@ -26,7 +26,7 @@ class pic_processor;
 
 // LCDCON - LIQUID CRYSTAL DISPLAY CONTROL REGISTER
 
-class LCDCON : public sfr_register
+class LCDCON : public SfrReg
 {
 public:
 
@@ -42,7 +42,7 @@ public:
       LCDEN	= 1<<7	// LCD Driver Enable bit
   };
 
-  LCDCON(Processor *pCpu, const char *pName, const char *pDesc, LCD_MODULE *);
+  LCDCON(Processor *pCpu, const char *pName,  LCD_MODULE *);
   virtual void put(uint new_value);
   virtual void put_value(uint new_value);
 
@@ -50,7 +50,7 @@ public:
 };
 
 // LCDPS - LCD PRESCALER SELECT REGISTER
-class LCDPS : public sfr_register
+class LCDPS : public SfrReg
 {
 public:
 
@@ -67,7 +67,7 @@ public:
 
 	LPMASK = (LP0 | LP1 | LP2 | LP3)
   };
-  LCDPS(Processor *pCpu, const char *pName, const char *pDesc, LCD_MODULE *, uint);
+  LCDPS(Processor *pCpu, const char *pName,  LCD_MODULE *, uint);
   virtual void put(uint new_value);
   LCD_MODULE *lcd_module;
   uint mask_writeable;
@@ -75,22 +75,22 @@ public:
 
 // LCDSEn - LCD SEGMENT REGISTERS
 
-class LCDSEn : public sfr_register
+class LCDSEn : public SfrReg
 {
 public:
 
-  LCDSEn(Processor *pCpu, const char *pName, const char *pDesc, LCD_MODULE *, uint _n);
+  LCDSEn(Processor *pCpu, const char *pName,  LCD_MODULE *, uint _n);
   virtual void put(uint new_value);
   LCD_MODULE *lcd_module;
   uint n;
 };
 
 // LCDDATAx - LCD DATA REGISTERS
-class LCDDATAx : public sfr_register
+class LCDDATAx : public SfrReg
 {
 public:
 
-  LCDDATAx(Processor *pCpu, const char *pName, const char *pDesc, LCD_MODULE *, uint _n);
+  LCDDATAx(Processor *pCpu, const char *pName,  LCD_MODULE *, uint _n);
   virtual void put(uint new_value);
   LCD_MODULE *lcd_module;
   uint n;

@@ -27,7 +27,7 @@ LibraryItem* Led::libraryItem()
 {
     return new LibraryItem(
             tr( "Led" ),
-            tr( "Outputs" ),
+            tr( "Leds" ),
             "led.png",
             "Led",
             Led::construct);
@@ -54,6 +54,19 @@ Led::Led( QObject* parent, QString type, QString id )
 }
 Led::~Led(){}
 
+QList<propGroup_t> Led::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Color", tr("Color"),"enum"} );
+    mainGroup.propList.append( {"Grounded", tr("Grounded"),""} );
+
+    propGroup_t elecGroup { tr("Electric") };
+    elecGroup.propList.append( {"Threshold", tr("Threshold"),"V"} );
+    elecGroup.propList.append( {"MaxCurrent", tr("Max Current"),"A"} );
+    elecGroup.propList.append( {"Resistance", tr("Resistance"),"Ω"} );
+
+    return {mainGroup, elecGroup};
+}
 
 void Led::drawBackground( QPainter *p )
 {

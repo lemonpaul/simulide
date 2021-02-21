@@ -31,10 +31,8 @@ class LibraryItem;
 class MAINMODULE_EXPORT Potentiometer : public Component, public eElement
 {
     Q_OBJECT
-    Q_PROPERTY( double  Resistance READ res     WRITE setRes    DESIGNABLE true USER true )
-    Q_PROPERTY( QString Unit       READ unit    WRITE setUnit    DESIGNABLE true USER true )
-    Q_PROPERTY( bool    Show_res   READ showVal WRITE setShowVal DESIGNABLE true USER true )
-    Q_PROPERTY( int     Value_Ohm  READ val     WRITE setVal    DESIGNABLE true USER true )
+    Q_PROPERTY( double  Resistance READ res     WRITE setRes     DESIGNABLE true USER true )
+    Q_PROPERTY( double  Value_Ohm  READ val     WRITE setVal     DESIGNABLE true USER true )
 
     public:
 
@@ -43,26 +41,25 @@ class MAINMODULE_EXPORT Potentiometer : public Component, public eElement
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
-
-        virtual void initialize();
-        virtual void attach();
-        virtual void stamp();
-
-        virtual void updateStep();
         
-        void setVal( int val );
-        int val();
+        virtual QList<propGroup_t> propGroups() override;
+
+        void setVal( double val );
+        double val();
         
         double res() const      { return m_value; }
         void setRes( double v );
         
         void setUnit( QString un );
 
+        virtual void stamp() override;
+        virtual void updateStep() override;
+        virtual void remove() override;
+
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
     public slots:
         void resChanged( int volt );
-        virtual void remove();
 
     private:
         double m_resist;

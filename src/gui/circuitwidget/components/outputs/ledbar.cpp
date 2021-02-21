@@ -18,7 +18,9 @@
  ***************************************************************************/
 
 #include "ledbar.h"
+#include "circuitwidget.h"
 #include "connector.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "pin.h"
 
@@ -30,7 +32,7 @@ LibraryItem* LedBar::libraryItem()
 {
     return new LibraryItem(
             tr( "LedBar" ),
-            tr( "Outputs" ),
+            tr( "Leds" ),
             "ledbar.png",
             "LedBar",
             LedBar::construct);
@@ -39,6 +41,8 @@ LibraryItem* LedBar::libraryItem()
 LedBar::LedBar( QObject* parent, QString type, QString id )
       : Component( parent, type, id )
 {
+    m_graphical = true;
+
     m_area = QRect( -8, -28, 16, 64 );
     m_color = QColor(0,0,0);
     
@@ -50,6 +54,21 @@ LedBar::LedBar( QObject* parent, QString type, QString id )
     setRes( 0.6 ); 
 }
 LedBar::~LedBar(){}
+
+QList<propGroup_t> LedBar::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Size", tr("Size"),"Leds"} );
+    mainGroup.propList.append( {"Color", tr("Color"),"enum"} );
+    mainGroup.propList.append( {"Grounded", tr("Grounded"),""} );
+
+    propGroup_t elecGroup { tr("Electric") };
+    elecGroup.propList.append( {"Threshold", tr("Threshold"),"V"} );
+    elecGroup.propList.append( {"MaxCurrent", tr("Max Current"),"A"} );
+    elecGroup.propList.append( {"Resistance", tr("Resistance"),"Ω"} );
+
+    return {mainGroup, elecGroup};
+}
 
 void LedBar::createLeds( int c )
 {
@@ -65,7 +84,7 @@ void LedBar::createLeds( int c )
         
         /*QString reid = m_id;
         reid.append(QString("-resistor"+QString::number(i)));
-        m_resistor[i] = new eResistor( reid.toStdString() );*/
+        m_resistor[i] = new eResistor( reid );*/
         
         QString ledid = m_id;
         ledid.append(QString("-led"+QString::number(i)));
@@ -139,17 +158,14 @@ int LedBar::size()
 
 void LedBar::setSize( int size )
 {
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
-    
+    if( Simulator::self()->isRunning() )  CircuitWidget::self()->powerCircOff();
+
     if( size == 0 ) size = 8;
-    
     if     ( size < m_size ) deleteLeds( m_size-size );
     else if( size > m_size ) createLeds( size-m_size );
     
     m_area = QRect( -8, -28, 16, m_size*8 );
-    
-    if( pauseSim ) Simulator::self()->runContinuous();
+
     Circuit::self()->update();
 }
 
@@ -194,12 +210,14 @@ void LedBar::setGrounded( bool grounded )
 
 void LedBar::remove()
 {
-    for( int i=0; i<m_size; i++ ) Circuit::self()->removeComp( m_led[i] );
+    deleteLeds( m_size );
 
     Component::remove();
 }
 void LedBar::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
+    if( m_hidden ) return;
+
     Component::paint( p, option, widget );
 
     p->drawRoundRect( m_area, 4, 4 );

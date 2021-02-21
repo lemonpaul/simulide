@@ -25,14 +25,12 @@ License along with this library; if not, see
 #include <string>
 #include <list>
 
-#include "config.h"
 #include "16bit-processors.h"
 #include "pic-instructions.h"
 #include "12bit-instructions.h"
 #include "16bit-instructions.h"
 
 #include "pic-processor.h"
-#include "stimuli.h"
 
 /* PIC 16-bit instruction set */
 
@@ -182,19 +180,18 @@ struct instruction_constructor op_17cxx[] = {
 const int NUM_OP_18CXX	= sizeof(op_18cxx) / sizeof(op_18cxx[0]);
 const int NUM_OP_17CXX	= sizeof(op_17cxx) / sizeof(op_17cxx[0]);
 
-instruction * disasm16 (pic_processor *cpu, uint address, uint inst)
+Instruction* disasm16 ( pic_processor* cpu, uint address, uint inst )
 {
-  instruction *pi;
+  Instruction* pi;
 
-  cpu16->setCurrentDisasmAddress(address);
+  cpu16->setCurrentDisasmAddress( address );
 
   pi = 0;
   for(int i =0; i<NUM_OP_18CXX && !pi; i++)
     if((op_18cxx[i].inst_mask & inst) == op_18cxx[i].opcode)
       pi = op_18cxx[i].inst_constructor(cpu, inst,address);
 
-  if(pi == 0)
-    pi = invalid_instruction::construct(cpu, inst, address);
+  if(pi == 0) pi = BadInstruction::construct(cpu, inst, address);
 
   return (pi);
 }

@@ -23,8 +23,11 @@
 #include <QtWidgets>
 
 #include "circuitview.h"
-#include "plotterwidget.h"
-#include "terminalwidget.h"
+#include "outpaneltext.h"
+
+class AppProp;
+class CircProp;
+class SimuProp;
 
 class MAINMODULE_EXPORT CircuitWidget : public QWidget
 {
@@ -41,53 +44,77 @@ class MAINMODULE_EXPORT CircuitWidget : public QWidget
         void createActions();
         void createToolBars();
         
-        void setRate( int rate );
+        void setRate( double rate , int load );
+        void setError( QString error );
+        void setMsg(QString msg , int type);
         void powerCircOn();
         void powerCircOff();
-        void powerCircDebug( bool run );
+        void powerCircDebug( bool paused );
+
+        void simDebug( QString msg );
+
+        QSplitter* splitter() { return m_splitter; }
         
     public slots:
         bool newCircuit();
+        void openRecentFile();
         void openCirc();
         void loadCirc( QString path );
         void saveCirc();
         bool saveCircAs();
         void powerCirc();
         void pauseSim();
+        void settApp();
+        void settCir();
+        void settSim();
         void openInfo();
         void about();
 
     signals:
         void dataAvailable( int uart, const QByteArray &data );
+        void saving();
         
     private:
 
  static CircuitWidget*  m_pSelf;
 
-        QVBoxLayout    m_verticalLayout;
-        QHBoxLayout    m_horizontLayout;
-        CircuitView    m_circView;
-        
-        //TerminalWidget    m_terminal;
-        PlotterWidget     m_plotter;
+        enum { MaxRecentFiles = 10 };
+        void updateRecentFileActions();
+
+        QVBoxLayout  m_verticalLayout;
+        //QHBoxLayout  m_horizontLayout;
+        CircuitView  m_circView;
+        OutPanelText m_outPane;
         
         QToolBar m_circToolBar;
         QLabel*  m_rateLabel;
-        
+        QLabel*  m_msgLabel;
+        QSplitter* m_splitter;
+
+        QAction* recentFileActs[MaxRecentFiles];
         QAction* newCircAct;
         QAction* openCircAct;
         QAction* saveCircAct;
         QAction* saveCircAsAct;
         QAction* powerCircAct;
         QAction* pauseSimAct;
+        QAction* settAppAct;
+        QAction* settCirAct;
+        QAction* settSimAct;
         QAction* infoAct;
         QAction* aboutAct;
         QAction* aboutQtAct;
         
+        QMenu m_fileMenu;
+        QMenu m_settingsMenu;
         QMenu m_infoMenu;
         
         QString m_curCirc;
         QString m_lastCircDir;
+
+        AppProp*  m_appPropW;
+        CircProp* m_cirPropW;
+        SimuProp* m_simPropW;
 };
 
 #endif

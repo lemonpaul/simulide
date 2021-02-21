@@ -38,7 +38,7 @@ LibraryItem* Mux::libraryItem()
 
 Mux::Mux( QObject* parent, QString type, QString id )
    : LogicComponent( parent, type, id )
-   , eMux( id.toStdString() )
+   , eMux( id )
 {
     m_width  = 4;
     m_height = 10;
@@ -78,6 +78,16 @@ Mux::Mux( QObject* parent, QString type, QString id )
     
 }
 Mux::~Mux(){}
+
+QList<propGroup_t> Mux::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Invert_Inputs", tr("Invert Inputs"),""} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
 
 void Mux::setInvertInps( bool invert )
 {

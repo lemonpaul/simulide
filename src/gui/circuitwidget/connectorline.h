@@ -71,11 +71,6 @@ class MAINMODULE_EXPORT ConnectorLine : public QGraphicsObject
         virtual QPainterPath shape() const;
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
-    signals:
-        //void moved();
-        //void yourP1changed( QPoint );
-        //void yourP2changed( QPoint );
-
     public slots:
         void sSetP1( QPoint );
         void sSetP2( QPoint );
@@ -93,7 +88,7 @@ class MAINMODULE_EXPORT ConnectorLine : public QGraphicsObject
         bool m_moveP2;
         bool m_moving;
 
-        Connector* m_pConnector;
+        Connector*     m_pConnector;
         ConnectorLine* m_prevLine;
         ConnectorLine* m_nextLine;
 };

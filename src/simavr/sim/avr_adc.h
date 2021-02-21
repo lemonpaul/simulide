@@ -104,38 +104,37 @@ typedef enum {
 typedef struct avr_adc_t {
 	avr_io_t		io;
 
-	uint8_t 		r_admux;
-	// if the last bit exists in the mux, we are an extended ADC
-	avr_regbit_t	mux[6];
-	avr_regbit_t	ref[3];		// reference voltages bits
-	uint16_t		ref_values[7]; // ADC_VREF_*
+    uint8_t 	  r_admux;
 
-	avr_regbit_t 	adlar;		// left/right adjustment bit
+    avr_regbit_t  mux[6]; // if the last bit exists in the mux, we are an extended ADC
+    avr_regbit_t  ref[3];		// reference voltages bits
+    uint16_t	  ref_values[7]; // ADC_VREF_*
 
-	uint8_t			r_adcsra;	// ADC Control and Status Register A
-	avr_regbit_t 	aden;		// ADC Enabled
-	avr_regbit_t 	adsc;		// ADC Start Conversion
-	avr_regbit_t 	adate;		// ADC Auto Trigger Enable
+    avr_regbit_t  adlar;		// left/right adjustment bit
 
-	avr_regbit_t	adps[3];	// Prescaler bits. Note that it's a frequency bit shift
+    uint8_t		  r_adcsra;	// ADC Control and Status Register A
+    avr_regbit_t  aden;		// ADC Enabled
+    avr_regbit_t  adsc;		// ADC Start Conversion
+    avr_regbit_t  adate;		// ADC Auto Trigger Enable
 
-	uint8_t			r_adcl, r_adch;	// Data Registers
+    avr_regbit_t  adps[3];	// Prescaler bits. Note that it's a frequency bit shift
 
-	uint8_t			r_adcsrb;	// ADC Control and Status Register B
-	avr_regbit_t	adts[4];	// Timing Source
-	avr_adts_type	adts_op[16];    // ADTS type
-	uint8_t		adts_mode;      // the extracted ADTS mode
-	avr_regbit_t 	bin;		// Bipolar Input Mode (tinyx5 have it)
-	avr_regbit_t 	ipr;		// Input Polarity Reversal (tinyx5 have it)
+    uint8_t		  r_adcl, r_adch;	// Data Registers
 
-	// use ADIF and ADIE bits
-	avr_int_vector_t adc;
+    uint8_t		  r_adcsrb;	// ADC Control and Status Register B
+    avr_regbit_t  adts[4];	// Timing Source
+    avr_adts_type adts_op[16];    // ADTS type
+    uint8_t		  adts_mode;      // the extracted ADTS mode
+    avr_regbit_t  bin;		// Bipolar Input Mode (tinyx5 have it)
+    avr_regbit_t  ipr;		// Input Polarity Reversal (tinyx5 have it)
+
+    avr_int_vector_t adc; // use ADIF and ADIE bits
 
 	/*
 	 * runtime bits
 	 */
 	avr_adc_mux_t	muxmode[64];// maximum 6 bits of mux modes
-	uint16_t		adc_values[16];	// current values on the ADCs
+    uint16_t		adc_values[16];	// current values on the ADCs
 	uint16_t		temp;		// temp sensor reading
 	uint8_t			first;
 	uint8_t			read_status;	// marked one when adcl is read

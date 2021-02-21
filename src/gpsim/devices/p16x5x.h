@@ -30,8 +30,6 @@ License along with this library; if not, see
 #ifndef __P16X5X_H__
 #define __P16X5X_H__
 
-#include "packages.h"
-#include "stimuli.h"
 #include "12bit-processors.h"
 
 class PicPortRegister;
@@ -41,90 +39,79 @@ class PicLatchRegister;
 
 class P16C54 : public  _12bit_processor
 {
-public:
-  PicPortRegister  *m_porta;
-  PicTrisRegister  *m_trisa;
+    public:
+      PicPortRegister  *m_porta;
+      PicTrisRegister  *m_trisa;
 
-  PicPortRegister  *m_portb;
-  PicTrisRegister  *m_trisb;
+      PicPortRegister  *m_portb;
+      PicTrisRegister  *m_trisb;
 
-#ifdef USE_PIN_MODULE_FOR_TOCKI
-  PinModule    *m_tocki;
-#else
-  PicPortRegister  *m_tocki;
-  PicTrisRegister  *m_trist0;
-#endif
-  
-  virtual PROCESSOR_TYPE isa(){return _P16C54_;};
+    #ifdef USE_PIN_MODULE_FOR_TOCKI
+      PinModule    *m_tocki;
+    #else
+      PicPortRegister  *m_tocki;
+      PicTrisRegister  *m_trist0;
+    #endif
 
-  virtual uint program_memory_size() const { return 0x200; };
-  virtual uint register_memory_size() const { return 0x20; };
-  virtual uint config_word_address() const {return 0xFFF;};
+      virtual PROCESSOR_TYPE isa(){return _P16C54_;}
 
-  virtual void create_sfr_map();
+      virtual uint program_memory_size() const { return 0x200; }
+      virtual uint register_memory_size() const { return 0x20; }
+      virtual uint config_word_address() const {return 0xFFF;}
 
-  virtual void option_new_bits_6_7(uint bits) {}
+      virtual void create_sfr_map();
 
-  P16C54(const char *_name=0, const char *desc=0);
-  virtual ~P16C54();
-  void create();
-  virtual void create_iopin_map();
+      virtual void option_new_bits_6_7(uint bits) {}
 
-  static Processor *construct(const char *name);
-  virtual void tris_instruction(uint tris_register);
+      P16C54(const char *_name=0 );
+      virtual ~P16C54();
+      void create();
+      virtual void create_iopin_map();
 
-  virtual uint fsr_valid_bits()
-    {
-      return 0x1f;  // Only 32 register addresses 
-    }
+      static Processor *construct(const char *name);
+      virtual void tris_instruction(uint tris_register);
 
-  virtual uint fsr_register_page_bits()
-    {
-      return 0;     // Only one register page.
-    }
-
-
+      virtual uint fsr_valid_bits() { return 0x1f;}  // Only 32 register addresses
+      virtual uint fsr_register_page_bits() { return 0; }    // Only one register page.
 };
 
 class P16C55 : public  P16C54
 {
-public:
+    public:
 
-  PicPortRegister  *m_portc;
-  PicTrisRegister  *m_trisc;
+      PicPortRegister  *m_portc;
+      PicTrisRegister  *m_trisc;
 
-  virtual PROCESSOR_TYPE isa(){return _P16C55_;};
+      virtual PROCESSOR_TYPE isa(){return _P16C55_;}
 
-  virtual uint program_memory_size() const { return 0x200; };
-  virtual uint register_memory_size() const { return 0x20; };
-  virtual uint config_word_address() const {return 0xFFF;};
+      virtual uint program_memory_size() const { return 0x200; }
+      virtual uint register_memory_size() const { return 0x20; }
+      virtual uint config_word_address() const {return 0xFFF;}
 
-  virtual void create_sfr_map();
+      virtual void create_sfr_map();
 
-  P16C55(const char *_name=0, const char *desc=0);
-  virtual ~P16C55();
-  virtual void create();
-  virtual void create_iopin_map();
+      P16C55(const char *_name=0 );
+      virtual ~P16C55();
+      virtual void create();
+      virtual void create_iopin_map();
 
-  static Processor *construct(const char *name);
-  virtual void tris_instruction(uint tris_register);
-
+      static Processor *construct(const char *name);
+      virtual void tris_instruction(uint tris_register);
 };
 
 class P16C56 : public  P16C54
 {
-public:
+    public:
 
-  virtual PROCESSOR_TYPE isa(){return _P16C56_;};
+      virtual PROCESSOR_TYPE isa(){return _P16C56_;}
 
-  virtual uint program_memory_size() const { return 0x400; };
-  virtual uint register_memory_size() const { return 0x20; };
-  virtual uint config_word_address() const {return 0xFFF;};
+      virtual uint program_memory_size() const { return 0x400; }
+      virtual uint register_memory_size() const { return 0x20; }
+      virtual uint config_word_address() const {return 0xFFF;}
 
-  P16C56(const char *_name=0, const char *desc=0);
+      P16C56(const char *_name=0 );
 
-  static Processor *construct(const char *name);
-
+      static Processor *construct(const char *name);
 };
 
 #endif

@@ -36,63 +36,59 @@ LibraryItem* PICComponent::libraryItem()
 
 Component* PICComponent::construct( QObject* parent, QString type, QString id )
 {
-    if( m_canCreate ) 
+    PICComponent* pic = new PICComponent( parent, type,  id );
+    if( m_error > 0 )
     {
-        PICComponent* pic = new PICComponent( parent, type,  id );
-        if( m_error > 0 )
-        {
-            Circuit::self()->removeComp( pic );
-            pic = 0l;
-            m_error = 0;
-            m_pSelf = 0l;
-            m_canCreate = true;
-        }
-        return pic;
+        Circuit::self()->removeComp( pic );
+        pic = 0l;
+        m_error = 0;
+        m_pSelf = 0l;
     }
-    MessageBoxNB( tr("Error")
-                , tr("Only 1 Mcu allowed\n to be in the Circuit.") );
-
-    return 0l;
+    return pic;
 }
 
 PICComponent::PICComponent( QObject* parent, QString type, QString id )
             : McuComponent( parent, type, id )
+            , m_pic( this )
 {
-    m_pSelf = this;
-    m_processor = PicProcessor::self();
+    m_processor = &m_pic;
+    createRamTable();
 
-    //if( m_id.startsWith("PIC") ) m_id.replace( "PIC", "pic16f876" );
+    m_cpi = 4;
 
     initChip();
     if( m_error == 0 )
     {
         setFreq( 20 );
-        
         qDebug() <<"     ..."<<m_id<<"OK\n";
     }
-    else
-    {
-        qDebug() <<"     ..."<<m_id<<"Error!!!\n";
-    }
+    else qDebug() <<"     ..."<<m_id<<"Error!!!\n";
 }
 PICComponent::~PICComponent() { }
 
 void PICComponent::attachPins()
 {
-    PicProcessor* ap = dynamic_cast<PicProcessor*>( m_processor );
-    pic_processor* cpu = ap->getCpu();
+    pic_processor* cpu = m_pic.getCpu();
 
-    for( int i=0; i < m_numpins; i++ )
+    for( int i=0; i<m_numpins; i++ )
     {
         PICComponentPin* pin = dynamic_cast<PICComponentPin*>( m_pinList[i] );
-        pin->attach( cpu );
+        pin->attachPin( cpu );
     }
     m_attached = true;
 }
 
-void PICComponent::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
+void PICComponent::addPin( QString id, QString type, QString label,
+                          int pos, int xpos, int ypos, int angle, int length )
 {
-    m_pinList.append( new PICComponentPin( this, id, type, label, pos, xpos, ypos, angle ) );
+    if( m_initialized )
+    {
+        updatePin( id, type, label, pos, xpos, ypos, angle );
+    }
+    else
+    {
+        m_pinList.append( new PICComponentPin( this, id, type, label, pos, xpos, ypos, angle ) );
+    }
 }
 
 #include "moc_piccomponent.cpp"

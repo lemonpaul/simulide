@@ -45,12 +45,11 @@ private:
 
 };
 
-
 DSM_MODULE::DSM_MODULE(Processor *pCpu) :
-    mdcon(pCpu, "mdcon", "Modulation Control Register", this),
-    mdsrc(pCpu, "mdsrc", "Modulation Source Control Register", this),
-    mdcarh(pCpu, "mdcarh", "Modulation High Carrier Control Register", this),
-    mdcarl(pCpu, "mdcarl", "Modulation Low Carrier Control Register", this),
+    mdcon(pCpu, "mdcon", this),
+    mdsrc(pCpu, "mdsrc", this),
+    mdcarh(pCpu, "mdcarh", this),
+    mdcarl(pCpu, "mdcarl", this),
     m_mdout(0), m_mdmin(0), m_minSink(0),
     m_mdcin1(0), cin1Sink_cnt(0), m_carlSink(0),
     m_mdcin2(0), m_carhSink(0), out_source(0), mdout('?'),
@@ -61,7 +60,6 @@ DSM_MODULE::DSM_MODULE(Processor *pCpu) :
 {
 }
 
-
 DSM_MODULE::~DSM_MODULE()
 {
   if (monitor_pin)
@@ -69,22 +67,10 @@ DSM_MODULE::~DSM_MODULE()
         delete monitor_mod;
         delete monitor_pin;
         monitor_pin = 0;
-        if (m_carhSink)
-        {
-/*RRR
-             if (m_mdcin1)
-             {
-                 m_mdcin1->removeSink(m_carhSink);
-             }
-             if (m_mdcin2)
-             {
-                 m_mdcin2->removeSink(m_carhSink);
-             }
-RRR */
-             delete m_carhSink;
-        }
+        if (m_carhSink) { delete m_carhSink; }
   }
 }
+
 void DSM_MODULE::dsm_logic(bool carl_neg_edge, bool carh_neg_edge)
 {
     bool out, outh, outl;
@@ -153,7 +139,6 @@ void DSM_MODULE::releaseMDout()
 }
 void DSM_MODULE::new_mdcon(uint old_value, uint new_value)
 {
-
    if (((old_value ^ new_value) & MDOE) && m_mdout)
    {
        if (new_value & MDOE)
@@ -416,8 +401,8 @@ void DSM_MODULE::carlEdge(char new3State)
         dsm_logic(false, old_state);  // old_state true on falling edge
 }
 
-_MDCON::_MDCON(Processor *pCpu, const char *pName, const char *pDesc, DSM_MODULE *_mDSM):
-    sfr_register(pCpu, pName, pDesc), mask(0xf1),
+_MDCON::_MDCON(Processor *pCpu, const char *pName, DSM_MODULE *_mDSM):
+    SfrReg(pCpu, pName ), mask(0xf1),
     mDSM(_mDSM)
 {
 }
@@ -432,11 +417,10 @@ void _MDCON::put_value(uint new_value)
   new_value &= (mask | DSM_MODULE::MDOUT);
   value.put(new_value);
   mDSM->new_mdcon(old_value, new_value);
-
 }
 
-_MDSRC::_MDSRC(Processor *pCpu, const char *pName, const char *pDesc, DSM_MODULE *_mDSM):
-    sfr_register(pCpu, pName, pDesc),mask(0x8f),
+_MDSRC::_MDSRC(Processor *pCpu, const char *pName, DSM_MODULE *_mDSM):
+    SfrReg(pCpu, pName ),mask(0x8f),
     mDSM(_mDSM)
 {
 }
@@ -452,8 +436,8 @@ void _MDSRC::put_value(uint new_value)
   mDSM->new_mdsrc(old_value, new_value);
 }
 
-_MDCARH::_MDCARH(Processor *pCpu, const char *pName, const char *pDesc, DSM_MODULE *_mDSM):
-    sfr_register(pCpu, pName, pDesc), mask(0xef),
+_MDCARH::_MDCARH(Processor *pCpu, const char *pName, DSM_MODULE *_mDSM):
+    SfrReg(pCpu, pName ), mask(0xef),
     mDSM(_mDSM)
 {
 }
@@ -469,16 +453,19 @@ void _MDCARH::put_value(uint new_value)
   value.put(new_value);
   mDSM->new_mdcarh(old_value, new_value);
 }
-_MDCARL::_MDCARL(Processor *pCpu, const char *pName, const char *pDesc, DSM_MODULE *_mDSM):
-    sfr_register(pCpu, pName, pDesc), mask(0xef),
+
+_MDCARL::_MDCARL(Processor *pCpu, const char *pName, DSM_MODULE *_mDSM):
+    SfrReg(pCpu, pName ), mask(0xef),
     mDSM(_mDSM)
 {
 }
+
 void _MDCARL::put(uint new_value)
 {
   new_value &= mask;
   put_value(new_value);
 }
+
 void _MDCARL::put_value(uint new_value)
 {
   uint old_value = value.get();

@@ -35,12 +35,10 @@ class MAINMODULE_EXPORT Meter : public Component, public eResistor
         Meter( QObject* parent, QString type, QString id );
         ~Meter();
 
-        void updateStep();
+        virtual void updateStep() override;
+        virtual void remove() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-
-    public slots:
-        void remove();
 
     protected:
         double m_dispValue;

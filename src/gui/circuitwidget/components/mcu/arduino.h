@@ -25,8 +25,8 @@
 #include "e-source.h"
 #include "e-node.h"
 #include "e-gate.h"
-#include "itemlibrary.h"
 
+class LibraryItem;
 
 class Arduino : public AvrCompBase
 {
@@ -39,11 +39,7 @@ class Arduino : public AvrCompBase
  static Component* construct( QObject* parent, QString type, QString id );
  static LibraryItem* libraryItem();
  
-        void attach();
-
-        void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
-        
-    public slots:
+        virtual void stamp();
         virtual void remove();
 
     private:

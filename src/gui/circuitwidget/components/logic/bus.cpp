@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "connector.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "bus.h"
 
@@ -43,14 +44,13 @@ LibraryItem* Bus::libraryItem()
 
 Bus::Bus( QObject* parent, QString type, QString id )
    : Component( parent, type, id )
-   , eBus( id.toStdString() )
+   , eBus( id )
 {
     Q_UNUSED( Bus_properties );
 
     m_busPin1 = new Pin( 270, QPoint( 0, 0 ), m_id+"-busPinI", 1, this );
     m_busPin1->setLength( 1 );
     m_busPin1->setFlag( QGraphicsItem::ItemStacksBehindParent, false );
-
 
     setNumLines( 8 );                           // Create Input Pins
 
@@ -62,10 +62,69 @@ Bus::Bus( QObject* parent, QString type, QString id )
     m_busPin0->setIsBus( true );
     m_pin[0]  = m_busPin0;
     m_ePin[0] = m_busPin0;
-
-    //m_pin[ m_numLines+1 ] = m_busPin1;
 }
-Bus::~Bus(){
+Bus::~Bus(){}
+
+QList<propGroup_t> Bus::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Num_Bits", tr("Size"),"Bits"} );
+    mainGroup.propList.append( {"Start_Bit", tr("Start Bit"),""} );
+    return {mainGroup};
+}
+
+void Bus::initialize()
+{
+    if( !m_busPin0->isConnected() && !m_busPin1->isConnected() ) return;
+
+    eNode* busEnode = m_busPin0->getEnode();
+    if( !busEnode ) busEnode = m_busPin1->getEnode();
+
+    for( int i=1; i<=m_numLines; i++ )
+    {
+        if( !m_pin[i]->isConnected() ) continue;
+
+        eNode* enode = new eNode( m_id+"eNode"+QString::number( i ) );
+        Pin* pin = m_pin[i];
+        pin->registerPinsW( enode );
+
+        if( busEnode )
+        {
+            QList<ePin*> epins = enode->getEpins();
+            busEnode->addBusPinList( epins, m_startBit+i-1 );
+        }
+    }
+}
+
+void Bus::inStateChanged( int msg )
+{
+    if( m_busPin0->isConnected() || m_busPin1->isConnected() )
+    {
+        eNode* enode = new eNode( m_id+"busNode" );
+        enode->setIsBus( true );
+        registerPins( enode );
+        return;
+    }
+    if( msg == 3 ) // Called by m_busPin When disconnected
+    {
+        for( int i=1; i<=m_numLines; i++ )
+        {
+            if( !m_pin[i]->isConnected() ) continue;
+
+            eNode* enode = new eNode( m_id+"eNode"+QString::number( i ) );
+            Pin* pin = m_pin[i];
+            pin->registerPinsW( enode );
+        }
+    }
+}
+
+
+void Bus::registerPins( eNode* enode )
+{
+    if( !enode->isBus() ) return;
+
+    if( m_busPin0->isConnected() ) m_busPin0->registerPinsW( enode );
+    if( m_busPin1->isConnected() ) m_busPin1->registerPinsW( enode );
 }
 
 void Bus::setNumLines( int lines )
@@ -114,69 +173,6 @@ void Bus::setStartBit( int bit )
     {
         m_pin[i]->setLabelText( " "+QString::number( m_startBit+i-1 ) );
     }
-}
-
-void Bus::initialize()
-{
-    if( !m_busPin0->isConnected() && !m_busPin1->isConnected() ) return;
-    
-    //qDebug() << "\nBus::initialize()"<< m_id << m_numLines;
-
-    eNode* busEnode = m_busPin0->getEnode();
-    if( !busEnode ) busEnode = m_busPin1->getEnode();
-    //if( !busEnode ) return;
-
-    for( int i=1; i<=m_numLines; i++ )
-    {
-        if( !m_pin[i]->isConnected() ) continue;
-        //eNode* enode = m_pin[i]->getEnode();
-        //if( !enode )
-        eNode* enode = new eNode( m_id+"eNode"+QString::number( i ) );
-        Pin* pin = m_pin[i];
-        pin->registerPinsW( enode );
-
-        if( busEnode )
-        {
-            QList<ePin*> epins = enode->getEpins();
-            //qDebug() << "Registering pins line"<< i << epins;
-            busEnode->addBusPinList( epins, m_startBit+i-1 );
-            //for( ePin* epin : epins )epin->setEnode( 0l );
-        }
-    }
-}
-
-void Bus::inStateChanged( int msg )
-{
-    //qDebug() << "Bus::inStateChanged()"<< m_id << m_numLines;
-
-    if( m_busPin0->isConnected() || m_busPin1->isConnected() )
-    {
-        eNode* enode = new eNode( m_id+"busNode" );
-        enode->setIsBus( true );
-        registerPins( enode );
-        return;
-    }
-    if( msg == 3 ) // Called by m_busPin When disconnected
-    {
-        //qDebug() << "Bus::inStateChanged()" << m_numLines;
-
-        for( int i=1; i<=m_numLines; i++ )
-        {
-            if( !m_pin[i]->isConnected() ) continue;
-
-            eNode* enode = new eNode( m_id+"eNode"+QString::number( i ) );
-            Pin* pin = m_pin[i];
-            pin->registerPinsW( enode );
-        }
-    }
-}
-
-void Bus::registerPins( eNode* enode )
-{
-    if( !enode->isBus() ) return;
-
-    if( m_busPin0->isConnected() ) m_busPin0->registerPinsW( enode );
-    if( m_busPin1->isConnected() ) m_busPin1->registerPinsW( enode );
 }
 
 void Bus::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

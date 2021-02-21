@@ -25,7 +25,7 @@
 class MAINMODULE_EXPORT eResistor : public eElement
 {
     public:
-        eResistor( std::string id );
+        eResistor( QString id );
         ~eResistor();
 
         virtual double res();
@@ -37,11 +37,9 @@ class MAINMODULE_EXPORT eResistor : public eElement
         void stampAdmit();
         void stampCurrent( double current );
 
-        double current();
+        virtual double current();
 
-        virtual void stamp();
-
-        virtual void initEpins();
+        virtual void stamp() override;
 
     protected:
         virtual void updateVI();

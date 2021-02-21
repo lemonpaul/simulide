@@ -28,26 +28,29 @@ class MAINMODULE_EXPORT eOpAmp : public eElement
 {
     public:
 
-        eOpAmp( std::string id );
+        eOpAmp( QString id );
         virtual ~eOpAmp();
 
-        virtual void stamp();
-        virtual void resetState();
-        virtual void setVChanged();
+        virtual void initialize() override;
+        virtual void stamp() override;
+        virtual void voltChanged() override;
         
         virtual double gain();
         virtual void setGain( double gain );
+
+        virtual double voltPos(){ return m_voltPosDef; }
+        virtual void setVoltPos( double volt ){ m_voltPosDef = volt; }
+
+        virtual double voltNeg(){ return m_voltNegDef; }
+        virtual void setVoltNeg( double volt ){ m_voltNegDef = volt; }
         
         virtual bool hasPowerPins();
         virtual void setPowerPins( bool set );
         
-        virtual ePin* getEpin( QString pinName );
-        virtual void initEpins();
-        
     protected:
         eSource* m_output;
         
-        bool m_converged;
+        bool m_firstStep;
         bool m_powerPins;
         
         double m_accuracy;
@@ -55,6 +58,8 @@ class MAINMODULE_EXPORT eOpAmp : public eElement
         double m_k;
         double m_voltPos;
         double m_voltNeg;
+        double m_voltPosDef;
+        double m_voltNegDef;
         double m_lastOut;
         double m_lastIn;
 };

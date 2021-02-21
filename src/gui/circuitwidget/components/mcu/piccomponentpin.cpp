@@ -23,11 +23,7 @@
 #include "piccomponentpin.h"
 #include "piccomponent.h"
 #include "simulator.h"
-
-//#include "stimuli.h"
-//#include "ioports.h"
 #include "pic-processor.h"
-//#include "gpsim_time.h"
 
 PICComponentPin::PICComponentPin( McuComponent* mcu, QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
                : McuComponentPin( mcu, id, type, label, pos, xpos, ypos, angle )
@@ -37,7 +33,7 @@ PICComponentPin::PICComponentPin( McuComponent* mcu, QString id, QString type, Q
 }
 PICComponentPin::~PICComponentPin(){}
 
-void PICComponentPin::attach( pic_processor *PicProcessor )
+void PICComponentPin::attachPin( pic_processor* PicProcessor )
 {
     if( m_PicProcessor ) return;
     
@@ -68,7 +64,7 @@ void PICComponentPin::attach( pic_processor *PicProcessor )
         if( m_pIOPIN->getType() == OPEN_COLLECTOR )
         {
             m_openColl = true;
-            eSource::setVoltHigh( 0 );
+            //eSource::setVoltHigh( 0 );
         }
     }
     else if( m_id.startsWith("MCLR") )
@@ -78,21 +74,21 @@ void PICComponentPin::attach( pic_processor *PicProcessor )
     m_attached = true;
 }
 
-void PICComponentPin::setVChanged()
+void PICComponentPin::voltChanged()
 {
     if( !m_isInput ) return;      // Nothing to do if pin is output
 
     double volt = m_ePin[0]->getVolt();
     //qDebug() << "PICComponentPin::setVChanged "<< m_id <<volt;
     
-    if( m_pinType == 1 )                                 // Is an IO Pin
+    if( m_pinType == 1 )                       // Is an IO Pin
     {
         m_pIOPIN->set_nodeVoltage(volt);
     }
-    else if( m_pinType == 21 ) // reset
+    else if( m_pinType == 21 )                // reset
     {
-        if( volt < 3 )  BaseProcessor::self()->hardReset( true );
-        else            BaseProcessor::self()->hardReset( false );
+        if( volt < 3 )  m_processor->hardReset( true );
+        else            m_processor->hardReset( false );
     }
 }
 

@@ -18,7 +18,10 @@
  ***************************************************************************/
 
 #include "terminalwidget.h"
+#include "mcucomponent.h"
 #include "baseprocessor.h"
+#include "simulator.h"
+#include "circuit.h"
 #include "serialterm.h"
 
 TerminalWidget::TerminalWidget( QWidget* parent, SerialTerm* ser )
@@ -43,10 +46,10 @@ TerminalWidget::TerminalWidget( QWidget* parent, SerialTerm* ser )
     m_addCR = false;
     m_uart = 0;
     
-    setMinimumSize(QSize(200, 200));
-    
-    setWindowFlags ( Qt::Window | Qt::WindowTitleHint
-                   | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint );
+    setMinimumSize( QSize(200, 200) );
+
+    setWindowFlags( Qt::Window | Qt::WindowTitleHint | Qt::Tool
+                  | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint );
     
     m_verticalLayout.setObjectName( "verticalLayout" );
     m_verticalLayout.setContentsMargins(0, 0, 0, 0);
@@ -139,41 +142,90 @@ TerminalWidget::TerminalWidget( QWidget* parent, SerialTerm* ser )
     m_textLayout.addWidget( &m_uartInPanel );
     m_verticalLayout.addLayout( &m_textLayout );
 
+    Simulator::self()->addToUpdateList( &m_uartOutPanel );
+    Simulator::self()->addToUpdateList( &m_uartInPanel );
+
     connect( &m_sendText, SIGNAL( returnPressed() ),
-                    this, SLOT( onTextChanged() ));
+                    this, SLOT( onTextChanged() ), Qt::UniqueConnection);
 
     connect( &m_sendValue, SIGNAL( returnPressed() ),
                      this, SLOT( onValueChanged() ));
 
     connect( &m_ascciButton, SIGNAL( clicked()),
-                       this, SLOT( ascciButtonClicked()) );
+                       this, SLOT( ascciButtonClicked()), Qt::UniqueConnection );
 
     connect( &m_valueButton, SIGNAL( clicked()),
-                       this, SLOT( valueButtonClicked()) );
+                       this, SLOT( valueButtonClicked()), Qt::UniqueConnection );
 
     connect( &m_addCrButton, SIGNAL( clicked()),
-                       this, SLOT( addCRClicked()) );
+                       this, SLOT( addCRClicked()), Qt::UniqueConnection );
 
     connect( &m_clearInButton, SIGNAL( clicked()),
-                         this, SLOT( clearInClicked()) );
+                         this, SLOT( clearInClicked()), Qt::UniqueConnection );
 
     connect( &m_clearOutButton, SIGNAL( clicked()),
-                          this, SLOT( clearOutClicked()) );
+                          this, SLOT( clearOutClicked()), Qt::UniqueConnection );
 
     connect( &m_uartBox, SIGNAL( valueChanged(int) ),
-              m_serComp, SLOT( setUart(int) ));
+              m_serComp, SLOT( setUart(int) ), Qt::UniqueConnection );
 
-    connect( BaseProcessor::self(), SIGNAL( uartDataOut( int, int )),
-                              this, SLOT(   uartOut( int, int )) );
-
-    connect( BaseProcessor::self(), SIGNAL( uartDataIn( int, int )),
-                              this, SLOT(   uartIn( int, int )) );
+    initialize();
 }
-TerminalWidget::~TerminalWidget() { }
-
-void TerminalWidget::closeEvent(QCloseEvent* event)
+TerminalWidget::~TerminalWidget()
 {
-    m_serComp->slotClose();
+    Simulator::self()->remFromUpdateList( &m_uartOutPanel );
+    Simulator::self()->remFromUpdateList( &m_uartInPanel );
+}
+
+void TerminalWidget::setMcuId( QString mcu )
+{
+    QString name = Circuit::self()->origId( mcu );
+    if( name == "" ) name = mcu;
+    m_mcuId =  name;
+
+    Component* mcuComp = Circuit::self()->getCompById( m_mcuId );
+    if( mcuComp )
+    {
+        m_mcuComponent = static_cast<McuComponent*>(mcuComp);
+        connectMcu();
+    }
+    else setWindowTitle( tr("Unknown Mcu") );
+
+    //qDebug() << "TerminalWidget::setMcuId" << mcu << name;
+}
+
+void TerminalWidget::initialize()
+{
+    int circVersion = Circuit::self()->circType().split(".").last().toInt();
+
+    if( circVersion < 5 )
+    {
+        m_mcuComponent = McuComponent::self();
+        m_mcuId = m_mcuComponent->objectName();
+        setMcuId( m_mcuId );
+    }
+}
+
+void TerminalWidget::connectMcu()
+{
+    this->setWindowTitle( m_mcuComponent->idLabel() );
+
+    m_processor = m_mcuComponent->processor();
+
+    connect( m_mcuComponent, SIGNAL( closeSerials()),
+                  m_serComp, SLOT(   slotClose()), Qt::UniqueConnection );
+
+    connect( m_processor, SIGNAL( uartDataOut( int, int )),
+                    this, SLOT(   uartOut( int, int )), Qt::UniqueConnection );
+
+    connect( m_processor, SIGNAL( uartDataIn( int, int )),
+                    this, SLOT(   uartIn( int, int )), Qt::UniqueConnection );
+}
+
+void TerminalWidget::closeEvent( QCloseEvent* event )
+{
+    //m_serComp->slotClose();
+    Circuit::self()->removeComp( m_serComp );
     QWidget::closeEvent( event );
 }
 
@@ -182,20 +234,19 @@ void TerminalWidget::onTextChanged()
     QString text = m_sendText.text();
     //qDebug()<< "TerminalWidget::onTextChanged" << text ;
     
-    QByteArray array = text.toLatin1();
+    QByteArray array = text.toUtf8();
     
     for( int i=0; i<array.size(); i++ )
-        BaseProcessor::self()->uartIn( m_uart, array.at(i) );
+        m_processor->uartIn( m_uart, array.at(i) );
 
-    if( m_addCR ) BaseProcessor::self()->uartIn( m_uart, 13 );
-    //if( m_addCR ) qDebug() << "CR";
+    if( m_addCR ) m_processor->uartIn( m_uart, 13 );
 }
 
 void TerminalWidget::onValueChanged()
 {
     QString text = m_sendValue.text();
 
-    BaseProcessor::self()->uartIn( m_uart, text.toInt() );
+    m_processor->uartIn( m_uart, text.toInt() );
 }
 
 void TerminalWidget::valueButtonClicked()
@@ -233,12 +284,6 @@ void TerminalWidget::uartChanged( int uart )
     if( m_uartBox.value() != uart ) m_uartBox.setValue( uart );
 }
 
-void TerminalWidget::step()
-{
-    m_uartInPanel.step();
-    m_uartOutPanel.step();
-}
-
 void TerminalWidget::uartIn( int uart, int value ) // Receive one byte on Uart
 {
     //qDebug() << "TerminalWidget::uartIn" << m_uart << uart << value;
@@ -261,15 +306,10 @@ void TerminalWidget::uartOut( int uart, int value ) // Send value to OutPanelTex
     if( uart != m_uart ) return;
 
     QString text = "";
-    if( m_printASCII )
-    {
-        //if( value == 0 ) return;
-        text.append( value );
-    }
-    else text = QString::number( value )+" ";
+    if( m_printASCII ) text.append( value );
+    else               text = QString::number( value )+" ";
 
     m_uartOutPanel.appendText( text );
 }
-
 
 #include "moc_terminalwidget.cpp"

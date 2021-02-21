@@ -18,10 +18,9 @@
  ***************************************************************************/
 
 #include "mech_contact.h"
-#include "simulator.h"
+#include "circuitwidget.h"
 #include "circuit.h"
-
-#include <math.h>
+#include "simulator.h"
 
 static const char* MechContact_properties[] = {
     QT_TRANSLATE_NOOP("App::Property","Poles"),
@@ -31,7 +30,7 @@ static const char* MechContact_properties[] = {
 
 MechContact::MechContact( QObject* parent, QString type, QString id )
            : Component( parent, type, id )
-           , eElement(  id.toStdString() )
+           , eElement(  id )
 {
     Q_UNUSED( MechContact_properties );
 
@@ -41,18 +40,17 @@ MechContact::MechContact( QObject* parent, QString type, QString id )
 
     m_nClose = false;
     m_closed = false;
-    m_hidden = false;
+    m_ButHidden = false;
 
-    //resetState();
+    Simulator::self()->addToUpdateList( this );
 }
-MechContact::~MechContact()
-{
-}
+MechContact::~MechContact(){}
+
 
 void MechContact::attach()
 {
-    if( m_hidden ) return;
-    for( int i=0; i<m_numPoles; i++ )
+    if( m_ButHidden ) return;
+    for( int i=0; i<m_numPoles; ++i )
     {
         eNode* enode = m_pin[m_pin0/2+i*(1+m_numthrows)]->getEnode();
 
@@ -65,19 +63,28 @@ void MechContact::attach()
 
 void MechContact::stamp()
 {
-    for( uint i=m_pin0; i<m_ePin.size(); i++ )
+    if( m_ButHidden ) return;
+    for( uint i=m_pin0; i<m_ePin.size(); ++i )
     {
         eNode* enode = m_ePin[i]->getEnode();
-
         if( enode ) enode->setSwitched( true );
     }
     setSwitch( m_nClose );
 }
 
+void MechContact::updateStep()
+{
+    if( m_changed )
+    {
+        m_changed = false;
+        update();
+    }
+}
 
 void MechContact::setSwitch( bool closed )
 {
     //qDebug() << "MechContact::setSwitch" << closed;
+    m_changed = true;
     m_closed = closed;
 
     for( int i=0; i<m_numPoles; i++ )
@@ -91,11 +98,11 @@ void MechContact::setSwitch( bool closed )
         {
             switchN++;
 
-            if( !closed ) m_switches[ switchN ]->setAdmit( 1e3 );
-            else          m_switches[ switchN ]->setAdmit( 0 );
+            if( closed ) m_switches[ switchN ]->setAdmit( 0 );
+            else         m_switches[ switchN ]->setAdmit( 1e3 );
         }
     }
-    update();
+    Simulator::self()->addEvent( 0, 0l );
 }
 
 void MechContact::remove()
@@ -106,24 +113,23 @@ void MechContact::remove()
 
 void MechContact::SetupButton()
 {
-    initEpins();
+    setNumEpins(2);
     m_switches.resize( 1 );
     m_switches[ 0 ] = new eResistor( "res0" );
     m_switches[ 0 ]->setEpin( 0, m_ePin[0] );
     m_switches[ 0 ]->setEpin( 1, m_ePin[1] );
     m_numPoles = 1;
     m_numthrows = 1;
-    m_hidden = true;
+    m_ButHidden = true;
 }
 
 void MechContact::SetupSwitches( int poles, int throws )
 {
-    if( m_pin0  == 0 ) m_area = QRectF( -13,-16*poles, 26, 16*poles );
-    else               m_area = QRectF( -13, -8-16*poles-4, 26, 8+16*poles+8+4 );
-    int start = m_pin0/2;
+    if( Simulator::self()->isRunning() )  CircuitWidget::self()->powerCircOff();
 
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim )  Simulator::self()->pauseSim();
+    if( m_pin0  == 0 ) m_area = QRectF( -12,-16*poles, 24, 16*poles );            // Switches
+    else               m_area = QRectF( -12, -8-16*poles-4, 24, 8+16*poles+8+4 ); // Relays
+    int start = m_pin0/2;
 
     for( uint i=0; i<m_switches.size(); i++ )
         delete m_switches[i];
@@ -133,10 +139,8 @@ void MechContact::SetupSwitches( int poles, int throws )
     {
         int epinN = m_pin0+i*m_numthrows*2;
         delete m_ePin[ epinN ];
-
         if( m_numthrows > 1 ) delete m_ePin[ epinN+2 ];
     }
-
     for( uint i=start; i<m_pin.size(); i++ )
     {
         Pin* pin = m_pin[i];
@@ -144,7 +148,6 @@ void MechContact::SetupSwitches( int poles, int throws )
         pin->reset();
         delete pin;
     }
-
     m_numPoles = poles;
     m_numthrows = throws;
 
@@ -175,11 +178,11 @@ void MechContact::SetupSwitches( int poles, int throws )
             int tN = i*throws+j;
 
             reid.append( QString( "-switch"+QString::number(tN)) );
-            m_switches[ tN ] = new eResistor( reid.toStdString() );
+            m_switches[ tN ] = new eResistor( reid );
 
             ePinN = m_pin0+tN*2;
             QString pinp = reid+"pinP";
-            m_ePin[ ePinN ] = new ePin( pinp.toStdString(), 1 );
+            m_ePin[ ePinN ] = new ePin( pinp, 1 );
 
             pinpos = QPoint( 16,-4*m_pin0-16*i-8*j);
             pin = new Pin( 0, pinpos, reid+"pinN", 1, this);
@@ -193,7 +196,6 @@ void MechContact::SetupSwitches( int poles, int throws )
         }
         cont++;
     }
-    if( pauseSim ) Simulator::self()->runContinuous();
     Circuit::self()->update();
     //for( Pin* pin : m_pin )
     //    pin->setFlag( QGraphicsItem::ItemStacksBehindParent, false ); // draw Pins on top
@@ -231,12 +233,13 @@ void MechContact::setNClose( bool nc )
 {
     m_nClose = nc;
     setSwitch( m_nClose );
+    update();
 }
 
 
 void MechContact::paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
-    if( m_hidden ) return;
+    if( m_ButHidden ) return;
 
     QPen pen = p->pen();
     pen.setWidth(3);

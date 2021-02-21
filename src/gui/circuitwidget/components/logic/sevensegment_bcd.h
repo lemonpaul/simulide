@@ -36,11 +36,13 @@ class MAINMODULE_EXPORT SevenSegmentBCD : public LogicComponent, public eBcdTo7S
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
-        void resetState();
-        void updateStep();
-        void stamp();
+        virtual QList<propGroup_t> propGroups() override;
 
-        void remove();
+        void initialize() override;
+        void updateStep() override;
+        void stamp() override;
+
+        void remove() override;
         
         void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 

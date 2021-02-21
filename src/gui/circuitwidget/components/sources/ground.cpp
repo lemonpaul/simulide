@@ -46,7 +46,7 @@ Ground::Ground( QObject* parent, QString type, QString id )
     groundpin = new Pin( 90, nodpos, nodid, 0, this);
 
     nodid.append(QString("-eSource"));
-    m_out = new eSource( nodid.toStdString(), groundpin );
+    m_out = new eSource( nodid, groundpin );
     
     setLabelPos(-16, 8, 0);
 }

@@ -23,13 +23,16 @@
 
 #include "e-gate_xor.h"
 
-eXorGate::eXorGate( std::string id, int inputs ) : eGate( id, inputs ) {}
+eXorGate::eXorGate( QString id, int inputs )
+        : eGate( id, inputs )
+{
+
+}
 eXorGate::~eXorGate(){}
 
 bool eXorGate::calcOutput( int inputs )
 {
-    if( inputs == 1 )  return true;
-
+    if( inputs == 1 ) return true;
     return false;
 }
 

@@ -18,8 +18,10 @@
  ***************************************************************************/
 
 #include "switchdip.h"
+#include "circuitwidget.h"
 #include "itemlibrary.h"
 #include "connector.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "pin.h"
 
@@ -42,23 +44,31 @@ LibraryItem* SwitchDip::libraryItem()
 
 SwitchDip::SwitchDip( QObject* parent, QString type, QString id )
          : Component( parent, type, id )
-         , eElement( id.toStdString() )
+         , eElement( id )
 {
     Q_UNUSED( SwitchDip_properties );
+
+    m_graphical = true;
+    m_changed = true;
 
     m_color = QColor( 50, 50, 70 );
     m_size = 0;
     m_state = 0;
     setSize( 8 );
-    
-    m_changed = true;
-    
+
     setShowVal( false );
     setLabelPos(-16,-44, 0);
     
     Simulator::self()->addToUpdateList( this );
 }
 SwitchDip::~SwitchDip(){}
+
+QList<propGroup_t> SwitchDip::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Size", tr("Size"),"Switches"} );
+    return {mainGroup};
+}
 
 void SwitchDip::stamp()
 {
@@ -99,6 +109,7 @@ void SwitchDip::updateStep()
        i++;
     }
     m_changed = false;
+    Simulator::self()->addEvent( 0, 0l );
 }
 
 void SwitchDip::onbuttonclicked()
@@ -176,7 +187,8 @@ void SwitchDip::createSwitches( int c )
         proxy->setParentItem( this );
         proxy->setPos( QPoint( 3, -27+i*8 ) );
         m_proxys.append( proxy );
-        connect( button, SIGNAL( released() ), this, SLOT  ( onbuttonclicked() ));
+        connect( button, SIGNAL( released() ),
+                   this, SLOT  ( onbuttonclicked() ), Qt::UniqueConnection);
         
         QPoint pinpos = QPoint(-8,-32+8+i*8 );
         Pin* pin = new Pin( 180, pinpos, butId+"-pinP", 0, this);
@@ -225,26 +237,22 @@ int SwitchDip::size()
 
 void SwitchDip::setSize( int size )
 {
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    if( Simulator::self()->isRunning() )  CircuitWidget::self()->powerCircOff();
     
     if( size == 0 ) size = 8;
     
     if     ( size < m_size ) deleteSwitches( m_size-size );
     else if( size > m_size ) createSwitches( size-m_size );
     
-    m_area = QRect( -1, -26, 10, m_size*8-4 );
-    
-    if( pauseSim ) Simulator::self()->runContinuous();
+    m_area = QRectF( -3, -28, 14, m_size*8 );
+
     Circuit::self()->update();
 }
 
 void SwitchDip::remove()
 {
     Simulator::self()->remFromUpdateList( this );
-    
     deleteSwitches( m_size );
-
     Component::remove();
 }
 
@@ -254,7 +262,7 @@ void SwitchDip::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWid
     
     //p->setBrush( QColor( 80, 80, 80) );
 
-    p->drawRoundRect( boundingRect(), 4, 4 );
+    p->drawRoundRect( m_area, 4, 4 );
 }
 
 #include "moc_switchdip.cpp"

@@ -28,8 +28,8 @@ License along with this library; if not, see
 #include "intcon.h"
 #include "processor.h"
 
-PIR::PIR(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie, int _valid_bits)
-  : sfr_register(pCpu,pName,pDesc),
+PIR::PIR(Processor *pCpu, const char *pName, INTCON *_intcon, PIE *_pie, int _valid_bits)
+  : SfrReg(pCpu,pName ),
     intcon(_intcon),pie(_pie),ipr(0),valid_bits(_valid_bits),writable_bits(0)
 {
 }
@@ -55,7 +55,7 @@ void PIR::set_pie(PIE *_pie)
   pie = _pie;
 }
 
-void PIR::set_ipr(sfr_register *_ipr)
+void PIR::set_ipr(SfrReg *_ipr)
 {
   ipr = _ipr;
 }
@@ -123,8 +123,8 @@ void InterruptSource::release()
 
 //------------------------------------------------------------------------
 
-PIR1v1::PIR1v1(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR1v1::PIR1v1(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   // Even though TXIF is a valid bit, it can't be written by the PIC
   // source code.  Its state reflects whether the usart txreg is full
@@ -174,8 +174,8 @@ void PIR1v1::set_eeif(void)
 }
 //------------------------------------------------------------------------
 //
-PIR1v2::PIR1v2(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR1v2::PIR1v2(Processor *pCpu, const char *pName, INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   // Even though TXIF is a valid bit, it can't be written by the PIC
   // source code.  Its state reflects whether the usart txreg is full
@@ -229,8 +229,8 @@ void PIR1v2::clear_rcif(void)
 
 //------------------------------------------------------------------------
 
-PIR1v3::PIR1v3(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR1v3::PIR1v3(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = TMR1IF | ADIF | CMIF | EEIF;
   writable_bits = TMR1IF | ADIF | CMIF | EEIF;
@@ -277,8 +277,8 @@ void PIR1v3::set_c2if(void)
 
 //------------------------------------------------------------------------
 
-PIR1v4::PIR1v4(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR1v4::PIR1v4(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   writable_bits = TMR1IF | TMR2IF | CCP1IF | SSPIF | ADIF | EEIF;
   valid_bits = 0xff;
@@ -303,15 +303,15 @@ void PIR1v4::clear_rcif(void)
   value.put(value.get() & ~RCIF);
 }
 //------------------------------------------------------------------------
-PIR2v1::PIR2v1(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR2v1::PIR2v1(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = CCP2IF;
   writable_bits = valid_bits;
 }
 //------------------------------------------------------------------------
-PIR2v2::PIR2v2(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR2v2::PIR2v2(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = ECCP1IF | TMR3IF | LVDIF | BCLIF | EEIF | CMIF;
   writable_bits = valid_bits;
@@ -333,8 +333,8 @@ void PIR2v2::set_bclif(void)
   if( value.get() & pie->value.get() ) setPeripheralInterrupt();
 }
 //------------------------------------------------------------------------
-PIR2v3::PIR2v3(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR2v3::PIR2v3(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = CCP2IF | ULPWUIF | BCLIF | EEIF | C1IF | C2IF | OSFIF;
   writable_bits = valid_bits;
@@ -361,8 +361,8 @@ void PIR2v3::set_bclif(void)
   if( value.get() & pie->value.get() ) setPeripheralInterrupt();
 }
 
-PIR2v4::PIR2v4(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR2v4::PIR2v4(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = OSCFIF | CMIF | USBIF | EEIF | BCLIF | HLVDIF | TMR3IF | CCP2IF;
   writable_bits = valid_bits;
@@ -387,16 +387,16 @@ void PIR2v4::set_bclif(void)
   value.put(value.get() | BCLIF);
   if( value.get() & pie->value.get() ) setPeripheralInterrupt();
 }
-PIR2v5::PIR2v5(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR2v5::PIR2v5(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = OSFIF | LVDIF | LCDIF | C1IF | C2IF |CCP2IF;
   writable_bits = valid_bits;
 }
 //------------------------------------------------------------------------
 
-PIR3v1::PIR3v1(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR3v1::PIR3v1(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   // Even though TXIF is a valid bit, it can't be written by the PIC
   // source code.  Its state reflects whether the usart txreg is full
@@ -429,30 +429,30 @@ void PIR3v1::clear_rcif(void)
 }
 
 //------------------------------------------------------------------------
-PIR3v2::PIR3v2(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR3v2::PIR3v2(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = RXB0IF | RXB1IF | TXB0IF | TXB1IF | TXB2IF | ERRIF |
     WAKIF | IRXIF;
   writable_bits = valid_bits;
 }
 
-PIR3v3::PIR3v3(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR3v3::PIR3v3(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = TMR3GIF | TMR5GIF | TMR1GIF | CTMUIF | TX2IF | RC2IF 
 	| BCL2IF | SSP2IF;
   writable_bits = valid_bits;
 }
 
-PIR4v1::PIR4v1(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR4v1::PIR4v1(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = CCP3IF | CCP4IF | CCP5IF ;
   writable_bits = CCP3IF | CCP4IF | CCP5IF;
 }
-PIR5v1::PIR5v1(Processor *pCpu, const char *pName, const char *pDesc,INTCON *_intcon, PIE *_pie)
-  : PIR(pCpu,pName,pDesc,_intcon, _pie,0)
+PIR5v1::PIR5v1(Processor *pCpu, const char *pName,  INTCON *_intcon, PIE *_pie)
+  : PIR(pCpu,pName ,_intcon, _pie,0)
 {
   valid_bits = TMR4IF | TMR5IF | TMR6IF ;
   writable_bits = TMR4IF | TMR5IF | TMR6IF ;

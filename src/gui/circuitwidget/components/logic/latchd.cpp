@@ -17,9 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <sstream>
-
 #include "latchd.h"
+#include "circuitwidget.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "pin.h"
 
@@ -41,35 +41,43 @@ LibraryItem* LatchD::libraryItem()
 
 LatchD::LatchD( QObject* parent, QString type, QString id )
       : LogicComponent( parent, type, id )
-      , eLatchD( id.toStdString() )
+      , eLatchD( id )
 {
     m_width  = 4;
     m_height = 10;
     
     m_tristate = true;
     
-    m_inputEnPin = new Pin( 180, QPoint( 0,0 ), m_id+"-Pin-inputEnable", 0, this );
-    m_inputEnPin->setLabelText( " IE" );
-    m_inputEnPin->setLabelColor( QColor( 0, 0, 0 ) );
-    
-    std::stringstream ssesource;
-    ssesource << m_elmId << "-eSource-inputEnable";
-    m_inEnSource = new eSource( ssesource.str(), m_inputEnPin );
-    m_inEnSource->setImp( m_inputImp );
-    
-    m_outEnPin   = new Pin(   0, QPoint( 0,0 ), m_id+"-Pin-outEnable"  , 0, this );
+    m_outEnPin = new Pin( 0, QPoint( 0,0 ), m_id+"-Pin-outEnable", 0, this );
     m_outEnPin->setLabelText( "OE " );
     m_outEnPin->setLabelColor( QColor( 0, 0, 0 ) );
+    eLogicDevice::createOutEnablePin( m_outEnPin );                    // Output Enable
 
-    //eLogicDevice::createInEnablePin( m_inputEnPin );     // Input Enable
-    eLogicDevice::createOutEnablePin( m_outEnPin );     // Output Enable
-    
+    m_trigPin = new Pin( 180, QPoint( 0,0 ), m_id+"-Pin-clock", 0, this );
+    m_trigPin->setLabelText( ">" );
+    m_trigPin->setLabelColor( QColor( 0, 0, 0 ) );
+    eLogicDevice::createClockPin( m_trigPin );
+
     setTrigger( InEnable );
 
     m_channels = 0;
     setChannels( 8 );
 }
 LatchD::~LatchD(){}
+
+QList<propGroup_t> LatchD::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+
+    mainGroup.propList.append( {"Tristate", tr("Tristate"),""} );
+    mainGroup.propList.append( {"Inverted", tr("Invert Outputs"),""} );
+    mainGroup.propList.append( {"Channels", tr("Size"),"Channels"} );
+    mainGroup.propList.append( {"Trigger", tr("Trigger Type"),"enum"} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
 
 void LatchD::createLatches( int n )
 {
@@ -111,8 +119,7 @@ void LatchD::setChannels( int channels )
     if( channels == m_channels ) return;
     if( channels < 1 ) return;
     
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
     
     m_height = channels+2;
     int origY = -(m_height/2)*8;
@@ -130,19 +137,17 @@ void LatchD::setChannels( int channels )
         m_outPin[i]->isMoved();
     }
     
-    m_inputEnPin->setPos( QPoint(-24,origY+8+channels*8 ) );
-    m_inputEnPin->isMoved();
-    m_inputEnPin->setLabelPos();
+    m_trigPin->setPos( QPoint(-24,origY+8+channels*8 ) );
+    m_trigPin->isMoved();
+    m_trigPin->setLabelPos();
     
     m_outEnPin->setPos( QPoint(24,origY+8+channels*8) );
     m_outEnPin->isMoved();
     m_outEnPin->setLabelPos();
     
     m_channels = channels;
-
     m_area   = QRect( -(m_width/2)*8, origY, m_width*8, m_height*8 );
-    
-    if( pauseSim ) Simulator::self()->runContinuous();
+
     Circuit::self()->update();
 }
 
@@ -162,62 +167,19 @@ void LatchD::setTristate( bool t )
 
 void LatchD::setTrigger( Trigger trigger )
 {
-    //if( trigger == m_trigger ) return;
-    
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
-    
-    m_trigger = trigger;
-    
-    if( trigger == None )
-    {
-        if( m_inputEnPin->isConnected() )m_inputEnPin->connector()->remove();
-        m_inputEnPin->reset();
-        m_inputEnPin->setLabelText( "" );
-        m_inputEnPin->setVisible( false );
-        
-        eLogicDevice::m_clockPin = 0l;
-        eLogicDevice::m_inEnablePin = 0l;
-        
-        eLogicDevice::m_inEnable = false;
-        eLogicDevice::m_clock = false;
-    }
-    else if( trigger == Clock )
-    {
-        std::stringstream sspin;
-        sspin << m_elmId << "-ePin-clock";
-        m_inputEnPin->setId( sspin.str() );
-        m_inputEnPin->setLabelText( ">" );
-        m_inputEnPin->setVisible( true );
-        
-        eLogicDevice::m_inEnablePin = 0l;
-        eLogicDevice::m_clockPin = m_inEnSource;
-        
-        eLogicDevice::m_inEnable = false;
-        eLogicDevice::m_clock = false;
-    }
-    else if( trigger == InEnable )
-    {
-        std::stringstream sspin;
-        sspin << m_elmId << "-ePin-inputEnable";
-        m_inputEnPin->setId( sspin.str() );
-        m_inputEnPin->setLabelText( " IE" );
-        m_inputEnPin->setVisible( true );
-        
-        eLogicDevice::m_clockPin = 0l;
-        eLogicDevice::m_inEnablePin = m_inEnSource;
+    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
 
-        eLogicDevice::m_inEnable = false;
-        eLogicDevice::m_clock = false;
-    }
-    if( pauseSim ) Simulator::self()->runContinuous();
+    int trig = static_cast<int>( trigger );
+    eLogicDevice::seteTrigger( trig );
+    LogicComponent::setTrigger( trigger );
+
     Circuit::self()->update();
 }
 
 void LatchD::remove()
 {
-    if( m_inputEnPin->isConnected() ) m_inputEnPin->connector()->remove();
-    if( m_outEnPin->isConnected() ) m_outEnPin->connector()->remove();
+    if( m_trigPin->connector() )  m_trigPin->connector()->remove();
+    if( m_outEnPin->connector() ) m_outEnPin->connector()->remove();
     
     LogicComponent::remove();
 }

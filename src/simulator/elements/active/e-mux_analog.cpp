@@ -19,12 +19,11 @@
 
 #include "e-mux_analog.h"
 #include "e-resistor.h"
+#include "simulator.h"
 #include "e-node.h"
-#include <QDebug>
-#include <sstream>
 
-eMuxAnalog::eMuxAnalog( std::string id )
-          : eElement( id )
+eMuxAnalog::eMuxAnalog( QString id )
+          : eLogicDevice( id )
 {
     m_channels = 0;
     m_addrBits = 0;
@@ -43,7 +42,7 @@ void eMuxAnalog::stamp()
     eNode* enode = m_inputPin->getEnode();
     if( enode ) enode->setSwitched( true );
     
-    for( int i=0; i<m_channels; i++ ) 
+    for( int i=0; i<m_channels; ++i )
     {
         m_ePin[i]->setEnode( enode );
         
@@ -52,63 +51,53 @@ void eMuxAnalog::stamp()
     }
     
     enode = m_enablePin->getEnode();
-    if( enode ) enode->addToChangedFast(this);
+    if( enode ) enode->voltChangedCallback( this );
     
-    for( int i=0; i<m_addrBits; i++ )
+    for( int i=0; i<m_addrBits; ++i )
     {
         enode = m_addrPin[i]->getEnode();
-        if( enode ) enode->addToChangedFast(this);
+        if( enode ) enode->voltChangedCallback( this );
     }
     m_enabled = false;
 }
 
-void eMuxAnalog::setVChanged()
+void eMuxAnalog::voltChanged()
 {
     bool enabled = m_enablePin->getVolt() < 2.5;
     
-    if( enabled != m_enabled )
-    {
-        m_enabled = enabled;
-        
-        if( !enabled ) 
-        {
-            for( int i=0; i<m_channels; i++ ) 
-            {
-                if( m_resistor[i]->admit() != 0 )
-                {
-                    m_resistor[i]->setAdmit( 0 );
-                    //qDebug() << "eMuxAnalog::setVChanged disabling:"<<i;
-                }
-            }
-        }
-    }
-    if( !enabled ) return;
+    m_enabled = enabled;
     
     int address = 0;
-    for( int i=0; i<m_addrBits; i++ )
+    for( int i=0; i<m_addrBits; ++i )
     {
-        
         bool state = (m_addrPin[i]->getVolt()>2.5);
         if( state ) address += pow( 2, i );
     }
-    //if( address == m_address ) return;
     m_address = address;
-    
-    //qDebug() << "eMuxAnalog::setVChanged"<<address<<m_admit;
-    for( int i=0; i<m_channels; i++ )
+
+    Simulator::self()->addEvent( m_propDelay, this );
+}
+
+void eMuxAnalog::runEvent()
+{
+    if( m_enabled )
     {
-        if( i == address )                
+        for( int i=0; i<m_channels; ++i )
         {
-            if( m_resistor[i]->admit() == 0 ) 
+            if( i == m_address )
             {
-                m_resistor[i]->setAdmit( m_admit );
-                //qDebug() << "eMuxAnalog::setVChanged connecting:"<<i;
+                if( m_resistor[i]->admit() == 0 )
+                    m_resistor[i]->setAdmit( m_admit );
             }
+            else if( m_resistor[i]->admit() != 0 )
+                m_resistor[i]->setAdmit( 0 );
         }
-        else if( m_resistor[i]->admit() != 0 ) 
+    }else
+    {
+        for( int i=0; i<m_channels; ++i )
         {
-            m_resistor[i]->setAdmit( 0 );
-            //qDebug() << "eMuxAnalog::setVChanged disconnecting:"<<i;
+            if( m_resistor[i]->admit() != 0 )
+                m_resistor[i]->setAdmit( 0 );
         }
     }
 }
@@ -124,24 +113,18 @@ void eMuxAnalog::setResist( double r )
 }
 
 void eMuxAnalog::setBits( int bits )
-{ 
-    std::stringstream si;
-    si << m_elmId << "-PinInput";
-    m_inputPin = new ePin( si.str(), 0 );
-    std::stringstream se;
-    se << m_elmId << "-PinEnable";
-    m_enablePin = new ePin( se.str(), 0 );
+{
+    m_inputPin  = new ePin( m_elmId+"-PinInput", 0 );
+    m_enablePin = new ePin( m_elmId+"-PinEnable", 0 );
     
     if( bits < 1 ) bits = 1;
     
     m_addrBits = bits;
     m_addrPin.resize( bits );
 
-    for( int i=0; i<m_addrBits; i++ )
+    for( int i=0; i<m_addrBits; ++i )
     {
-        std::stringstream ss;
-        ss << m_elmId << "-pinAddr" << i;
-        m_addrPin[i] = new ePin( ss.str(), i );
+        m_addrPin[i] = new ePin( m_elmId+"-pinAddr"+i, i );
     }
     m_channels = pow( 2, bits );
     m_resistor.resize( m_channels );
@@ -149,40 +132,15 @@ void eMuxAnalog::setBits( int bits )
     //m_ePin.resize( m_channels );
     setNumEpins( m_channels );
 
-    for( int i=0; i<m_channels; i++ )
+    for( int i=0; i<m_channels; ++i )
     {
-        std::stringstream ss;
-        ss << m_elmId << "-resistor" << i;
-        m_resistor[i] = new eResistor( ss.str() );
-        
+        m_resistor[i] = new eResistor( m_elmId+"-resistor"+i );
         m_resistor[i]->setEpin( 0, m_ePin[i] );
-        
-        std::stringstream sl;
-        sl<< m_elmId << "-pinY" << i;
-        m_chanPin[i] = new ePin( sl.str(), i );
+        m_chanPin[i] = new ePin( m_elmId+"-pinY"+i, i );
         m_resistor[i]->setEpin( 1, m_chanPin[i] );
-
         m_resistor[i]->setAdmit( 0 );
     }
+    Simulator::self()->addEvent( 0, NULL );
     //qDebug() << "eMuxAnalog::setBits"<<m_ePin.size();
-}
-
-ePin* eMuxAnalog::getEpin( QString pinName )
-{
-    //qDebug() << "eElement::getEpin" << pinName;
-    if     ( pinName == "PinInput")  return m_inputPin;
-    else if( pinName == "PinEnable") return m_enablePin;
-    
-    else if( pinName.contains("pinY") )
-    {
-        int pin = pinName.remove("pinY").toInt();
-        if( pin < m_channels ) return m_chanPin[pin];
-    }
-    else if( pinName.contains("pinAddr") ) 
-    {
-        int pin = pinName.remove("pinAddr").toInt();
-        if( pin < m_addrBits ) return m_addrPin[pin];
-    }
-    return 0l;
 }
 

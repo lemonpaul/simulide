@@ -29,34 +29,31 @@ class PicTrisRegister;
 class PicPortRegister : public PortRegister
 {
 public:
-  PicPortRegister(Processor *pCpu, const char *pName, const char *pDesc,
-                  /*const char *port_name, */
-                  uint numIopins, uint enableMask=0xff);
-  void setTris(PicTrisRegister *new_tris);
-  Register *getTris();
+    PicPortRegister(Processor *pCpu, const char *pName,
+                    uint numIopins, uint enableMask=0xff);
+    void setTris(PicTrisRegister *new_tris);
+    Register *getTris();
 protected:
-  PicTrisRegister *m_tris;
+    PicTrisRegister *m_tris;
 };
 
-class PicTrisRegister : public sfr_register
+class PicTrisRegister : public  SfrReg
 {
-
 public:
+    PicTrisRegister(Processor *pCpu, const char *pName,
+                    PicPortRegister *,bool bIgnoreWDTResets, uint nEnableMask=0xff);
+    virtual void put(uint new_value);
+    virtual void put_value(uint new_value);
+    virtual uint get();
+    virtual char get3StateBit(uint bitMask);
+    void setEnableMask(uint);
+    uint getEnableMask() { return m_EnableMask; }
+    void reset(RESET_TYPE r);
 
-  PicTrisRegister(Processor *pCpu, const char *pName, const char *pDesc,
-                  /*const char *tris_name, */
-                  PicPortRegister *,bool bIgnoreWDTResets, uint nEnableMask=0xff);
-  virtual void put(uint new_value);
-  virtual void put_value(uint new_value);
-  virtual uint get();
-  virtual char get3StateBit(uint bitMask);
-  void setEnableMask(uint);
-  uint getEnableMask() { return m_EnableMask; }
-  void reset(RESET_TYPE r);
 protected:
-  PicPortRegister *m_port;
-  uint m_EnableMask;
-  bool m_bIgnoreWDTResets;
+    PicPortRegister *m_port;
+    uint m_EnableMask;
+    bool m_bIgnoreWDTResets;
 };
 
 class INTCON;
@@ -67,34 +64,31 @@ class INTCON3;
 class PicPortBRegister : public PicPortRegister
 {
 public:
-  PicPortBRegister(Processor *pCpu, const char *pName, const char *pDesc,
-                   INTCON *pIntcon,
-                   uint numIopins, 
-		   uint enableMask=0xff,
-		   INTCON2 *pIntcon2 = NULL,
-		   INTCON3 *pIntcon3 = NULL
-		);
-  ~PicPortBRegister();
+    PicPortBRegister(Processor *pCpu, const char *pName, INTCON *pIntcon,
+                     uint numIopins, uint enableMask=0xff,
+                     INTCON2 *pIntcon2 = NULL, INTCON3 *pIntcon3 = NULL );
+    ~PicPortBRegister();
 
-  virtual void put(uint new_value);
-  virtual uint get();
-  virtual void setbit(uint bit_number, char new_value);
-  void setRBPU(bool);
-  void setIntEdge(bool);
-  void assignRBPUSink(uint bitPos, sfr_register *);
+    virtual void put(uint new_value);
+    virtual uint get();
+    virtual void setbit(uint bit_number, char new_value);
+    void setRBPU(bool);
+    void setIntEdge(bool);
+    void assignRBPUSink(uint bitPos,  SfrReg *);
+
 protected:
-  enum {
-    eIntEdge = 1<<6,
-    eRBPU    = 1<<7
-  };
-  bool m_bRBPU;
-  bool m_bIntEdge;
+    enum {
+        eIntEdge = 1<<6,
+        eRBPU    = 1<<7
+    };
+    bool m_bRBPU;
+    bool m_bIntEdge;
 
-  BitSink *m_bsRBPU;
-  INTCON  *m_pIntcon;
-  INTCON2  *m_pIntcon2;
-  INTCON3  *m_pIntcon3;
-  RegisterValue lastDrivenValue;
+    BitSink *m_bsRBPU;
+    INTCON  *m_pIntcon;
+    INTCON2  *m_pIntcon2;
+    INTCON3  *m_pIntcon3;
+    RegisterValue lastDrivenValue;
 };
 
 class IOC;
@@ -108,38 +102,36 @@ class IOCxF;
 //	 
 class PicPortGRegister : public PicPortBRegister
 {
- 
 public:
-  INTCON *m_pIntcon;
-  IOC	 *m_pIoc;
-  uint intf_bit;	// port bit that can trigger intf interrupt
+    INTCON *m_pIntcon;
+    IOC	 *m_pIoc;
+    uint intf_bit;	// port bit that can trigger intf interrupt
 
-  PicPortGRegister(Processor *pCpu, const char *pName, const char *pDesc,
-                   INTCON *pIntcon, IOC *pIoc,
-                   uint numIopins, uint enableMask=0x3f);
+    PicPortGRegister(Processor *pCpu, const char *pName  ,
+                     INTCON *pIntcon, IOC *pIoc,
+                     uint numIopins, uint enableMask=0x3f);
 
-  virtual void setbit(uint bit_number, char new3State);
-  virtual void setIOCif();
-
+    virtual void setbit(uint bit_number, char new3State);
+    virtual void setIOCif();
 };
+
 class PicPortIOCRegister : public PicPortBRegister
 {
- 
 public:
-  INTCON *m_pIntcon;
-  IOC    *m_Iocap;	// pins which can cause interrupts on positive edge
-  IOC    *m_Iocan;	// pins which can cause interrupts on negative edge
-  IOCxF  *m_Iocaf;	// which pins triggered interrupt
+    INTCON *m_pIntcon;
+    IOC    *m_Iocap;	// pins which can cause interrupts on positive edge
+    IOC    *m_Iocan;	// pins which can cause interrupts on negative edge
+    IOCxF  *m_Iocaf;	// which pins triggered interrupt
 
-  PicPortIOCRegister(Processor *pCpu, const char *pName, const char *pDesc,
-                   INTCON *pIntcon, IOC *pIocap, IOC *pIocan, IOCxF *pIocaf,
-                   uint numIopins, uint enableMask=0x3f)
-	: PicPortBRegister(pCpu, pName, pDesc, pIntcon, numIopins, enableMask),
-	m_pIntcon(pIntcon), m_Iocap(pIocap), m_Iocan(pIocan), m_Iocaf(pIocaf)
-  {
-  }
+    PicPortIOCRegister(Processor *pCpu, const char *pName,
+                       INTCON *pIntcon, IOC *pIocap, IOC *pIocan, IOCxF *pIocaf,
+                       uint numIopins, uint enableMask=0x3f)
+        : PicPortBRegister( pCpu, pName, pIntcon, numIopins, enableMask ),
+          m_pIntcon(pIntcon), m_Iocap(pIocap), m_Iocan(pIocan), m_Iocaf(pIocaf)
+    {
+    }
 
-  virtual void setbit(uint bit_number, char new3State);
+    virtual void setbit(uint bit_number, char new3State);
 };
 
 class PSP;
@@ -147,51 +139,45 @@ class PSP;
 class PicPSP_PortRegister : public PortRegister
 {
 public:
-  PicPSP_PortRegister(Processor *pCpu, const char *pName, const char *pDesc,
-                      /*const char *port_name, */
-                      uint numIopins, uint enableMask);
-  virtual void put(uint new_value);
-  virtual uint get();
-  void setPSP(PSP *pspReg) { m_psp = pspReg;}
-  void setTris(PicTrisRegister *new_tris);
-  Register *getTris();
+    PicPSP_PortRegister(Processor *pCpu, const char *pName, uint numIopins, uint enableMask);
+    virtual void put(uint new_value);
+    virtual uint get();
+    void setPSP(PSP *pspReg) { m_psp = pspReg;}
+    void setTris(PicTrisRegister *new_tris);
+    Register *getTris();
+
 protected:
-  PicTrisRegister *m_tris;
-  PSP           *m_psp;
+    PicTrisRegister *m_tris;
+    PSP           *m_psp;
 };
 
 class PicPSP_TrisRegister : public PicTrisRegister
 {
-
 public:
 
-  PicPSP_TrisRegister(Processor *pCpu, const char *pName, const char *pDesc,
-                      /*const char *tris_name, */
-                      PicPortRegister *,bool bIgnoreWDTResets);
-  virtual void put(uint new_value);
-  virtual void put_value(uint new_value);
-  virtual uint get();
+    PicPSP_TrisRegister(Processor *pCpu, const char *pName, PicPortRegister *,bool bIgnoreWDTResets);
+    virtual void put(uint new_value);
+    virtual void put_value(uint new_value);
+    virtual uint get();
 };
 
 //------------------------------------------------------------------------
 // PicLatchRegister - 16bit-core devices
-class PicLatchRegister : public sfr_register
+class PicLatchRegister : public  SfrReg
 {
 public:
-  virtual void put(uint new_value);
-  virtual void put_value(uint new_value);
-  virtual uint get();
-  virtual void setbit(uint bit_number, char new_value);
+    virtual void put(uint new_value);
+    virtual void put_value(uint new_value);
+    virtual uint get();
+    virtual void setbit(uint bit_number, char new_value);
 
-  virtual void setEnableMask(uint nEnableMask);
+    virtual void setEnableMask(uint nEnableMask);
 
-  PicLatchRegister(Processor *pCpu, const char *pName, const char *pDesc,
-                   /*const char *, */
-                   PortRegister *,uint nEnableMask=0xff);
+    PicLatchRegister(Processor *pCpu, const char *pName, PortRegister *,uint nEnableMask=0xff);
 
 protected:
-  PortRegister *m_port;
-  uint m_EnableMask;
+    PortRegister *m_port;
+    uint m_EnableMask;
 };
 
 #endif  // __PIC_IOPORTS_H__

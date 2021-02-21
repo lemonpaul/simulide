@@ -38,14 +38,17 @@ class MAINMODULE_EXPORT SwitchDip : public Component, public eElement
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
+        virtual QList<propGroup_t> propGroups() override;
+
         int  size();
         void setSize( int size );
 
         int  state();
         void setState( int state );
 
-        virtual void stamp();
-        virtual void updateStep();
+        virtual void stamp() override;
+        virtual void updateStep() override;
+        virtual void remove() override;
 
         void createSwitches( int c );
         void deleteSwitches( int d );
@@ -53,15 +56,11 @@ class MAINMODULE_EXPORT SwitchDip : public Component, public eElement
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
-        virtual void remove();
         void onbuttonclicked();
 
     private:
         QList<QPushButton*> m_buttons;
         QList<QGraphicsProxyWidget*> m_proxys;
-        std::vector<Pin*> m_pin;
-
-        bool m_changed;
 
         int m_size;
         int m_state;

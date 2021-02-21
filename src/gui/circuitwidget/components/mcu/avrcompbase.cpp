@@ -17,37 +17,41 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-
 #include "avrcompbase.h"
 #include "avr_twi.h"
 
-
 AvrCompBase::AvrCompBase( QObject* parent, QString type, QString id )
            : McuComponent( parent, type, id )
+           , m_avr( this )
            , m_avrI2C("avrI2C")
 {
+    m_processor = &m_avr;
+    createRamTable();
+
     m_avrI2C.setEnabled( false );
     m_avrI2C.setComponent( this );
-    m_sda = 0l;
-    m_scl = 0l;
+    m_i2cInIrq = NULL;
+    m_twenIrq = NULL;
+    m_sda = NULL;
+    m_scl = NULL;
 }
 AvrCompBase::~AvrCompBase() { }
 
-/*void AvrCompBase::remove()
+QList<propGroup_t> AvrCompBase::propGroups()
 {
-
-}*/
+    QList<propGroup_t> pg = McuComponent::propGroups();
+    pg.first().propList.append( {"Init_gdb", tr("Init gdb server at restart"),""} );
+    return pg;
+}
 
 void AvrCompBase::attachPins()
-{
-    AvrProcessor* ap = dynamic_cast<AvrProcessor*>( m_processor );
-    avr_t* cpu = ap->getCpu();
+{;
+    avr_t* cpu = m_avr.getCpu();
 
     for( int i = 0; i < m_numpins; i++ )
     {
         AVRComponentPin *pin = dynamic_cast<AVRComponentPin*>( m_pinList[i] );
-        pin->attach( cpu );
+        pin->attachPin( cpu );
     }
     cpu->vcc  = 5000;
     cpu->avcc = 5000;
@@ -63,7 +67,7 @@ void AvrCompBase::attachPins()
         avr_irq_register_notify( i2cOutIrq, i2c_out_hook, this );
 
         // TWEN change irq
-        int twcrAddr = BaseProcessor::self()->getRegAddress( "TWCR" );
+        int twcrAddr = m_avr.getRegAddress( "TWCR" );
         if( twcrAddr < 0 ) qDebug()<<"AvrCompBase::attachPins: TWCR Register Not found";
         else
         {
@@ -71,8 +75,8 @@ void AvrCompBase::attachPins()
             m_avrI2C.setInput( 0, m_sda );         // Input SDA
             m_avrI2C.setClockPin( m_scl );         // Input SCL
 
-            avr_irq_t* twenIrq = avr_iomem_getirq( cpu, twcrAddr, 0l, 2 );
-            avr_irq_register_notify( twenIrq, twen_hook, this );
+            m_twenIrq = avr_iomem_getirq( cpu, twcrAddr, 0l, 2 );
+            avr_irq_register_notify( m_twenIrq, twen_hook, this );
 
             m_i2cInIrq = avr_io_getirq( cpu, AVR_IOCTL_TWI_GETIRQ(0), TWI_IRQ_INPUT);
         }
@@ -80,7 +84,8 @@ void AvrCompBase::attachPins()
     m_attached = true;
 }
 
-void AvrCompBase::addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle )
+void AvrCompBase::addPin( QString id, QString type, QString label,
+                          int pos, int xpos, int ypos, int angle, int length )
 {
     if( m_initialized )
     {
@@ -101,6 +106,17 @@ void AvrCompBase::addPin( QString id, QString type, QString label, int pos, int 
         ty = getType( type, "scl" );
         if( !ty.isEmpty() ) m_scl = newPin;
     }
+}
+
+void AvrCompBase::reset()
+{
+    McuComponent::reset();
+    if( m_twenIrq )
+    {
+        m_twenIrq->flags  |= IRQ_FLAG_INIT;
+        m_i2cInIrq->flags |= IRQ_FLAG_INIT;
+    }
+    m_avrI2C.setEnabled( false );
 }
 
 QString AvrCompBase::getType( QString type, QString t )
@@ -147,7 +163,7 @@ void AvrCompBase::i2cOut( uint32_t value )
     }
     else if( msg & TWI_COND_STOP )
     {
-        m_avrI2C.masterStop();
+        m_avrI2C.I2Cstop();
     }
     else if( msg & TWI_COND_READ )
     {
@@ -192,14 +208,13 @@ void AvrCompBase::twenChanged( uint32_t value )
     if( value )
     {
         m_avrI2C.setEnabled( true );
-        m_avrI2C.setMaster( true );
         m_sda->enableIO( false );
         m_scl->enableIO( false );
 
         double i2cFreq = 4e5;
 
-        int twbr = BaseProcessor::self()->getRamValue( "TWBR" );
-        int twsr = BaseProcessor::self()->getRamValue( "TWSR" );
+        int twbr = m_processor->getRamValue( "TWBR" );
+        int twsr = m_processor->getRamValue( "TWSR" );
 
         if( (twbr<0) || (twsr<0) ) qDebug() << "AvrCompBase::twenChanged: TWBR or TWSR not found";
         else                       // Calculate Prescaler and Frequency
@@ -208,14 +223,13 @@ void AvrCompBase::twenChanged( uint32_t value )
             double dpr = 16+2*twbr*pr;
             i2cFreq = this->freq()*1e6/dpr;
         }
-        m_avrI2C.setFreq( i2cFreq );
+        m_avrI2C.setFreq( i2cFreq/1e3 ); // Freq in KHz
 
         qDebug() << "AvrCompBase::twenChanged i2cFreq:" << i2cFreq;
     }
-    else
+    else // Disable I2C
     {
         m_avrI2C.setEnabled( false );
-        m_avrI2C.setMaster( false );
         m_sda->enableIO( true );
         m_scl->enableIO( true );
     }
@@ -223,14 +237,18 @@ void AvrCompBase::twenChanged( uint32_t value )
 
 bool AvrCompBase::initGdb()
 {
-    AvrProcessor* ap = dynamic_cast<AvrProcessor*>( m_processor );
-    return ap->initGdb();
+    return m_avr.initGdb();
 }
 
 void AvrCompBase::setInitGdb( bool init )
 {
-    AvrProcessor* ap = dynamic_cast<AvrProcessor*>( m_processor );
-    ap->setInitGdb( init );
+    m_avr.setInitGdb( init );
+}
+
+void AvrCompBase::crash()
+{
+    m_crashed = true;
+    m_warning = 100 ;
 }
 
 #include "moc_avrcompbase.cpp"

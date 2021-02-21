@@ -48,13 +48,7 @@ Node::~Node(){}
 
 void Node::inStateChanged( int rem ) // Called by pin
 {
-    if( rem == 1 ) remove();
-    /*else if( rem == 0 )
-    {
-        for( int i=0; i< 3; i++)
-            if( m_pin[i]->isConnected() ) m_pin[i]->findConnectedPins();
-
-    }*/
+    if     ( rem == 1 ) remove();
     else if( rem == 2 ) // Propagate Is Bus
     {
         for( int i=0; i< 3; i++) m_pin[i]->setIsBus( true );
@@ -90,11 +84,10 @@ void Node::remove() // Only remove if there are less than 3 connectors
         if( conectors == 2 ) joinConns( con[0], con[1] );  // 2 Conn
         else                                               // 1 Conn
         {
-             if( m_pin[con[0]]->isConnected() ) m_pin[con[0]]->connector()->remove();
+             if( m_pin[con[0]]->connector() ) m_pin[con[0]]->connector()->remove();
         }
-        
         Circuit::self()->compList()->removeOne( this );
-        Circuit::self()->removeItem( this );
+        if( this->scene() ) Circuit::self()->removeItem( this );
     }
 }
 

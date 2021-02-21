@@ -27,12 +27,12 @@ class MAINMODULE_EXPORT eMosfet : public eResistor
 {
     public:
 
-        eMosfet( std::string id );
+        eMosfet( QString id );
         ~eMosfet();
 
-        virtual void stamp();
-        virtual void resetState();
-        virtual void setVChanged();
+        virtual void stamp() override;
+        virtual void initialize() override;
+        virtual void voltChanged() override;
         
         virtual bool pChannel();
         virtual void setPchannel( bool pc );
@@ -45,9 +45,6 @@ class MAINMODULE_EXPORT eMosfet : public eResistor
         
         virtual double threshold();
         virtual void  setThreshold( double th );
-        
-        virtual ePin* getEpin( QString pinName );
-        virtual void initEpins();
         
     protected:
         double m_accuracy;
@@ -62,7 +59,8 @@ class MAINMODULE_EXPORT eMosfet : public eResistor
         bool m_Pchannel;
         bool m_depletion;
         bool m_Sfollow;
-        bool m_converged;
+        //bool m_converged;
+        bool m_firtStage;
 };
 
 #endif

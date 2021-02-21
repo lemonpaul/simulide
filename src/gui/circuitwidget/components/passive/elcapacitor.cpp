@@ -43,9 +43,9 @@ elCapacitor::elCapacitor( QObject* parent, QString type, QString id )
 }
 elCapacitor::~elCapacitor(){}
 
-void elCapacitor::resetState()
+void elCapacitor::initialize()
 {
-    eCapacitor::resetState();
+    eCapacitor::initialize();
     m_reversed = false;
     m_counter = 0;
     update();

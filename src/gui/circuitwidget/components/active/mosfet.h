@@ -42,15 +42,16 @@ class MAINMODULE_EXPORT Mosfet : public Component, public eMosfet
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
         
-        void updateStep();
+        virtual QList<propGroup_t> propGroups() override;
+
+        virtual void updateStep() override;
+        virtual void remove() override;
         
         void setPchannel( bool pc );
         void setDepletion( bool dep );
         
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-        
-    public slots:
-        void remove();
+
 };
 
 #endif

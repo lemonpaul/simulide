@@ -43,9 +43,12 @@ extern avr_kind_t mega2560;
 extern avr_kind_t mega16;
 extern avr_kind_t mega64;
 extern avr_kind_t mega328;
+extern avr_kind_t mega328pb;
 extern avr_kind_t tiny2313;
 extern avr_kind_t tiny13;
 extern avr_kind_t mega16m1;
+extern avr_kind_t mega32m1;
+extern avr_kind_t mega64m1;
 extern avr_kind_t mega324a;
 extern avr_kind_t mega32u4;
 extern avr_kind_t mega644;
@@ -57,41 +60,43 @@ extern avr_kind_t mega32;
 extern avr_kind_t * avr_kind[];
 
 avr_kind_t * avr_kind[] = {
-	&mega164,
-	&tiny45,
-	&tiny85,
-	&mega324,
-	&mega1284,
-	&mega1280,
-	&tiny84,
-	&mega168,
-	&mega1281,
-	&tiny24,
-	&mega169p,
-	&mega128rfr2,
-	&tiny2313a,
-	&mega88,
-	&tiny4313,
-	&usb162,
-	&mega128rfa1,
-	&mega8,
-	&tiny25,
-	&mega2560,
-	&mega16,
-	&mega64,
-	&mega328,
-	&tiny2313,
-	&tiny13,
-	&mega16m1,
-	&mega324a,
-	&mega32u4,
-	&mega644,
-	&usb162,
-	&tiny44,
-	&mega128,
-	&mega48,
-	&mega32,
-	NULL
+    &mega164,
+    &tiny45,
+    &tiny85,
+    &mega324,
+    &mega1284,
+    &mega1280,
+    &tiny84,
+    &mega168,
+    &mega1281,
+    &tiny24,
+    &mega169p,
+    &mega128rfr2,
+    &tiny2313a,
+    &mega88,
+    &tiny4313,
+    &usb162,
+    &mega128rfa1,
+    &mega8,
+    &tiny25,
+    &mega2560,
+    &mega16,
+    &mega64,
+    &mega328,
+    &tiny2313,
+    &tiny13,
+    &mega16m1,
+    &mega32m1,
+    &mega64m1,
+    &mega324a,
+    &mega32u4,
+    &mega644,
+    &usb162,
+    &tiny44,
+    &mega128,
+    &mega48,
+    &mega32,
+    NULL
 };
 
 #endif

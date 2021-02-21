@@ -22,6 +22,7 @@
 #include "logiccomponent.h"
 
 static const char* LogicComponent_properties[] = {
+    QT_TRANSLATE_NOOP("App::Property","Propagation Delay ns"),
     QT_TRANSLATE_NOOP("App::Property","Input High V"),
     QT_TRANSLATE_NOOP("App::Property","Input Low V"),
     QT_TRANSLATE_NOOP("App::Property","Input Imped"),
@@ -50,9 +51,29 @@ LogicComponent::LogicComponent( QObject* parent, QString type, QString id )
     
     m_numInPins  = 0;
     m_numOutPins = 0;
+
+    m_trigPin = 0l;
 }
-LogicComponent::~LogicComponent()
+LogicComponent::~LogicComponent(){}
+
+QList<propGroup_t> LogicComponent::propGroups()
 {
+    propGroup_t elecGroup { tr("Electric") };
+    elecGroup.propList.append( {"", tr("Inputs:"),""} );
+    elecGroup.propList.append( {"Input_High_V", tr("Low to High Threshold"),"V"} );
+    elecGroup.propList.append( {"Input_Low_V", tr("High to Low Threshold"),"V"} );
+    elecGroup.propList.append( {"Input_Imped", tr("Input Impedance"),"Ω"} );
+    elecGroup.propList.append( {"", tr("Outputs:"),""} );
+    elecGroup.propList.append( {"Out_High_V", tr("Output High Voltage"),"V"} );
+    elecGroup.propList.append( {"Out_Low_V", tr("Output Low Voltage"),"V"} );
+    elecGroup.propList.append( {"Out_Imped", tr("Output Impedance"),"Ω"} );
+
+    propGroup_t edgeGroup { tr("Edges") };
+    edgeGroup.propList.append( {"Tpd_ps", tr("Propagation Delay"),"ps"} );
+    edgeGroup.propList.append( {"Tr_ps", tr("Rise Time"),"ps"} );
+    edgeGroup.propList.append( {"Tf_ps", tr("Fall Time"),"ps"} );
+
+    return {elecGroup, edgeGroup};
 }
 
 void LogicComponent::init( QStringList pins )
@@ -78,7 +99,7 @@ void LogicComponent::init( QStringList pins )
     for( QString input : inputs )
     {
         // Example input = "L02Name"
-        QString pin = input.left(3);        // Pin position
+        QString pin   = input.left(3);      // Pin position
         QString label = input.remove(0,3);  // Pin name
 
         m_inPin[i] = createPin( pin, m_id+"-in"+QString::number(i) );
@@ -92,7 +113,7 @@ void LogicComponent::init( QStringList pins )
     for( QString output : outputs )
     {
         // Example output = "L02Name"
-        QString pin = output.left(3);        // Pin position
+        QString pin   = output.left(3);      // Pin position
         QString label = output.remove(0,3);  // Pin name
 
         m_outPin[i] = createPin( pin, m_id+"-out"+QString::number(i) );
@@ -129,11 +150,11 @@ Pin* LogicComponent::createPin( QString data, QString pinId )
     {
         angle = 270;
         x = m_area.x() + num*8;
-        y = m_area.height()/2 + 8;
+        y = m_area.y() + m_height*8 + 8;
     }
     else if( pos == "R")    // Right
     {
-        x = m_area.width()/2 + 8;
+        x = m_area.x() + m_width*8+8;
         y = m_area.y() + num*8;
     }
     Pin* pin = new Pin( angle, QPoint( x, y ), pinId, 0, this );
@@ -186,6 +207,7 @@ void LogicComponent::setNumOuts( int outPins )
     m_outPin.resize( outPins );
     
     m_numOutPins = outPins;
+    Circuit::self()->update();
 }
 
 void LogicComponent::deleteInputs( int inputs )
@@ -216,6 +238,29 @@ void LogicComponent::deleteOutputs( int outputs )
     }
     m_numOutPins -= outputs;
     m_outPin.resize( m_numOutPins );
+}
+
+void LogicComponent::setTrigger( Trigger trigger )
+{
+    m_trigger = trigger;
+
+    if( trigger == None )
+    {
+        if( m_trigPin->connector() ) m_trigPin->connector()->remove();
+        m_trigPin->reset();
+        m_trigPin->setLabelText( "" );
+        m_trigPin->setVisible( false );
+    }
+    else if( trigger == Clock )
+    {
+        m_trigPin->setLabelText( ">" );
+        m_trigPin->setVisible( true );
+    }
+    else if( trigger == InEnable )
+    {
+        m_trigPin->setLabelText( " IE" );
+        m_trigPin->setVisible( true );
+    }
 }
 
 void LogicComponent::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

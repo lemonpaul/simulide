@@ -36,7 +36,7 @@ LibraryItem* DAC::libraryItem()
 
 DAC::DAC( QObject* parent, QString type, QString id )
    : LogicComponent( parent, type, id )
-   , eDAC( id.toStdString() )
+   , eDAC( id )
 {    
     m_width  = 4;
     m_height = 9;
@@ -52,7 +52,18 @@ DAC::DAC( QObject* parent, QString type, QString id )
                           
     eLogicDevice::createOutput( m_outPin[0] );
 }
-DAC::~DAC(){
+DAC::~DAC(){}
+
+QList<propGroup_t> DAC::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Num_Bits", tr("Size"),"Bits"} );
+    mainGroup.propList.append( {"Vref", tr("Reference Voltage"),"V"} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    for( int i=0;i<4; ++i ) pg.first().propList.removeLast(); //remove Outputs.
+    pg.prepend( mainGroup );
+    return pg;
 }
 
 void DAC::setNumInps( int inputs )
@@ -73,7 +84,7 @@ void DAC::setNumInps( int inputs )
 
         eLogicDevice::createInput( m_inPin[i] );
     }
-    m_maxAddr = pow( 2, m_numInputs )-1;
+    m_maxValue = pow( 2, m_numInputs )-1;
 
     m_height = inputs+1;
     m_area = QRect( -(m_width/2)*8, -m_height*8+8, m_width*8, m_height*8 );

@@ -41,7 +41,7 @@ LibraryItem* Diode::libraryItem()
 
 Diode::Diode( QObject* parent, QString type, QString id )
      : Component( parent, type, id )
-     , eDiode( id.toStdString() )
+     , eDiode( id )
 {
     Q_UNUSED( Diode_properties );
 
@@ -61,6 +61,14 @@ Diode::Diode( QObject* parent, QString type, QString id )
     m_ePin[1] = m_pin[1];
 }
 Diode::~Diode(){}
+
+QList<propGroup_t> Diode::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Threshold", tr("Threshold"),"V"} );
+    mainGroup.propList.append( {"Zener_Volt", tr("Zener Voltage"),"V"} );
+    return {mainGroup};
+}
 
 void Diode::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {

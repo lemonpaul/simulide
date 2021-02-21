@@ -45,6 +45,8 @@ class MAINMODULE_EXPORT ComponentSelector : public QTreeWidget
 
         void mouseReleaseEvent(QMouseEvent*);
 
+        void search( QString filter );
+
     private slots:
         void slotItemClicked( QTreeWidgetItem* item, int column );
         void slotContextMenu(const QPoint&);

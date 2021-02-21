@@ -26,21 +26,16 @@ class MAINMODULE_EXPORT eBus : public eElement
 {
     public:
 
-        eBus( std::string id  );
+        eBus( QString id  );
         ~eBus();
-
-        virtual void setVChanged();
         
         int numLines() { return m_numLines; }
-        virtual void initEpins();
         
         virtual void setNumLines( int lines );
         
         int startBit() { return m_startBit; }
         void setStartBit( int bit );
 
-        ePin* getEpin( QString pinName );
-                             
     protected:
         int m_numLines;
         int m_startBit;

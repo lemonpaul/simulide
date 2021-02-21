@@ -30,9 +30,7 @@
 
 DEFINE_FIFO(avr_int_vector_p, avr_int_pending);
 
-void
-avr_interrupt_init(
-		avr_t * avr )
+void avr_interrupt_init( avr_t * avr )
 {
 	avr_int_table_p table = &avr->interrupts;
 	memset(table, 0, sizeof(*table));
@@ -43,9 +41,7 @@ avr_interrupt_init(
 			AVR_INT_IRQ_COUNT, names);
 }
 
-void
-avr_interrupt_reset(
-		avr_t * avr )
+void avr_interrupt_reset( avr_t * avr )
 {
 	avr_int_table_p table = &avr->interrupts;
 
@@ -57,9 +53,7 @@ avr_interrupt_reset(
 }
 
 void
-avr_register_vector(
-		avr_t *avr,
-		avr_int_vector_t * vector)
+avr_register_vector( avr_t *avr, avr_int_vector_t * vector)
 {
 	if (!vector->vector)
 		return;
@@ -83,34 +77,23 @@ avr_register_vector(
 			vector->vector);
 }
 
-int
-avr_has_pending_interrupts(
-		avr_t * avr)
+int avr_has_pending_interrupts( avr_t * avr)
 {
 	avr_int_table_p table = &avr->interrupts;
 	return !avr_int_pending_isempty(&table->pending);
 }
 
-int
-avr_is_interrupt_pending(
-		avr_t * avr,
-		avr_int_vector_t * vector)
+int avr_is_interrupt_pending( avr_t * avr, avr_int_vector_t * vector)
 {
 	return vector->pending;
 }
 
-int
-avr_is_interrupt_enabled(
-		avr_t * avr,
-		avr_int_vector_t * vector)
+int avr_is_interrupt_enabled( avr_t * avr, avr_int_vector_t * vector)
 {
 	return avr_regbit_get(avr, vector->enable);
 }
 
-int
-avr_raise_interrupt(
-		avr_t * avr,
-		avr_int_vector_t * vector)
+int avr_raise_interrupt( avr_t * avr, avr_int_vector_t * vector)
 {
 	if (!vector || !vector->vector)
 		return 0;
@@ -155,15 +138,12 @@ avr_raise_interrupt(
 	return 1;
 }
 
-void
-avr_clear_interrupt(
-		avr_t * avr,
-		avr_int_vector_t * vector)
+void avr_clear_interrupt( avr_t* avr, avr_int_vector_t* vector)
 {
-	if (!vector)
-		return;
-	if (vector->trace)
-		printf("IRQ%d cleared\n", vector->vector);
+    if (!vector) return;
+
+    if (vector->trace) printf("IRQ%d cleared\n", vector->vector);
+
 	vector->pending = 0;
 
 	avr_raise_irq(vector->irq + AVR_INT_IRQ_PENDING, 0);
@@ -177,26 +157,22 @@ avr_clear_interrupt(
 		avr_regbit_clear(avr, vector->raised);
 }
 
-int
-avr_clear_interrupt_if(
-		avr_t * avr,
-		avr_int_vector_t * vector,
-		uint8_t old)
+int avr_clear_interrupt_if( avr_t* avr, avr_int_vector_t* vector, uint8_t old )
 {
-	avr_raise_irq(avr->interrupts.irq + AVR_INT_IRQ_PENDING,
-			avr_has_pending_interrupts(avr));
-	if (avr_regbit_get(avr, vector->raised)) {
-		avr_clear_interrupt(avr, vector);
+    avr_raise_irq(avr->interrupts.irq + AVR_INT_IRQ_PENDING, avr_has_pending_interrupts(avr));
+
+    if( avr_regbit_get( avr, vector->raised ))
+    {
+        avr_clear_interrupt( avr, vector );
 		return 1;
 	}
-	avr_regbit_setto(avr, vector->raised, old);
+
+    avr_regbit_setto( avr, vector->raised, old );
+
 	return 0;
 }
 
-avr_irq_t *
-avr_get_interrupt_irq(
-		avr_t * avr,
-		uint8_t v)
+avr_irq_t* avr_get_interrupt_irq( avr_t * avr, uint8_t v)
 {
 	avr_int_table_p table = &avr->interrupts;
 	if (v == AVR_INT_ANY)
@@ -208,9 +184,7 @@ avr_get_interrupt_irq(
 }
 
 /* this is called uppon RETI. */
-void
-avr_interrupt_reti(
-		struct avr_t * avr)
+void avr_interrupt_reti( struct avr_t * avr)
 {
 	avr_int_table_p table = &avr->interrupts;
 	if (table->running_ptr) {
@@ -228,9 +202,7 @@ avr_interrupt_reti(
  * check whether interrupts are pending. If so, check if the interrupt "latency" is reached,
  * and if so triggers the handlers and jump to the vector.
  */
-void
-avr_service_interrupts(
-		avr_t * avr)
+void avr_service_interrupts( avr_t * avr)
 {
 	if (!avr->sreg[S_I] || !avr->interrupt_state)
 		return;
@@ -258,8 +230,7 @@ avr_service_interrupts(
 	}
 	avr_int_vector_t * vector = avr_int_pending_read_at(&table->pending, mini);
 
-	// now move the one at the front of the fifo in the slot of
-	// the one we service
+    // now move the one at the front of the fifo in the slot of the one we service
 	table->pending.buffer[(table->pending.read + mini) % avr_int_pending_fifo_size] =
 			avr_int_pending_read(&table->pending);
 	avr_raise_irq(avr->interrupts.irq + AVR_INT_IRQ_PENDING,

@@ -17,62 +17,55 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-
 #include "e-bcdtodec.h"
+#include "simulator.h"
 
-eBcdToDec::eBcdToDec( std::string id )
+eBcdToDec::eBcdToDec( QString id )
          : eLogicDevice( id )
 {
 }
-eBcdToDec::~eBcdToDec()
-{ 
-}
+eBcdToDec::~eBcdToDec() {}
 
 void eBcdToDec::stamp()
 {
-    for( int i=0; i<4; i++ )
+    for( int i=0; i<4; ++i )
     {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedFast(this);
+        eNode* enode = m_input[i]->getEpin(0)->getEnode();
+        if( enode ) enode->voltChangedCallback( this );
     }
-    m_address = -1;
+    m_dec = -1;
 
     eLogicDevice::stamp();
 }
 
-void eBcdToDec::resetState()
+void eBcdToDec::initialize()
 {
-    eLogicDevice::resetState();
-    eLogicDevice::setOut( 0, true );
+    eLogicDevice::initialize();
+    setOut( 0, true );
+    m_old = -1;
 }
 
-void eBcdToDec::setVChanged()
+void eBcdToDec::voltChanged()
 {
     eLogicDevice::updateOutEnabled();
 
-    int address = 0;
+    m_dec = 0;
 
-    for( int i=0; i<4; i++ )
-    {
-        if( eLogicDevice::getInputState( i ) ) address += pow( 2, i );
-    }
-    if( address == m_address ) return;
-    m_address = address;
+    for( int i=0; i<4; ++i )
+        if( getInputState( i ) ) m_dec += pow( 2, i );
 
-    for( int i=0; i<16; i++ )
-    {
-        bool out = (i == address);
-        eLogicDevice::setOut( i, out );
-    }
+    Simulator::self()->addEvent( m_propDelay, this );
+}
+
+void eBcdToDec::runEvent()
+{
+    if( m_old >= 0 ) m_output[m_old]->setTimedOut( false );
+    if( m_dec >= 0 ) m_output[m_dec]->setTimedOut( true );
+
+    m_old = m_dec;
 }
 
 void eBcdToDec::set_16bits( bool set )
 {
     m_16Bits = set;
-}
-
-void eBcdToDec::createPins()
-{
-    eLogicDevice::createPins( 4, 16 );
 }

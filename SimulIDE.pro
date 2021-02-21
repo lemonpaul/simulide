@@ -16,10 +16,14 @@
  #   along with this program; if not, see <http://www.gnu.org/licenses/>.  #
  #                                                                         #
  ###########################################################################
- 
-VERSION     = "0.4.13"
+
+
+VERSION = "0.5.16"
+RELEASE = "-RC1"
 
 TEMPLATE = app
+
+TARGET = simulide
 
 QT += svg
 QT += xml
@@ -39,17 +43,18 @@ SOURCES += ../src/*.cpp \
     ../src/gui/circuitwidget/components/meters/*.cpp \
     ../src/gui/circuitwidget/components/other/*.cpp \
     ../src/gui/circuitwidget/components/outputs/*.cpp \
+    ../src/gui/circuitwidget/components/outputs/displays/*.cpp \
     ../src/gui/circuitwidget/components/passive/*.cpp \
     ../src/gui/circuitwidget/components/sources/*.cpp \
     ../src/gui/circuitwidget/components/switches/*.cpp \
-    ../src/gui/oscopewidget/*.cpp \
-    ../src/gui/plotterwidget/*.cpp \
+    ../src/gui/dataplotwidget/*.cpp \
     ../src/gui/terminalwidget/*.cpp \
-    ../src/gui/QPropertyEditor/*.cpp \
     ../src/gui/componentselector/*.cpp \
     ../src/gui/filebrowser/*.cpp \
     ../src/gui/editorwidget/*.cpp \
     ../src/gui/editorwidget/findreplacedialog/*.cpp \
+    ../src/gui/dialogs/*.cpp \
+    ../src/gui/dialogs/components/*.cpp \
     ../src/simulator/*.cpp \
     ../src/simulator/elements/*.cpp \
     ../src/simulator/elements/active/*.cpp \
@@ -62,7 +67,13 @@ SOURCES += ../src/*.cpp \
     ../src/gpsim/*.cc \
     ../src/gpsim/devices/*.cc \
     ../src/gpsim/modules/*.cc \
-    ../src/gpsim/registers/*.cc
+    ../src/gpsim/registers/*.cc \
+    ../src/mcusim/*.cpp \
+    ../src/mcusim/cores/*.cpp \
+    ../src/mcusim/cores/avr/*.cpp \
+    ../src/mcusim/cores/i51/*.cpp \
+    ../src/mcusim/cores/pic/*.cpp \
+    ../src/mcusim/modules/*.cpp
 
 HEADERS += ../src/*.h \
     ../src/gui/*.h \
@@ -74,17 +85,18 @@ HEADERS += ../src/*.h \
     ../src/gui/circuitwidget/components/meters/*.h \
     ../src/gui/circuitwidget/components/other/*.h \
     ../src/gui/circuitwidget/components/outputs/*.h \
+    ../src/gui/circuitwidget/components/outputs/displays/*.h \
     ../src/gui/circuitwidget/components/passive/*.h \
     ../src/gui/circuitwidget/components/sources/*.h \
     ../src/gui/circuitwidget/components/switches/*.h \
-    ../src/gui/oscopewidget/*.h \
-    ../src/gui/plotterwidget/*.h \
+    ../src/gui/dataplotwidget/*.h \
     ../src/gui/terminalwidget/*.h \
-    ../src/gui/QPropertyEditor/*.h \
     ../src/gui/componentselector/*.h \
     ../src/gui/filebrowser/*.h \
     ../src/gui/editorwidget/*.h \
     ../src/gui/editorwidget/findreplacedialog/*.h \
+    ../src/gui/dialogs/*.h \
+    ../src/gui/dialogs/components/*.h \
     ../src/simulator/*.h \
     ../src/simulator/elements/*.h \
     ../src/simulator/elements/active/*.h \
@@ -99,7 +111,13 @@ HEADERS += ../src/*.h \
     ../src/gpsim/*.h \
     ../src/gpsim/devices/*.h \
     ../src/gpsim/modules/*.h \
-    ../src/gpsim/registers/*.h
+    ../src/gpsim/registers/*.h \
+    ../src/mcusim/*.h \
+    ../src/mcusim/cores/*.h \
+    ../src/mcusim/cores/avr/*.h \
+    ../src/mcusim/cores/i51/*.h \
+    ../src/mcusim/cores/pic/*.h \
+    ../src/mcusim/modules/*.h
 
 INCLUDEPATH += ../src \
     ../src/gui \
@@ -111,17 +129,18 @@ INCLUDEPATH += ../src \
     ../src/gui/circuitwidget/components/meters \
     ../src/gui/circuitwidget/components/other \
     ../src/gui/circuitwidget/components/outputs \
+    ../src/gui/circuitwidget/components/outputs/displays \
     ../src/gui/circuitwidget/components/passive \
     ../src/gui/circuitwidget/components/sources \
     ../src/gui/circuitwidget/components/switches \
-    ../src/gui/oscopewidget \
-    ../src/gui/plotterwidget \
+    ../src/gui/dataplotwidget \
     ../src/gui/terminalwidget \
-    ../src/gui/QPropertyEditor \
     ../src/gui/componentselector \
     ../src/gui/filebrowser \
     ../src/gui/editorwidget \
     ../src/gui/editorwidget/findreplacedialog \
+    ../src/gui/dialogs \
+    ../src/gui/dialogs/components \
     ../src/simulator \
     ../src/simulator/elements \
     ../src/simulator/elements/active \
@@ -136,58 +155,145 @@ INCLUDEPATH += ../src \
     ../src/gpsim \
     ../src/gpsim/devices \
     ../src/gpsim/modules \
-    ../src/gpsim/registers
+    ../src/gpsim/registers \
+    ../src/mcusim \
+    ../src/mcusim/cores \
+    ../src/mcusim/cores/avr \
+    ../src/mcusim/cores/i51 \
+    ../src/mcusim/cores/pic \
+    ../src/mcusim/modules
 
 TRANSLATIONS +=  \
     ../resources/translations/simulide.ts \
+    ../resources/translations/simulide_de.ts \
     ../resources/translations/simulide_en.ts \
     ../resources/translations/simulide_es.ts \
     ../resources/translations/simulide_fr.ts \
-    ../resources/translations/simulide_ru.ts 
+    ../resources/translations/simulide_pt_BR.ts \
+    ../resources/translations/simulide_ru.ts \
+    ../resources/translations/simulide_nl.ts \
+    ../resources/translations/simulide_it.ts
+
+FORMS +=   \
+    ../src/gui/dialogs/*.ui \
+    ../src/gui/dialogs/components/*.ui \
+    ../src/gui/dataplotwidget/*.ui
 
 RESOURCES = ../src/application.qrc
 
+QMAKE_CXXFLAGS += -Wno-unused-parameter
+QMAKE_CXXFLAGS += -Wno-missing-field-initializers
+QMAKE_CXXFLAGS += -Wno-implicit-fallthrough
+QMAKE_CXXFLAGS -= -fPIC
+QMAKE_CXXFLAGS += -fno-pic
+QMAKE_CXXFLAGS += -Ofast
 QMAKE_CXXFLAGS_DEBUG -= -O
 QMAKE_CXXFLAGS_DEBUG -= -O1
 QMAKE_CXXFLAGS_DEBUG -= -O2
 QMAKE_CXXFLAGS_DEBUG -= -O3
 QMAKE_CXXFLAGS_DEBUG += -O0
-QMAKE_CXXFLAGS_RELEASE -= -O
-QMAKE_CXXFLAGS_RELEASE -= -O1
-QMAKE_CXXFLAGS_RELEASE -= -O2
-QMAKE_CXXFLAGS_RELEASE *= -O3
 
 QMAKE_CFLAGS += --std=gnu11
+QMAKE_CFLAGS += -Wno-unused-result
+QMAKE_CFLAGS += -Wno-unused-parameter
+QMAKE_CFLAGS += -Wno-missing-field-initializers
+QMAKE_CFLAGS += -Wno-implicit-function-declaration
+QMAKE_CFLAGS += -Wno-implicit-fallthrough
+QMAKE_CFLAGS += -Wno-int-conversion
+QMAKE_CFLAGS += -Wno-sign-compare
+QMAKE_CFLAGS += -Ofast
+QMAKE_CFLAGS -= -fPIC
+QMAKE_CFLAGS += -fno-pic
+QMAKE_CFLAGS_DEBUG -= -O
+QMAKE_CFLAGS_DEBUG -= -O1
+QMAKE_CFLAGS_DEBUG -= -O2
+QMAKE_CFLAGS_DEBUG -= -O3
+QMAKE_CFLAGS_DEBUG += -O0
 
-QMAKE_LIBS += -lelf
+win32 {
+    OS = Windows
+    INCLUDEPATH += deps/libelf \
+                   deps
+    QMAKE_LIBS += -lwsock32
+    LIBS +=  deps/libelf.a
+    RC_ICONS += ../src/icons/simulide.ico
+}
+linux {
+    OS = Linux
+    QMAKE_LIBS += -lelf
+    QMAKE_LFLAGS += -no-pie
+}
+macx {
+    OS = MacOs
+    INCLUDEPATH += \
+        /usr/local/Cellar/libelf/0.8.13_1/include \
+        /usr/local/Cellar/libelf/0.8.13_1/include/libelf
+    
+    LIBS += /usr/local/lib/libelf.a
+    QMAKE_LFLAGS += -no-pie
+    ICON = ../src/icons/simulide.icns
+}
 
 CONFIG += qt 
 CONFIG += warn_on
 CONFIG += no_qml_debug
 CONFIG *= c++11
-CONFIG += lrelease
 
 DEFINES += MAINMODULE_EXPORT=
-DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+DEFINES += APP_VERSION=\\\"$$VERSION$$RELEASE\\\"
 
-TARGET_NAME = SimulIDE_$$VERSION$$
+TARGET_NAME   = SimulIDE_$$VERSION$$RELEASE$$
+TARGET_PREFIX = $$BUILD_DIR/executables/$$TARGET_NAME
 
-TARGET = simulide
+OBJECTS_DIR *= $$OUT_PWD/build/objects
+MOC_DIR     *= $$OUT_PWD/build/moc
+INCLUDEPATH += $$MOC_DIR
 
 runLrelease.commands = lrelease ../resources/translations/*.ts; 
 QMAKE_EXTRA_TARGETS += runLrelease
 POST_TARGETDEPS     += runLrelease
 
-QM_FILES_INSTALL_PATH = /usr/share/$$TARGET/translations
+win32 | linux {
+    DESTDIR = $$TARGET_PREFIX/bin 
+    mkpath( $$TARGET_PREFIX/bin )
+    copy2dest.commands = \
+        $(MKDIR)    $$TARGET_PREFIX/share/simulide/data ; \
+        $(MKDIR)    $$TARGET_PREFIX/share/simulide/examples ; \
+        $(MKDIR)    $$TARGET_PREFIX/share/simulide/translations ; \
+        $(COPY_DIR) ../resources/data              $$TARGET_PREFIX/share/simulide ; \
+        $(COPY_DIR) ../resources/examples          $$TARGET_PREFIX/share/simulide ; \
+        $(COPY_DIR) ../resources/icons             $$TARGET_PREFIX/share ; \
+        $(MOVE)     ../resources/translations/*.qm $$TARGET_PREFIX/share/simulide/translations ;
+}
+macx {
+    QMAKE_CC = gcc-10
+    QMAKE_CXX = g++-10
+    QMAKE_LINK = g++-10
+    QMAKE_CXXFLAGS -= -stdlib=libc++
+    QMAKE_LFLAGS -= -stdlib=libc++
+    DESTDIR = $$TARGET_PREFIX 
+    mkpath( $$TARGET_PREFIX/simulide.app )
+    copy2dest.commands = \
+        $(MKDIR)    $$TARGET_PREFIX/simulide.app/Contents/share/simulide/data ; \
+        $(MKDIR)    $$TARGET_PREFIX/simulide.app/Contents/share/simulide/examples ; \
+        $(MKDIR)    $$TARGET_PREFIX/simulide.app/Contents/share/simulide/translations ; \
+        $(COPY_DIR) ../resources/data              $$TARGET_PREFIX/simulide.app/Contents/share/simulide ; \
+        $(COPY_DIR) ../resources/examples          $$TARGET_PREFIX/simulide.app/Contents/share/simulide ; \
+        $(COPY_DIR) ../resources/icons             $$TARGET_PREFIX/simulide.app/Contents/share ; \
+        $(MOVE)     ../resources/translations/*.qm $$TARGET_PREFIX/simulide.app/Contents/share/simulide/translations ;
+}
 
-data.path = /usr/share/$$TARGET
-data.files = ../resources/data
-examples.path = /usr/share/$$TARGET
-examples.files = ../resources/examples
-icons.path = /usr/share
-icons.files = ../resources/icons
-target.path = /usr/bin
-INSTALLS += data
-INSTALLS += examples
-INSTALLS += icons
-INSTALLS += target
+QMAKE_EXTRA_TARGETS += copy2dest
+POST_TARGETDEPS     += copy2dest
+
+
+message( "-----------------------------------")
+message( "    "                               )
+message( "    "$$TARGET_NAME for $$OS         )
+message( "    "                               )
+message( "          Qt version: "$$QT_VERSION )
+message( "    "                               )
+message( "    Destination Folder:"            )
+message( $$TARGET_PREFIX                      )
+message( "-----------------------------------")
+

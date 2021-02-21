@@ -54,22 +54,23 @@ class TriggerObject;
 
 class TriggerAction
 {
-public:
-  TriggerAction();
-  virtual ~TriggerAction();
-  virtual bool evaluate();
-  virtual bool getTriggerState();
-  virtual void action();
+    public:
+      TriggerAction();
+      virtual ~TriggerAction();
+
+      virtual bool evaluate();
+      virtual bool getTriggerState();
+      virtual void action();
 };
 
 class SimpleTriggerAction : public TriggerAction
 {
-public:
-  explicit SimpleTriggerAction(TriggerObject *_to);
-  virtual void action();
-protected:
-  TriggerObject *to;
+    public:
+      explicit SimpleTriggerAction( TriggerObject *_to );
+      virtual void action();
 
+    protected:
+      TriggerObject *to;
 };
 
 // TriggerObject - a base class for handling all of gpsim's breakpoints.
@@ -79,71 +80,47 @@ protected:
 // breakpoint functionality.
 //
 //
-
+class Processor;
 class TriggerObject
 {
- public:
+    public:
+        TriggerObject( Processor* cpu=0 );
+        explicit TriggerObject( TriggerAction*, Processor* cpu=0 );
+        virtual ~TriggerObject();
 
-  uint bpn;
+        uint bpn;
 
-  // Enable the breakpoint and return true if successful
-  virtual bool set_break() {return false;}
+        virtual bool set_break() {return false;} // Enable the breakpoint and return true if successful
 
-  // A unique number assigned when the break point is armed.
-  int CallBackID;
+        int CallBackID; // A unique number assigned when the break point is armed.
 
-  // When the breakpoint associated with this object is encountered,
-  // then 'callback' is invoked.
-  virtual void callback();
+        // When the breakpoint associated with this object is encountered,
+        // then 'callback' is invoked.
+        virtual void callback();
 
-  // Invoked to display info about the breakpoint.
-  virtual void callback_print();
+        virtual void callback_print(); // Invoked to display info about the breakpoint.
 
-  // clear_trigger is invoked when the breakpoint associated with
-  // this object is cleared.
-  virtual void clear_trigger();
+        // clear_trigger is invoked when the breakpoint associated with
+        // this object is cleared.
+        virtual void clear_trigger();
 
-  // Will search for a place to store this break point.
-  virtual int find_free();
+        // Display the breakpoint - Probably should tie into a stream...
+        virtual void print();
+        virtual void clear(); // Clear the breakpoint
 
-  // This object has no cpu associated with it. However, derived
-  // types may and can choose to provide access to it through here:
-  //virtual Processor *get_cpu() { return 0; }
+        virtual void set_action(TriggerAction *ta) { m_action = ta; }
+        virtual TriggerAction *get_action() { return m_action;}
+        virtual void invokeAction();
 
-  // Display the breakpoint - Probably should tie into a stream...
-  virtual void print();
+    protected:
+        // When the TriggerObject becomes true, then the TriggerAction is
+        // evaluated. E.g. If the trigger object is an execution breakpoint,
+        // then whenever the PC == break address, the Breakpoint_Instruction
+        // class (which is derived from this class) will invoke action->evaluate()
+        // which will in turn halt the execution.
 
-  // Clear the breakpoint
-  virtual void clear();
-
-  virtual char const * bpName() { return "Generic"; }
-
-  virtual void set_action(TriggerAction *ta) { m_action = ta; }
-  virtual TriggerAction *get_action() { return m_action;}
-  virtual void invokeAction();
-
-  // Messages can be associatated with triggers
-  string &message() {return m_sMessage;}
-  virtual void new_message(const char *);
-  virtual void new_message(string &);
-
-  TriggerObject();
-  explicit TriggerObject(TriggerAction *);
-  // Virtual destructor place holder
-  virtual ~TriggerObject();
-
-private:
-  string m_sMessage;
-
-  // When the TriggerObject becomes true, then the TriggerAction is
-  // evaluated. E.g. If the trigger object is an execution breakpoint,
-  // then whenever the PC == break address, the Breakpoint_Instruction
-  // class (which is derived from this class) will invoke action->evaluate()
-  // which will in turn halt the execution.
-
-  TriggerAction *m_action;
+        TriggerAction *m_action;
+        Processor* m_cpu;
 };
-
-
 
 #endif // !defined(__TRIGGER_H__)

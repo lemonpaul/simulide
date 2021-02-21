@@ -25,13 +25,17 @@
 #include <QtSerialPort/QSerialPort>
 
 class LibraryItem;
+class McuComponent;
+class BaseProcessor;
 
 class MAINMODULE_EXPORT SerialPort : public Component, public eElement
 {
     Q_OBJECT
-    Q_PROPERTY( bool     Auto_Open     READ autoOpen  WRITE setAutoOpen  DESIGNABLE true  USER true )
-    Q_PROPERTY( int      Mcu_Uart      READ uart  WRITE setUart  DESIGNABLE true  USER true )
-    Q_PROPERTY( QString  Port_Name     READ port  WRITE setPort  DESIGNABLE true  USER true )
+    Q_PROPERTY( QString  Mcu_Id    READ mcuId    WRITE setMcuId )
+    Q_PROPERTY( bool     Auto_Open READ autoOpen WRITE setAutoOpen DESIGNABLE true  USER true )
+    Q_PROPERTY( int      Mcu_Uart  READ uart     WRITE setUart     DESIGNABLE true  USER true )
+    Q_PROPERTY( QString  Port_Name READ port     WRITE setPort     DESIGNABLE true  USER true )
+
     Q_PROPERTY( QSerialPort::BaudRate BaudRate READ baudRate WRITE setBaudRate  DESIGNABLE true  USER true )
     Q_PROPERTY( QSerialPort::DataBits DataBits READ dataBits WRITE setDataBits  DESIGNABLE true  USER true )
     Q_PROPERTY( QSerialPort::Parity   Parity   READ parity   WRITE setParity    DESIGNABLE true  USER true )
@@ -46,7 +50,12 @@ class MAINMODULE_EXPORT SerialPort : public Component, public eElement
  static Component* construct( QObject* parent, QString type, QString id );
  static LibraryItem* libraryItem();
 
-        void updateStep();
+        virtual void initialize() override;
+        virtual void updateStep() override;
+
+
+        QString mcuId() { return m_mcuId; }
+        void setMcuId( QString mcu );
 
         bool autoOpen() { return m_autoOpen; }
         void setAutoOpen( bool ao ) { m_autoOpen = ao; }
@@ -55,7 +64,7 @@ class MAINMODULE_EXPORT SerialPort : public Component, public eElement
         void setUart( int uart );
 
         QString port(){return m_portName;}
-        void setPort( QString name ){ m_portName = name;}
+        void setPort( QString name ){ m_portName = name; update();}
 
         QSerialPort::BaudRate baudRate() { return m_BaudRate; }
         void setBaudRate( QSerialPort::BaudRate br ) { m_BaudRate = br; }
@@ -86,6 +95,10 @@ class MAINMODULE_EXPORT SerialPort : public Component, public eElement
     private:
         void open();
         void close();
+
+        QString m_mcuId;
+        McuComponent* m_mcuComponent;
+        BaseProcessor* m_processor;
 
         QPushButton* m_button;
         QGraphicsProxyWidget* m_proxy;

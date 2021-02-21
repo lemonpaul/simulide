@@ -35,9 +35,9 @@ class MAINMODULE_EXPORT elCapacitor : public CapacitorBase
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
         
-        virtual void resetState();
-        virtual void updateStep();
-        virtual void remove();
+        virtual void initialize() override;
+        virtual void updateStep() override;
+        virtual void remove() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 

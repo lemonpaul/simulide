@@ -17,31 +17,52 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <sstream>
+
 #include <QTranslator>
 
 #include "memdata.h"
+#include "simulator.h"
+#include "circuitwidget.h"
 #include "circuit.h"
+#include "memtable.h"
 #include "utils.h"
 
 
 MemData::MemData()
 {
+    m_memTable = NULL;
 }
-MemData::~MemData(){}
+MemData::~MemData()
+{
+    if( m_memTable )
+    {
+        m_memTable->setParent( NULL );
+        m_memTable->deleteLater();
+    }
+}
+
+void MemData::showTable( int dataSize, int wordBytes )
+{
+    if( !m_memTable )
+    {
+        m_memTable = new MemTable( CircuitWidget::self(), dataSize, wordBytes );
+    }
+    m_memTable->show();
+}
 
 void MemData::loadData( QVector<int>* toData, bool resize, int bits )
 {
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim )  Simulator::self()->pauseSim();
+
     QString dir = Circuit::self()->getFileName();
     dir.replace( ".simu", ".data" );
+
     QString fileName = QFileDialog::getOpenFileName( 0l,
-                       QCoreApplication::translate( "MemData", "Load Data"), dir,
+                                                    "MemData::loadData", dir,
                        QCoreApplication::translate( "MemData", ".data (*.data);;.bin (*.bin);;All files (*.*)"));
 
     if( fileName.isEmpty() ) return; // User cancels loading
-
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim )  Simulator::self()->pauseSim();
 
     if( resize ) toData->resize( 1 );
     int addr = 0;
@@ -115,11 +136,14 @@ void MemData::loadData( QVector<int>* toData, bool resize, int bits )
             toData->replace( i, data );
         }
     }
-    if( pauseSim ) Simulator::self()->runContinuous();
+    if( pauseSim ) Simulator::self()->resumeSim();
 }
 
 void MemData::saveData( QVector<int> data, int bits )
 {
+    bool pauseSim = Simulator::self()->isRunning();
+    if( pauseSim )  Simulator::self()->pauseSim();
+
     QString dir = Circuit::self()->getFileName();
     dir.replace( ".simu", ".data" );
 
@@ -128,9 +152,6 @@ void MemData::saveData( QVector<int> data, int bits )
                        QCoreApplication::translate( "MemData", ".data (*.data);;.bin (*.bin);;All files (*.*)") );
 
     if( fileName.isEmpty() ) return; // User cancels saving
-
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim )  Simulator::self()->pauseSim();
 
     QFile outFile( fileName );
     int bytes = (bits+7)/8;
@@ -147,7 +168,6 @@ void MemData::saveData( QVector<int> data, int bits )
 
             if( i == 15 ) { output += "\n"; i = 0; }
             else          { output += ",";  i++;  }
-
         }
 
         if( !outFile.open( QFile::WriteOnly | QFile::Text ) )
@@ -187,6 +207,5 @@ void MemData::saveData( QVector<int> data, int bits )
             //qDebug()<<"MemData::saveData bits"<< bits << bytes <<i;
         }
     }
-
-    if( pauseSim ) Simulator::self()->runContinuous();
+    if( pauseSim ) Simulator::self()->resumeSim();
 }

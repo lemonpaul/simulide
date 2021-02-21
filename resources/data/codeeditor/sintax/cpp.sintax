@@ -56,7 +56,7 @@ number: "\b[0-9]+\b"
 htmlTag-style: #303078 default false false
 htmlTag: "<.*>" 
 
-quotation-style: #205010 default false false
+quotation-style: #206410 default false false
 quotation: "\"(\\.|[^\"])*\""
 
 lineComment-style: #646464 default false true

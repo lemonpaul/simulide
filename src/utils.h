@@ -20,181 +20,67 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <QString>
-#include <QFile>
-#include <QMessageBox>
-#include <QTextStream>
-#include <qpoint.h>
-#include <QPointF>
-#include <cmath>
+class QDomDocument;
+class QByteArray;
+class QStringList;
+class QString;
+class QPointF;
+class QPoint;
+class Pin;
 
+#define unitToVal( val, mult ) \
+    if     ( mult == " n" ) val *= 1e3; \
+    else if( mult == " u")  val *= 1e6; \
+    else if( mult == " m" ) val *= 1e9; \
+    else if( mult == " ")   val *= 1e12;
 
-inline void MessageBoxNB( const QString &title, const QString &message )
-{
-    QMessageBox* msgBox = new QMessageBox( 0l );
-    msgBox->setAttribute( Qt::WA_DeleteOnClose ); //makes sure the msgbox is deleted automatically when closed
-    msgBox->setStandardButtons( QMessageBox::Ok );
-    msgBox->setWindowTitle( title );
-    msgBox->setText( message );
-    msgBox->setModal( false ); 
-    msgBox->open();
-}
+#define valToUnit( val, mult, decimals ) \
+    mult = " p";\
+    if( fabs( val ) > 999 ) { \
+        val /= 1e3; mult = " n"; \
+        if( fabs( val ) > 999 ) { \
+            val /= 1e3; mult = " u"; \
+            if( fabs( val ) > 999 ) { \
+                val /= 1e3; mult = " m"; \
+                if( fabs( val ) > 999 ) { \
+                    val /= 1e3; mult = " "; \
+                    if( fabs( val ) > 999 ) { \
+                        val /= 1e3; mult = " k"; \
+                        if( fabs( val ) > 999 ) { \
+                            val /= 1e3; mult = " M"; \
+                            if( fabs( val ) > 999 ) { \
+                                val /= 1e3; mult = " G"; \
+    }}}}}}} \
+    if     ( fabs( val ) < 10)   decimals = 3; \
+    else if( fabs( val ) < 100)  decimals = 2; \
+    else if( fabs( val ) < 1000) decimals = 1;
 
-inline QString addQuotes( const QString &string )
-{
-    return "\""+string+"\"";
-}
+void MessageBoxNB( const QString &title, const QString &message );
 
+QString addQuotes( const QString &string );
+QString strippedName( const QString &fullFileName );
 
-inline QString strippedName( const QString &fullFileName )
-{
-    return QFileInfo(fullFileName).fileName();
-}
+QDomDocument fileToDomDoc( const QString &fileName, const QString &caller );
+QString      fileToString( const QString &fileName, const QString &caller );
+QStringList  fileToStringList( const QString &fileName, const QString &caller );
+QByteArray   fileToByteArray( const QString &fileName, const QString &caller );
 
-inline QString fileToString( const QString &fileName, const QString &caller )
-{
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        MessageBoxNB( "ERROR", "Cannot read file "+fileName+":\n"+file.errorString() );
-        return "";
-    }
-    QTextStream in(&file);
-    in.setCodec("UTF-8");
-    QString text = in.readAll();
-    file.close();
+QString val2hex( int d );
+QString decToBase( int value, int base, int digits );
 
-    return text;
-}
+int roundDown( int x, int roundness );
+int roundDown( float x, int roundness );
+QPoint roundDown( const QPoint & p, int roundness );
 
-inline QStringList fileToStringList( const QString &fileName, const QString &caller )
-{
-    QStringList text;
-    text << " ";
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        MessageBoxNB( "ERROR", "Cannot read file "+fileName+":\n"+file.errorString() );
-        return text;
-    }
-    QTextStream in(&file);
-    in.setCodec("UTF-8");
-    while( !in.atEnd() ) text.append( in.readLine() );
-    file.close();
+int snapToGrid( int x );
+int snapToCompGrid( int x );
 
-    return text;
-}
+QPointF togrid( QPointF point );
+QPoint  togrid( QPoint point );
+QPointF toCompGrid( QPointF point );
+int getAlignment( QPointF p1, QPointF p2 );
 
-inline QByteArray fileToByteArray( const QString &fileName, const QString &caller )
-{
-    QByteArray ba;
-
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        MessageBoxNB( "ERROR", "Cannot read file "+fileName+":\n"+file.errorString() );
-        return ba;
-    }
-    ba = file.readAll();
-
-    file.close();
-
-    return ba;
-}
-
-inline QString val2hex( int d )
-{
-    QString Hex="0123456789ABCDEF";
-    QString h = Hex.mid(d&15,1);
-    while(d>15)
-    {
-        d >>= 4;
-        h = Hex.mid( d&15,1 ) + h;
-    }
-    return h;
-}
-
-inline QString decToBase( int value, int base, int digits )
-{
-    QString converted = "";
-    for( int i=0; i<digits; i++ )
-    {
-        if( value >= base ) converted = val2hex(value%base) + converted;
-        else                converted = val2hex(value) + converted;
-
-        if( i+1 == 4 ) converted = " " + converted;
-        //if( (i+1)%8 == 0 ) converted = " " + converted;
-
-        value = floor( value/base );
-    }
-    return converted;
-}
-
-inline int roundDown( int x, int roundness )
-{
-    if( x < 0 ) return (x-roundness+1) / roundness;
-    else        return (x / roundness);
-}
-
-inline int roundDown( float x, int roundness ) { return roundDown( int(x), roundness ); }
-
-inline QPoint roundDown( const QPoint & p, int roundness )
-{
-    return QPoint( roundDown( p.x(), roundness ), roundDown( p.y(), roundness ) );
-}
-
-inline int snapToGrid( int x ) { return roundDown( x+2, 4 )*4; }
-
-inline int snapToCompGrid( int x ) { return roundDown( x+4, 8 )*8; }
-
-inline QPointF togrid( QPointF point )
-{
-    int valor;
-    valor = snapToGrid( (int)point.x() );
-    point.rx() = (float)valor;
-    valor = snapToGrid( (int)point.y() );
-    point.ry() = (float)valor;
-    return point;
-}
-
-inline QPointF toCompGrid( QPointF point )
-{
-    int valor;
-    valor = snapToCompGrid( (int)point.x() );
-    point.rx() = (float)valor;
-    valor = snapToCompGrid( (int)point.y() );
-    point.ry() = (float)valor;
-    return point;
-}
-
-inline QPoint togrid( QPoint point )
-{
-    int valor;
-    valor = snapToGrid( (int)point.x() );
-    point.rx() = valor;
-    valor = snapToGrid( (int)point.y() );
-    point.ry() = valor;
-    return point;
-}
-
-inline int getAlignment( QPointF p1, QPointF p2 )
-{
-    int align = 0;
-    if( p1.x() == p2.x() ) align += 2;           // Aligned in Y axis
-    if( p1.y() == p2.y() ) align += 1;           // Aligned in X axis
-
-    return align;
-}
-
-#include "pin.h"
-inline bool lessPinX( Pin* pinA, Pin* pinB )
-{
-    return pinA->x() < pinB->x();
-}
-
-inline bool lessPinY( Pin* pinA, Pin* pinB )
-{
-    return pinA->y() < pinB->y();
-}
+bool lessPinX( Pin* pinA, Pin* pinB );
+bool lessPinY( Pin* pinA, Pin* pinB );
 #endif
 

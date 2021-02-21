@@ -43,6 +43,8 @@ class MAINMODULE_EXPORT LedMatrix : public Component, public eElement
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
+        virtual QList<propGroup_t> propGroups() override;
+
         void setColor( LedBase::LedColor color );
         LedBase::LedColor color();
         
@@ -64,12 +66,10 @@ class MAINMODULE_EXPORT LedMatrix : public Component, public eElement
         double res();
         void  setRes( double resist );
 
-        virtual void attach();
+        virtual void attach() override;
+        virtual void remove() override;
         
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-        
-    public slots:
-        virtual void remove();
 
     private:
         void setupMatrix( int rows, int cols );

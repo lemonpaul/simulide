@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "switch_base.h"
+#include "simulator.h"
 #include "circuit.h"
 
 static const char* SwitchBase_properties[] = {
@@ -30,6 +31,8 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
 {
     Q_UNUSED( SwitchBase_properties );
 
+    m_graphical = true;
+
     m_area =  QRectF( 0,0,0,0 );
 
     m_ePin.resize(2);
@@ -38,7 +41,7 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
 
     m_idLabel->setPos(-12,-24);
 
-    m_button = new QPushButton( );
+    m_button = new QToolButton( );
     m_button->setMaximumSize( 16,16 );
     m_button->setGeometry(-20,-16,16,16);
     m_button->setCheckable( true );
@@ -48,15 +51,12 @@ SwitchBase::SwitchBase( QObject* parent, QString type, QString id )
     //m_proxy->setPos( QPoint(-8, 4) );
 
     connect( Circuit::self(), SIGNAL( keyEvent( QString, bool ) ),
-                        this, SLOT( keyEvent( QString, bool ) ) );
+                        this, SLOT(   keyEvent( QString, bool ) )
+                            , Qt::UniqueConnection );
 
     m_key = "";
-
-    Simulator::self()->addToUpdateList( this );
 }
-SwitchBase::~SwitchBase()
-{
-}
+SwitchBase::~SwitchBase(){}
 
 void SwitchBase::updateStep()
 {
@@ -64,7 +64,16 @@ void SwitchBase::updateStep()
     {
         setSwitch( m_closed );
         m_changed = false;
+        update();
     }
+}
+
+void SwitchBase::setHidden( bool hide )
+{
+    Component::setHidden( hide );
+
+    if( hide ) m_area = QRectF( -8,-2, 16, 4 );
+    else       m_area = QRectF( -13,-16*m_numPoles, 26, 16*m_numPoles );
 }
 
 void SwitchBase::onbuttonclicked()

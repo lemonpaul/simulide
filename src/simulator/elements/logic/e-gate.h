@@ -26,12 +26,12 @@ class MAINMODULE_EXPORT eGate : public eLogicDevice
 {
     public:
 
-        eGate( std::string id, int inputs );
+        eGate( QString id, int inputs );
         ~eGate();
 
-        virtual void stamp();
-        virtual void resetState();
-        virtual void setVChanged();
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void runEvent() override;
         
         bool tristate();
         void setTristate( bool t );
@@ -42,12 +42,9 @@ class MAINMODULE_EXPORT eGate : public eLogicDevice
     protected:           
         virtual bool calcOutput( int inputs );
 
+        bool m_out;
         bool m_tristate;
         bool m_openCol;
- static bool m_oscCtrl;
-        int  m_oscCount;
-        
-        uint64_t m_lastStep;
 };
 
 

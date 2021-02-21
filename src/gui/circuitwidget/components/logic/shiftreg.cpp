@@ -23,7 +23,7 @@
 
 Component* ShiftReg::construct( QObject* parent, QString type, QString id )
 {
-        return new ShiftReg( parent, type, id );
+    return new ShiftReg( parent, type, id );
 }
 
 LibraryItem* ShiftReg::libraryItem()
@@ -38,7 +38,7 @@ LibraryItem* ShiftReg::libraryItem()
 
 ShiftReg::ShiftReg( QObject* parent, QString type, QString id )
         : LogicComponent( parent, type, id )
-        , eShiftReg( id.toStdString() )
+        , eShiftReg( id )
 {
     m_width  = 4;
     m_height = 9;
@@ -65,11 +65,8 @@ ShiftReg::ShiftReg( QObject* parent, QString type, QString id )
     init( pinList );
 
     eLogicDevice::createInput( m_inPin[0] );                 // Input DI
-    
     eLogicDevice::createClockPin( m_inPin[1] );           // Input Clock
-
     eLogicDevice::createInput( m_inPin[2] );                // Input Rst
-
     eLogicDevice::createOutEnablePin( m_inPin[3] );    // IOutput Enable
 
     for( int i=0; i<m_numOutPins; i++ )
@@ -78,5 +75,16 @@ ShiftReg::ShiftReg( QObject* parent, QString type, QString id )
     setResetInv( true );                             // Invert Reset Pin
 }
 ShiftReg::~ShiftReg(){}
+
+QList<propGroup_t> ShiftReg::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Clock_Inverted", tr("Clock Inverted"),""} );
+    mainGroup.propList.append( {"Reset_Inverted", tr("Reset Inverted"),""} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
 
 #include "moc_shiftreg.cpp"

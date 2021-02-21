@@ -1,0 +1,106 @@
+/***************************************************************************
+ *   Copyright (C) 2018 by santiago González                               *
+ *   santigoro@gmail.com                                                   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 3 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, see <http://www.gnu.org/licenses/>.  *
+ *                                                                         *
+ ***************************************************************************/
+
+#include "e-pn.h"
+//#include "simulator.h"
+
+ePN::ePN( QString id )
+   : eResistor(id )
+{
+    //m_threshold = 0.7;
+
+    m_vt = 0.025;
+    m_rsCurr = 1e-13;
+    m_vcrit = m_vt*log( m_vt/(sqrt(2)*m_rsCurr) );
+}
+ePN::~ePN(){}
+
+void ePN::stamp()
+{
+    //step(0);
+
+    eResistor::setAdmit( cero_doub );
+    eResistor::stamp();
+}
+
+void ePN::initialize()
+{
+    //eResistor::setRes( 0.6 );
+    //step(0);
+    m_accuracy = 0.00001;
+
+    m_lastV = 0;
+
+}
+
+double ePN::step( double volt )
+{
+    if( fabs( volt-m_lastV) < m_accuracy )
+    {
+        m_admit = 0;
+        return m_current;
+    }
+    if( volt > m_vcrit && fabs(volt-m_lastV) > (2*m_vt) )
+    {
+        if( m_lastV > 0 )
+        {
+            double arg = 1+(volt-m_lastV)/m_vt;
+            if( arg > 0 ) volt = m_lastV + m_vt*log( arg );
+            else          volt = m_vcrit;
+        }
+        else volt = m_vt *log( volt/m_vt );
+    }
+    m_lastV = volt;
+
+    // Id = rsC*(exp(V/vt)-1)
+    // rsC = Reverse Saturation Current
+    // vt  = Thermal Voltage
+    double expV = m_rsCurr*exp( volt/m_vt ); // rsC*exp(V/vt)
+    m_current = expV-m_rsCurr;               // rsC*exp(V/vt) - rsC // rsC*(exp(V/vt)-1)
+    m_admit += expV/m_vt;                    // rsC*exp(V/vt)/vt = delta Admitance
+
+    eResistor::setAdmit( m_admit );
+    eResistor::stampCurrent( m_current );
+
+    return m_current;
+}
+
+void ePN::setThreshold( double threshold )
+{
+    //m_threshold = threshold;
+}
+
+double ePN::current()
+{
+    return m_current;
+}
+/*void ePN::updateVI()
+{
+    m_current = 0;
+
+    if( m_ePin[0]->isConnected() && m_ePin[1]->isConnected() )
+    {
+        double volt = m_voltPN - m_deltaV;
+        if( volt>0 )
+        {
+            m_current = volt/m_resist;
+            //qDebug() << " current " <<m_current<<volt<<m_deltaV;
+        }
+    }
+}*/

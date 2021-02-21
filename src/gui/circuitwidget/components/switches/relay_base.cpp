@@ -62,22 +62,22 @@ RelayBase::RelayBase( QObject* parent, QString type, QString id )
     QString reid = m_id;
     nodid = reid;                  // Internal Left pin to inductor
     nodid.append(QString("-lIntPin"));
-    m_ePin[1] = new ePin( reid.toStdString(), 1 );
+    m_ePin[1] = new ePin( reid, 1 );
 
     nodid = reid;                 // Internal right pin to resistor
     nodid.append(QString("-rIntPin"));
-    m_ePin[2] = new ePin( reid.toStdString(), 2 );
+    m_ePin[2] = new ePin( reid, 2 );
 
     reid = m_id;
     reid.append(QString("-resistor"));
-    m_resistor = new eResistor( reid.toStdString() );
+    m_resistor = new eResistor( reid );
     m_resistor->setRes( 100 );
     m_resistor->setEpin( 0, m_ePin[2] );
     m_resistor->setEpin( 1, m_ePin[3] );
 
     reid = m_id;
     reid.append(QString("-inductor"));
-    m_inductor = new eInductor( reid.toStdString() );
+    m_inductor = new eInductor( reid );
     m_inductor->setInd( 0.1 );  // 100 mH
     m_inductor->setEpin( 0, m_ePin[0] );
     m_inductor->setEpin( 1, m_ePin[1] );
@@ -95,27 +95,27 @@ RelayBase::RelayBase( QObject* parent, QString type, QString id )
 
     SetupSwitches( 1, 1 );
 }
-RelayBase::~RelayBase()
-{
-}
+RelayBase::~RelayBase(){}
 
 void RelayBase::stamp()
 {
-    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->addToChangedFast(this);
-    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->addToChangedFast(this);
+    m_relayOn = false;
+    if( m_ePin[0]->isConnected() ) m_ePin[0]->getEnode()->voltChangedCallback( this );
+    if( m_ePin[1]->isConnected() ) m_ePin[1]->getEnode()->voltChangedCallback( this );
     MechContact::stamp();
 }
 
-void RelayBase::setVChanged()
+void RelayBase::voltChanged()
 {
     double indCurr = fabs( m_inductor->indCurrent() );
-    bool closed;
+    bool relayOn;
 
-    if( m_closed ) closed = ( indCurr > m_relCurrent );
-    else           closed = ( indCurr > m_trigCurrent );
+    if( m_relayOn ) relayOn = ( indCurr > m_relCurrent );
+    else            relayOn = ( indCurr > m_trigCurrent );
+    m_relayOn = relayOn;
 
-    if( m_nClose ) closed = !closed;
-    if( closed != m_closed ) setSwitch( closed );
+    if( m_nClose ) relayOn = !relayOn;
+    if( relayOn != m_closed ) setSwitch( relayOn );
 }
 
 void RelayBase::remove()

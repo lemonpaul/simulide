@@ -39,13 +39,13 @@ extern "C" {
 /*
  * Instruction decoder, run ONE instruction
  */
-avr_flashaddr_t avr_run_one(avr_t * avr);
+avr_flashaddr_t avr_run_one( avr_t * avr);
 
 /*
- * These are for internal access to the stack (for interrupts)
+ * These are for internal access to the stack( for interrupts)
  */
-uint16_t _avr_sp_get(avr_t * avr);
-void _avr_sp_set(avr_t * avr, uint16_t sp);
+uint16_t _avr_sp_get( avr_t * avr);
+void _avr_sp_set( avr_t * avr, uint16_t sp);
 int _avr_push_addr(avr_t * avr, avr_flashaddr_t addr);
 
 #if CONFIG_SIMAVR_TRACE
@@ -62,17 +62,17 @@ const char * avr_regname(uint8_t reg);
 void avr_dump_state(avr_t * avr);
 
 #define DUMP_REG() { \
-				for (int i = 0; i < 32; i++) printf("%s=%02x%c", avr_regname(i), avr->data[i],i==15?'\n':' ');\
+                for( int i = 0; i < 32; i++) printf("%s=%02x%c", avr_regname(i), avr->data[i],i==15?'\n':' ');\
 				printf("\n");\
-				uint16_t y = avr->data[R_YL] | (avr->data[R_YH]<<8);\
-				for (int i = 0; i < 20; i++) printf("Y+%02d=%02x ", i, avr->data[y+i]);\
+                uint16_t y = avr->data[R_YL] |( avr->data[R_YH]<<8);\
+                for( int i = 0; i < 20; i++) printf("Y+%02d=%02x ", i, avr->data[y+i]);\
 				printf("\n");\
 		}
 
 
 #if AVR_STACK_WATCH
 #define DUMP_STACK() \
-		for (int i = avr->trace_data->stack_frame_index; i; i--) {\
+        for( int i = avr->trace_data->stack_frame_index; i; i--) {\
 			int pci = i-1;\
 			printf(FONT_RED "*** %04x: %-25s sp %04x\n" FONT_DEFAULT,\
 					avr->trace_data->stack_frame[pci].pc, \
@@ -95,14 +95,14 @@ void avr_dump_state(avr_t * avr);
  */
 #define READ_SREG_INTO(avr, dst) { \
 			dst = 0; \
-			for (int i = 0; i < 8; i++) \
-				if (avr->sreg[i] > 1) { \
+            for( int i = 0; i < 8; i++) \
+                if( avr->sreg[i] > 1) { \
 					printf("** Invalid SREG!!\n"); \
-				} else if (avr->sreg[i]) \
-					dst |= (1 << i); \
+                } else if( avr->sreg[i]) \
+                    dst |=( 1 << i); \
 		}
 
-static inline void avr_sreg_set(avr_t * avr, uint8_t flag, uint8_t ival)
+static inline void avr_sreg_set( avr_t * avr, uint8_t flag, uint8_t ival)
 {
 	/*
 	 *	clear interrupt_state if disabling interrupts.
@@ -110,12 +110,13 @@ static inline void avr_sreg_set(avr_t * avr, uint8_t flag, uint8_t ival)
 	 *	no change if interrupt flag does not change.
 	 */
 
-	if (flag == S_I) {
-		if (ival) {
-			if (!avr->sreg[S_I])
-				avr->interrupt_state = -2;
-		} else
-			avr->interrupt_state = 0;
+    if( flag == S_I )
+    {
+        if( ival )
+        {
+            if( !avr->sreg[S_I] ) avr->interrupt_state = -1;
+        }
+        else avr->interrupt_state = 0;
 	}
 
 	avr->sreg[flag] = ival;
@@ -125,8 +126,8 @@ static inline void avr_sreg_set(avr_t * avr, uint8_t flag, uint8_t ival)
  * Splits the SREG value from src into the avr->sreg array.
  */
 #define SET_SREG_FROM(avr, src) { \
-			for (int i = 0; i < 8; i++) \
-				avr_sreg_set(avr, i, (src & (1 << i)) != 0); \
+            for( int i = 0; i < 8; i++) \
+                avr_sreg_set(avr, i,( src &( 1 << i)) != 0); \
 		}
 
 #ifdef __cplusplus

@@ -19,88 +19,55 @@
 
 #include "e-gate.h"
 #include "simulator.h"
-//#include <QDebug>
 
-bool eGate::m_oscCtrl = false;
-
-eGate::eGate( std::string id, int inputs )
+eGate::eGate( QString id, int inputs )
      : eLogicDevice( id )
 {
     m_tristate = false;
-    m_oscCtrl  = false;
     m_openCol  = false;
-    m_oscCount = 0;
 }
-eGate::~eGate()
-{
-}
+eGate::~eGate() { }
 
 void eGate::stamp()
 {
     eLogicDevice::stamp();
     
-    for( int i=0; i<m_numInputs; i++ )
+    for( int i=0; i<m_numInputs; ++i )
     {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedFast(this);
+        eNode* enode = m_input[i]->getEpin(0)->getEnode();
+        if( enode ) enode->voltChangedCallback( this );
     }
 }
 
-void eGate::resetState()
+void eGate::voltChanged()
 {
-    m_oscCtrl  = false;
-    m_oscCount = 0;
-    m_lastStep = Simulator::self()->step();
-}
-
-void eGate::setVChanged()
-{
-    uint64_t step = Simulator::self()->step();
-
-    if( step-m_lastStep < 2 )                // Detect Oscillating gates
-    {
-        if(( m_oscCount < 10 ) && !m_oscCtrl )
-        {
-            m_oscCount++;
-            if( m_oscCount == 10 ) 
-            {
-                m_oscCtrl = true;
-                return;
-            }
-        }
-    }
-    else if( m_oscCount > 0 ) 
-    {
-        if( m_oscCount == 10 ) m_oscCtrl  = false;
-        m_oscCount = 0;
-    }
-    m_lastStep = step;
-    
-    if( m_tristate ) eLogicDevice::updateOutEnabled();
-
     int  inputs = 0;
 
-    for( int i=0; i<m_numInputs; i++ )
+    for( int i=0; i<m_numInputs; ++i )
     {
-        bool  state = eLogicDevice::getInputState( i );
-
+        bool state = eLogicDevice::getInputState( i );
         if( state ) inputs++;
     }
-    //qDebug() << "eGate::setVChanged" << inputs <<m_output[0]->imp()<<m_outImp; 
-
-    bool out = calcOutput( inputs );
+    m_out = calcOutput( inputs ); // In each gate type
     
-    if( m_openCol ) 
+    // Add random 1-10 ps to avoid oscillations
+    Simulator::self()->addEvent( m_propDelay+(std::rand() %2), this );
+}
+
+void eGate::runEvent()
+{
+    if( m_tristate ) eLogicDevice::updateOutEnabled();
+
+    if( m_openCol )
     {
         double imp = m_outImp;
-        bool oOut = out;
-        if( m_output[0]->isInverted() ) oOut = !out;
+        bool  oOut = m_out;
+        if( m_output[0]->isInverted() ) oOut = !m_out;
         if( oOut || !eLogicDevice::outputEnabled() ) imp = high_imp;
-        
+
         m_output[0]->setImp( imp );
     }
-    
-    eLogicDevice::setOut( 0, out );// In each gate type
+    m_output[0]->setTimedOut( m_out );
 }
 
 bool eGate::calcOutput( int inputs ) 

@@ -36,20 +36,24 @@ class MAINMODULE_EXPORT Image : public Shape
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
+        virtual QList<propGroup_t> propGroups() override;
+
         virtual void setBackground( QString bck );
         QString background();
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
     public slots:
+        void updateGif( const QRect &rect );
         void slotLoad();
-        void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
+        virtual void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
 
     protected:
         virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
     private:
         QPixmap m_image;
+        QMovie* m_movie;
 
 };
 

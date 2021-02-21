@@ -209,15 +209,19 @@ const struct mcu_t SIM_CORENAME = {
 	.timer0 = {
 		.name = '0',
 		.disabled = AVR_IO_REGBIT(PRR,PRTIM0),
-		.wgm = { AVR_IO_REGBIT(TCCR0A, WGM00), AVR_IO_REGBIT(TCCR0A, WGM01), AVR_IO_REGBIT(TCCR0B, WGM02) },
+        .wgm = { AVR_IO_REGBIT( TCCR0A, WGM00 )
+               , AVR_IO_REGBIT( TCCR0A, WGM01 )
+               , AVR_IO_REGBIT( TCCR0B, WGM02 ) },
 		.wgm_op = {
-			[0] = AVR_TIMER_WGM_NORMAL8(),
-			[2] = AVR_TIMER_WGM_CTC(),
-			[3] = AVR_TIMER_WGM_FASTPWM8(),
-			[7] = AVR_TIMER_WGM_OCPWM(),
+            [0] = WGM_NORMAL8(),
+            [1] = WGM_FCPWM_8(),
+            [2] = WGM_CTC_OC(),
+            [3] = WGM_FASTPWM_8(),
+            [5] = WGM_FCPWM_OC(),
+            [7] = WGM_FASTPWM_OC(),
 		},
 		.cs = { AVR_IO_REGBIT(TCCR0B, CS00), AVR_IO_REGBIT(TCCR0B, CS01), AVR_IO_REGBIT(TCCR0B, CS02) },
-		.cs_div = { 0, 0, 3 /* 8 */, 6 /* 64 */, 8 /* 256 */, 10 /* 1024 */, AVR_TIMER_EXTCLK_CHOOSE, AVR_TIMER_EXTCLK_CHOOSE },
+        .cs_div = { 0, 0, 3 /* 8 */, 6 /* 64 */, 8 /* 256 */, 10 /* 1024 */, EXTCLK_CHOOSE, EXTCLK_CHOOSE },
 		.ext_clock_pin = AVR_IO_REGBIT(PORTC, 2), /* External clock pin */
 
 		.r_tcnt = TCNT0,
@@ -253,20 +257,28 @@ const struct mcu_t SIM_CORENAME = {
 	.timer1 = {
 		.name = '1',
 		.disabled = AVR_IO_REGBIT(PRR,PRTIM1),
-		.wgm = { AVR_IO_REGBIT(TCCR1A, WGM10), AVR_IO_REGBIT(TCCR1A, WGM11),
-					AVR_IO_REGBIT(TCCR1B, WGM12), AVR_IO_REGBIT(TCCR1B, WGM13) },
+        .wgm = { AVR_IO_REGBIT( TCCR1A, WGM10 )
+               , AVR_IO_REGBIT( TCCR1A, WGM11 )
+               , AVR_IO_REGBIT( TCCR1B, WGM12 )
+               , AVR_IO_REGBIT( TCCR1B, WGM13 ) },
 		.wgm_op = {
-			[0] = AVR_TIMER_WGM_NORMAL16(),
-			[4] = AVR_TIMER_WGM_CTC(),
-			[5] = AVR_TIMER_WGM_FASTPWM8(),
-			[6] = AVR_TIMER_WGM_FASTPWM9(),
-			[7] = AVR_TIMER_WGM_FASTPWM10(),
-			[12] = AVR_TIMER_WGM_ICCTC(),
-			[14] = AVR_TIMER_WGM_ICPWM(),
-			[15] = AVR_TIMER_WGM_OCPWM(),
+            [0]  = WGM_NORMAL16(),
+            [1]  = WGM_FCPWM_8(),
+            [2]  = WGM_FCPWM_9(),
+            [3]  = WGM_FCPWM_10(),
+            [4]  = WGM_FASTPWM_8(),
+            [6]  = WGM_FASTPWM_9(),
+            [7]  = WGM_FASTPWM_10(),
+            [8]  = WGM_FCPWM_IC(),
+            [9]  = WGM_FCPWM_OC(),
+            [10] = WGM_FCPWM_IC(),
+            [11] = WGM_FCPWM_OC(),
+            [12] = WGM_CTC_IC(),
+            [14] = WGM_FASTPWM_IC(),
+            [15] = WGM_FASTPWM_OC(),
 		},
 		.cs = { AVR_IO_REGBIT(TCCR1B, CS10), AVR_IO_REGBIT(TCCR1B, CS11), AVR_IO_REGBIT(TCCR1B, CS12) },
-		.cs_div = { 0, 0, 3 /* 8 */, 6 /* 64 */, 8 /* 256 */, 10 /* 1024 */, AVR_TIMER_EXTCLK_CHOOSE, AVR_TIMER_EXTCLK_CHOOSE },
+        .cs_div = { 0, 0, 3 /* 8 */, 6 /* 64 */, 8 /* 256 */, 10 /* 1024 */, EXTCLK_CHOOSE, EXTCLK_CHOOSE },
 		.ext_clock_pin = AVR_IO_REGBIT(PORTC, 3), /* External clock pin */
 
 		.r_tcnt = TCNT1L,

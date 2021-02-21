@@ -33,6 +33,8 @@ Shape::Shape( QObject* parent, QString type, QString id )
      : Component( parent, type, id )
 {
     Q_UNUSED( Shape_properties );
+
+    m_graphical = true;
     
     m_hSize = 50;
     m_vSize = 30;
@@ -44,6 +46,21 @@ Shape::Shape( QObject* parent, QString type, QString id )
     m_area = QRectF( -m_hSize/2, -m_vSize/2, m_hSize, m_vSize );
 }
 Shape::~Shape(){}
+
+QList<propGroup_t> Shape::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"H_size", tr("Size X"),"Pixels"} );
+    mainGroup.propList.append( {"V_size", tr("Size Y"),"Pixels"} );
+    mainGroup.propList.append( {"Border", tr("Border"),"Pixels"} );
+    mainGroup.propList.append( {"Z_Value", tr("Z Value"),""} );
+
+    propGroup_t colorGroup { tr("Color") };
+    colorGroup.propList.append( {"Color", tr("Color"),""} );
+    colorGroup.propList.append( {"Opacity", tr("Opacity"),""} );
+
+    return {mainGroup, colorGroup};
+}
 
 int Shape::hSize()
 {

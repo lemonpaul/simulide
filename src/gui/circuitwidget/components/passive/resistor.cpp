@@ -33,7 +33,7 @@ LibraryItem* Resistor::libraryItem()
 {
     return new LibraryItem(
             tr( "Resistor" ),
-            tr( "Passive" ),
+            tr( "Resistors" ),
             "resistor.png",
             "Resistor",
             Resistor::construct);
@@ -41,21 +41,14 @@ LibraryItem* Resistor::libraryItem()
 
 Resistor::Resistor( QObject* parent, QString type, QString id )
         : Component( parent, type, id )
-        , eResistor( id.toStdString() )
+        , eResistor( id )
 {
     Q_UNUSED( Resistor_properties );
 
     m_area = QRectF( -11, -4.5, 22, 9 );
-    
-    QString pinId = m_id;
-    pinId.append(QString("-lPin"));
-    QPoint pinPos = QPoint(-8-8,0);
-    m_ePin[0] = new Pin( 180, pinPos, pinId, 0, this);
 
-    pinId = m_id;
-    pinId.append(QString("-rPin"));
-    pinPos = QPoint(8+8,0);
-    m_ePin[1] = new Pin( 0, pinPos, pinId, 1, this);
+    m_ePin[0] = new Pin( 180, QPoint(-8-8, 0), m_id+"-lPin", 0, this);
+    m_ePin[1] = new Pin(   0, QPoint( 8+8, 0), m_id+"-rPin", 1, this);
 
     m_idLabel->setPos(-12,-24);
     setLabelPos(-12,-20, 0);
@@ -67,6 +60,13 @@ Resistor::Resistor( QObject* parent, QString type, QString id )
     setShowVal( true );
 }
 Resistor::~Resistor(){}
+
+QList<propGroup_t> Resistor::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Resistance", tr("Resistance"),"main"} );
+    return {mainGroup};
+}
 
 double Resistor::resist() { return m_value; }
 
@@ -95,7 +95,7 @@ void Resistor::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidg
 {
     Component::paint( p, option, widget );
 
-    p->drawRect( -10.5, -4, 21, 8 );
+    p->drawRect( m_area );//( -10.5, -4, 21, 8 );
 }
 
 #include "moc_resistor.cpp"

@@ -17,47 +17,51 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-
 #include "e-demux.h"
+#include "simulator.h"
 
-eDemux::eDemux( std::string id )
+eDemux::eDemux( QString id )
       : eLogicDevice( id )
 {
 }
-eDemux::~eDemux()
-{ 
+eDemux::~eDemux() {}
+
+void eDemux::initialize()
+{
+    m_oldAddr = -1;
+    eLogicDevice::initialize();
 }
 
 void eDemux::stamp()
 {
-    for( int i=0; i<4; i++ )
+    for( int i=0; i<4; ++i )
     {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedFast(this);
+        eNode* enode = m_input[i]->getEpin(0)->getEnode();
+        if( enode ) enode->voltChangedCallback( this );
     }
     eLogicDevice::stamp();
 }
 
-void eDemux::setVChanged()
+void eDemux::voltChanged()
 {
     eLogicDevice::updateOutEnabled();
     
-    int address = 0;
-    
-    for( int i=0; i<3; i++ )
+    m_address = -1;
+
+    if( getInputState( 3 ) )
     {
-        if( getInputState( i ) ) address += pow( 2, i );
+        m_address = 0;
+
+        for( int i=0; i<3; ++i )
+            if( getInputState( i ) ) m_address += pow( 2, i );
     }
-    
-    for( int i=0; i<8; i++ )
-    {
-        eLogicDevice::setOut( i, false );
-    }
-    if( getInputState( 3 ) ) eLogicDevice::setOut( address, true );
+    Simulator::self()->addEvent( m_propDelay, this );
 }
 
-void eDemux::createPins()
+void eDemux::runEvent()
 {
-    eLogicDevice::createPins( 5, 8 );
+    if( m_oldAddr >= 0 ) m_output[m_oldAddr]->setTimedOut( false );
+    if( m_address >= 0 ) m_output[m_address]->setTimedOut( true );
+
+    m_oldAddr = m_address;
 }

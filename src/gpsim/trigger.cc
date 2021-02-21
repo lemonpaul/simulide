@@ -20,10 +20,7 @@ License along with this library; if not, see
 
 
 #include "trigger.h"
-#include "config.h"
 #include "value.h"
-#include "errors.h"
-#include "breakpoints.h"
 
 #include <iostream>
 #include <iomanip>
@@ -56,7 +53,7 @@ bool TriggerAction::getTriggerState()
 
 void TriggerAction::action()
 {
-  bp.halt();
+  //bp.halt();
 }
 
 //------------------------------------------------------------------------
@@ -65,7 +62,7 @@ void TriggerAction::action()
 // For most cases... A single trigger action coupled with a single trigger
 // object
 SimpleTriggerAction::SimpleTriggerAction(TriggerObject *_to)
-  : TriggerAction(), to(_to)
+                   : TriggerAction(), to(_to)
 {
 }
 
@@ -75,15 +72,17 @@ void SimpleTriggerAction::action()
 }
 
 //------------------------------------------------------------------------
-TriggerObject::TriggerObject()
+TriggerObject::TriggerObject( Processor* cpu )
 {
-  set_action(&DefaultTrigger);
+    m_cpu = cpu;
+    set_action(&DefaultTrigger);
 }
 
-TriggerObject::TriggerObject(TriggerAction *ta)
+TriggerObject::TriggerObject( TriggerAction* ta, Processor* cpu )
 {
-  if(ta) set_action(ta);
-  else   set_action(&DefaultTrigger);
+    m_cpu = cpu;
+    if(ta) set_action(ta);
+    else   set_action(&DefaultTrigger);
 }
 
 TriggerObject::~TriggerObject()
@@ -105,21 +104,6 @@ void  TriggerObject::clear_trigger()
 {
 }
 
-int TriggerObject::find_free()
-{
-  bpn = bp.find_free();
-
-  if(bpn < MAX_BREAKPOINTS) {
-
-    bp.break_status[bpn].type = Breakpoints::BREAK_CLEAR;
-    bp.break_status[bpn].cpu  = 0; //get_cpu();
-    bp.break_status[bpn].arg1 = 0;
-    bp.break_status[bpn].arg2 = 0;
-    bp.break_status[bpn].bpo  = this;
-  }
-  return bpn;
-}
-
 void TriggerObject::print()
 {
 }
@@ -135,13 +119,3 @@ void TriggerObject::invokeAction()
   m_action->action();
 }
 
-//-------------------------------------------------------------------
-void TriggerObject::new_message(const char *s)
-{
-  m_sMessage = string(s);
-}
-
-void TriggerObject::new_message(string &new_message)
-{
-  m_sMessage = new_message;
-}

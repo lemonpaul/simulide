@@ -20,17 +20,18 @@
 #include "pin.h"
 #include "bus.h"
 #include "node.h"
+#include "tunnel.h"
 #include "connector.h"
 #include "circuit.h"
 
 
-Pin::Pin( int angle, const QPoint &pos, QString id, int index, Component* parent )
+Pin::Pin( int angle, const QPoint pos, QString id, int index, Component* parent )
    : QObject()
    , QGraphicsItem( parent )
-   , ePin( id.toStdString(), index )
+   , ePin( id, index )
    , m_label( parent )
 {
-    m_component  = parent;
+    m_component = parent;
 
     m_blocked = false;
     m_isBus   = false;
@@ -65,11 +66,12 @@ Pin::Pin( int angle, const QPoint &pos, QString id, int index, Component* parent
 
     Circuit::self()->addPin( this, id );
 
-    connect( parent, SIGNAL( moved() ), this, SLOT( isMoved() ) );
+    connect( parent, SIGNAL( moved() ),
+               this, SLOT( isMoved() ), Qt::UniqueConnection );
 }
 Pin::~Pin()
 { 
-    Circuit::self()->removePin( QString::fromStdString( m_id ) );
+    Circuit::self()->removePin( m_id );
 }
 
 void Pin::reset()
@@ -94,15 +96,13 @@ void Pin::setUnused( bool unused )
     if( unused ) setCursor( Qt::ArrowCursor );
 }
 
-void Pin::registerPinsW( eNode* enode )     // Called by connector closing or other pin
+void Pin::registerPinsW( eNode* enode )     // Called by component, calls conPin
 {
     if( m_blocked ) return;
     m_blocked = true;
-
     //qDebug() <<"Pin::registerPinsW "<<m_component->itemID();
 
     ePin::setEnode( enode );
-
     if( m_conPin ) m_conPin->registerPins( enode ); // Call pin at other side of Connector
 
     m_blocked = false;
@@ -125,6 +125,11 @@ void Pin::registerPins( eNode* enode )     // Called by connector closing or oth
         Bus* bus = dynamic_cast<Bus*>(m_component);
         bus->registerPins( enode );
     }
+    else if( m_component->itemType() == "Tunnel" )
+    {
+        Tunnel* tunnel = dynamic_cast<Tunnel*>(m_component);
+        tunnel->registerPins( enode );
+    }
     m_blocked = false;
 }
 
@@ -146,6 +151,27 @@ void  Pin::setConnector( Connector* connector )
 
 Connector* Pin::connector() { return my_connector; }
 
+void Pin::connectPin()
+{
+    QList<QGraphicsItem*> list = this->collidingItems();
+    for( QGraphicsItem* it : list )
+    {
+        if( it->type() == 65536+3 )                         // Pin found
+        {
+            Pin* pin =  qgraphicsitem_cast<Pin *>( it );
+
+            if( m_isBus != pin->isBus() ) continue;
+            if( !pin->connector() )
+            {
+                Circuit::self()->newconnector( this );
+                Circuit::self()->closeconnector( pin );
+            }
+            //qDebug() << " Pin: Pin found";
+            break;
+        }
+    }
+}
+
 void Pin::isMoved()
 {
     if( my_connector ) my_connector->updateConRoute( this, scenePos() );
@@ -154,23 +180,7 @@ void Pin::isMoved()
         if( m_isBus ) return;
         if( QApplication::queryKeyboardModifiers() & Qt::ControlModifier )
         {
-            QList<QGraphicsItem*> list = this->collidingItems();
-            for( QGraphicsItem* it : list )
-            {
-                if( it->type() == 65536+3 )                         // Pin found
-                {
-                    Pin* pin =  qgraphicsitem_cast<Pin *>( it );
-                    
-                    if( m_isBus != pin->isBus() ) continue;
-                    if( !pin->connector() )
-                    {
-                        Circuit::self()->newconnector( this );
-                        Circuit::self()->closeconnector( pin );
-                    }
-                    //qDebug() << " Pin: Pin found";
-                    break;
-                }
-            }
+            connectPin();
         }
     }
 }
@@ -233,6 +243,7 @@ void Pin::setLabelText( QString label )
     m_label.setText( label );
     setLabelPos();
 }
+
 void Pin::setLabelPos()
 {
     QFontMetrics fm( m_label.font() );
@@ -260,12 +271,18 @@ void Pin::setLabelPos()
     }
     if( m_angle == 270 )   // Bottom
     {
-        m_label.setRotation(m_angle);
+        m_label.setRotation( m_angle );
         xlabelpos -= 5;
         ylabelpos -= m_length+1;
         
     }
     m_label.setPos(xlabelpos, ylabelpos );
+}
+
+int Pin::labelSizeX()
+{
+    QFontMetrics fm( m_label.font() );
+    return fm.width( m_label.text() );
 }
 
 void Pin::setLabelColor( QColor color )
@@ -294,18 +311,21 @@ void Pin::moveBy( int dx, int dy )
 
 void Pin::setPinId( QString id ) 
 { 
-    m_id = id.toStdString(); 
+    m_id = id; 
 }
         
 QString Pin::pinId() 
 { 
-    return  QString::fromStdString( m_id ); 
+    return m_id;
 }
 
 void Pin::setLength( int length )
 {
     if( length < 1 ) length = 1;
     m_length = length;
+    int aLength = 9;
+    if( length == 1 ) aLength = 6;
+    m_area = QRect(-3, -3, aLength, 6);
     setLabelPos();
 }
 
@@ -342,9 +362,6 @@ void Pin::setVisible( bool visible )
 
 void Pin::paint( QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget )
 {
-    Q_UNUSED(option); Q_UNUSED(widget);
-
-
     QPen pen(m_color, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
     //painter->setBrush( Qt::red );
@@ -354,17 +371,18 @@ void Pin::paint( QPainter* painter, const QStyleOptionGraphicsItem* option, QWid
     if( isSelected() ) pen.setColor( Qt::darkGray);
 
     painter->setPen(pen);
-    painter->drawLine( 0, 0, m_length-1, 0);
+    if( m_length > 1 ) painter->drawLine( 0, 0, m_length-1, 0);
+    else painter->drawLine( QPointF(-0.01, 0 ), QPointF( 0.01, 0 ));
     
     if( m_inverted )
     {
         //Component::paint( p, option, widget );
         painter->setBrush( Qt::white );
         QPen pen = painter->pen();
-        pen.setWidth( 2 );
+        pen.setWidthF( 1.8 );
         //if( isSelected() ) pen.setColor( Qt::darkGray);
         painter->setPen(pen);
-        QRectF rect( 3,-2.5, 5, 5 ); 
+        QRectF rect( 3.5,-2.2, 4.4, 4.4 );
         painter->drawEllipse(rect);
     }
 }

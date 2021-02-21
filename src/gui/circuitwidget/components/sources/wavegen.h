@@ -27,12 +27,11 @@
 class MAINMODULE_EXPORT WaveGen : public ClockBase
 {
     Q_OBJECT
-    Q_PROPERTY( double    Volt_Base   READ voltBase    WRITE setVoltBase DESIGNABLE true USER true )
-    Q_PROPERTY( double    Duty_Square READ duty        WRITE setDuty     DESIGNABLE true USER true )
-    Q_PROPERTY( int       Quality     READ quality     WRITE setQuality  DESIGNABLE true USER true )
-    Q_PROPERTY( wave_type Wave_Type   READ waveType    WRITE setWaveType DESIGNABLE true USER true )
-    Q_ENUMS( wave_type )
-    
+    Q_PROPERTY( double    Volt_Base READ voltBase WRITE setVoltBase DESIGNABLE true USER true )
+    Q_PROPERTY( double    Duty      READ duty     WRITE setDuty     DESIGNABLE true USER true )
+    Q_PROPERTY( int       Steps     READ steps    WRITE setSteps    DESIGNABLE true USER true )
+    Q_PROPERTY( wave_type Wave_Type READ waveType WRITE setWaveType DESIGNABLE true USER true )
+
     public:
 
         WaveGen( QObject* parent, QString type, QString id );
@@ -45,9 +44,12 @@ class MAINMODULE_EXPORT WaveGen : public ClockBase
             Square,
             Random
         };
+        Q_ENUM( wave_type )
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
+
+        virtual QList<propGroup_t> propGroups() override;
         
         double voltBase()            { return m_voltBase; }
         void setVoltBase( double v ) { m_voltBase = v; }
@@ -55,14 +57,14 @@ class MAINMODULE_EXPORT WaveGen : public ClockBase
         double duty();
         void setDuty( double duty );
         
-        int quality();
-        void setQuality( int q );
+        int steps();
+        void setSteps( int steps );
         
         wave_type waveType()              { return m_type; }
         void setWaveType( wave_type typ ) { m_type = typ; }
         
-        virtual void updateStep();
-        virtual void simuClockStep();
+        virtual void updateStep() override;
+        virtual void runEvent() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
         
@@ -79,13 +81,14 @@ class MAINMODULE_EXPORT WaveGen : public ClockBase
         wave_type m_type;
         double m_duty;
         double m_vOut;
-        double m_vOldOut;
         double m_voltBase;
         double m_lastVout;
         double m_halfW;
+        double m_time;
         
-        int m_quality;
-        int m_qSteps;
+        int      m_steps;
+        uint64_t m_qSteps;
+        uint64_t m_nextStep;
 };
 
 #endif

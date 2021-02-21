@@ -26,17 +26,16 @@
 #include "memdata.h"
 #include <QtSerialPort/QSerialPort>
 
-#include "shield.h"
-
 class BaseProcessor;
 class McuComponentPin;
 
 class MAINMODULE_EXPORT McuComponent : public Chip, public MemData
 {
     Q_OBJECT
+    Q_PROPERTY( QStringList varList  READ varList  WRITE setVarList )
     Q_PROPERTY( QVector<int> eeprom  READ eeprom   WRITE setEeprom )
-    Q_PROPERTY( QString  Program     READ program  WRITE setProgram  DESIGNABLE true  USER true )
     Q_PROPERTY( double   Mhz         READ freq     WRITE setFreq     DESIGNABLE true  USER true )
+    Q_PROPERTY( QString  Program     READ program  WRITE setProgram  DESIGNABLE true  USER true )
     Q_PROPERTY( bool     Auto_Load   READ autoLoad WRITE setAutoLoad DESIGNABLE true  USER true )
 
     public:
@@ -46,13 +45,22 @@ class MAINMODULE_EXPORT McuComponent : public Chip, public MemData
         
  static McuComponent* self() { return m_pSelf; }
 
-        virtual void updateStep();
-        virtual void runAutoLoad();
+        virtual QList<propGroup_t> propGroups() override;
 
-        QString program()   const { return  m_symbolFile; }
+        virtual void initialize() override;
+        virtual void updateStep() override;
+        virtual void attach() override;
+        virtual void remove() override;
+
+        virtual void initChip();
+
+        QStringList varList();
+        void setVarList( QStringList vl ) { m_varList = vl; }
+
+        QString program()   const { return m_symbolFile; }
         void setProgram( QString pro );
 
-        double freq();
+        double freq(){ return m_freq; }
         virtual void setFreq( double freq );
 
         bool autoLoad() { return m_autoLoad; }
@@ -60,14 +68,18 @@ class MAINMODULE_EXPORT McuComponent : public Chip, public MemData
         
         QString device() { return m_device; }
 
-        virtual void initChip();
-
         void setEeprom(QVector<int> eep );
         QVector<int> eeprom();
-
-        virtual void setLogicSymbol( bool ls );
         
         QList<McuComponentPin*> getPinList() { return m_pinList; }
+
+        virtual void terminate();
+        virtual void reset();
+        virtual void load( QString fileName );
+        virtual void setSubcDir( QString dir );
+        virtual void crash(){;}
+
+        BaseProcessor* processor() { return m_processor; }
 
         virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
@@ -75,50 +87,55 @@ class MAINMODULE_EXPORT McuComponent : public Chip, public MemData
         void closeSerials();
         void openSerials();
   
+
     public slots:
-        virtual void terminate();
-        virtual void remove();
-        virtual void reset();
-        virtual void load( QString fileName );
+        void slotmain();
         void slotLoad();
         void slotReload();
         void slotOpenTerm();
         void slotOpenSerial();
+        void slotOpenRamTable();
 
         void loadData();
         void saveData();
-        
-        void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
-        
+        void showTable();
+
     protected:
  static McuComponent* m_pSelf;
- static bool m_canCreate;
-        
+
+        virtual void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
         virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
 
         virtual void addPin( QString id, QString type, QString label,
-                             int pos, int xpos, int ypos, int angle )=0;
+                             int pos, int xpos, int ypos, int angle, int length=8 )=0;
 
         virtual void updatePin( QString id, QString type, QString label,
                                 int pos, int xpos, int ypos, int angle );
 
         virtual void attachPins()=0;
 
+        void createRamTable();
+
         BaseProcessor* m_processor;
 
         double m_freq;           // Clock Frequency Mhz
+        int m_cpi;
         
         bool m_attached;
         bool m_autoLoad;
+        bool m_crashed;
+
+        int m_warning;
 
         QString m_device;       // Name of device
         QString m_symbolFile;   // firmware file loaded
         QString m_lastFirmDir;  // Last firmware folder used
+        QString m_subcDir;      // Subcircuit Path
 
         QList<McuComponentPin*> m_pinList;
+        QStringList m_varList;
 
-        Shield* m_shield;
-
-    friend class Shield;
+        QWidget*     m_ramTabWidget;
+        QVBoxLayout* m_ramTabWidgetLayout;
 };
 #endif

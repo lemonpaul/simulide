@@ -25,22 +25,26 @@
 
 #include "highlighter.h"
 #include "outpaneltext.h"
-#include "ramtable.h"
+#include "ramtablewidget.h"
+#include "e-element.h"
 
-#define DBG_STOPPED 0
-#define DBG_STEPING 1
-#define DBG_RUNNING 2
-#define DBG_PAUSED  3
+enum bebugState_t{
+    DBG_STOPPED = 0,
+    DBG_PAUSED,
+    DBG_STEPING,
+    DBG_RUNNING
+};
 
 class QPaintEvent;
 class QResizeEvent;
 class QSize;
 class QWidget;
 
+class EditorProp;
 class BaseDebugger;
 class LineNumberArea;
 
-class CodeEditor : public QPlainTextEdit
+class CodeEditor : public QPlainTextEdit, public eElement
 {
     Q_OBJECT
     //Q_PROPERTY( bool   centerOnScroll   READ centerOnScroll    WRITE setCenterOnScroll  DESIGNABLE true USER true )
@@ -50,13 +54,15 @@ class CodeEditor : public QPlainTextEdit
     Q_PROPERTY( bool Show_Spaces   READ showSpaces WRITE setShowSpaces DESIGNABLE true USER true )
 
     public:
-        CodeEditor( QWidget *parent, OutPanelText *outPane );
+        CodeEditor( QWidget* parent, OutPanelText* outPane );
         ~CodeEditor();
         
-        int fontSize();
+        virtual void updateStep() override;
+
+        int fontSize() { return m_fontSize; }
         void setFontSize( int size );
         
-        int tabSize();
+        int tabSize() { return m_tabSize; }
         void setTabSize( int size );
         
         bool showSpaces();
@@ -65,20 +71,21 @@ class CodeEditor : public QPlainTextEdit
         bool spaceTabs();
         void setSpaceTabs( bool on );
         
-        bool driveCirc();
+        bool driveCirc() { return m_driveCirc; }
         void setDriveCirc( bool drive );
 
-        void setFile(const QString &filePath);
-        QString getFilePath();
+        void setFile(const QString filePath);
+        QString getFilePath() { return m_file ; }
 
-        void lineNumberAreaPaintEvent(QPaintEvent *event);
+        void lineNumberAreaPaintEvent( QPaintEvent* event );
         int  lineNumberAreaWidth();
         
         void setCompiled( bool compiled ) { m_isCompiled = compiled; }
         
-        bool debugStarted() { return m_debugging; }
+        bool debugStarted() { return (m_state > DBG_STOPPED); }
         bool initDebbuger();
-        bool hasDebugger() { return m_debugger!=0l; }
+        void stopDebbuger();
+        void lineReached( int line );
 
         void setCompilerPath();
 
@@ -86,37 +93,33 @@ class CodeEditor : public QPlainTextEdit
         void msg( QString text );
 
     public slots:
-        void stopDebbuger();
+        void slotProperties();
+
         void slotAddBreak() { m_brkAction = 1; }
         void slotRemBreak() { m_brkAction = 2; }
-        void timerTick();
         void compile();
         void upload();
+        void runToBreak();
         void step( bool over=false );
         void stepOver();
         void pause();
-        void resume();
         void reset();
-        void run();
 
     protected:
         void resizeEvent(QResizeEvent *event);
-        void focusInEvent( QFocusEvent* );
         void keyPressEvent( QKeyEvent* event );
+        void contextMenuEvent(QContextMenuEvent* event);
 
     private slots:
         void updateLineNumberAreaWidth(int newBlockCount);
         void updateLineNumberArea( const QRect &, int );
         void highlightCurrentLine();
-        void runClockTick();
 
     private:
         int  getSintaxCoincidences(QString& fileName, QStringList& instructions );
         void addBreakPoint( int line );
         void remBreakPoint( int line );
         void updateScreen();
-
-        void setupDebugTimer();
         
         void indentSelection( bool unIndent );
         
@@ -126,27 +129,25 @@ class CodeEditor : public QPlainTextEdit
         LineNumberArea *m_lNumArea;
         Highlighter    *m_hlighter;
 
-        //QString m_appPath;
         QString m_file;
         QString m_fileDir;
         QString m_fileName;
         QString m_fileExt;
+        QString m_help;
         
         QString m_tab;
 
+        bebugState_t m_state;
+        bebugState_t m_resume;
         QList<int> m_brkPoints;
 
         int m_brkAction;    // 0 = no action, 1 = add brkpoint, 2 = rem brkpoint
         int m_debugLine;
-        int m_prevDebugLine;
-        int m_state;
-        int m_resume;
+        int m_lastCycle;
 
         bool m_isCompiled;
-        bool m_debugging;
-        //bool m_running;
 
-        bool m_stepOver;
+        EditorProp* m_propDialog;
         
  static bool  m_showSpaces;
  static bool  m_spaceTabs;

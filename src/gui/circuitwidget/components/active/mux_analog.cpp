@@ -17,9 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <sstream>
-
 #include "mux_analog.h"
+#include "circuitwidget.h"
+#include "simulator.h"
 #include "circuit.h"
 #include "e-source.h"
 #include "e-resistor.h"
@@ -46,7 +46,7 @@ LibraryItem* MuxAnalog::libraryItem()
 
 MuxAnalog::MuxAnalog( QObject* parent, QString type, QString id )
          : Component( parent, type, id )
-         , eMuxAnalog( id.toStdString() )
+         , eMuxAnalog( id )
 {
     Q_UNUSED( MuxAnalog_properties );
 
@@ -67,6 +67,14 @@ MuxAnalog::MuxAnalog( QObject* parent, QString type, QString id )
 }
 MuxAnalog::~MuxAnalog(){}
 
+QList<propGroup_t> MuxAnalog::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Address_Bits", tr("Address Size"),"Bits"} );
+    mainGroup.propList.append( {"Impedance", tr("Impedance"),"Ω"} );
+    return {mainGroup};
+}
+
 void MuxAnalog::setAddrBits( int bits )
 {
     if( bits == m_addrBits ) return;
@@ -74,8 +82,7 @@ void MuxAnalog::setAddrBits( int bits )
     
     int channels = pow( 2, bits );
     
-    bool pauseSim = Simulator::self()->isRunning();
-    if( pauseSim ) Simulator::self()->pauseSim();
+    if( Simulator::self()->isRunning() ) CircuitWidget::self()->powerCircOff();
     
     if( bits < m_addrBits ) deleteAddrBits( m_addrBits-bits );
     else                    createAddrBits( bits-m_addrBits );
@@ -95,8 +102,7 @@ void MuxAnalog::setAddrBits( int bits )
     pin->setPos( QPoint(-3*8,4*8+bits*8 ) );
     pin->isMoved();
     pin->setLabelPos();
-    
-    if( pauseSim ) Simulator::self()->runContinuous();
+
     Circuit::self()->update();
 }
 
@@ -145,10 +151,10 @@ void MuxAnalog::createResistors( int c )
     {
         QString reid = m_id;
         reid.append(QString("-resistor"+QString::number(i)));
-        m_resistor[i] = new eResistor( reid.toStdString() );
+        m_resistor[i] = new eResistor( reid );
         
         QString pinId = reid+"-pinL";
-        m_ePin[i] = new ePin( pinId.toStdString(), 0 );
+        m_ePin[i] = new ePin( pinId, 0 );
         m_resistor[i]->setEpin( 0, m_ePin[i] );
         
         pinId = m_id+"-pinY"+QString::number(i);

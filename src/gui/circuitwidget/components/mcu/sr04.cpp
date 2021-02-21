@@ -19,6 +19,8 @@
 
 #include "sr04.h"
 #include "pin.h"
+
+#define I_NEED_ADD_EVENTS
 #include "simulator.h"
 
 Component* SR04::construct( QObject* parent, QString type, QString id )
@@ -36,7 +38,7 @@ LibraryItem* SR04::libraryItem()
 
 SR04::SR04( QObject* parent, QString type, QString id )
     : Component( parent, type, id )
-    , eElement( id.toStdString() )
+    , eElement( id )
 {
     m_area = QRect( -10*8, -4*8, 21*8, 9*8 );
     setLabelPos(-16,-48, 0);
@@ -82,80 +84,66 @@ SR04::SR04( QObject* parent, QString type, QString id )
     m_pin[4] = m_echopin;
 
     pinid.append(QString("-eSource"));
-    m_echo = new eSource( pinid.toStdString(), m_echopin );
+    m_echo = new eSource( pinid, m_echopin );
     m_echo->setVoltHigh( 5 );
     m_echo->setImp( 40 );
     
-    resetState();
+    initialize();
 }
-SR04::~SR04(){ Simulator::self()->remFromSimuClockList( this ); }
+SR04::~SR04(){}
 
 void SR04::stamp()
 {
     eNode* enode = m_trigpin->getEnode(); // Register for Trigger Pin changes
-    if( enode ) enode->addToChangedFast(this);
+    if( enode ) enode->voltChangedCallback( this );
 }
 
-void SR04::resetState()
+void SR04::initialize()
 {
-    m_lastStep = Simulator::self()->step();
+    m_lastStep = Simulator::self()->circTime();
     m_lastTrig = false;
-    m_trigCount = 0;
     m_echouS = 0;
 }
 
-void SR04::setVChanged()              // Called when Trigger Pin changes
+void SR04::voltChanged()              // Called when Trigger Pin changes
 {
     bool trigState = m_trigpin->getVolt()>2.5;
     
     if( !m_lastTrig && trigState )                 // Rising trigger Pin
     {
-        m_lastStep = Simulator::self()->step();
+        m_lastStep = Simulator::self()->circTime();
     }
-    else if( m_lastTrig && !trigState )                     // Triggered
+    else if( m_lastTrig && !trigState )            // Triggered
     {
-        uint64_t step = Simulator::self()->step();
-        double stepsPerus = Simulator::self()->stepsPerus();
-        double time = (double)(step-m_lastStep)/stepsPerus;
+        uint64_t time = Simulator::self()->circTime()-m_lastStep; // in picosecondss
 
-        if( time >= 10 )                        // >=10 uS Trigger pulse
+        if( time >= 10*1e6 )     // >=10 uS Trigger pulse
         {
-            double count = 200*stepsPerus;
-            m_trigCount = (int)count;
-            
-            double us = (m_inpin->getVolt()*2000/0.344+0.5)*stepsPerus;
-            m_echouS = us;
+            m_echouS = (m_inpin->getVolt()*2000/0.344+0.5);
+            if( m_echouS < 10 ) m_echouS = 10;
             //qDebug() <<m_inpin->getVolt()<< us<<m_echouS;
             
-            Simulator::self()->addToSimuClockList( this );
+            Simulator::self()->addEvent( 200*1e6, this ); // Send echo after 200 us
         }
     }
     m_lastTrig = trigState;
 }
 
-void SR04::simuClockStep()
+void SR04::runEvent()
 {
-    if( m_trigCount > 0 ) 
+    if( m_echouS )
     {
-        m_trigCount--;
-        
-        if( m_trigCount == 0 )                       // Start Echo pulse
-        {
-            m_echo->setOut( true );
-            m_echo->stampOutput();
-        }
+        m_echo->setOut( true );
+        m_echo->stampOutput();
+
+        Simulator::self()->addEvent( m_echouS*1e6, this );
+
+        m_echouS = 0;
     }
-    else if( m_trigCount == 0 )
+    else
     {
-        m_echouS--;
-        
-        if( m_echouS == 0 )                           // Stop Echo pulse
-        {
-            m_echo->setOut( false );
-            m_echo->stampOutput();
-            
-            Simulator::self()->remFromSimuClockList( this );
-        }
+        m_echo->setOut( false );
+        m_echo->stampOutput();
     }
 }
 

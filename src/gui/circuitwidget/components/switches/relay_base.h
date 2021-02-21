@@ -50,14 +50,11 @@ class MAINMODULE_EXPORT RelayBase : public MechContact
         double induc();
         void  setInduc( double c );
 
-        virtual void stamp();
-
-        void setVChanged();
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void remove() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
-
-    public slots:
-        virtual void remove();
 
     protected:
         eResistor* m_resistor;
@@ -66,6 +63,8 @@ class MAINMODULE_EXPORT RelayBase : public MechContact
         eNode* m_internalEnode;
         double m_trigCurrent;
         double m_relCurrent;
+
+        bool m_relayOn;
 };
 
 #endif

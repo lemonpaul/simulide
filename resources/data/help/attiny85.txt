@@ -1,4 +1,4 @@
-MCU: attiny45
+MCU: attiny85
 Package: 8-pin PDIP
 
 1: PB5 ADC0 !Reset dW   PCINT5
@@ -17,8 +17,8 @@ The high-performance Microchip picoPower 8-bit AVR RISC-based microcontroller
 512 Byte SRAM,
 6 general purpose I/O lines,
 32 general purpose working registers,
-1 x 8-bit timer/counters,
-2-channel PWM,
+2 x 8-bit timer/counters,
+4-channel PWM (2 per Timer),
 1 comparators,
 internal and external interrupts,
 In-System Programmable via SPI Port,

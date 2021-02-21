@@ -32,7 +32,7 @@ class MAINMODULE_EXPORT Pin : public QObject, public QGraphicsItem, public ePin
     public:
         QRectF boundingRect() const { return m_area; }
 
-        Pin( int angle, const QPoint &pos, QString id, int index, Component* parent = 0 );
+        Pin( int angle, const QPoint pos, QString id, int index, Component* parent = 0 );
         ~Pin();
 
         enum { Type = UserType + 3 };
@@ -43,6 +43,7 @@ class MAINMODULE_EXPORT Pin : public QObject, public QGraphicsItem, public ePin
         bool unused() {return m_unused; }
         void setUnused( bool unused );
 
+        int length() { return m_length; }
         void setLength( int length );
         
         void setColor( QColor color ) { m_color = color; }
@@ -59,10 +60,13 @@ class MAINMODULE_EXPORT Pin : public QObject, public QGraphicsItem, public ePin
         void setConPin( Pin* pin );
         Pin* conPin();
 
+        void connectPin();
+
         QString getLabelText();
         void setLabelPos();
         void setLabelColor( QColor color );
         void setFontSize( int size );
+        int  labelSizeX();
 
         void setVisible( bool visible );
 
@@ -96,7 +100,7 @@ class MAINMODULE_EXPORT Pin : public QObject, public QGraphicsItem, public ePin
 
         QString m_labelText;
         
-        QColor m_color;
+        QColor     m_color;
         QRect      m_area;
         Connector* my_connector;
         Component* m_component;

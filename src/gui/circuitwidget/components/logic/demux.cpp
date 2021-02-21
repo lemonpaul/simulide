@@ -36,7 +36,8 @@ LibraryItem* Demux::libraryItem()
 }
 
 Demux::Demux( QObject* parent, QString type, QString id )
-        : LogicComponent( parent, type, id ), eDemux( id.toStdString() )
+     : LogicComponent( parent, type, id )
+     , eDemux( id )
 {
     m_width  = 4;
     m_height = 10;
@@ -75,6 +76,16 @@ Demux::Demux( QObject* parent, QString type, QString id )
         eLogicDevice::createOutput( m_outPin[i] );
 }
 Demux::~Demux(){}
+
+QList<propGroup_t> Demux::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Inverted", tr("Invert Outputs"),""} );
+
+    QList<propGroup_t> pg = LogicComponent::propGroups();
+    pg.prepend( mainGroup );
+    return pg;
+}
 
 QPainterPath Demux::shape() const
 {

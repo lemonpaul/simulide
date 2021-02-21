@@ -30,38 +30,44 @@ class MAINMODULE_EXPORT LogicInput : public Component, public eElement
 {
     Q_OBJECT
     Q_PROPERTY( double   Voltage   READ volt    WRITE setVolt    DESIGNABLE true USER true )
-    Q_PROPERTY( QString  Unit      READ unit    WRITE setUnit    DESIGNABLE true USER true )
-    Q_PROPERTY( bool     Show_Volt READ showVal WRITE setShowVal DESIGNABLE true USER true )
+    Q_PROPERTY( bool     Out       READ out     WRITE setOut     DESIGNABLE true)
 
     public:
         LogicInput( QObject* parent, QString type, QString id );
         ~LogicInput();
 
         static Component* construct( QObject* parent, QString type, QString id );
-        static LibraryItem *libraryItem();
-        
-        virtual void updateStep();
+        static LibraryItem* libraryItem();
+
+        virtual QList<propGroup_t> propGroups() override;
+
+        bool out() { return m_out->out(); }
+        void setOut( bool out );
 
         double volt();
         void setVolt( double v );
         
-        void setUnit( QString un );
+        virtual void setUnit( QString un ) override;
+
+        virtual void stamp() override;
+        virtual void updateStep() override;
+        virtual void runEvent() override;
+        virtual void remove() override;
 
         virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     public slots:
         virtual void onbuttonclicked();
-        virtual void remove();
 
     protected:
+        void updateOutput();
+
         double m_voltHight;
-        
-        bool m_changed;
 
-        Pin     *m_outpin;
-        eSource *m_out;
+        Pin*     m_outpin;
+        eSource* m_out;
 
-        QPushButton* m_button;
+        QToolButton* m_button;
         QGraphicsProxyWidget* m_proxy;
 };
 

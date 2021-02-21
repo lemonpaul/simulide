@@ -46,16 +46,16 @@ FindReplaceForm::FindReplaceForm(QWidget *parent)
 
     ui->errorLabel->setText("");
 
-    connect(ui->textToFind, SIGNAL(textChanged(QString)), this, SLOT(textToFindChanged()));
-    connect(ui->textToFind, SIGNAL(textChanged(QString)), this, SLOT(validateRegExp(QString)));
+    connect(ui->textToFind, SIGNAL(textChanged(QString)), this, SLOT(textToFindChanged()), Qt::UniqueConnection);
+    connect(ui->textToFind, SIGNAL(textChanged(QString)), this, SLOT(validateRegExp(QString)), Qt::UniqueConnection);
 
-    connect(ui->regexCheckBox, SIGNAL(toggled(bool)), this, SLOT(regexpSelected(bool)));
+    connect(ui->regexCheckBox, SIGNAL(toggled(bool)), this, SLOT(regexpSelected(bool)), Qt::UniqueConnection);
 
-    connect(ui->findButton,  SIGNAL(clicked()), this, SLOT(find()));
-    connect(ui->closeButton, SIGNAL(clicked()), parent, SLOT(close()));
+    connect(ui->findButton,  SIGNAL(clicked()), this, SLOT(find()), Qt::UniqueConnection);
+    connect(ui->closeButton, SIGNAL(clicked()), parent, SLOT(close()), Qt::UniqueConnection);
 
-    connect(ui->replaceButton,    SIGNAL(clicked()), this, SLOT(replace()));
-    connect(ui->replaceAllButton, SIGNAL(clicked()), this, SLOT(replaceAll()));
+    connect(ui->replaceButton,    SIGNAL(clicked()), this, SLOT(replace()), Qt::UniqueConnection);
+    connect(ui->replaceAllButton, SIGNAL(clicked()), this, SLOT(replaceAll()), Qt::UniqueConnection);
 }
 
 FindReplaceForm::~FindReplaceForm()
@@ -74,8 +74,8 @@ void FindReplaceForm::hideReplaceWidgets()
 void FindReplaceForm::setTextEdit( CodeEditor* textEdit_) 
 {
     m_textEdit = textEdit_;
-    connect( m_textEdit, SIGNAL(copyAvailable(bool)), ui->replaceButton, SLOT(setEnabled(bool)));
-    connect( m_textEdit, SIGNAL(copyAvailable(bool)), ui->replaceAllButton, SLOT(setEnabled(bool)));
+    connect( m_textEdit, SIGNAL(copyAvailable(bool)), ui->replaceButton, SLOT(setEnabled(bool)), Qt::UniqueConnection);
+    connect( m_textEdit, SIGNAL(copyAvailable(bool)), ui->replaceAllButton, SLOT(setEnabled(bool)), Qt::UniqueConnection);
 }
 
 void FindReplaceForm::setTextToFind( QString text)
@@ -103,13 +103,13 @@ void FindReplaceForm::textToFindChanged()
     ui->findButton->setEnabled(ui->textToFind->text().size() > 0);
 }
 
-void FindReplaceForm::regexpSelected(bool sel) 
+void FindReplaceForm::regexpSelected( bool sel )
 {
     if( sel ) validateRegExp(ui->textToFind->text());
     else      validateRegExp("");
 }
 
-void FindReplaceForm::validateRegExp(const QString &text) 
+void FindReplaceForm::validateRegExp( const QString &text )
 {
     if( !ui->regexCheckBox->isChecked() || text.size() == 0 ) 
     {

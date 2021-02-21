@@ -27,46 +27,55 @@
 class MAINMODULE_EXPORT eSource : public eElement
 {
     public:
-        eSource( std::string id, ePin* epin );
+        eSource( QString id, ePin* epin );
         virtual ~eSource();
 
-        virtual void initialize();
+        virtual void initialize() override;
+        virtual void runEvent() override;
         
-        void stamp();
+        void stamp() override;
         void stampOutput();
 
-        double voltHight();
+        double voltHight() { return m_voltHigh; }
         void  setVoltHigh( double v );
 
-        double voltLow();
+        double voltLow() { return m_voltLow; }
         void  setVoltLow( double v );
         
-        bool  out();
-        void  setOut( bool hight );
+        bool out() { return m_out; }
+        void setOut( bool out );
+        void setTimedOut( bool out );
 
-        bool  isInverted();
+        bool  isInverted() { return m_inverted; }
         void  setInverted( bool inverted );
 
-        double imp();
+        double imp() { return m_imp; }
         void  setImp( double imp );
+        virtual void setTimedImp( double imp );
+
+        uint64_t riseTime() { return m_timeLH; }
+        void setRiseTime( uint64_t time );
+
+        uint64_t fallTime() { return m_timeHL; }
+        void setFallTime( uint64_t time );
 
         double getVolt();
 
-        ePin* getEpin();
-        ePin* getEpin( QString pinName );
-
-        void  createPin();
-
     protected:
-        
         double m_voltHigh;
         double m_voltLow;
         double m_voltOut;
+        double m_voltOutNext;
         double m_imp;
+        double m_impNext;
         double m_admit;
 
         bool m_out;
+        bool m_outNext;
         bool m_inverted;
+
+        double m_timeLH;
+        double m_timeHL;
 
         eNode* m_scrEnode;
 };

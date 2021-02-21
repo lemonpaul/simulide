@@ -39,11 +39,14 @@ class PICComponent : public McuComponent
 
         int getRamValue( int address );
 
+    protected:
+        PicProcessor m_pic;
+
     private:
         void attachPins();
-        void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
-        
-        PicProcessor m_pic;
+        virtual void addPin( QString id, QString type, QString label,
+                             int pos, int xpos, int ypos, int angle , int length=8);
+
 };
 
 #endif

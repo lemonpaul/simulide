@@ -27,21 +27,28 @@
 
 #include "sim_utils.h"
 
-static argv_p
-argv_realloc(
-	argv_p	argv,
-	uint32_t size )
+#ifdef WIN32
+/* https://unixpapa.com/incnote/string.html */
+char *strsep(char **sp, char *sep)
 {
-	argv = realloc(argv,
-				sizeof(argv_t) + (size * sizeof(argv->argv[0])));
+    char *p, *s;
+    if (sp == NULL || *sp == NULL || **sp == '\0') return(NULL);
+    s = *sp;
+    p = s + strcspn(s, sep);
+    if (*p != '\0') *p++ = '\0';
+    *sp = p;
+    return(s);
+}
+#endif
+
+static argv_p argv_realloc( argv_p argv, uint32_t size )
+{
+    argv = realloc(argv, sizeof(argv_t) + (size * sizeof(argv->argv[0])));
 	argv->size = size;
 	return argv;
 }
 
-argv_p
-argv_parse(
-	argv_p	argv,
-	char * line )
+argv_p argv_parse( argv_p argv, char * line )
 {
 	if (!argv)
 		argv = argv_realloc(argv, 8);

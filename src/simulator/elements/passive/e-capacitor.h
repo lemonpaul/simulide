@@ -25,12 +25,11 @@
 class MAINMODULE_EXPORT eCapacitor : public eResistor
 {
     public:
-        eCapacitor( std::string id );
+        eCapacitor( QString id );
         ~eCapacitor();
 
-        virtual void stamp();
-        virtual void resetState();
-        void setVChanged();
+        virtual void initialize() override;
+        virtual void runEvent() override;
 
         double cap();
         void setCap( double c );
@@ -40,6 +39,8 @@ class MAINMODULE_EXPORT eCapacitor : public eResistor
         double m_curSource;
         double m_tStep;
         double m_volt;
+
+        uint64_t m_nextStep;
 };
 
 #endif

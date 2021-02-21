@@ -36,7 +36,7 @@ class MAINMODULE_EXPORT Amperimeter : public Meter
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
 
-        void updateStep();
+        void updateStep() override;
 };
 
 #endif

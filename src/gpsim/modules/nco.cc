@@ -34,7 +34,6 @@ License along with this library; if not, see
 #endif
 
 #include "pic-processor.h"
-#include "packages.h"
 #include "apfcon.h"
 #include "nco.h"
 #include "clc.h"
@@ -42,7 +41,7 @@ License along with this library; if not, see
 
 class NCOSigSource:public SignalControl
 {
-  public:
+public:
     NCOSigSource (NCO * _nco, PinModule * _pin):m_nco (_nco),
         m_state ('?'), m_pin (_pin)
     {
@@ -52,20 +51,11 @@ class NCOSigSource:public SignalControl
     {
     }
 
-    void setState (char _state)
-    {
-        m_state = _state;
-    }
-    virtual char getState ()
-    {
-        return m_state;
-    }
-    virtual void release ()
-    {
-        m_nco->releasePinSource (m_pin);
-    }
+    void setState (char _state) { m_state = _state; }
+    virtual char getState () { return m_state; }
+    virtual void release () { m_nco->releasePinSource (m_pin); }
 
-  private:
+private:
     NCO * m_nco;
     char m_state;
     PinModule *m_pin;
@@ -74,32 +64,26 @@ class NCOSigSource:public SignalControl
 // Report state changes on incoming CLK pin
 class ncoCLKSignalSink:public SignalSink
 {
-  public:
+public:
     ncoCLKSignalSink (NCO * _nco):m_nco (_nco)
     {
     }
 
-    virtual void setSinkState (char new3State)
-    {
-        m_nco->setState (new3State);
-    }
-    virtual void release ()
-    {
-        delete this;
-    }
-  private:
+    virtual void setSinkState (char new3State) { m_nco->setState (new3State); }
+    virtual void release ()    { delete this; }
+private:
     NCO * m_nco;
 };
 
 
 NCO::NCO (Processor * pCpu):
-    nco1con (this, pCpu, "nco1con", "NCOx Control Register"),
-    nco1clk (this, pCpu, "nco1clk", "NCOx Input Clock Control Register"),
-    nco1acch (this, pCpu, "nco1acch", "NCOx Accumulator Register-High Byte"),
-    nco1accl (this, pCpu, "nco1accl", "NCOx Accumulator Register-Low Byte"),
-    nco1accu (this, pCpu, "nco1accu", "NCOx Accumulator Register-Upper Byte"),
-    nco1inch (this, pCpu, "nco1inch", "NCOx Increment Register-High Byte"),
-    nco1incl (this, pCpu, "nco1incl", "NCOx Increment Register-Low Byte"),
+    nco1con (this, pCpu, "nco1con" ),
+    nco1clk (this, pCpu, "nco1clk" ),
+    nco1acch (this, pCpu, "nco1acch" ),
+    nco1accl (this, pCpu, "nco1accl" ),
+    nco1accu (this, pCpu, "nco1accu" ),
+    nco1inch (this, pCpu, "nco1inch" ),
+    nco1incl (this, pCpu, "nco1incl" ),
     pir (0), m_NCOif (0),
     cpu (pCpu), pinNCOclk (0), pinNCO1 (0), NCO1src (0), srcNCO1active (false),
     inc_load (0), inc (1), acc (0), future_cycle (0), last_cycle (0),
@@ -127,42 +111,29 @@ void NCO::update_ncocon (uint diff)
     Dprintf (("NCO::update_ncocon diff=0x%x value=0x%x\n", diff, value));
     if ((diff & NxEN) && (value & NxEN))        //NCO turning on
     {
-        Dprintf (("NCO::update_ncocon ON nco1con=0x%x nco1clk=0x%x\n", value,
-                  nco1clk.value.get ()));
         pulseWidth = 0;
-        /*if (!nco_interface)
-        {
-            nco_interface = new NCO_Interface (this);
-            get_interface ().prepend_interface (nco_interface);
-        }*/
-        if (value & NxOE)
-            oeNCO1 (true);
+
+        if (value & NxOE) oeNCO1 (true);
 
         // force clock to current state
         update_ncoclk (NxCLKS_mask);
     }
     else if ((diff & NxEN) && !(value & NxEN))        //NCO turning off
     {
-        Dprintf (("NCO::update_ncocon OFF nco1con=0x%x nco1clk=0x%x acc=0x%x\n", value,
-                  nco1clk.value.get (), acc));
         pulseWidth = 0;
         oeNCO1 (false);
         current_value ();
         if (future_cycle)
         {
-            get_cycles ().clear_break (future_cycle);
+            cpu->clear_break (future_cycle);
             future_cycle = 0;
         }
-        if (acc >= (1 << 20))
-                acc -= (1 << 20);
+        if (acc >= (1 << 20)) acc -= (1 << 20);
     }
     else if (value & NxEN)        // currently running
     {
-        if ((diff & NxOE))
-            oeNCO1 (value & NxOE);
-
-        if (diff & NxPOL)
-            outputNCO1 (value & NxOUT);
+        if ((diff & NxOE)) oeNCO1 (value & NxOE);
+        if (diff & NxPOL) outputNCO1 (value & NxOUT);
     }
 }
 
@@ -202,18 +173,14 @@ void NCO::NCOincrement ()
         NCOoverflow = false;
         outputNCO1 (value & NxOUT);
         Dprintf(("m_NCOif=%p pir=%p\n", m_NCOif,pir));
-        if (m_NCOif)
-            m_NCOif->Trigger ();
-        else if (pir)
-            pir->set_nco1if ();
-        else
-            fprintf (stderr, "NCO interrupt method not configured\n");
+        if (m_NCOif) m_NCOif->Trigger ();
+        else if (pir) pir->set_nco1if ();
+        else fprintf (stderr, "NCO interrupt method not configured\n");
     }
     acc += inc;
-    Dprintf (("NCO::NCOincrement() acc=0x%x inc=0x%x\n", acc, inc));
+
     if (acc >= (1 << 20))        // overflow
     {
-        Dprintf (("NCO::NCOincrement() acc overflow acc=0x%x\n", acc));
         acc -= (1 << 20);
         NCOoverflow = true;
     }
@@ -221,8 +188,7 @@ void NCO::NCOincrement ()
 
 void NCO::callback ()
 {
-
-    current_value ();
+    current_value();
     future_cycle = 0;
     uint value = nco1con.value.get ();
 
@@ -238,31 +204,25 @@ void NCO::callback ()
         }
         else
         {
-            uint cps = cpu->get_ClockCycles_per_Instruction ();
+            uint cps = cpu->get_ClockPerInstr();
             pulseWidth = 1 << ((nco1clk.value.get () & NxPW_mask) >> 5);
             Dprintf (("NCO::callback raw pulseWidth=%u ", pulseWidth));
             value = value | NxOUT;
-            if (clock_src () == HFINTOSC)
-                pulseWidth *= cpu->get_frequency () / (16e6);
+            if (clock_src () == HFINTOSC) pulseWidth *= cpu->get_frequency () / (16e6);
             int rem = pulseWidth % cps;
             pulseWidth /= cps;
-            if (!pulseWidth || rem)
-                pulseWidth++;
-            Dprintf (("pulseWidth=%u rem = %d value=0x%x\n", pulseWidth, rem,
-                      value));
-            last_cycle = get_cycles ().get ();
+            if (!pulseWidth || rem) pulseWidth++;
+
+            last_cycle = cpu->currentCycle();
             future_cycle = last_cycle + pulseWidth;
-            get_cycles ().set_break (future_cycle, this);
+            cpu->setBreakAbs(future_cycle, this);
         }
         nco1con.value.put (value);
         outputNCO1 (value & NxOUT);
-        Dprintf(("m_NCOif=%p pir=%p\n", m_NCOif,pir));
-        if (m_NCOif)
-            m_NCOif->Trigger ();
-        else if (pir)
-            pir->set_nco1if ();
-        else
-            fprintf (stderr, "NCO interrupt method not configured\n");
+
+        if (m_NCOif) m_NCOif->Trigger ();
+        else if (pir) pir->set_nco1if ();
+        else fprintf (stderr, "NCO interrupt method not configured\n");
     }
     else if (pulseWidth)
     {
@@ -270,58 +230,40 @@ void NCO::callback ()
         nco1con.value.put (value);
         outputNCO1 (value & NxOUT);
 
-        Dprintf (("call simulate_clock\n"));
         simulate_clock (true);
     }
-    else
-    {
-        Dprintf (("call simulate_clock\n"));
-        simulate_clock (true);
-    }
+    else simulate_clock (true);
+
 }
 
 // Use callback to simulate NCO driven by internal clock
 void NCO::simulate_clock (bool on)
 {
-    Dprintf(("on=%d inc=%u clock=%s\n", on, inc, clock_src() ? "Fosc" : "HFINTOSC"));
-    if (on && inc)
+    if( on && inc )
     {
         int64_t delta;
-        uint cps = cpu->get_ClockCycles_per_Instruction ();
+        uint cps = cpu->get_ClockPerInstr();
         uint rem = 0;
 
-        if (future_cycle)
+        if( future_cycle )
         {
             current_value ();
-            get_cycles ().clear_break (future_cycle);
+            cpu->clear_break( future_cycle );
         }
         delta = ((1 << 20) - acc) / inc;
-        if (delta <= 0)
-            delta = 1;
-        else
-            rem = ((1 << 20) - acc) % inc;
-        if (rem)
-            delta++;
+        if (delta <= 0) delta = 1;
+        else rem = ((1 << 20) - acc) % inc;
+        if (rem)  delta++;
 
-        if (clock_src () == HFINTOSC)
-        {
-            delta *= cpu->get_frequency() / (16e6);
-            Dprintf(("delta=%ld cpu=%.3fMHz HFINTOC=%.3fMHz\n", delta, cpu->get_frequency()/1e6, 16e6/1e6));
-        }
+        if (clock_src () == HFINTOSC)  delta *= cpu->get_frequency() / (16e6);
 
         rem = delta % cps;        // if rem != 0 timing is approximate
         delta /= cps;
-        if ((delta <= 0) || rem > 0)
-            delta++;
-        Dprintf (("NCO::simulate_clock clock=%.2e acc=0x%x delta = %"
-                  PRINTF_GINT64_MODIFIER "d rem=%u\n",
-                  (clock_src () == HFINTOSC) ? 16e6 : cpu->get_frequency (),
-                  acc, delta, rem));
+        if ((delta <= 0) || rem > 0) delta++;
 
-
-        last_cycle = get_cycles ().get ();
+        last_cycle = cpu->currentCycle();
         future_cycle = last_cycle + delta;
-        get_cycles ().set_break (future_cycle, this);
+        cpu->setBreakAbs( future_cycle, this );
     }
     else                        // clock off
     {
@@ -329,10 +271,9 @@ void NCO::simulate_clock (bool on)
         if (future_cycle)
         {
             current_value ();
-            get_cycles ().clear_break (future_cycle);
+            cpu->clear_break (future_cycle);
             future_cycle = 0;
         }
-
     }
 }
 
@@ -340,13 +281,12 @@ void NCO::simulate_clock (bool on)
 void NCO::outputNCO1 (bool level)
 {
     level = (nco1con.value.get () & NxPOL) ? !level : level;
-    Dprintf (("NCO::outputNCO1 level=%d\n", level));
+
     for (int i = 0; i < 4; i++)
         if (m_clc[i])
             m_clc[i]->NCO_out (level);
 
-    if (m_cwg)
-        m_cwg->out_NCO(level);
+    if (m_cwg) m_cwg->out_NCO(level);
 
     if (NCO1src)
     {
@@ -387,24 +327,17 @@ void NCO::enableCLKpin (bool on)
         pinNCOclk->addSink (CLKsink);
         CLKstate = pinNCOclk->getPin ().getState ();
     }
-    else
-    {
-        if (CLKsink) pinNCOclk->removeSink (CLKsink);
-    }
+    else  if (CLKsink) pinNCOclk->removeSink (CLKsink);
 }
 
 // new value for NCO1CLK register
 void NCO::update_ncoclk (uint diff)
 {
-    Dprintf(("nco1con=0x%x diff=0x%x\n", nco1con.value.get(), diff));
     if ((nco1con.value.get () & NxEN) && (diff & NxCLKS_mask))
     {
         enableCLKpin (false);
-        if (future_cycle)
-        {
-            simulate_clock (false);
-        }
-        Dprintf(("clk=%d\n", clock_src()));
+        if (future_cycle) simulate_clock (false);
+
         switch (clock_src ())
         {
         case HFINTOSC:
@@ -464,46 +397,39 @@ void NCO::setIOpin(int data, PinModule *pin)
 // remap NCO1 pin, called from APFCON
 void NCO::setNCOxPin (PinModule * pNCOx)
 {
-    if (pNCOx == pinNCO1)
-        return;
+    if (pNCOx == pinNCO1) return;
+
     if (srcNCO1active)                // old pin active disconnect
     {
         oeNCO1 (false);
-        if (NCO1src)
-            delete NCO1src;
+        if (NCO1src) delete NCO1src;
         NCO1src = 0;
     }
     pinNCO1 = pNCOx;
-    if (nco1con.value.get () & NxOE)
-        oeNCO1 (true);
+    if (nco1con.value.get() & NxOE) oeNCO1(true);
 }
 
 // link from Configurable Logic Cell
-void NCO::link_nco (bool level, char index)
+void NCO::link_nco( bool level, char index )
 {
-    // Active?
-    if (clock_src () == LC1_OUT)
+    if (clock_src () == LC1_OUT) // Active?
     {
-        Dprintf (("NCO::link_nco level=%d index=%d edge=%d\n", level, index,
-                  (bool) (level & !CLKstate)));
-        if (level & !CLKstate)        // new edge
-            NCOincrement ();
+        if (level & !CLKstate) NCOincrement();   // new edge
         CLKstate = level;
     }
 }
 
 // Save acc buffer into accx registers,
 // but if clock is simulated, first compute value of acc buffer.
-void NCO::current_value ()
+void NCO::current_value()
 {
-    if (future_cycle && (get_cycles ().get () - last_cycle))
+    if (future_cycle && (cpu->currentCycle() - last_cycle))
     {
-        uint cps = cpu->get_ClockCycles_per_Instruction ();
-        uint32_t delta_acc = (get_cycles ().get () - last_cycle) * inc * cps;
-        if (clock_src () == HFINTOSC)
-            delta_acc *= 16e6 / cpu->get_frequency ();
+        uint cps = cpu->get_ClockPerInstr();
+        uint32_t delta_acc = (cpu->currentCycle() - last_cycle) * inc * cps;
+        if (clock_src () == HFINTOSC) delta_acc *= 16e6 / cpu->get_frequency();
         acc += delta_acc;
-        last_cycle = get_cycles ().get ();
+        last_cycle = cpu->currentCycle();
     }
     nco1accu.value.put ((acc >> 16) & 0x0f);
     nco1acch.value.put ((acc >> 8) & 0xff);
@@ -518,10 +444,9 @@ void NCO::set_acc_buf ()
     NCOoverflow = false;
 
     if ((clock_src () == FOSC || clock_src () == HFINTOSC) &&
-        (nco1con.value.get () & NxEN))
+            (nco1con.value.get () & NxEN))
     {
         set_inc_buf ();
-        Dprintf (("call simulate_clock\n"));
         simulate_clock (true);
     }
 }
@@ -542,18 +467,15 @@ void NCO::newINCL ()
     {
         current_value ();
         set_inc_buf ();
-        Dprintf (("call simulate_clock\n"));
         simulate_clock (true);
     }
-    else
-        inc_load = 2;
+    else inc_load = 2;
 }
 
 // load inc buffer from registers
 void NCO::set_inc_buf ()
 {
     inc = (nco1inch.value.get () << 8) | nco1incl.value.get ();
-    Dprintf (("NCO::set_inc_buf inc=0x%x\n", inc));
 }
 
 // process input from clock pin
@@ -586,16 +508,13 @@ void NCO::releasePinSource (PinModule * pin)
 {
     if (pin)
     {
-
-        if (pin == pinNCO1)
-            srcNCO1active = false;
+        if (pin == pinNCO1) srcNCO1active = false;
     }
 }
 
 
-NCOxCON::NCOxCON (NCO * pt, Processor * pCpu, const char *pName,
-                  const char *pDesc):
-        sfr_register (pCpu, pName, pDesc), con_mask (0xd1), pt_nco (pt)
+NCOxCON::NCOxCON (NCO * pt, Processor * pCpu, const char *pName ):
+    SfrReg (pCpu, pName ), con_mask (0xd1), pt_nco (pt)
 {
 }
 
@@ -618,9 +537,8 @@ void NCOxCON::reset(RESET_TYPE r)
 }
 
 
-NCOxCLK::NCOxCLK (NCO * pt, Processor * pCpu, const char *pName,
-                const char *pDesc):
-        sfr_register (pCpu, pName, pDesc), clk_mask (0xe3), pt_nco (pt)
+NCOxCLK::NCOxCLK (NCO * pt, Processor * pCpu, const char *pName ):
+    SfrReg (pCpu, pName ), clk_mask (0xe3), pt_nco (pt)
 {
 }
 
@@ -634,9 +552,8 @@ void NCOxCLK::put (uint new_value)
     pt_nco->update_ncoclk (diff);
 }
 
-NCOxACCH::NCOxACCH (NCO * pt, Processor * pCpu, const char *pName,
-                    const char *pDesc):
-        sfr_register (pCpu, pName, pDesc), pt_nco (pt)
+NCOxACCH::NCOxACCH (NCO * pt, Processor * pCpu, const char *pName ):
+    SfrReg (pCpu, pName ), pt_nco (pt)
 {
 }
 
@@ -651,9 +568,8 @@ void NCOxACCH::put (uint new_value)
     value.put (new_value);
 }
 
-NCOxACCL::NCOxACCL (NCO * pt, Processor * pCpu, const char *pName,
-                    const char *pDesc):
-        sfr_register (pCpu, pName, pDesc), pt_nco (pt)
+NCOxACCL::NCOxACCL (NCO * pt, Processor * pCpu, const char *pName ):
+    SfrReg (pCpu, pName ), pt_nco (pt)
 {
 }
 
@@ -672,9 +588,8 @@ void NCOxACCL::put (uint new_value)
     }
 }
 
-NCOxACCU::NCOxACCU (NCO * pt, Processor * pCpu, const char *pName,
-                    const char *pDesc):
-        sfr_register (pCpu, pName, pDesc), pt_nco (pt)
+NCOxACCU::NCOxACCU (NCO * pt, Processor * pCpu, const char *pName ):
+    SfrReg (pCpu, pName ), pt_nco (pt)
 {
 }
 
@@ -689,9 +604,8 @@ void NCOxACCU::put (uint new_value)
     value.put (new_value);
 }
 
-NCOxINCH::NCOxINCH (NCO * pt, Processor * pCpu, const char *pName,
-                const char *pDesc):
-        sfr_register (pCpu, pName, pDesc), pt_nco (pt)
+NCOxINCH::NCOxINCH (NCO * pt, Processor * pCpu, const char *pName ):
+    SfrReg (pCpu, pName ), pt_nco (pt)
 {
 }
 
@@ -703,9 +617,8 @@ void NCOxINCH::put (uint new_value)
     value.put (new_value);
 }
 
-NCOxINCL::NCOxINCL (NCO * pt, Processor * pCpu, const char *pName,
-                const char *pDesc):
-        sfr_register (pCpu, pName, pDesc), pt_nco (pt)
+NCOxINCL::NCOxINCL (NCO * pt, Processor * pCpu, const char *pName ):
+    SfrReg (pCpu, pName ), pt_nco (pt)
 {
 }
 

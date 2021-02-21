@@ -22,107 +22,83 @@ License along with this library; if not, see
 #include <iostream>
 #include <iomanip>
 
-#include "config.h"
 #include "12bit-processors.h"
 
 #include <string>
-#include "stimuli.h"
 
-extern uint config_word;
+//extern uint config_word;
 
 //-------------------------------------------------------------------
-_12bit_processor::_12bit_processor(const char *_name, const char *desc)
-  : pic_processor(_name, desc)
+_12bit_processor::_12bit_processor(const char *_name )
+    : pic_processor(_name  )
 {
-  pc         = new Program_Counter("pc", "Program Counter", this);
-  option_reg = new OPTION_REG(this, "option_reg");
-  stack      = new Stack(this);
+    pc         = new Program_Counter("pc", this);
+    option_reg = new OPTION_REG(this, "option_reg");
+    stack      = new Stack(this);
 }
 
 _12bit_processor::~_12bit_processor()
 {
-  delete pc;
+    delete pc;
 
-  delete_sfr_register(fsr);
-  delete_sfr_register(option_reg);
+    delete_SfrReg(fsr);
+    delete_SfrReg(option_reg);
 }
 
-void _12bit_processor::reset(RESET_TYPE r)
+void _12bit_processor::reset( RESET_TYPE r )
 {
-  option_reg->reset(r);
-  pic_processor::reset(r);
+    option_reg->reset(r);
+    pic_processor::reset(r);
 }
 
-void _12bit_processor::save_state()
-{
-  pic_processor::save_state();
-}
-
-bool _12bit_processor::set_config_word(uint address,uint cfg_word)
+bool _12bit_processor::set_config_word( uint address,uint cfg_word )
 {
 
-  // Clear all of the configuration bits in config_modes and then
-  // reset each of them based on the config bits in cfg_word:
-  //config_modes &= ~(CM_WDTE);
-  //config_modes |= ( (cfg_word & WDTE) ? CM_WDTE : 0);
-  //cout << " setting cfg_word and cfg_modes " << hex << config_word << "  " << config_modes << '\n';
+    if( (address == config_word_address()) )
+    {
+        config_word = cfg_word;
 
-  if((address == config_word_address()) && config_modes) {
-    config_word = cfg_word;
+        if (m_configMemory && m_configMemory->getConfigWord(0))
+            m_configMemory->getConfigWord(0)->set((int)cfg_word);
 
-    if (m_configMemory && m_configMemory->getConfigWord(0))
-      m_configMemory->getConfigWord(0)->set((int)cfg_word);
-
-    /*
-    config_modes->config_mode = (config_modes->config_mode & ~7) | (cfg_word & 7);
-
-    config_word = cfg_word;
-
-    if((bool)verbose && config_modes)
-      config_modes->print();
-    */
-    return true;
-  }
-  return false;
+        return true;
+    }
+    return false;
 }
 
 void _12bit_processor::create()
 {
-  pa_bits = 0;                 // Assume only one code page (page select bits in status)
+    pa_bits = 0;                 // Assume only one code page (page select bits in status)
 
-  pic_processor::create();
+    pic_processor::create();
 
-  fsr = new FSR_12(this,"fsr",fsr_register_page_bits(), fsr_valid_bits());
+    fsr = new FSR_12(this,"fsr",fsr_register_page_bits(), fsr_valid_bits());
 
-  // Sigh. Hack, hack,... manually assign indf bits
-  indf->fsr_mask = 0x1f;
-  indf->base_address_mask1 = 0x0;
-  indf->base_address_mask2 = 0x1f;
+    // Sigh. Hack, hack,... manually assign indf bits
+    indf->fsr_mask = 0x1f;
+    indf->base_address_mask1 = 0x0;
+    indf->base_address_mask2 = 0x1f;
 
-  stack->stack_mask = 1;        // The 12bit core only has 2 stack positions
+    stack->stack_mask = 1;        // The 12bit core only has 2 stack positions
 
-  //1 tmr0.set_cpu(this);
-  //1 tmr0.start(0);
+    //1 tmr0.set_cpu(this);
+    //1 tmr0.start(0);
 }
 
 void _12bit_processor::create_config_memory()
 {
-  m_configMemory = new ConfigMemory(this,1);
-  m_configMemory->addConfigWord(0,new ConfigWord("CONFIG", 0xfff,"Configuration Word",this,0xfff));
+    m_configMemory = new ConfigMemory(this,1);
+    m_configMemory->addConfigWord(0,new ConfigWord("CONFIG", 0xfff, this,0xfff));
 }
 
 void _12bit_processor::option_new_bits_6_7(uint bits)
 {
-  cout << "12bit, option bits 6 and/or 7 changed\n";
+    cout << "12bit, option bits 6 and/or 7 changed\n";
 }
 
 void _12bit_processor::put_option_reg(uint val)
 {
-  option_reg->put(val);
-}
-
-void _12bit_processor::dump_registers ()
-{
+    option_reg->put(val);
 }
 
 void _12bit_processor::enter_sleep()
@@ -133,9 +109,9 @@ void _12bit_processor::enter_sleep()
 
 void _12bit_processor::exit_sleep()
 {
-  if (m_ActivityState == ePASleeping)
-  {
-    tmr0.wake();
-    pic_processor::exit_sleep();
-  }
+    if (m_ActivityState == ePASleeping)
+    {
+        tmr0.wake();
+        pic_processor::exit_sleep();
+    }
 }

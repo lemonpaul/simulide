@@ -20,9 +20,9 @@
 #include "e-resistordip.h"
 #include "simulator.h"
 
-#include <sstream>
 
-eResistorDip::eResistorDip( std::string id ) 
+
+eResistorDip::eResistorDip( QString id ) 
             : eElement( id )
 {
     m_resist = 100;
@@ -35,7 +35,7 @@ void eResistorDip::setRes( double resist )
     m_resist = resist;
 }
 
-void eResistorDip::initEpins()
+/*void eResistorDip::initEpins()
 {
     m_resistor.resize( m_size );
     m_ePin.resize( m_size*2 );
@@ -43,21 +43,21 @@ void eResistorDip::initEpins()
     for( int i=0; i<m_size; i++ )
     {
         int index = i*2;
-        QString reid = QString::fromStdString( m_elmId );
+        QString reid = m_elmId;
         reid.append(QString("-resistor"+QString::number(i)));
-        m_resistor[i] = new eResistor( reid.toStdString() );
+        m_resistor[i] = new eResistor( reid );
         
         QString pinId = reid+"-ePin"+QString::number(index);
-        ePin* epin = new ePin( pinId.toStdString(), 0 );
+        ePin* epin = new ePin( pinId, 0 );
         m_resistor[i]->setEpin( 0, epin );
         m_ePin[index] = epin;
 
         pinId = reid+"-ePin"+QString::number(index+1);
-        epin = new ePin( pinId.toStdString(), 0 );
+        epin = new ePin( pinId, 0 );
         m_resistor[i]->setEpin( 1, epin );
         m_ePin[index+1] = epin;
     }
     
     setRes( m_resist );
-}
+}*/
 

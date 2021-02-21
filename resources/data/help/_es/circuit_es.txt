@@ -1,34 +1,36 @@
 Circuito:
 
-Parámetros:
+Parámetros: (valor por defecto)
 
-- Velocidad:
-   Velocidad de simulación en pasos por segundo. 1000000
+- Velocidad: (1000000)
+   Velocidad de simulación en pasos por segundo. 
+   
+- Speed per: (100)
+   Velocidad de simulación en porcentaje %. 
 
-- Paso React.:
-   Simula componentes Reactivos cada pasos de simulación. 50
+- Simu Step nS: (1000)
+   Paso de simulacion en nanoSegundos. 
 
-- Paso No Lin.: 
-   Simula componentes No Lineales cada pasos de simulación. 10
+- Paso React.: (50)
+   Simula componentes Reactivos cada pasos de simulación. 
 
-- Precisión No Lin.: 
-   Precisión en componentes No Lineales, mayor = mas preciso. 5
+- Precisión No Lin.: (5)
+   Precisión en componentes No Lineales, mayor = mas preciso. 
 
-- Mostrar Rejilla: 
-   true
+- Mostrar Rejilla: (true)
+   
+- Mostrar Scrollbar: (false)
+   
+- Anímate: (false)
+   Cables en Rojo cuando Volts>2.5, Azul en caso contrario.
 
-- Mostrar Scrollbar: 
-   false
+- Font Scale: (1)
+   Escala el tamaño de fuentes, por ejemplo 1,5 = 150%. 
 
-- Anímate: 
-   Cables en Rojo cuando Volts>2.5, Azul en caso contrario. false
-
-- Font Scale: 
-   Escala el tamaño de fuentes, por ejemplo 1,5 = 150%. 1
-
-- Auto Backup Secs: 
-      Intervalo de tiempo para chequeo de backup, si hay cambios se guarda backup de circuito.
-      Ajustando a 0 desabilita Auto-Backup. 15
+- Auto Backup Secs: (15)
+   Intervalo de tiempo para chequeo de backup.
+   Si hay cambios se guarda backup de circuito.
+   Ajustando a 0 desabilita Auto-Backup. 
 
 Mas Información:
    http://simulide.blogspot.com/p/blog-page_15.html

@@ -23,7 +23,7 @@
 #include "e-led.h"
 #include "e-source.h"
 #include "component.h"
-#include <QWidget>
+//#include <QWidget>
 #include <QColor>
 
 class MAINMODULE_EXPORT LedBase : public Component, public eLed
@@ -34,7 +34,6 @@ class MAINMODULE_EXPORT LedBase : public Component, public eLed
     Q_PROPERTY( double MaxCurrent READ maxCurrent WRITE setMaxCurrent DESIGNABLE true USER true )
     Q_PROPERTY( double Resistance READ res        WRITE setRes        DESIGNABLE true USER true )
     Q_PROPERTY( bool   Grounded   READ grounded   WRITE setGrounded   DESIGNABLE true USER true )
-    Q_ENUMS( LedColor )
 
     public:
         LedBase( QObject* parent, QString type, QString id );
@@ -48,33 +47,31 @@ class MAINMODULE_EXPORT LedBase : public Component, public eLed
             orange,
             purple
         };
+        Q_ENUM( LedColor )
         
         void setColor( LedColor color ) { m_ledColor = color; }
         LedColor color() { return m_ledColor; } 
 
-        void updateStep();
-        
         bool grounded();
         void setGrounded( bool grounded );
 
-        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
+        virtual void initialize();
+        virtual void updateStep() override;
+        virtual void remove() override;
 
-    public slots:
-        virtual void remove();
+        virtual void paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget );
 
     protected:
         virtual void drawBackground( QPainter *p )=0;
         virtual void drawForeground( QPainter *p )=0;
         
         bool     m_grounded;
-        eSource* m_ground;
         eNode*   m_scrEnode;
         
         LedColor m_ledColor;
         
         bool m_overCurrent;
         int  m_counter;
-        
 };
 
 #endif

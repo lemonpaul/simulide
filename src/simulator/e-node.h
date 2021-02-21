@@ -31,16 +31,11 @@ class MAINMODULE_EXPORT eNode
 
         QString itemId();
 
-        //void connectorChanged( int c ); // Keep the num of connectors using this eNode
         void addEpin( ePin* epin );
-        //void addSubEpin( ePin* epin );
         void remEpin( ePin* epin );
 
-        void addToChangedFast( eElement* el );
-        void remFromChangedFast( eElement* el );
-
-        void addToReactiveList( eElement* el );
-        void remFromReactiveList( eElement* el );
+        void voltChangedCallback( eElement* el );
+        void remFromChangedCallback( eElement* el );
 
         void addToNoLinList( eElement* el );
         void remFromNoLinList( eElement* el );
@@ -72,23 +67,22 @@ class MAINMODULE_EXPORT eNode
         bool isSwitched();
 
         void setIsBus( bool bus );
-        bool isBus();
+        bool isBus() { return m_isBus; }
         void createBus();
         void addBusPinList( QList<ePin*> list, int line );
 
         QList<ePin*> getEpins();
-        //QList<ePin*> getSubEpins();
         QList<int> getConnections();
+
+        eNode* nextCH;
 
     private:
         QList<ePin*>     m_ePinList;
-        //QList<ePin*>     m_ePinSubList;  // Used by Connector to find connected dpins
 
         QList<QList<ePin*>> m_eBusPinList;
         QList<eNode*>       m_eNodeList;
 
         QList<eElement*> m_changedFast;
-        QList<eElement*> m_reactiveList;
         QList<eElement*> m_nonLinear;
 
         QHash<ePin*, double> m_admitList;

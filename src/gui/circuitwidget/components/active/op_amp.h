@@ -33,6 +33,8 @@ class MAINMODULE_EXPORT OpAmp : public Component, public eOpAmp
 {
     Q_OBJECT
     Q_PROPERTY( double Gain       READ gain          WRITE setGain      DESIGNABLE true USER true )
+    Q_PROPERTY( double Volt_Pos   READ voltPos       WRITE setVoltPos   DESIGNABLE true USER true )
+    Q_PROPERTY( double Volt_Neg   READ voltNeg       WRITE setVoltNeg   DESIGNABLE true USER true )
     Q_PROPERTY( bool   Power_Pins READ hasPowerPins  WRITE setPowerPins DESIGNABLE true USER true )
     
     public:
@@ -43,6 +45,8 @@ class MAINMODULE_EXPORT OpAmp : public Component, public eOpAmp
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
         
+        virtual QList<propGroup_t> propGroups() override;
+
         void setPowerPins( bool set );
 
         virtual QPainterPath shape() const;

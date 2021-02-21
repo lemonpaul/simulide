@@ -18,50 +18,39 @@
  ***************************************************************************/
 
 #include "e-bincounter.h"
+#include "simulator.h"
 
-
-eBinCounter::eBinCounter( std::string id )
+eBinCounter::eBinCounter( QString id )
            : eLogicDevice( id )
 {
     m_TopValue = 1;
-    resetState();
+    initialize();
 }
 eBinCounter::~eBinCounter() {}
 
 void eBinCounter::stamp()
 {
-    eNode* enode = m_input[0]->getEpin()->getEnode();              // Reset pin
-    if( enode ) enode->addToChangedFast(this);
+    eNode* enode = m_input[0]->getEpin(0)->getEnode();              // Reset pin
+    if( enode ) enode->voltChangedCallback( this );
     
     eLogicDevice::stamp();
 }
 
-void eBinCounter::resetState()
+void eBinCounter::initialize()
 {
     m_Counter = 0;
-    eLogicDevice::resetState();
+    eLogicDevice::initialize();
 }
 
-void eBinCounter::createPins()
+void eBinCounter::voltChanged()
 {
-    createClockPin();
-    eLogicDevice::createPins( 1, 1 );          // Create Inputs, Outputs
+    bool clkRising = (eLogicDevice::getClockState() == Clock_Rising);
 
-    // Input 0 - Reset
-    
-    // Output 0 - Q
-
-    m_input[0]->setInverted( true );
-}
-
-void eBinCounter::setVChanged()
-{
-    bool clkRising = (eLogicDevice::getClockState() == Rising);
-    
     if( eLogicDevice::getInputState( 0 ) == true ) // Reset
     {
        m_Counter = 0;
-       eLogicDevice::setOut( 0, false );
+       m_runOut = false;
+       Simulator::self()->addEvent( m_propDelay, this );
     }
     else if( clkRising )
     {
@@ -69,14 +58,21 @@ void eBinCounter::setVChanged()
 
         if( m_Counter == m_TopValue )
         {
-            eLogicDevice::setOut( 0, true );
+            m_runOut = true;
+            Simulator::self()->addEvent( m_propDelay, this );
         }
-        else if ( m_Counter > m_TopValue )
+        else if( m_Counter > m_TopValue )
         {
-            eLogicDevice::setOut( 0, false );
             m_Counter = 0;
+            m_runOut = false;
+            Simulator::self()->addEvent( m_propDelay, this );
         }
     }
+}
+
+void eBinCounter::runEvent()
+{
+    m_output[0]->setTimedOut( m_runOut );
 }
 
 int eBinCounter::TopValue() const

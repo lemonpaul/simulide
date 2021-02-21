@@ -19,8 +19,8 @@
 
 #include <QSvgGenerator>
 
-#include "circuitwidget.h"
 #include "circuitview.h"
+#include "circuitwidget.h"
 #include "circuit.h"
 #include "mainwindow.h"
 #include "component.h"
@@ -33,12 +33,13 @@ CircuitView*  CircuitView::m_pSelf = 0l;
 CircuitView::CircuitView( QWidget *parent )
            : QGraphicsView( parent )
 {
+    setObjectName( "CircuitView" );
     m_pSelf = this;
     
+    m_scale = 1;
+    m_help = "";
     m_circuit     = 0l;
     m_enterItem   = 0l;
-
-    clear();
 
     viewport()->setFixedSize( 3200, 2400 );
     bool scrollBars = MainWindow::self()->settings()->value( "Circuit/showScroll" ).toBool();
@@ -64,8 +65,8 @@ CircuitView::CircuitView( QWidget *parent )
     setAcceptDrops(true);
     
     m_info = new QPlainTextEdit( this );
+    m_info->setObjectName( "m_info" );
     m_info->setLineWrapMode( QPlainTextEdit::NoWrap );
-    m_info->setMinimumSize( 500, 30 );
     m_info->setPlainText( "Time: 00:00:00.000000" );
     m_info->setWindowFlags( Qt::FramelessWindowHint );
     m_info->setAttribute( Qt::WA_NoSystemBackground );
@@ -73,6 +74,7 @@ CircuitView::CircuitView( QWidget *parent )
     m_info->setAttribute( Qt::WA_TransparentForMouseEvents );
     m_info->setStyleSheet( "color: #884433;background-color: rgba(0,0,0,0)" );
     m_info->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff  );
+    m_info->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff  );
     
     double fontScale = MainWindow::self()->fontScale();
     QFont font = m_info->font();
@@ -80,20 +82,29 @@ CircuitView::CircuitView( QWidget *parent )
     font.setPixelSize( int(10*fontScale) );
     m_info->setFont( font );
     
-    m_info->setMaximumSize( 320*fontScale, 20*fontScale );
-    m_info->setMinimumSize( 400, 25 );
+    //m_info->setMaximumSize( 500*fontScale, 80*fontScale );
+    m_info->setMinimumSize( 500*fontScale, 40*fontScale );
     m_info->show();
 }
 CircuitView::~CircuitView() { }
 
-void CircuitView::setCircTime( uint64_t step)
+void CircuitView::setCircTime( uint64_t tStep )
 {
+    double step = tStep/1e6;
     int hours = step/3600e6;
     step -= hours*3600e6;
     int mins  = step/60e6;
     step -= mins*60e6;
     int secs  = step/1e6;
-    int mSecs = step - secs*1e6;
+    step -= secs*1e6;
+    int mSecs = step/1e3;
+    step -= mSecs*1e3;
+    int uSecs = step;
+    step -= uSecs;
+    int nSecs = step*1e3;
+    step -= nSecs/1e3;
+    step += 1e-7;
+    int pSecs = step*1e6;
 
     QString strH = QString::number( hours );
     if( strH.length() < 2 ) strH = "0"+strH;
@@ -102,9 +113,15 @@ void CircuitView::setCircTime( uint64_t step)
     QString strS = QString::number( secs );
     if( strS.length() < 2 ) strS = "0"+strS;
     QString strMS = QString::number( mSecs );
-    while( strMS.length() < 6 ) strMS = "0"+strMS;
+    while( strMS.length() < 3 ) strMS = "0"+strMS;
+    QString strUS = QString::number( uSecs );
+    while( strUS.length() < 3 ) strUS = "0"+strUS;
+    QString strNS = QString::number( nSecs );
+    while( strNS.length() < 3 ) strNS = "0"+strNS;
+    QString strPS = QString::number( pSecs );
+    while( strPS.length() < 3 ) strPS = "0"+strPS;
     
-    QString strMcu = "";
+    QString strMcu = " ";
     
     if( McuComponent::self() ) 
     {
@@ -112,7 +129,8 @@ void CircuitView::setCircTime( uint64_t step)
         QString freq = QString::number( McuComponent::self()->freq() );
         strMcu = "      Mcu: "+device+" at "+freq+" MHz";
     }
-    m_info->setPlainText( tr("Time: ")+strH+":"+strM+":"+strS+"."+strMS + strMcu );
+    m_info->setPlainText( tr("Time: ")+strH+":"+strM+":"+strS+" s  "
+                          +strMS+" ms  "+strUS+" µs  "+strNS+" ns  "+strPS+" ps "+strMcu );
 }
 
 void CircuitView::clear()
@@ -123,6 +141,8 @@ void CircuitView::clear()
         m_circuit->deleteLater();
     }
     resetMatrix();
+    m_scale = 1;
+    m_enterItem = 0l;
     
     m_circuit = new Circuit( -1600, -1200, 3200, 2400, this );
     setScene( m_circuit );
@@ -130,25 +150,27 @@ void CircuitView::clear()
     //setCircTime( 0 );
 }
 
-void CircuitView::wheelEvent( QWheelEvent *event ) 
+void CircuitView::wheelEvent( QWheelEvent* event )
 { 
     qreal scaleFactor = pow( 2.0, event->delta() / 700.0);
     scale( scaleFactor, scaleFactor );
+    m_scale *= scaleFactor;
 }
 
-void CircuitView::dragEnterEvent(QDragEnterEvent *event)
+void CircuitView::dragEnterEvent( QDragEnterEvent* event )
 {
     event->accept();
+    m_enterItem = 0l;
 
     QString type = event->mimeData()->html();
-    QString id   = event->mimeData()->text();
+    QString name = event->mimeData()->text();
 
-    if( type.isEmpty() || id.isEmpty() ) return;
+    if( type.isEmpty() || name.isEmpty() ) return;
+    Circuit::self()->saveState();
 
-    m_enterItem = m_circuit->createItem( type, id+"-"+m_circuit->newSceneId() );
+    m_enterItem = m_circuit->createItem( type, name+"-"+m_circuit->newSceneId() );
     if( m_enterItem )
     {
-        Circuit::self()->saveState();
         if( type == "Subcircuit" )
         {
             SubCircuit* subC = static_cast<SubCircuit*>( m_enterItem );
@@ -158,22 +180,25 @@ void CircuitView::dragEnterEvent(QDragEnterEvent *event)
         m_enterItem->setPos( mapToScene( event->pos() ) );
         m_circuit->addItem( m_enterItem );
         //qDebug()<<"CircuitView::dragEnterEvent"<<m_enterItem->itemID()<< type<< id;
+        this->setFocus();
     }
+    else Circuit::self()->unSaveState();
 }
 
-void CircuitView::dragMoveEvent(QDragMoveEvent *event)
+void CircuitView::dragMoveEvent( QDragMoveEvent* event )
 {
     event->accept();
     if( m_enterItem ) m_enterItem->moveTo( togrid( mapToScene( event->pos() ) ) );
 }
 
-void CircuitView::dragLeaveEvent(QDragLeaveEvent *event)
+void CircuitView::dragLeaveEvent( QDragLeaveEvent* event )
 {
     event->accept();
     if ( m_enterItem )
     {
         m_circuit->removeComp( m_enterItem );
         m_enterItem = 0l;
+        Circuit::self()->unSaveState();
     }
 }
 
@@ -206,7 +231,6 @@ void CircuitView::mousePressEvent( QMouseEvent* event )
     else
     {
         QGraphicsView::mousePressEvent( event );
-        //viewport()->setCursor( Qt::ArrowCursor );
     }
 }
 
@@ -223,7 +247,6 @@ void CircuitView::mouseReleaseEvent( QMouseEvent* event )
     else
     {
         QGraphicsView::mouseReleaseEvent( event );
-        //viewport()->setCursor( Qt::ArrowCursor );
     }
     viewport()->setCursor( Qt::ArrowCursor );
     setDragMode( QGraphicsView::RubberBandDrag );
@@ -242,39 +265,30 @@ void CircuitView::contextMenuEvent(QContextMenuEvent* event)
         QMenu menu;
 
         QAction* pasteAction = menu.addAction(QIcon(":/paste.png"),tr("Paste")+"\tCtrl+V");
-        connect( pasteAction, SIGNAL( triggered()), this, SLOT(slotPaste()) );
+        connect( pasteAction, SIGNAL( triggered()),
+                        this, SLOT(slotPaste()), Qt::UniqueConnection );
 
         QAction* undoAction = menu.addAction(QIcon(":/undo.png"),tr("Undo")+"\tCtrl+Z");
-        connect( undoAction, SIGNAL( triggered()), Circuit::self(), SLOT(undo()) );
+        connect( undoAction, SIGNAL( triggered()),
+                  m_circuit, SLOT(undo()), Qt::UniqueConnection );
 
         QAction* redoAction = menu.addAction(QIcon(":/redo.png"),tr("Redo")+"\tCtrl+Y");
-        connect( redoAction, SIGNAL( triggered()), Circuit::self(), SLOT(redo()) );
+        connect( redoAction, SIGNAL( triggered()),
+                  m_circuit, SLOT(redo()), Qt::UniqueConnection );
+
         menu.addSeparator();
 
-        /*QAction* openCircAct = menu.addAction(QIcon(":/opencirc.png"), tr("Open Circuit")+"\tCtrl+O" );
-        connect(openCircAct, SIGNAL(triggered()), CircuitWidget::self(), SLOT(openCirc()));
-
-        QAction* newCircAct = menu.addAction( QIcon(":/newcirc.png"), tr("New Circuit")+"\tCtrl+N" );
-        connect( newCircAct, SIGNAL(triggered()), CircuitWidget::self(), SLOT(newCircuit()));
-
-        QAction* saveCircAct = menu.addAction(QIcon(":/savecirc.png"), tr("Save Circuit")+"\tCtrl+S" );
-        connect(saveCircAct, SIGNAL(triggered()), CircuitWidget::self(), SLOT(saveCirc()));
-
-        QAction* saveCircAsAct = menu.addAction(QIcon(":/savecircas.png"),tr("Save Circuit As...")+"\tCtrl+Shift+S" );
-        connect(saveCircAsAct, SIGNAL(triggered()), CircuitWidget::self(), SLOT(saveCircAs()));
-        menu.addSeparator();*/
-
         QAction* importCircAct = menu.addAction(QIcon(":/opencirc.png"), tr("Import Circuit") );
-        connect(importCircAct, SIGNAL(triggered()), this, SLOT(importCirc()));
+        connect(importCircAct, SIGNAL(triggered()),
+                         this, SLOT(importCirc()), Qt::UniqueConnection );
 
         QAction* saveImgAct = menu.addAction( QIcon(":/saveimage.png"), tr("Save Circuit as Image") );
-        connect( saveImgAct, SIGNAL(triggered()), this, SLOT(saveImage()));
+        connect( saveImgAct, SIGNAL(triggered()),
+                       this, SLOT(saveImage()), Qt::UniqueConnection );
 
-        QAction* createSubCircAct = menu.addAction(QIcon(":/load.png"), tr("Create SubCircuit") );
-        connect(createSubCircAct, SIGNAL(triggered()), Circuit::self(), SLOT( createSubcircuit() ));
-        
         QAction* createBomAct = menu.addAction(QIcon(":/savecirc.png"), tr("Bill of Materials") );
-        connect(createBomAct, SIGNAL(triggered()), Circuit::self(), SLOT( bom() ));
+        connect(createBomAct, SIGNAL(triggered()),
+                   m_circuit, SLOT( bom() ), Qt::UniqueConnection );
 
         menu.exec( mapFromScene( eventPos ) );
     }

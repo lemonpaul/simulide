@@ -24,10 +24,10 @@ PushBase::PushBase( QObject* parent, QString type, QString id )
         : SwitchBase( parent, type, id )
 {
     connect( m_button, SIGNAL( pressed() ),
-                 this, SLOT  ( onbuttonPressed() ));
+                 this, SLOT  ( onbuttonPressed() ), Qt::UniqueConnection);
 
     connect( m_button, SIGNAL( released() ),
-                 this, SLOT  ( onbuttonReleased() ));
+                 this, SLOT  ( onbuttonReleased() ), Qt::UniqueConnection);
 }
 PushBase::~PushBase()
 {

@@ -27,57 +27,49 @@
 class MAINMODULE_EXPORT LatchD : public LogicComponent, public eLatchD
 {
     Q_OBJECT
+    Q_PROPERTY( quint64 Tpd_ps  READ propDelay   WRITE setPropDelay   DESIGNABLE true USER true )
+    Q_PROPERTY( quint64  Tr_ps READ riseTime WRITE setRiseTime DESIGNABLE true USER true )
+    Q_PROPERTY( quint64  Tf_ps READ fallTime WRITE setFallTime DESIGNABLE true USER true )
     Q_PROPERTY( double Input_High_V READ inputHighV WRITE setInputHighV DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Low_V  READ inputLowV  WRITE setInputLowV  DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Imped  READ inputImp   WRITE setInputImp   DESIGNABLE true USER true )
     Q_PROPERTY( double Out_High_V   READ outHighV   WRITE setOutHighV   DESIGNABLE true USER true )
     Q_PROPERTY( double Out_Low_V    READ outLowV    WRITE setOutLowV    DESIGNABLE true USER true )
     Q_PROPERTY( double Out_Imped    READ outImp     WRITE setOutImp     DESIGNABLE true USER true )
+
     Q_PROPERTY( int    Channels     READ channels   WRITE setChannels   DESIGNABLE true USER true )
     Q_PROPERTY( bool   Tristate     READ tristate   WRITE setTristate   DESIGNABLE true USER true )
     Q_PROPERTY( bool   Inverted     READ inverted   WRITE setInverted   DESIGNABLE true USER true )
     Q_PROPERTY( Trigger Trigger     READ trigger    WRITE setTrigger    DESIGNABLE true USER true )
-    Q_ENUMS( Trigger )
 
     public:
         LatchD( QObject* parent, QString type, QString id );
         ~LatchD();
-        
-        enum Trigger {
-            None = 0,
-            Clock,
-            InEnable
-        };
 
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem *libraryItem();
+
+        virtual QList<propGroup_t> propGroups() override;
 
         int channels() { return m_channels; }
         void setChannels( int channels );
 
         bool tristate() { return m_tristate; }
         void setTristate( bool t );
+
+        virtual void setTrigger( Trigger trigger );
         
-        Trigger trigger() { return m_trigger; }
-        void setTrigger( Trigger trigger );
-        
-    public slots:
-        virtual void remove();
+        virtual void remove() override;
         
     private:
         void createLatches( int n );
         void deleteLatches( int n );
-        
-        eSource* m_inEnSource;
-        
-        Pin* m_inputEnPin;
+
         Pin* m_outEnPin;
         
         int m_channels;
         
         bool m_tristate;
-        
-        Trigger m_trigger;
 };
 
 #endif

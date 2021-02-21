@@ -28,6 +28,9 @@ class LibraryItem;
 class MAINMODULE_EXPORT Function : public LogicComponent, public eFunction
 {
     Q_OBJECT
+    Q_PROPERTY( quint64 Tpd_ps  READ propDelay   WRITE setPropDelay   DESIGNABLE true USER true )
+    Q_PROPERTY( quint64  Tr_ps READ riseTime WRITE setRiseTime DESIGNABLE true USER true )
+    Q_PROPERTY( quint64  Tf_ps READ fallTime WRITE setFallTime DESIGNABLE true USER true )
     Q_PROPERTY( double Input_High_V READ inputHighV WRITE setInputHighV DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Low_V  READ inputLowV  WRITE setInputLowV  DESIGNABLE true USER true )
     Q_PROPERTY( double Input_Imped  READ inputImp   WRITE setInputImp   DESIGNABLE true USER true )
@@ -39,7 +42,6 @@ class MAINMODULE_EXPORT Function : public LogicComponent, public eFunction
     Q_PROPERTY( int    Num_Outputs  READ numOuts    WRITE setNumOuts    DESIGNABLE true USER true )
     Q_PROPERTY( QString Functions   READ functions  WRITE setFunctions  DESIGNABLE true USER true )
     
-
     public:
         
         Function( QObject* parent, QString type, QString id );
@@ -47,17 +49,28 @@ class MAINMODULE_EXPORT Function : public LogicComponent, public eFunction
         
  static Component* construct( QObject* parent, QString type, QString id );
  static LibraryItem* libraryItem();
+
+        virtual QList<propGroup_t> propGroups() override;
+
+        virtual void remove() override;
         
         void setNumInps( int inputs );
         void setNumOuts( int outs );
         
     public slots:
-        virtual void remove();
         void onbuttonclicked();
+        void loadData();
+        void saveData();
         
+    protected:
+        virtual void contextMenu( QGraphicsSceneContextMenuEvent* event, QMenu* menu );
+        virtual void contextMenuEvent( QGraphicsSceneContextMenuEvent* event);
+
     private:
         QList<QPushButton*> m_buttons;
         QList<QGraphicsProxyWidget*> m_proxys;
+
+        QString m_lastDir;
 };
 
 #endif

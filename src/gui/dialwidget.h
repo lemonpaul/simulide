@@ -34,7 +34,6 @@ class DialWidget : public QWidget
         void setupWidget();
 
         QDial       *dial;
-
         QVBoxLayout *verticalLayout;
 };
 #endif

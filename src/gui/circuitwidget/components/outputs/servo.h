@@ -37,27 +37,26 @@ class MAINMODULE_EXPORT Servo : public LogicComponent, public eLogicDevice
         static Component* construct( QObject* parent, QString type, QString id );
         static LibraryItem* libraryItem();
 
+        virtual QList<propGroup_t> propGroups() override;
+
         double speed() { return m_speed; }
         void setSpeed( double speed ) { m_speed = speed; }
 
-        void resetState();
-        void stamp();
-
-        void setVChanged();
-        void updateStep();
+        virtual void initialize() override;
+        virtual void stamp() override;
+        virtual void voltChanged() override;
+        virtual void updateStep() override;
+        virtual void remove() override;
         
         virtual QPainterPath shape() const;
-        void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
+        virtual void paint( QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget );
 
-    public slots:
-        void remove();
-        
     private:
         int m_pos;                      // Actual Angular position 0-180
         int m_targetPos;                // Target Angular position 0-180
 
-        double m_speed;                         // Angular speed sec/60ª
-        int    m_minAngle;                 // Angle to move evry repaint
+        double m_speed;                         // Angular speed sec/60º
+        int    m_minAngle;                // Angle to move evrey repaint
 
         uint64_t m_pulseStart;              // Simulation step
         uint64_t m_lastUpdate;              // Simulation step

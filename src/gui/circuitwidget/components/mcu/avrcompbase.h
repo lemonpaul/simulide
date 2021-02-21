@@ -23,7 +23,7 @@
 #include "avrcomponentpin.h"
 #include "mcucomponent.h"
 #include "avrprocessor.h"
-#include "e-i2c.h"
+#include "e-i2c_master.h"
 
 
 class AvrCompBase : public McuComponent
@@ -35,16 +35,20 @@ class AvrCompBase : public McuComponent
         AvrCompBase( QObject* parent, QString type, QString id );
         ~AvrCompBase();
 
+        virtual QList<propGroup_t> propGroups() override;
+
+        virtual void reset() override;
+
         bool initGdb();
         void setInitGdb( bool init );
-
-        //int getRamValue( int address );
         
         void adcread( int channel );
         void i2cOut( uint32_t value );
         void twenChanged( uint32_t value );
 
         virtual void inStateChanged( int value );
+
+        virtual void crash() override;
 
  static void adc_hook( struct avr_irq_t* irq, uint32_t value, void* param )
         {
@@ -53,6 +57,7 @@ class AvrCompBase : public McuComponent
 
             int channel = int( value/524288 );
             ptrAvr->adcread( channel );
+            //qDebug()<<"avr adc_hook"<<value<<channel;
         }
 
  static void i2c_out_hook( struct avr_irq_t* irq, uint32_t value, void* param )
@@ -71,25 +76,25 @@ class AvrCompBase : public McuComponent
             ptrAvr->twenChanged( value );
         }
 
-    public slots:
-        //virtual void remove();
+    protected:
+        AvrProcessor m_avr;
 
     private:
         void attachPins();
-        void addPin( QString id, QString type, QString label, int pos, int xpos, int ypos, int angle );
+        virtual void addPin( QString id, QString type, QString label,
+                             int pos, int xpos, int ypos, int angle, int length=8 );
         QString getType( QString type , QString t );
 
         QHash<int, AVRComponentPin*> m_ADCpinList;
 
-        eI2C m_avrI2C;
+        eI2CMaster m_avrI2C;
         AVRComponentPin* m_sda;
         AVRComponentPin* m_scl;
 
         uint8_t m_slvAddr;
 
         avr_irq_t* m_i2cInIrq;
-
-        AvrProcessor m_avr;
+        avr_irq_t* m_twenIrq;
 };
 
 #endif

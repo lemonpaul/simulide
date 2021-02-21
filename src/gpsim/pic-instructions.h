@@ -28,14 +28,14 @@ class Register;
 /*
  *  base class for an instruction
  */
-class instruction : public Value
+class Instruction : public Value
 {
 public:
 
   enum INSTRUCTION_TYPES
   {
     NORMAL_INSTRUCTION,
-    INVALID_INSTRUCTION,
+    BAD_INSTRUCTION,
     BREAKPOINT_INSTRUCTION,
     NOTIFY_INSTRUCTION,
     PROFILE_START_INSTRUCTION,
@@ -45,7 +45,7 @@ public:
   };
 
   /*
-   * Not all instructions derived from the instruction
+   * Not all instructions derived from the Instruction
    * class use these constants...
    */
   enum
@@ -59,8 +59,8 @@ public:
     ACCESS_MASK_16BIT = 0x100,
   };
 
-  instruction(Processor *pProcessor, uint uOpCode, uint uAddrOfInstr);
-  virtual ~instruction();
+  Instruction(Processor *pProcessor, uint uOpCode, uint uAddrOfInstr);
+  virtual ~Instruction();
 
   virtual void execute() = 0;
   virtual void debug(){ }
@@ -76,13 +76,11 @@ public:
   virtual bool isBase() = 0;
   void decode(Processor *new_cpu, uint new_opcode);
 
-  virtual void addLabel(string &rLabel);
-
   // Some instructions require special initialization after they've
   // been instantiated. For those that do, the instruction base class
   // provides a way to control the initialization state (see the 16-bit
   // PIC instructions).
-  virtual void initialize(bool init_state) {};
+  virtual void initialize(bool init_state) {}
 
   bool bIsModified() { return m_bIsModified; }
   void setModified(bool b) { m_bIsModified=b; }
@@ -101,17 +99,17 @@ protected:
 // An AliasedInstruction is a class that is designed to replace an
 // instruction in program memory. (E.g. breakpoint instructions are an
 // example).
-class AliasedInstruction : public instruction
+class AliasedInstruction : public Instruction
 {
     public:
-      explicit AliasedInstruction(instruction *);
+      explicit AliasedInstruction( Instruction* );
       AliasedInstruction();
       AliasedInstruction(Processor *pProcessor,
                  uint uOpCode,
                  uint uAddrOfInstr);
       ~AliasedInstruction();
-      void setReplaced(instruction *);
-      virtual instruction *getReplaced();
+      void setReplaced( Instruction* );
+      virtual Instruction *getReplaced();
 
       virtual void execute();
       virtual void debug();
@@ -122,48 +120,41 @@ class AliasedInstruction : public instruction
 
       virtual enum INSTRUCTION_TYPES isa();
       virtual void initialize(bool init_state);
-      virtual char *name(char *,int len);
       virtual bool isBase();
 
       virtual void update(void);
 
     protected:
-      instruction *m_replaced;
+      Instruction* m_replaced;
 };
 
 //---------------------------------------------------------
-class invalid_instruction : public instruction
+class BadInstruction : public Instruction
 {
     public:
 
       virtual void execute();
 
-      virtual void debug()
-      {
-        //cout << "*** INVALID INSTRUCTION ***\n";
-      };
 
-      //invalid_instruction(Processor *new_cpu=0,uint new_opcode=0);
-      invalid_instruction(Processor *new_cpu, uint new_opcode, uint address);
+      BadInstruction( Processor* cpu, uint new_opcode, uint address );
                           
-      virtual enum INSTRUCTION_TYPES isa() {return INVALID_INSTRUCTION;};
+      virtual enum INSTRUCTION_TYPES isa() {return BAD_INSTRUCTION;}
 
-      static instruction *construct(Processor *new_cpu, uint new_opcode,uint address)
-      {return new invalid_instruction(new_cpu,new_opcode,address);}
+      static Instruction *construct(Processor *new_cpu, uint new_opcode,uint address)
+      {return new BadInstruction(new_cpu,new_opcode,address);}
       
       virtual void addLabel(string &rLabel);
       virtual bool isBase() { return true; }
 };
 
 //---------------------------------------------------------
-class Literal_op : public instruction
+class Literal_op : public Instruction
 {
     public:
       Literal_op(Processor *pProcessor, uint uOpCode, uint uAddrOfInstr);
 
       uint L;
 
-      virtual void debug(){ };
       virtual char *name(char *,int);
       virtual bool isBase() { return true; }
 
@@ -172,7 +163,7 @@ class Literal_op : public instruction
 
 
 //---------------------------------------------------------
-class Bit_op : public instruction
+class Bit_op : public Instruction
 {
     public:
       Bit_op(Processor *pProcessor, uint uOpCode, uint uAddrOfInstr);
@@ -181,7 +172,6 @@ class Bit_op : public instruction
       bool access;
       Register *reg;
 
-      virtual void debug(){ };
       virtual char *name(char *,int);
       virtual bool isBase() { return true; }
 
@@ -190,7 +180,7 @@ class Bit_op : public instruction
 
 
 //---------------------------------------------------------
-class Register_op : public instruction
+class Register_op : public Instruction
 {
     public:
 
@@ -200,9 +190,6 @@ class Register_op : public instruction
       uint register_address;
       bool destination, access;
 
-      /*  Register *destination;*/
-
-      virtual void debug(){ };
       virtual char *name(char *,int);
       virtual bool isBase() { return true; }
 
@@ -233,7 +220,7 @@ class Register_op : public instruction
 struct instruction_constructor {
   uint inst_mask;
   uint opcode;
-  instruction * (*inst_constructor) (Processor *cpu, uint inst, uint address);
+  Instruction * (*inst_constructor) (Processor *cpu, uint inst, uint address);
 };
 
 

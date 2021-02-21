@@ -28,7 +28,7 @@ static const char* InoDebugger_properties[] = {
     QT_TRANSLATE_NOOP("App::Property","Custom Board")
 };
 
-InoDebugger::InoDebugger( QObject* parent, OutPanelText* outPane, QString filePath ) 
+InoDebugger::InoDebugger( CodeEditor* parent, OutPanelText* outPane, QString filePath )
            : BaseDebugger( parent, outPane, filePath )
 {
     Q_UNUSED( InoDebugger_properties );
@@ -40,8 +40,7 @@ InoDebugger::InoDebugger( QObject* parent, OutPanelText* outPane, QString filePa
     
     readSettings();
     
-    boardList << "uno" << "megaADK" << "nano" << "diecimila" << "leonardo";
-    
+    m_boardList << "uno" << "megaADK" << "nano" << "diecimila" << "leonardo";
     m_board = Uno;
     
     m_typesList["char"]   = "int8";
@@ -56,67 +55,53 @@ InoDebugger::InoDebugger( QObject* parent, OutPanelText* outPane, QString filePa
 }
 InoDebugger::~InoDebugger() {}
 
-void InoDebugger::upload()
+bool InoDebugger::upload()
 {
     QString circDir = Circuit::self()->getFileName();
     QString firmPath =  m_firmware;
     
-    if( circDir != "" )
+    if( circDir != "" ) // Copy hex file to Circuit folder
     {
         QDir circuitDir = QFileInfo( circDir ).absoluteDir();
-        
         m_firmware = circuitDir.absolutePath()+"/"+m_fileName+".hex";
-        //qDebug() <<"InoDebugger::upload"<<m_firmware<<firmPath;
         circuitDir.remove( m_fileName+".hex" );
-        
         QFile::copy( firmPath, m_firmware );
     }
-    BaseDebugger::upload();
-    
     m_firmware = firmPath;
+    return BaseDebugger::upload();
 }
 
 int InoDebugger::compile()
 {
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    
-    QDir arduinoDir( m_compilerPath );
-    if( !arduinoDir.exists() )
+    QString builder = "arduino-builder";
+    #ifndef Q_OS_UNIX
+    builder += ".exe";
+    #endif
+
+    if( !QFile::exists( m_compilerPath+builder) )
     {
         m_outPane->appendText( "\nArduino" );
         toolChainNotFound();
         return -1;
     }
-    QString filePath = m_fileDir+m_fileName+m_fileExt;
-    // Doing build in the user directory
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    QString filePath = m_file;
     QString buildPath = SIMUAPI_AppPath::self()->RWDataFolder().absoluteFilePath("codeeditor/buildIno");
     
     QDir dir(buildPath);
-    dir.removeRecursively();                         // Remove old files
-    dir.mkpath(buildPath+"/"+m_fileName);        // Create sketch folder
+    bool b = dir.cd( "build" );
+    if( b ) dir.removeRecursively(); // Remove old files
+    dir.mkpath(buildPath+"/cache");  // Create cache folder ( if doesn't exist )
+    dir.mkpath(buildPath+"/build");  // Create build folder
     
-    QDir directory( m_fileDir );          
-    QStringList fileList = directory.entryList(QDir::Files);
-    
-    for( QString fileName : fileList ) // Copy files to sketch folder
-    {
-        QFile::copy( m_fileDir+fileName, buildPath+"/"+m_fileName+"/"+fileName );
-    }
-    QString ProcInoFile = buildPath+"/"+m_fileName+"/"+m_fileName+m_fileExt;
-    QFile file( ProcInoFile );
-
-    if( !file.open(QFile::WriteOnly | QFile::Text) )
-    {
-          QMessageBox::warning(0l, "InoDebugger::compile",
-          tr("Cannot write file %1:\n%2.").arg(ProcInoFile).arg(file.errorString()));
-          return -1;
-    }
-    QTextStream out(&file);
-    out.setCodec("UTF-8");
+    //QDir directory( m_fileDir );
+    //m_fileList = directory.entryList( QDir::Files );
+    m_fileList.clear();
+    m_fileList.append( m_fileName+m_fileExt );
     
     QStringList inoLines = fileToStringList( filePath, "InoDebugger::compile" );
     QString line;
-    int inoLineNumber = 0;
     
     m_varList.clear();
     for( QString inoLine : inoLines )                        // Get Variables
@@ -125,85 +110,91 @@ int InoDebugger::compile()
         line = line.replace( "\t", " " ).remove(";");
         QStringList wordList= line.split( " " );
         wordList.removeAll( "" );        
-        if( !wordList.isEmpty())      // Fix crash on empty list.first()
+        if( !wordList.isEmpty())
         {
             QString type = wordList.takeFirst();
             if( type == "unsigned" ) type = "u"+wordList.takeFirst();
 
-            if( m_typesList.contains( type ) )
+            if( m_typesList.contains( type ) && !wordList.isEmpty() )
             {
                 QString varName = wordList.at(0);
                 if( !m_varList.contains( varName ) )
                     m_varList[ varName ] = m_typesList[ type ];
-
                 //qDebug() << "InoDebugger::compile  variable "<<type<<varName<<m_typesList[ type ];
             }
         }
-        if( inoLine.contains( "loop()" ) ) m_loopInoLine = inoLineNumber;
-        inoLineNumber++;
-        
-        out << inoLine << " // INOLINE " << inoLineNumber << "\n";
     }
-    file.close();
+    QString command  = m_compilerPath+"arduino";
 
-    ///TODO: verify arduino version, older versions can compile, but no sorce code emited into .lst file
-    /// , then debugger will hang!
+    if( m_sketchBook.isEmpty() )
+    {
+        #ifndef Q_OS_UNIX
+        command += "_debug";
+        command = addQuotes( command );
+        #endif
+        command += " --get-pref sketchbook.path";
+
+        QProcess getSkBook( this );  // Get sketchBook Path
+        getSkBook.start( command );
+        getSkBook.waitForFinished();
+        m_sketchBook = getSkBook.readAllStandardOutput();
+        m_sketchBook = m_sketchBook.remove("\r").remove("\n");
+        getSkBook.close();
+        if( m_sketchBook.isEmpty() )
+            m_outPane->writeText( "\nNo User sketchBook Found\n\n" );
+        else
+            m_outPane->writeText( "\nFound User sketchBook at:\n"+m_sketchBook+"\n\n" );
+    }
+
     QString cBuildPath = buildPath;
-    QString preferencesPath = SIMUAPI_AppPath::self()->availableDataFilePath("codeeditor/preferences.txt");
-    QString command  = m_compilerPath +"arduino";
+    QString boardName;
+
+    if( m_board < Custom ) boardName = m_boardList.at( m_board );
+    else                   boardName = m_customBoard;
+
+    command  = m_compilerPath+"arduino-builder";
     
     #ifndef Q_OS_UNIX
-    command    += "_debug";
-    command     = addQuotes( command );
-    cBuildPath  = addQuotes( cBuildPath );
-    ProcInoFile = addQuotes( ProcInoFile );
+    command    = addQuotes( command );
+    //cBuildPath = addQuotes( cBuildPath );
+    filePath   = addQuotes( filePath );
     #endif
-    
-    QString boardName;
-    
-    if( m_board < Custom ) boardName = boardList.at(m_board);
-    else                   boardName = m_customBoard;
-                
-    command += " -v --board arduino:avr:"+boardName+" --pref build.path=" + cBuildPath;
-    if( !preferencesPath.isEmpty() )
-        command += " --preferences-file " + preferencesPath;
-    command += " --preserve-temp-files --verify " + ProcInoFile;
+
+    command += " -compile";
+    command += " -hardware "+m_compilerPath+"hardware";
+    command += " -tools "+m_compilerPath+"tools-builder";
+    command += " -tools "+m_compilerPath+"hardware/tools/avr";
+    command += " -built-in-libraries "+m_compilerPath+"libraries";
+    command += " -libraries "+m_sketchBook+"/libraries";
+    command += " -fqbn=arduino:avr:"+boardName;
+    command += " -build-path "+cBuildPath+"/build";
+    command += " -build-cache "+cBuildPath+"/cache";
+    command += " "+filePath;
     m_firmware = "";
     
-    m_outPane->appendText( command );
-    m_outPane->writeText( "\n\n" );
+    m_outPane->writeText( command );
     
     m_compProcess.start( command );
     m_compProcess.waitForFinished(-1);
     
     QString p_stderr = m_compProcess.readAllStandardError();
-    //m_outPane->appendText( p_stderr );
-    //m_outPane->writeText( "\n\n" );
 
     int error = -1;
-    if( p_stderr=="" )
+    if( p_stderr.toUpper().contains("ERROR:") )
     {
-        m_outPane->appendText( "\nArduino" );
-        toolChainNotFound();
-        error = -1;
-    }
-    else if( p_stderr.toUpper().contains("ERROR:") )
-    {
+        m_outPane->writeText( p_stderr );
         QStringList lines = p_stderr.split("\n");
         for( QString line : lines )
         {
-            if( !(line.contains( "error:" )) ) continue;
-
-            m_outPane->appendText( line );
-            m_outPane->writeText( "\n\n" );
-            QStringList words = line.split(":");
-            error = words.at(1).toInt()-1;
-            break;
+            if( line.contains( "error:" ) )
+            {
+                QStringList words = line.split(":");
+                error = words.at(1).toInt();
+                break;
+            }
         }
-    }
-    else
-    {
-        m_firmware = buildPath + "/"+ m_fileName + ".ino.hex";
+    }else{
+        m_firmware = buildPath+"/build/"+m_fileName+".ino.hex";
         error = 0;
     }
     QApplication::restoreOverrideCursor();
@@ -215,54 +206,37 @@ void InoDebugger::getVariables()
     QString buildPath = SIMUAPI_AppPath::self()->RWDataFolder().absoluteFilePath("codeeditor/buildIno");
     
     QString objdump = m_compilerPath+"hardware/tools/avr/bin/avr-objdump";
-    QString elfPath = buildPath+"/"+m_fileName+".ino.elf";
+    QString elfPath = buildPath+"/build/"+m_fileName+".ino.elf";
     
     #ifndef Q_OS_UNIX
     objdump = addQuotes( objdump );
     elfPath = addQuotes( elfPath );
     #endif
-    
-    QString command  = objdump+" -S -j .text "+elfPath;
-    QProcess compIno( 0l );
-    compIno.setStandardOutputFile( buildPath+"/"+m_fileName+".ino.lst" );
-    compIno.start( command );
-    compIno.waitForFinished(-1);
-                         
-    QProcess getBss( 0l );      // Get var address from .bss section
-    command  = objdump+" -t -j.bss "+elfPath;
+
+    QProcess getBss( 0l );      // Get var addresses from .bss section
+    QString command  = objdump+" -t -j.bss "+elfPath;
     getBss.start( command );
     getBss.waitForFinished(-1);
 
     QString  p_stdout = getBss.readAllStandardOutput();
-    QStringList lines = p_stdout.split("\n");
+    QStringList varNames = m_varList.keys();
     
-    for( QString line : lines )
+    for( QString line : p_stdout.split("\n") )
     {
-        //qDebug() << line;
-        
         QStringList words = line.split(" ");
         if( words.size() < 4 ) continue;
-        QString addr      = words.takeFirst();
-        QString symbol    = words.takeLast();
-        
-        QHashIterator<QString, QString> i( m_varList );
-        while( i.hasNext() )                        // Find Variable 
+        QString addr   = words.takeFirst();
+        QString symbol = words.takeLast();
+
+        if( varNames.contains( symbol ) )
         {
-            i.next();
-            QString varName = i.key();
-            if( varName == symbol )          // Get variable address
-            {
-                bool ok = false;
-                int address = addr.toInt( &ok, 16 );
-                if( ok )
-                {
-                    address -= 0x800000;          // 0x800000 offset
-                    BaseProcessor* proc = BaseProcessor::self();
-                    if( proc ) proc->addWatchVar( varName, address, i.value() );
-                    //qDebug() << "InoDebugger::compile  variable "<<addr<<varName<<address<<i.value();
-                }
-                break;
-            }
+            bool ok = false;
+            int address = addr.toInt( &ok, 16 );
+            if( !ok ) continue;
+            address -= 0x800000;          // 0x800000 offset
+            BaseProcessor* proc = BaseProcessor::self();
+            if( proc ) proc->addWatchVar( symbol, address, m_varList.value( symbol ) );
+            //qDebug() << "InoDebugger::compile  variable "<<addr<<varName<<address<<i.value();
         }
     }
 }
@@ -270,83 +244,67 @@ void InoDebugger::getVariables()
 void InoDebugger::mapFlashToSource()
 {
     getVariables();
-    
     m_flashToSource.clear();
     m_sourceToFlash.clear();
+    
     QString buildPath = SIMUAPI_AppPath::self()->RWDataFolder().absoluteFilePath("codeeditor/buildIno");
-    
-    /*QString elfFileName = buildPath+"/"+ m_fileName + ".ino.elf";
-    QProcess flashToLine( 0l );
-    for( int i=0; i<10000; i++ )
-    {
-        QString addr = val2hex( i );
-        QString command  = m_compilerPath+"hardware/tools/avr/bin/avr-addr2line -e "+ elfFileName+" "+addr;
-        flashToLine.start( command );
-        flashToLine.waitForFinished(-1);
-        
-        QString p_stdout = flashToLine.readAllStandardOutput();
-        if( p_stdout.contains(".ino") ) qDebug() << p_stdout;
-    }*/
-    
-    QString lstFileName = buildPath+"/"+ m_fileName + ".ino.lst";
-    QStringList lstLines = fileToStringList( lstFileName, "InoDebugger::mapInoToFlash" );
+    QString elfPath = buildPath+"/build/"+m_fileName+".ino.elf";
+    QString avrSize = m_compilerPath+"hardware/tools/avr/bin/avr-size";
+    QString addr2li = m_compilerPath+"hardware/tools/avr/bin/avr-addr2line";
 
-    m_lastLine = 0;
-    
-    bool readFlasAddr = false;
-    bool isInoLIne =    false;
-    int inoLineNum = -1;
+    #ifndef Q_OS_UNIX
+    avrSize = addQuotes( avrSize );
+    addr2li = addQuotes( addr2li );
+    elfPath = addQuotes( elfPath );
+    #endif
 
-    for( QString line : lstLines )
+    QProcess getSize( this );  // Get Firmware size
+    getSize.start( avrSize + " " + elfPath );
+    getSize.waitForFinished();
+    QString lines = getSize.readAllStandardOutput();
+    getSize.close();
+    bool ok = false;
+    int flashSize;
+    if( !lines.isEmpty() )
     {
-        if( readFlasAddr ) // Last line contained source line
+        QString size = lines.split("\n").at(1).split("\t").takeFirst().remove(" ");
+        flashSize = size.toInt( &ok );
+    }
+    if( !ok ) flashSize = 35000;
+
+    QProcess flashToLine( this );
+    flashToLine.start( addr2li + " -e " + elfPath );
+    bool started = flashToLine.waitForStarted( 1000 );
+    if( !started ) return;
+
+    for( int flashAddr=0; flashAddr<flashSize; ++flashAddr ) // Map Flash Address to Source Line
+    {
+        QString addr = val2hex( flashAddr )+"\n";
+        flashToLine.write( addr.toUtf8() );
+    }
+    flashToLine.closeWriteChannel();
+    flashToLine.waitForFinished();
+
+    for( int flashAddr=0; flashAddr<flashSize; ++flashAddr ) // Map Flash Address to Source Line
+    {
+        QString p_stdout = flashToLine.readLine();
+        if( p_stdout.startsWith("?") ) continue;
+
+        int idx = p_stdout.lastIndexOf( ":" );
+        if( idx == -1 ) continue;
+
+        QString fileName = QFileInfo( p_stdout.left( idx ) ).fileName();
+        if( m_fileList.contains( fileName ) )
         {
             bool ok = false;
-            int flashAddr = line.split( ":" ).first().toInt( &ok, 16 );
-            if( ok )
-            {
-                m_flashToSource[ flashAddr ] = inoLineNum;
-                m_sourceToFlash[ inoLineNum ] = flashAddr;
-                if( inoLineNum > m_lastLine ) m_lastLine = inoLineNum;
-                readFlasAddr = false;
-                //qDebug()<<"InoDebugger::mapInoToFlash ino-flash:" << inoLineNum << flashAddr ;
-            }
-            if( isInoLIne ) 
-            {
-                readFlasAddr = false;
-                isInoLIne =    false;
-            }
+            int inoLineNum = p_stdout.mid( idx+1 ).toInt( &ok );
+            if( !ok ) continue;
+
+            m_flashToSource[ flashAddr ]  = inoLineNum;
+            m_sourceToFlash[ inoLineNum ] = flashAddr;
         }
-        if( line.contains("INOLINE") )
-        {
-            inoLineNum = line.split( " " ).last().toInt()-1;
-            readFlasAddr = true;
-            isInoLIne =    true;
-        }
-        else if( line.contains("loop();") )
-        {
-            inoLineNum = m_loopInoLine;
-            readFlasAddr = true;
-        }
-        /*QHashIterator<QString, QString> i( m_varList );
-        while (i.hasNext())                             // Find Variable 
-        {
-            i.next();
-            QString varName = "<"+i.key()+">";
-            if( line.contains( varName ) )       // Get variable address
-            {
-                line = line.remove( " "+varName ).split( " " ).last().remove( "0x80" );
-                bool ok = false;
-                int address = line.toInt( &ok, 16 );
-                if( ok ) BaseProcessor::self()->addWatchVar( i.key(), address, i.value() );
-                
-                qDebug() << "InoDebugger::mapInoToFlash  variable "<<line<<i.key()<<address<<i.value();
-                
-                break;
-            }
-        }*/
-        
     }
+    flashToLine.close();
 }
 
 #include "moc_inodebugger.cpp"

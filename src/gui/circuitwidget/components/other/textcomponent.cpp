@@ -39,7 +39,7 @@ LibraryItem* TextComponent::libraryItem()
 {
     return new LibraryItem(
         tr( "Text" ),
-        tr( "Other" ),
+        tr( "Graphical" ),
         "text.png",
         "TextComponent",
     TextComponent::construct );
@@ -49,6 +49,8 @@ TextComponent::TextComponent( QObject* parent, QString type, QString id )
              : Component( parent, type, id )
 {
     Q_UNUSED( TextComponent_properties );
+
+    m_graphical = true;
 
     m_opac = 1;
     
@@ -73,6 +75,7 @@ TextComponent::TextComponent( QObject* parent, QString type, QString id )
     m_text->document()->setTextWidth(-1);
     m_text->setDefaultTextColor( Qt::darkBlue );
     m_text->setCursor( Qt::OpenHandCursor );
+    m_text->installEventFilter( this );
 
     m_margin = 5;
     m_border = 1;
@@ -81,9 +84,24 @@ TextComponent::TextComponent( QObject* parent, QString type, QString id )
     setFontSize( 10 );
 
     connect(m_text->document(), SIGNAL( contentsChange(int, int, int )),
-                          this, SLOT( updateGeometry(int, int, int )));
+                          this, SLOT( updateGeometry(int, int, int )), Qt::UniqueConnection );
 }
 TextComponent::~TextComponent(){}
+
+QList<propGroup_t> TextComponent::propGroups()
+{
+    propGroup_t mainGroup { tr("Main") };
+    mainGroup.propList.append( {"Margin", tr("Margin"),"Pixels"} );
+    mainGroup.propList.append( {"Border", tr("Border"),"Pixels"} );
+    mainGroup.propList.append( {"Opacity", tr("Opacity"),""} );
+
+    propGroup_t fontGroup { tr("Font") };
+    fontGroup.propList.append( {"Font", tr("Font"),""} );
+    fontGroup.propList.append( {"Font_Size", tr("Font Size"),"Pixels"} );
+    fontGroup.propList.append( {"Fixed_Width", tr("Fixed_Width"),""} );
+
+    return {mainGroup, fontGroup};
+}
 
 void TextComponent::updateGeometry(int, int, int)
 {
@@ -170,11 +188,23 @@ void TextComponent::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* event )
 {
     if( event->button() == Qt::LeftButton )
     {
-        m_text->setTextInteractionFlags( Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard | Qt::TextEditable);
+        m_text->setTextInteractionFlags( Qt::TextEditorInteraction | Qt::TextBrowserInteraction ); //( Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard | Qt::TextEditable);
         m_text->setCursor( Qt::IBeamCursor );
         m_text->setFocus();
         setSelected( false );
     }
+}
+
+bool TextComponent::eventFilter( QObject* object, QEvent* event )
+{
+    if( event->type() == QEvent::FocusIn )
+    {
+        if( object == m_text)
+        {
+            Circuit::self()->deselectAll();
+        }
+    }
+    return false;
 }
 
 void TextComponent::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget *widget )

@@ -23,29 +23,29 @@
 
 #include "baseprocessor.h"
 
+#include "pic-processor.h"
 #include "registers.h"
 #include "hexutils.h"
 
-class pic_processor;
 class _RCSTA;
 
 class PicProcessor : public BaseProcessor
 {
     Q_OBJECT
     public:
-        PicProcessor( QObject* parent=0 );
+        PicProcessor( McuComponent* parent );
         ~PicProcessor();
-        
- //static PicProcessor* self() { return m_pSelf; }
 
         bool loadFirmware( QString file );
         void terminate();
 
-        void reset();
-        void step(); 
-        void stepOne();
-        void stepCpu();
-        int pc();
+        virtual void reset();
+
+        void stepCpu(){ m_pPicProcessor->stepCpuClock(); }
+
+        virtual int pc();
+        virtual uint64_t cycle(){ return m_pPicProcessor->currentCycle(); }
+        virtual void setFreq( double freq );
 
         int getRamValue( int address );
 
@@ -53,17 +53,17 @@ class PicProcessor : public BaseProcessor
 
         virtual QVector<int> eeprom();
         virtual void setEeprom( QVector<int> eep );
+
+        virtual void setDevice( QString device );
         
         pic_processor* getCpu() { return m_pPicProcessor; }
 
     private:
-        virtual int  validate( int address );
-        
-        double m_ipc;
-        
+        virtual int validate( int address );
+
         pic_processor* m_pPicProcessor;
         
-        IntelHexProgramFileType m_hexLoader;
+        HexLoader m_hexLoader;
         
         QVector<_RCSTA*> m_rcsta;
 };

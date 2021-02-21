@@ -51,10 +51,10 @@ ComponentSelector::ComponentSelector( QWidget* parent )
     setContextMenuPolicy( Qt::CustomContextMenu );
 
     connect( this, SIGNAL(customContextMenuRequested(const QPoint&)),
-             this, SLOT  (slotContextMenu(const QPoint&)));
+             this, SLOT  (slotContextMenu(const QPoint&)), Qt::UniqueConnection );
 
     connect( this, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
-             this, SLOT  (slotItemClicked(QTreeWidgetItem*, int)) );
+             this, SLOT  (slotItemClicked(QTreeWidgetItem*, int)), Qt::UniqueConnection );
 }
 ComponentSelector::~ComponentSelector()
 {
@@ -122,7 +122,6 @@ void ComponentSelector::loadXml( const QString &setFile )
         QDomNode    node    = element.firstChild();
 
         QString category = element.attribute( "category" );
-        //const char* charCat = category.toUtf8().data();
         std::string stdCat = category.toStdString();
         const char* charCat = &(stdCat[0]);
         category = QApplication::translate( "xmlfile", charCat );
@@ -147,9 +146,9 @@ void ComponentSelector::loadXml( const QString &setFile )
                 QString name = element.attribute( "name" );
                 
                 m_xmlFileList[ name ] = setFile;   // Save xml File used to create this item
-                
+                //qDebug()<<"ComponentSelector::loadXml" <<name<< category<< icon<< type<<setFile;
                 if( element.hasAttribute("info") ) name += "???"+element.attribute( "info" );
-                
+
                 addItem( name, category, icon, type );
                 
                 node = node.nextSibling();
@@ -274,11 +273,12 @@ void ComponentSelector::addItem( const QString &caption, const QString &_categor
     item->setIcon( 0, QIcon(icon) );
     item->setText( 0, name+info );
     item->setData( 0, Qt::UserRole, type );
-    
+
     if( ( type == "Subcircuit" )
+      ||( type == "Arduino" )
+      ||( type == "MCU" )
       ||( type == "PIC" )
-      ||( type == "AVR" )
-      ||( type == "Arduino" ) )
+      ||( type == "AVR" ))
     {
          item->setData( 0, Qt::WhatsThisRole, name );
     }
@@ -368,6 +368,33 @@ void ComponentSelector::slotManageComponents()
     m_pluginsdDialog.setVisible( true );
 }
 
+void ComponentSelector::search( QString filter )
+{
+    QList<QTreeWidgetItem*> cList = findItems( filter, Qt::MatchContains|Qt::MatchRecursive, 0 );
+    QList<QTreeWidgetItem*> allItems = findItems( "", Qt::MatchContains|Qt::MatchRecursive, 0 );
+
+    for( QTreeWidgetItem* item : allItems )
+    {
+        item->setHidden( true );
+
+        if( item->childCount() > 0 )
+        {
+            //qDebug()<<"ComponentSelector::search Category" << item->text( 0 );
+            continue;
+        }
+        if( cList.contains( item ) )
+        {
+            item->setHidden( false );
+
+            QTreeWidgetItem* parent = item->parent();
+            while( parent )
+            {
+                parent->setHidden( false );
+                parent = parent->parent();
+            }
+        }
+    }
+}
 
 /*void ComponentSelector::unistallPlugin( QString item )
 {

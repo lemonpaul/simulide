@@ -18,46 +18,39 @@
  ***************************************************************************/
 
 #include "e-fulladder.h"
+#include "simulator.h"
 
-
-eFullAdder::eFullAdder( std::string id ) 
+eFullAdder::eFullAdder( QString id ) 
           : eLogicDevice( id )
 {
 }
 
 void eFullAdder::stamp()
 {
-    for( int i=0; i<m_numInputs; i++ )
+    for( int i=0; i<m_numInputs; ++i )
     {
-        eNode* enode = m_input[i]->getEpin()->getEnode();
-        if( enode ) enode->addToChangedFast(this);
+        eNode* enode = m_input[i]->getEpin(0)->getEnode();
+        if( enode ) enode->voltChangedCallback( this );
     }
     
     eLogicDevice::stamp();
 }
 
-void eFullAdder::createPins()
+void eFullAdder::voltChanged()
 {
-    eLogicDevice::createPins( 3, 2 );          // Create Inputs, Outputs
-
-    // Input 0 - A
-    // Input 1 - B
-    // Input 2 - Ci
+    bool X  = getInputState( 0 );
+    bool Y  = getInputState( 1 );
+    bool Ci = getInputState( 2 );
     
-    // Output 0 - S
-    // Output 1 - Co
+    m_Sum = (X ^ Y) ^ Ci;                    // Sum
+    m_Co  = (X & Ci) | (Y & Ci) | (X & Y);   // Carry out
+
+    Simulator::self()->addEvent( m_propDelay, this );
 }
 
-void eFullAdder::setVChanged()
+void eFullAdder::runEvent()
 {
-    bool X  = eLogicDevice::getInputState( 0 );
-    bool Y  = eLogicDevice::getInputState( 1 );
-    bool Ci = eLogicDevice::getInputState( 2 );
-    
-    bool S  = (X ^ Y) ^ Ci;                                      // Suma
-    bool Co = (X & Ci) | (Y & Ci) | (X & Y);                // Carry out
-    
-    eLogicDevice::setOut( 0, S );
-    eLogicDevice::setOut( 1, Co );
+    m_output[0]->setTimedOut( m_Sum );
+    m_output[1]->setTimedOut( m_Co );
 }
 
